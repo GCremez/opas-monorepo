@@ -63,6 +63,10 @@ opas:
     url: ${PRESIDIO_SIDECAR_URL:http://localhost:5001}
   s3:
     bucket: ${S3_BUCKET_NAME:opas-uploads-dev}
+    region: ${AWS_REGION:eu-north-1}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+    endpoint: ${AWS_ENDPOINT_URL:}
     upload-ttl-minutes: 15
   stripe:
     secret-key: ${STRIPE_SECRET_KEY}
