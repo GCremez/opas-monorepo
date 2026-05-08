@@ -4,7 +4,7 @@ spring:
 
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://opas-database.ct88sic8yy3s.eu-north-1.rds.amazonaws.com:5432/postgres}
-    username: ${DATABASE_USER:opas}
+    username: ${DATABASE_USER:opas_db}
     password: ${DATABASE_PASSWORD:opas}
     hikari:
       maximum-pool-size: 20
