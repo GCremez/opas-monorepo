@@ -1,0 +1,105 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: opas-postgres
+    environment:
+      POSTGRES_DB: opas
+      POSTGRES_USER: opas
+      POSTGRES_PASSWORD: opas
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U opas']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: opas-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: opas-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: opas
+      RABBITMQ_DEFAULT_PASS: opas
+    ports:
+      - '5672:5672'
+      - '15672:15672'  # Management UI
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  presidio-analyzer:
+    image: mcr.microsoft.com/presidio-analyzer:latest
+    container_name: opas-presidio-analyzer
+    ports:
+      - '5001:3000'
+    environment:
+      GRPC_PORT: '3001'
+
+  presidio-anonymizer:
+    image: mcr.microsoft.com/presidio-anonymizer:latest
+    container_name: opas-presidio-anonymizer
+    ports:
+      - '5002:3000'
+
+  localstack:
+    image: localstack/localstack:3
+    container_name: opas-localstack
+    environment:
+      SERVICES: s3,textract
+      DEFAULT_REGION: eu-north-1
+      AWS_DEFAULT_REGION: eu-north-1
+    ports:
+      - '4566:4566'
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - ./docker/localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: opas-prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: opas-grafana
+    ports:
+      - '3001:3000'
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+  localstack-data:
+  grafana-data:

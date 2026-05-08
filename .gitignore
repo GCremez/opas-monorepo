@@ -1,0 +1,33 @@
+# Backend (Java / Spring Boot)
+target/
+*.class
+*.jar
+*.war
+*.log
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+.vscode/
+opas-backend/bin/
+
+# Mobile (React Native / Expo)
+node_modules/
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+dist/
+npm-debug.*
+
+# Infra
+.env
+*.log
+
+# macOS
+.DS_Store
