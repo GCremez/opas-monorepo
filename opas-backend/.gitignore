@@ -1,0 +1,15 @@
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.env
+.env.*
+!.env.example
+*.iml
+.idea/
+.vscode/
+*.DS_Store
+application-local.yml
+application-secrets.yml

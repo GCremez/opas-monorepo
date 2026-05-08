@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: opas-backend
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/opas}
+    username: ${DATABASE_USER:opas}
+    password: ${DATABASE_PASSWORD:opas}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+
+  rabbitmq:
+    addresses: ${RABBITMQ_URL:amqp://guest:guest@localhost:5672}
+
+  ai:
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY}
+      chat:
+        options:
+          model: claude-sonnet-4-20250514
+          max-tokens: 4096
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+jwt:
+  private-key: ${JWT_PRIVATE_KEY}
+  public-key: ${JWT_PUBLIC_KEY}
+  access-token-ttl-minutes: 15
+  refresh-token-ttl-days: 30
+
+opas:
+  presidio:
+    url: ${PRESIDIO_SIDECAR_URL:http://localhost:5001}
+  s3:
+    bucket: ${S3_BUCKET_NAME:opas-uploads-dev}
+    upload-ttl-minutes: 15
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+  free-tier:
+    monthly-decode-limit: 2
+
+logging:
+  pattern:
+    console: '{"time":"%d{ISO8601}","level":"%p","logger":"%logger{36}","msg":"%msg","trace":"%X{traceId}"}%n'
+  level:
+    root: INFO
+    com.opas: DEBUG
