@@ -103,6 +103,12 @@
             <artifactId>stripe-java</artifactId>
             <version>25.7.0</version>
         </dependency>
+        <!-- AWS S3 SDK -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.25.0</version>
+        </dependency>
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
