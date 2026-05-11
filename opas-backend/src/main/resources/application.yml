@@ -46,6 +46,9 @@ spring:
         prefetch: 5
 
   ai:
+    embedding:
+      transformer:
+        enabled: true
     anthropic:
       api-key: ${ANTHROPIC_API_KEY}
       chat:
