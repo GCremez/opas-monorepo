@@ -2,7 +2,7 @@ FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-RUN ./mvnw package -DskipTests 2>/dev/null || mvn package -DskipTests
+RUN mvnw package -DskipTests 
 
 FROM eclipse-temurin:21-jre-alpine
 RUN addgroup -S app && adduser -S app -G app

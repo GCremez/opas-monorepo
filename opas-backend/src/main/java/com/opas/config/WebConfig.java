@@ -11,13 +11,17 @@ public class WebConfig {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
+            opas:
+                cors:allowed-origins: https://app.opas.com,https://admin.opas.com
+
+                @Value("${opas.cors.allowed-origins}")
+                private List<String> allowedOrigins;
+
+                registry.addMapping("/api/**")
+                .allowedOrigins(allowedOrigins.toArray(String[0]::new))
+                .allowedMethods("GET", "POST")
+                .allowedHeaders("Authorization", "Content-Type");
             }
-        };
     }
 }
+
