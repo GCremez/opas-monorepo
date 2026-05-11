@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface DocumentRepository extends JpaRepository<Document, UUID> {
     List<Document> findByUserIdOrderByCreatedAtDesc(UUID userId);
     long countByUserId(UUID userId);
+
+    void deleteByUser_Id(UUID userId);
 }

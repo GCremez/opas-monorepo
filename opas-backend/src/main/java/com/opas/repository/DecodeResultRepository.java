@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface DecodeResultRepository extends JpaRepository<DecodeResult, UUID> {
     List<DecodeResult> findByDocumentId(UUID documentId);
     long countByUserId(UUID userId);
+
+    void deleteByUser_Id(UUID userId);
 }

@@ -29,5 +29,11 @@ npm-debug.*
 .env
 *.log
 
+# Agent / IDE rules (project-specific, not repo-wide)
+.claude/
+.cursorrules
+.opencode/
+AGENTS.md
+
 # macOS
 .DS_Store
