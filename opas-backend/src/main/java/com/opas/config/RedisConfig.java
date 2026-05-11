@@ -2,7 +2,7 @@ package com.opas.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,17 +30,20 @@ public class RedisConfig {
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        var ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.opas.")
+                .allowIfSubType("java.util.")
+                .allowIfSubType("java.time.")
+                .build();
+
+        var mapper = objectMapper.copy();
+        mapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(
-                objectMapper.activateDefaultTyping(
-                        LaissezFaireSubTypeValidator.instance,
-                        ObjectMapper.DefaultTyping.NON_FINAL,
-                        JsonTypeInfo.As.PROPERTY
-                )
-        ));
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(mapper));
         template.setHashValueSerializer(template.getValueSerializer());
         template.afterPropertiesSet();
         return template;

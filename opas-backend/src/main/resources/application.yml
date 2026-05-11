@@ -76,7 +76,7 @@ jwt:
 
 opas:
   presidio:
-    url: ${PRESIDIO_SIDECAR_URL:http://localhost:5001}
+    url: ${PRESIDIO_SIDECAR_URL:https://localhost:5001}
   s3:
     bucket: ${S3_BUCKET_NAME:opas-app-bucket}
     region: ${AWS_REGION:eu-north-1}

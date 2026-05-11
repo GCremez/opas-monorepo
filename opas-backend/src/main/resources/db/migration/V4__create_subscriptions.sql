@@ -13,3 +13,13 @@ CREATE TABLE subscriptions (
 
 CREATE INDEX idx_subscriptions_user_id              ON subscriptions (user_id);
 CREATE INDEX idx_subscriptions_stripe_customer_id   ON subscriptions (stripe_customer_id);
+CREATE INDEX idx_subscriptions_stripe_subscription_id ON subscriptions (stripe_subscription_id);
+
+-- Stripe IDs should be unique when present
+CREATE UNIQUE INDEX uq_subscriptions_stripe_customer_id
+    ON subscriptions (stripe_customer_id)
+    WHERE stripe_customer_id IS NOT NULL;
+
+CREATE UNIQUE INDEX uq_subscriptions_stripe_subscription_id
+    ON subscriptions (stripe_subscription_id)
+    WHERE stripe_subscription_id IS NOT NULL;
