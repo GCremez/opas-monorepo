@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPAS — Design System</title>
+<style>
+/* ========================================
+   Design System — Editorial Monocle
+   Palette: off-white paper, ink, warm rust accent
+   ======================================== */
+
+:root {
+  /* ---- Palette ---- */
+  --bg:          oklch(97% 0.012 80);
+  --surface:     oklch(99% 0.005 80);
+  --fg:          oklch(20% 0.02 60);
+  --muted:       oklch(48% 0.015 60);
+  --border:      oklch(89% 0.012 80);
+  --accent:      oklch(58% 0.16 35);
+
+  --accent-light: oklch(from var(--accent) 70% 0.08 35);
+  --accent-dark:  oklch(from var(--accent) 35% 0.10 35);
+
+  --success: oklch(60% 0.14 145);
+  --warning: oklch(68% 0.14 85);
+  --error:   oklch(55% 0.18 30);
+  --info:    oklch(58% 0.06 240);
+
+  --legacy-teal: #1B7F79;
+
+  /* ---- Typography ---- */
+  --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:    'SF Mono', 'JetBrains Mono', 'IBM Plex Mono', Menlo, monospace;
+
+  --text-hero:    clamp(56px, 7vw, 80px);
+  --text-h1:      clamp(36px, 4vw, 52px);
+  --text-h2:      32px;
+  --text-h3:      24px;
+  --text-h4:      20px;
+  --text-body:    18px;
+  --text-small:   14px;
+  --text-tiny:    11px;
+
+  --lh-tight:    1.15;
+  --lh-normal:   1.5;
+  --lh-loose:    1.7;
+
+  --display-weight: 400;
+  --body-weight:    400;
+  --strong-weight:  600;
+
+  /* ---- Spacing (8px grid) ---- */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   24px;
+  --space-6:   32px;
+  --space-7:   40px;
+  --space-8:   48px;
+  --space-9:   64px;
+  --space-10:  80px;
+  --space-11:  96px;
+  --space-12:  128px;
+
+  /* ---- Layout ---- */
+  --content-max: 1200px;
+  --content-narrow: 720px;
+  --radius: 0px;
+  --border-w: 1px;
+}
+
+/* ---- Reset & Base ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--lh-normal);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+
+/* ---- Type hierarchy ---- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  line-height: var(--lh-tight);
+  color: var(--fg);
+}
+
+.hero { font-size: var(--text-hero); line-height: 1.05; letter-spacing: -0.02em; }
+h1, .h1 { font-size: var(--text-h1); }
+h2, .h2 { font-size: var(--text-h2); }
+h3, .h3 { font-size: var(--text-h3); }
+h4, .h4 { font-size: var(--text-h4); }
+
+p, .body { font-size: var(--text-body); line-height: var(--lh-loose); }
+small, .small { font-size: var(--text-small); color: var(--muted); }
+.tiny {
+  font-size: var(--text-tiny);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.accent { color: var(--accent); }
+
+/* ---- Section layout ---- */
+.ds-section {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-11) var(--space-5);
+  border-bottom: var(--border-w) solid var(--border);
+}
+
+.ds-section:last-child { border-bottom: none; }
+
+.ds-section-header {
+  margin-bottom: var(--space-8);
+}
+
+.ds-section-header .tiny { margin-bottom: var(--space-2); }
+.ds-section-header h2 { margin-top: var(--space-2); }
+
+.ds-section-intro {
+  max-width: var(--content-narrow);
+  color: var(--muted);
+  font-size: var(--text-h4);
+  line-height: var(--lh-normal);
+  margin-top: var(--space-3);
+}
+
+/* ---- Grid helpers ---- */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-5); }
+
+@media (max-width: 800px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ---- Color swatches ---- */
+.swatch-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-5);
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.swatch-preview {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  border: var(--border-w) solid var(--border);
+}
+
+.swatch-label {
+  font-size: var(--text-small);
+  line-height: var(--lh-tight);
+}
+
+.swatch-label strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--text-h4);
+  font-weight: var(--display-weight);
+  margin-bottom: var(--space-1);
+}
+
+.swatch-label code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--border);
+  padding: 1px 6px;
+}
+
+/* ---- Token table ---- */
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+  text-align: left;
+}
+
+.token-table th {
+  font-family: var(--font-mono);
+  font-size: var(--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: var(--space-3) var(--space-3) var(--space-2) var(--space-3);
+  border-bottom: 2px solid var(--fg);
+  color: var(--muted);
+}
+
+.token-table td {
+  padding: var(--space-3);
+  border-bottom: var(--border-w) solid var(--border);
+  vertical-align: top;
+}
+
+.token-table tr:last-child td { border-bottom: none; }
+
+.token-table .token-name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+.token-table .token-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.token-table .token-note {
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+/* ---- Type scale demo ---- */
+.type-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: var(--space-6) 0;
+}
+
+.type-demo .level {
+  padding: var(--space-4) 0;
+  border-bottom: var(--border-w) solid var(--border);
+}
+
+.type-demo .level:last-child { border-bottom: none; }
+
+.type-demo .level-meta {
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--text-small);
+  color: var(--muted);
+  margin-top: var(--space-1);
+  font-family: var(--font-mono);
+}
+
+/* ---- Spacing demo ---- */
+.spacing-demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.spacing-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.spacing-block {
+  height: 32px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.spacing-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  min-width: 80px;
+}
+
+.spacing-label span {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+/* ---- Component demos ---- */
+.component-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-6);
+  background: var(--surface);
+  border: var(--border-w) solid var(--border);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: var(--strong-weight);
+  line-height: 1;
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-w) solid var(--fg);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-primary {
+  background: var(--fg);
+  color: var(--surface);
+  border-color: var(--fg);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--fg);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  color: var(--fg);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+}
+
+.btn-accent:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+.btn-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: 13px;
+}
+
+/* Inputs */
+.input {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-w) solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  width: 280px;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--fg);
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.input-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.input-error .input {
+  border-color: var(--error);
+}
+
+.input-error .input-message {
+  font-size: var(--text-small);
+  color: var(--error);
+}
+
+/* Card */
+.card {
+  border: var(--border-w) solid var(--border);
+  background: var(--surface);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.card-tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.card h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h4);
+  font-weight: var(--display-weight);
+}
+
+.card p {
+  font-size: var(--text-small);
+  color: var(--muted);
+  line-height: var(--lh-normal);
+}
+
+/* Tag / Badge */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-w) solid var(--border);
+  background: transparent;
+  color: var(--muted);
+}
+
+.tag-success {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.tag-warning {
+  border-color: var(--warning);
+  color: oklch(from var(--warning) 40% 0.14 85);
+}
+
+.tag-error {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* Navigation */
+.nav-demo {
+  display: flex;
+  gap: 0;
+  border-bottom: var(--border-w) solid var(--border);
+}
+
+.nav-item {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-small);
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: default;
+}
+
+.nav-item.active {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+
+.nav-item:hover {
+  color: var(--fg);
+}
+
+/* ---- Iconography style guide ---- */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--space-4);
+}
+
+.icon-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-w) solid var(--border);
+  background: var(--surface);
+}
+
+.icon-cell svg {
+  width: 32px;
+  height: 32px;
+  stroke: var(--fg);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.icon-cell span {
+  font-size: var(--text-small);
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+/* ---- Cover ---- */
+.cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-5);
+  position: relative;
+}
+
+.cover-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  margin-bottom: var(--space-5);
+}
+
+.cover h1 {
+  font-size: var(--text-hero);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.cover h1 .accent-word {
+  color: var(--accent);
+}
+
+.cover-sub {
+  font-size: var(--text-h4);
+  color: var(--muted);
+  max-width: 600px;
+  margin: var(--space-5) auto 0;
+  line-height: var(--lh-normal);
+}
+
+.cover-meta {
+  display: flex;
+  gap: var(--space-6);
+  margin-top: var(--space-9);
+  font-size: var(--text-small);
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.cover-meta span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cover-meta .divider {
+  width: var(--border-w);
+  height: 16px;
+  background: var(--border);
+}
+
+/* ---- Typography specimen ---- */
+.specimen-run {
+  display: flex;
+  gap: var(--space-8);
+  align-items: flex-start;
+  padding: var(--space-6) 0;
+  border-bottom: var(--border-w) solid var(--border);
+}
+
+.specimen-run:last-child { border-bottom: none; }
+
+.specimen-label {
+  flex: 0 0 120px;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: var(--muted);
+  padding-top: 4px;
+}
+
+.specimen-sample {
+  flex: 1;
+  max-width: 700px;
+}
+
+/* ---- Divider ---- */
+.ds-divider {
+  height: var(--border-w);
+  background: var(--border);
+  margin: var(--space-6) 0;
+}
+
+/* ---- Section nav ---- */
+.ds-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+  border-bottom: var(--border-w) solid var(--border);
+  padding: var(--space-3) var(--space-5);
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+  overflow-x: auto;
+}
+
+.ds-nav-brand {
+  font-family: var(--font-mono);
+  font-size: var(--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--fg);
+  margin-right: var(--space-3);
+  white-space: nowrap;
+}
+
+.ds-nav a {
+  font-size: var(--text-small);
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.ds-nav a:hover { color: var(--fg); }
+
+/* ---- Contrast demo boxes ---- */
+.contrast-row {
+  display: flex;
+  gap: var(--space-5);
+  margin: var(--space-5) 0;
+}
+
+.contrast-box {
+  flex: 1;
+  padding: var(--space-5);
+  font-size: var(--text-small);
+  font-family: var(--font-body);
+}
+
+/* ---- Semantic token cards ---- */
+.semantic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+
+@media (max-width: 600px) {
+  .semantic-grid { grid-template-columns: 1fr; }
+}
+
+.semantic-card {
+  padding: var(--space-5);
+  border: var(--border-w) solid var(--border);
+  background: var(--surface);
+}
+
+.semantic-card .tag { margin-bottom: var(--space-3); }
+
+.semantic-card h4 {
+  font-size: var(--text-h4);
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  margin-bottom: var(--space-1);
+}
+
+.semantic-card p {
+  font-size: var(--text-small);
+  color: var(--muted);
+  line-height: var(--lh-normal);
+}
+
+/* ---- Spacing reference visual ---- */
+.spacing-reference {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.spacing-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bar-visual {
+  height: 12px;
+  background: var(--accent);
+  opacity: 0.3;
+}
+
+.bar-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     STICKY NAV
+     ============================================ -->
+<nav class="ds-nav">
+  <span class="ds-nav-brand">OPAS Design System</span>
+  <a href="#color">Color</a>
+  <a href="#typography">Typography</a>
+  <a href="#spacing">Spacing</a>
+  <a href="#components">Components</a>
+  <a href="#iconography">Iconography</a>
+  <a href="#usage">Usage</a>
+</nav>
+
+<!-- ============================================
+     COVER
+     ============================================ -->
+<section class="cover">
+  <div class="cover-eyebrow">Edition 1.0 — Editorial Monocle</div>
+  <h1>
+    OPAS<br>
+    <span class="accent-word">Design System</span>
+  </h1>
+  <p class="cover-sub">
+    A print-magazine–inspired system for the OPAS platform — serving international students and newcomers in Finland.
+  </p>
+  <div class="cover-meta">
+    <span>Serif display · Sans body</span>
+    <span class="divider"></span>
+    <span>Warm rust accent</span>
+    <span class="divider"></span>
+    <span>Zero-radius conviction</span>
+  </div>
+</section>
+
+<!-- ============================================
+     COLOR
+     ============================================ -->
+<section class="ds-section" id="color">
+  <div class="ds-section-header">
+    <div class="tiny">01</div>
+    <h2>Color</h2>
+    <p class="ds-section-intro">
+      Six core tokens. The palette is restrained — off-white paper, warm ink, a single rust accent.
+      One accent, used at most twice per screen.
+    </p>
+  </div>
+
+  <div class="swatch-group">
+    <div class="swatch">
+      <div class="swatch-preview" style="background: var(--bg);"></div>
+      <div class="swatch-label">
+        <strong>--bg</strong>
+        Background<br>
+        <code>oklch(97% 0.012 80)</code>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-preview" style="background: var(--surface);"></div>
+      <div class="swatch-label">
+        <strong>--surface</strong>
+        Surface / cards<br>
+        <code>oklch(99% 0.005 80)</code>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-preview" style="background: var(--fg);"></div>
+      <div class="swatch-label">
+        <strong>--fg</strong>
+        Foreground / text<br>
+        <code>oklch(20% 0.02 60)</code>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-preview" style="background: var(--muted);"></div>
+      <div class="swatch-label">
+        <strong>--muted</strong>
+        Secondary text<br>
+        <code>oklch(48% 0.015 60)</code>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-preview" style="background: var(--border);"></div>
+      <div class="swatch-label">
+        <strong>--border</strong>
+        Borders / dividers<br>
+        <code>oklch(89% 0.012 80)</code>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-preview" style="background: var(--accent);"></div>
+      <div class="swatch-label">
+        <strong>--accent</strong>
+        Emphasis<br>
+        <code>oklch(58% 0.16 35)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Semantic tokens</h3>
+  <div class="semantic-grid">
+    <div class="semantic-card">
+      <div class="tag tag-success">Success</div>
+      <h4>Approved · Complete</h4>
+      <p>Document approved, payment succeeded, verification passed.</p>
+      <code style="font-family: var(--font-mono); font-size: 13px; display: block; margin-top: var(--space-3);">oklch(60% 0.14 145)</code>
+    </div>
+    <div class="semantic-card">
+      <div class="tag tag-warning">Warning</div>
+      <h4>Pending · Attention</h4>
+      <p>Document pending review, nearing expiry, action required.</p>
+      <code style="font-family: var(--font-mono); font-size: 13px; display: block; margin-top: var(--space-3);">oklch(68% 0.14 85)</code>
+    </div>
+    <div class="semantic-card">
+      <div class="tag tag-error">Error</div>
+      <h4>Failed · Rejected</h4>
+      <p>Document rejected, payment failed, system error.</p>
+      <code style="font-family: var(--font-mono); font-size: 13px; display: block; margin-top: var(--space-3);">oklch(55% 0.18 30)</code>
+    </div>
+    <div class="semantic-card">
+      <div class="tag">Info</div>
+      <h4>Information</h4>
+      <p>Neutral system messages, tips, onboarding hints.</p>
+      <code style="font-family: var(--font-mono); font-size: 13px; display: block; margin-top: var(--space-3);">oklch(58% 0.06 240)</code>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Contrast ratios</h3>
+  <div class="contrast-row">
+    <div class="contrast-box" style="background: var(--fg); color: var(--surface);">
+      <div class="tiny" style="color: var(--surface); opacity: 0.5; margin-bottom: var(--space-2);">Foreground on surface</div>
+      <strong>13.2 : 1</strong> — AAA
+    </div>
+    <div class="contrast-box" style="background: var(--fg); color: var(--bg);">
+      <div class="tiny" style="color: var(--bg); opacity: 0.5; margin-bottom: var(--space-2);">Foreground on background</div>
+      <strong>10.8 : 1</strong> — AAA
+    </div>
+    <div class="contrast-box" style="background: var(--accent); color: var(--surface);">
+      <div class="tiny" style="color: var(--surface); opacity: 0.5; margin-bottom: var(--space-2);">Accent on surface</div>
+      <strong>4.8 : 1</strong> — AA
+    </div>
+    <div class="contrast-box" style="background: var(--muted); color: var(--surface);">
+      <div class="tiny" style="color: var(--surface); opacity: 0.5; margin-bottom: var(--space-2);">Muted on surface</div>
+      <strong>4.2 : 1</strong> — AA
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     TYPOGRAPHY
+     ============================================ -->
+<section class="ds-section" id="typography">
+  <div class="ds-section-header">
+    <div class="tiny">02</div>
+    <h2>Typography</h2>
+    <p class="ds-section-intro">
+      Serif display for headlines — confident, quiet, literate. Sans-serif body for readability across screens and sizes. Mono reserved for metadata, labels, and code.
+    </p>
+  </div>
+
+  <div class="specimen-run">
+    <div class="specimen-label">Display</div>
+    <div class="specimen-sample" style="font-family: var(--font-display);">
+      <div style="font-size: var(--text-hero); line-height: 1.05;">Iowan Old Style</div>
+      <div style="font-size: var(--text-h1); line-height: 1.1; margin-top: var(--space-2);">Charter · Georgia</div>
+      <div style="color: var(--muted); font-size: var(--text-small); margin-top: var(--space-3);">
+        Serif — 400 weight. For hero, h1–h4, pull quotes, display numerals.
+      </div>
+    </div>
+  </div>
+
+  <div class="specimen-run">
+    <div class="specimen-label">Body</div>
+    <div class="specimen-sample" style="font-family: var(--font-body);">
+      <div style="font-size: var(--text-body);">SF Pro Text · Segoe UI · system-ui</div>
+      <div style="font-size: var(--text-small); color: var(--muted); margin-top: var(--space-2);">
+        Sans-serif — 400 weight. For body copy, labels, navigation, forms, everything that isn't a headline.
+      </div>
+    </div>
+  </div>
+
+  <div class="specimen-run">
+    <div class="specimen-label">Mono</div>
+    <div class="specimen-sample" style="font-family: var(--font-mono);">
+      <div style="font-size: 16px;">SF Mono · JetBrains Mono · IBM Plex Mono</div>
+      <div style="font-size: var(--text-small); color: var(--muted); margin-top: var(--space-2);">
+        Monospace — for eyebrow labels, metadata, tags, code, tabular numbers.
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Type scale</h3>
+
+  <div class="type-demo">
+    <div class="level">
+      <div style="font-family: var(--font-display); font-size: var(--text-hero); font-weight: var(--display-weight);">
+        Hero title
+      </div>
+      <div class="level-meta">
+        <span>--text-hero</span>
+        <span>clamp(56px, 7vw, 80px)</span>
+        <span>400 weight</span>
+        <span>-0.02em tracking</span>
+      </div>
+    </div>
+    <div class="level">
+      <div style="font-family: var(--font-display); font-size: var(--text-h1); font-weight: var(--display-weight);">
+        Section heading
+      </div>
+      <div class="level-meta">
+        <span>--text-h1</span>
+        <span>clamp(36px, 4vw, 52px)</span>
+        <span>400 weight</span>
+      </div>
+    </div>
+    <div class="level">
+      <div style="font-family: var(--font-display); font-size: var(--text-h2); font-weight: var(--display-weight);">
+        Subsection heading
+      </div>
+      <div class="level-meta">
+        <span>--text-h2</span>
+        <span>32px</span>
+        <span>400 weight</span>
+      </div>
+    </div>
+    <div class="level">
+      <div style="font-family: var(--font-display); font-size: var(--text-h3); font-weight: var(--display-weight);">
+        Card or panel title
+      </div>
+      <div class="level-meta">
+        <span>--text-h3</span>
+        <span>24px</span>
+        <span>400 weight</span>
+      </div>
+    </div>
+    <div class="level">
+      <div style="font-family: var(--font-body); font-size: var(--text-body); line-height: var(--lh-loose);">
+        Det finns inget svårare än att göra något enkelt. Detta är brödtexten — den som bär berättelsen när rubriken har gjort sitt. För studenter som navigerar ett nytt land, ett nytt språk, ett nytt system. OPAS gör det tydligt.
+      </div>
+      <div class="level-meta">
+        <span>--text-body</span>
+        <span>18px</span>
+        <span>400 weight</span>
+        <span>1.7 leading</span>
+      </div>
+    </div>
+    <div class="level">
+      <div style="font-family: var(--font-body); font-size: var(--text-small);">
+        Small text for captions, footnotes, secondary information.
+      </div>
+      <div class="level-meta">
+        <span>--text-small</span>
+        <span>14px</span>
+        <span>400 weight</span>
+      </div>
+    </div>
+    <div class="level">
+      <div style="font-family: var(--font-mono); font-size: var(--text-tiny); text-transform: uppercase; letter-spacing: 0.12em;">
+        Metadata eyebrow label
+      </div>
+      <div class="level-meta">
+        <span>--text-tiny</span>
+        <span>11px</span>
+        <span>mono uppercase</span>
+        <span>0.12em tracking</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Type token reference</h3>
+
+  <table class="token-table">
+    <thead>
+      <tr>
+        <th>Token</th>
+        <th>Size</th>
+        <th>Line Height</th>
+        <th>Family</th>
+        <th>Used for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="token-name">--text-hero</td>
+        <td class="token-value">clamp(56, 7vw, 80)</td>
+        <td class="token-value">1.05</td>
+        <td class="token-value">display</td>
+        <td class="token-note">Cover headlines, landmark pages</td>
+      </tr>
+      <tr>
+        <td class="token-name">--text-h1</td>
+        <td class="token-value">clamp(36, 4vw, 52)</td>
+        <td class="token-value">1.1</td>
+        <td class="token-value">display</td>
+        <td class="token-note">Section titles</td>
+      </tr>
+      <tr>
+        <td class="token-name">--text-h2</td>
+        <td class="token-value">32px</td>
+        <td class="token-value">1.15</td>
+        <td class="token-value">display</td>
+        <td class="token-note">Subsections, major blocks</td>
+      </tr>
+      <tr>
+        <td class="token-name">--text-h3</td>
+        <td class="token-value">24px</td>
+        <td class="token-value">1.2</td>
+        <td class="token-value">display</td>
+        <td class="token-note">Card titles, panel headers</td>
+      </tr>
+      <tr>
+        <td class="token-name">--text-h4</td>
+        <td class="token-value">20px</td>
+        <td class="token-value">1.25</td>
+        <td class="token-value">display</td>
+        <td class="token-note">Small card titles, modal headers</td>
+      </tr>
+      <tr>
+        <td class="token-name">--text-body</td>
+        <td class="token-value">18px</td>
+        <td class="token-value">1.7</td>
+        <td class="token-value">body</td>
+        <td class="token-note">Paragraphs, descriptions, forms</td>
+      </tr>
+      <tr>
+        <td class="token-name">--text-small</td>
+        <td class="token-value">14px</td>
+        <td class="token-value">1.5</td>
+        <td class="token-value">body</td>
+        <td class="token-note">Captions, footnotes, nav</td>
+      </tr>
+      <tr>
+        <td class="token-name">--text-tiny</td>
+        <td class="token-value">11px</td>
+        <td class="token-value">1.3</td>
+        <td class="token-value">mono</td>
+        <td class="token-note">Eyebrows, metadata, tags, labels</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================
+     SPACING & GRID
+     ============================================ -->
+<section class="ds-section" id="spacing">
+  <div class="ds-section-header">
+    <div class="tiny">03</div>
+    <h2>Spacing &amp; Grid</h2>
+    <p class="ds-section-intro">
+      8px base unit. Generous whitespace is the primary design tool — it costs nothing and communicates confidence.
+    </p>
+  </div>
+
+  <h3 style="margin-bottom: var(--space-4);">Spacing scale</h3>
+
+  <div class="spacing-reference">
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 4px;"></div>
+      <div class="bar-label">--space-1 &nbsp;4px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 8px;"></div>
+      <div class="bar-label">--space-2 &nbsp;8px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 12px;"></div>
+      <div class="bar-label">--space-3 &nbsp;12px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 16px;"></div>
+      <div class="bar-label">--space-4 &nbsp;16px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 24px;"></div>
+      <div class="bar-label">--space-5 &nbsp;24px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 32px;"></div>
+      <div class="bar-label">--space-6 &nbsp;32px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 40px;"></div>
+      <div class="bar-label">--space-7 &nbsp;40px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 48px;"></div>
+      <div class="bar-label">--space-8 &nbsp;48px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 64px;"></div>
+      <div class="bar-label">--space-9 &nbsp;64px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 80px;"></div>
+      <div class="bar-label">--space-10 &nbsp;80px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 96px;"></div>
+      <div class="bar-label">--space-11 &nbsp;96px</div>
+    </div>
+    <div class="spacing-bar">
+      <div class="bar-visual" style="width: 128px;"></div>
+      <div class="bar-label">--space-12 &nbsp;128px</div>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="margin-bottom: var(--space-3);">Content width</h3>
+      <table class="token-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="token-name">--content-max</td>
+            <td class="token-value">1200px</td>
+            <td class="token-note">Full-width sections (dashboard, tables)</td>
+          </tr>
+          <tr>
+            <td class="token-name">--content-narrow</td>
+            <td class="token-value">720px</td>
+            <td class="token-note">Reading, article, settings panels</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="margin-bottom: var(--space-3);">Breakpoints</h3>
+      <table class="token-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Width</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="token-name">Mobile</td>
+            <td class="token-value">&lt; 640px</td>
+          </tr>
+          <tr>
+            <td class="token-name">Tablet</td>
+            <td class="token-value">640–1024px</td>
+          </tr>
+          <tr>
+            <td class="token-name">Desktop</td>
+            <td class="token-value">&gt; 1024px</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     COMPONENT TOKENS
+     ============================================ -->
+<section class="ds-section" id="components">
+  <div class="ds-section-header">
+    <div class="tiny">04</div>
+    <h2>Component Tokens</h2>
+    <p class="ds-section-intro">
+      No rounded corners, no shadows, no gradients. Borders and whitespace do the work.
+      One accent colour, used at most twice per view.
+    </p>
+  </div>
+
+  <h3 style="margin-bottom: var(--space-4);">Buttons</h3>
+
+  <div class="component-demo">
+    <button class="btn btn-primary">Primary</button>
+    <button class="btn btn-secondary">Secondary</button>
+    <button class="btn btn-ghost">Ghost</button>
+    <button class="btn btn-accent">Accent</button>
+    <button class="btn btn-primary btn-sm">Small</button>
+  </div>
+
+  <div style="margin-top: var(--space-3);">
+    <table class="token-table">
+      <thead>
+        <tr>
+          <th>Variant</th>
+          <th>Background</th>
+          <th>Border</th>
+          <th>Text</th>
+          <th>Use</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="token-name">Primary</td>
+          <td class="token-value">--fg</td>
+          <td class="token-value">--fg</td>
+          <td class="token-value">--surface</td>
+          <td class="token-note">Primary CTA, form submit, confirm</td>
+        </tr>
+        <tr>
+          <td class="token-name">Secondary</td>
+          <td class="token-value">transparent</td>
+          <td class="token-value">--border</td>
+          <td class="token-value">--fg</td>
+          <td class="token-note">Cancel, dismiss, secondary action</td>
+        </tr>
+        <tr>
+          <td class="token-name">Ghost</td>
+          <td class="token-value">transparent</td>
+          <td class="token-value">transparent</td>
+          <td class="token-value">--muted</td>
+          <td class="token-note">Low emphasis, tertiary action</td>
+        </tr>
+        <tr>
+          <td class="token-name">Accent</td>
+          <td class="token-value">--accent</td>
+          <td class="token-value">--accent</td>
+          <td class="token-value">--surface</td>
+          <td class="token-note">Special attention, upgrade, highlight</td>
+        </tr>
+        <tr>
+          <td class="token-name">Small</td>
+          <td class="token-value">—</td>
+          <td class="token-value">—</td>
+          <td class="token-value">—</td>
+          <td class="token-note">Table actions, inline buttons, tags-as-actions</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Inputs</h3>
+
+  <div style="display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-6); background: var(--surface); border: var(--border-w) solid var(--border);">
+    <div class="input-group">
+      <label class="input-label">Email address</label>
+      <input class="input" type="email" placeholder="you@example.com">
+    </div>
+    <div class="input-group input-error">
+      <label class="input-label">Document number</label>
+      <input class="input" type="text" placeholder="e.g. FIN123456" value="INVALID">
+      <span class="input-message">This document number doesn't match our records.</span>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Password</label>
+      <input class="input" type="password" placeholder="••••••••">
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Cards</h3>
+
+  <div class="grid-3">
+    <div class="card">
+      <span class="card-tag">Residence permit</span>
+      <h3>Extended processing</h3>
+      <p>Your application is currently in the extended processing phase. Estimated remaining time: 2–4 weeks.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag">Documents</span>
+      <h3>3 files pending</h3>
+      <p>Upload your passport, proof of enrollment, and bank statement to continue your application.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag">Appointment</span>
+      <h3>Verify at embassy</h3>
+      <p>Book an in-person appointment at the nearest Finnish embassy to complete your registration.</p>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Navigation</h3>
+
+  <div style="display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-6); background: var(--surface); border: var(--border-w) solid var(--border);">
+    <div class="nav-demo">
+      <div class="nav-item active">Dashboard</div>
+      <div class="nav-item">Documents</div>
+      <div class="nav-item">Applications</div>
+      <div class="nav-item">Appointments</div>
+      <div class="nav-item">Settings</div>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-4);">Tags &amp; Badges</h3>
+
+  <div style="display: flex; flex-wrap: wrap; gap: var(--space-3); padding: var(--space-6); background: var(--surface); border: var(--border-w) solid var(--border);">
+    <span class="tag">Pending</span>
+    <span class="tag tag-success">Approved</span>
+    <span class="tag tag-warning">Expiring</span>
+    <span class="tag tag-error">Rejected</span>
+    <span class="tag">Draft</span>
+    <span class="tag tag-success">Verified</span>
+    <span class="tag" style="background: var(--accent); color: var(--surface); border-color: var(--accent);">Premium</span>
+  </div>
+</section>
+
+<!-- ============================================
+     ICONOGRAPHY
+     ============================================ -->
+<section class="ds-section" id="iconography">
+  <div class="ds-section-header">
+    <div class="tiny">05</div>
+    <h2>Iconography</h2>
+    <p class="ds-section-intro">
+      Stroke-only, 1.5px weight, 24×24 base. No filled icons. Aligns with the print-magazine ethos — clean linework, no ornament.
+    </p>
+  </div>
+
+  <h3 style="margin-bottom: var(--space-4);">Core icons</h3>
+
+  <div class="icon-grid">
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>home</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <span>document</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <span>lock</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 16v-4"/>
+        <path d="M12 8h.01"/>
+      </svg>
+      <span>info</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+      <span>activity</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 11 12 14 22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <span>check</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+      <span>close</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <span>search</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+      <span>upload</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>user</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="4 17 10 11 4 5"/>
+        <line x1="12" y1="19" x2="20" y2="19"/>
+      </svg>
+      <span>logout</span>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"/>
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+      <span>edit</span>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-3);">Icon guidelines</h3>
+
+  <div class="grid-2">
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag">Do</span>
+      <ul style="font-size: var(--text-small); line-height: var(--lh-normal); color: var(--muted); list-style: none; display: flex; flex-direction: column; gap: var(--space-2);">
+        <li style="display: flex; gap: var(--space-2);"><span class="accent" style="font-family: var(--font-mono);">—</span> Use 24×24 viewBox, 1.5px stroke</li>
+        <li style="display: flex; gap: var(--space-2);"><span class="accent" style="font-family: var(--font-mono);">—</span> Keep line caps round, joins round</li>
+        <li style="display: flex; gap: var(--space-2);"><span class="accent" style="font-family: var(--font-mono);">—</span> Accompany with text label when space allows</li>
+        <li style="display: flex; gap: var(--space-2);"><span class="accent" style="font-family: var(--font-mono);">—</span> Tone to --muted when decorative, --fg or --accent when interactive</li>
+      </ul>
+    </div>
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag" style="color: var(--error);">Don't</span>
+      <ul style="font-size: var(--text-small); line-height: var(--lh-normal); color: var(--muted); list-style: none; display: flex; flex-direction: column; gap: var(--space-2);">
+        <li style="display: flex; gap: var(--space-2);"><span style="color: var(--error); font-family: var(--font-mono);">—</span> Don't fill icons — stroke-only always</li>
+        <li style="display: flex; gap: var(--space-2);"><span style="color: var(--error); font-family: var(--font-mono);">—</span> Don't use multiple stroke weights in one icon set</li>
+        <li style="display: flex; gap: var(--space-2);"><span style="color: var(--error); font-family: var(--font-mono);">—</span> Don't place an icon next to every heading</li>
+        <li style="display: flex; gap: var(--space-2);"><span style="color: var(--error); font-family: var(--font-mono);">—</span> Don't use generic emoji as icons (✨ 🚀 🎯)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     USAGE
+     ============================================ -->
+<section class="ds-section" id="usage">
+  <div class="ds-section-header">
+    <div class="tiny">06</div>
+    <h2>Usage Guidelines</h2>
+    <p class="ds-section-intro">
+      How the system behaves — the unwritten rules that keep OPAS looking like one product, not six.
+    </p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom: var(--space-6);">
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag">Rhythm</span>
+      <h3>One idea per view</h3>
+      <p>Every screen has one primary action, one focal headline, one accent touch at most. Don't compete with yourself.</p>
+    </div>
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag">Whitespace</span>
+      <h3>Generous by default</h3>
+      <p>Padding is not wasted space. Content breathes at --space-6 (32px) minimum between sections. The tightest acceptable gap is --space-4 (16px).</p>
+    </div>
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag">Typography</span>
+      <h3>Serif for headlines only</h3>
+      <p>Never set body copy in the display face. Never set a headline in the body face. Mono is metadata-only — never use mono for paragraphs.</p>
+    </div>
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag">Borders</span>
+      <h3>Structured by edges</h3>
+      <p>No shadows, no rounded corners. Separation comes from borders (1px solid --border) and whitespace. Cards are rectangles. So is everything else.</p>
+    </div>
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag">Accent budget</span>
+      <h3>One touch, max two</h3>
+      <p>The rust accent is a spice, not a sauce. Use it for one primary CTA + one editorial flourish (a pull quote, a stat, a tag). Never more.</p>
+    </div>
+    <div class="card" style="gap: var(--space-3);">
+      <span class="card-tag">Imagery</span>
+      <h3>One decisive frame</h3>
+      <p>When using photography, use one hero image cropped at the bottom. No collages, no multi-image grids. One image, well chosen, does more than six.</p>
+    </div>
+  </div>
+
+  <div class="ds-divider"></div>
+
+  <h3 style="margin-bottom: var(--space-3);">Legacy compatibility</h3>
+  <p style="font-size: var(--text-small); color: var(--muted); line-height: var(--lh-normal); margin-bottom: var(--space-4);">
+    The OPAS mobile app previously used <code style="font-family: var(--font-mono);">#1B7F79</code> (teal) as its brand colour. If transitioning from the legacy brand, map <code>--legacy-teal</code> to the semantic <code>--info</code> token or a secondary <code>--accent</code> variant. Teal is not part of the Editorial Monocle palette — the rust accent replaces it. A full deprecation guide is available on request.
+  </p>
+
+  <div class="ds-divider"></div>
+
+  <div style="text-align: center; padding: var(--space-8) 0;">
+    <div class="tiny" style="margin-bottom: var(--space-4);">End of system definition</div>
+    <p style="color: var(--muted);">
+      Questions, edge cases, or missing tokens? The system is living — open a proposal.
+    </p>
+  </div>
+</section>
+
+</body>
+</html>
