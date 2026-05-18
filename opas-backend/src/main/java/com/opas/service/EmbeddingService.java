@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.dto.DocumentSearchResult;
 import com.pgvector.PGvector;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.stereotype.Service;
@@ -47,17 +48,20 @@ public class EmbeddingService {
     }
 
     @Transactional(readOnly = true)
-    public List<Object[]> searchSimilarWithScore(String query, int limit) {
+    public List<DocumentSearchResult> searchSimilarWithScore(String query, int limit) {
         float[] vector = embeddingModel.embed(query);
         PGvector pgVector = new PGvector(vector);
         @SuppressWarnings("unchecked")
-        List<Object[]> results = entityManager.createNativeQuery(
+        List<Object[]> rows = entityManager.createNativeQuery(
                         "SELECT id, filename, 1 - (embedding <=> ?1::vector) AS similarity " +
                                 "FROM documents WHERE embedding IS NOT NULL " +
                                 "ORDER BY embedding <=> ?1::vector LIMIT ?2")
                 .setParameter(1, pgVector)
                 .setParameter(2, limit)
                 .getResultList();
-        return results;
+        return rows.stream()
+                .map(row -> new DocumentSearchResult(
+                        (UUID) row[0], (String) row[1], ((Number) row[2]).doubleValue()))
+                .toList();
     }
 }
