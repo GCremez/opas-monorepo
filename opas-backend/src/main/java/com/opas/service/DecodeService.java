@@ -10,15 +10,15 @@ import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.SubscriptionRepository;
 import com.opas.repository.UserRepository;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.UUID;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.UUID;
 
 @Service
 public class DecodeService {
@@ -33,16 +33,10 @@ public class DecodeService {
     private final ChatModel chatModel;
     private final int freeTierLimit;
 
-    public DecodeService(
-            DocumentRepository documentRepository,
-            UserRepository userRepository,
-            DecodeResultRepository decodeResultRepository,
-            SubscriptionRepository subscriptionRepository,
-            StorageService storageService,
-            PresidioService presidioService,
-            UsageTracker usageTracker,
-            ChatModel chatModel,
-            @Value("${opas.free-tier.monthly-decode-limit}") int freeTierLimit) {
+    public DecodeService(DocumentRepository documentRepository, UserRepository userRepository,
+            DecodeResultRepository decodeResultRepository, SubscriptionRepository subscriptionRepository,
+            StorageService storageService, PresidioService presidioService, UsageTracker usageTracker,
+            ChatModel chatModel, @Value("${opas.free-tier.monthly-decode-limit}") int freeTierLimit) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.decodeResultRepository = decodeResultRepository;
@@ -75,7 +69,7 @@ public class DecodeService {
         }
 
         byte[] fileBytes = storageService.getObjectBytes(document.getS3Key());
-        String content = new String(fileBytes);
+        String content = new String(fileBytes, StandardCharsets.UTF_8);
 
         if (request.scrubPii()) {
             content = presidioService.scrubPii(content);
@@ -86,13 +80,11 @@ public class DecodeService {
         var chatResponse = chatModel.call(prompt);
         Instant completedAt = Instant.now();
 
-        String rawText = chatResponse.getResult() != null
-                ? chatResponse.getResult().getOutput().getText() : "";
-        var usage = chatResponse.getMetadata().getUsage();
-        Integer tokensIn = usage != null && usage.getPromptTokens() != null
-                ? usage.getPromptTokens().intValue() : null;
-        Integer tokensOut = usage != null && usage.getGenerationTokens() != null
-                ? usage.getGenerationTokens().intValue() : null;
+        String rawText = chatResponse.getResult() != null ? chatResponse.getResult().getOutput().getText() : "";
+        var metadata = chatResponse.getMetadata();
+        var usage = metadata != null ? metadata.getUsage() : null;
+        Integer tokensIn = usage != null ? usage.getPromptTokens() : null;
+        Integer tokensOut = usage != null ? usage.getCompletionTokens() : null;
 
         DecodeResult result = new DecodeResult();
         result.setDocument(document);
@@ -115,11 +107,8 @@ public class DecodeService {
     }
 
     private int resolveLimit(UUID userId) {
-        return subscriptionRepository.findByUserId(userId)
-                .map(Subscription::getTier)
-                .filter("premium"::equals)
-                .map(tier -> Integer.MAX_VALUE)
-                .orElse(freeTierLimit);
+        return subscriptionRepository.findByUserId(userId).map(Subscription::getTier).filter("premium"::equals)
+                .map(tier -> Integer.MAX_VALUE).orElse(freeTierLimit);
     }
 
     private static String buildDecodePrompt(String filename, String content) {
@@ -144,19 +133,12 @@ public class DecodeService {
     }
 
     private static DecodeResponse toResponse(DecodeResult result) {
-        return new DecodeResponse(
-                result.getId(),
-                result.getDocument().getId(),
-                result.getRawResponse(),
-                result.getStructuredData(),
-                result.isPiiScrubbed(),
-                result.getModel(),
+        return new DecodeResponse(result.getId(), result.getDocument().getId(), result.getRawResponse(),
+                result.getStructuredData(), result.isPiiScrubbed(), result.getModel(),
                 result.getTokensIn() != null ? result.getTokensIn() : 0,
                 result.getTokensOut() != null ? result.getTokensOut() : 0,
                 result.getStartedAt() != null && result.getCompletedAt() != null
-                        ? Duration.between(result.getStartedAt(), result.getCompletedAt()).toMillis()
-                        : 0,
-                result.getCreatedAt()
-        );
+                        ? Duration.between(result.getStartedAt(), result.getCompletedAt()).toMillis() : 0,
+                result.getCreatedAt());
     }
 }

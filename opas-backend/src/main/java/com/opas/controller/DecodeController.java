@@ -4,6 +4,8 @@ import com.opas.dto.DecodeRequest;
 import com.opas.dto.DecodeResponse;
 import com.opas.service.DecodeService;
 import jakarta.validation.Valid;
+import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/documents/{documentId}/decode")
@@ -25,11 +25,12 @@ public class DecodeController {
     }
 
     @PostMapping
-    public ResponseEntity<DecodeResponse> decode(
-            Authentication authentication,
-            @PathVariable UUID documentId,
+    public ResponseEntity<DecodeResponse> decode(Authentication authentication, @PathVariable UUID documentId,
             @Valid @RequestBody DecodeRequest request) {
         UUID userId = UUID.fromString(authentication.getName());
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.ok(decodeService.decode(userId, documentId, request));
     }
 }

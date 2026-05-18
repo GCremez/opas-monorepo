@@ -6,6 +6,7 @@ import com.opas.dto.RefreshRequest;
 import com.opas.dto.RegisterRequest;
 import com.opas.service.AuthService;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -44,8 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-            @RequestHeader("Authorization") String authorization,
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization,
             @Valid @RequestBody RefreshRequest request) {
         authService.logout(authorization, request.refreshToken());
         return ResponseEntity.noContent().build();
@@ -53,7 +51,10 @@ public class AuthController {
 
     @DeleteMapping("/account")
     public ResponseEntity<Void> deleteAccount(Authentication authentication) {
-        UUID userId = UUID.fromString(authentication.getName());
+        String name = authentication.getName();
+        if (name == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        UUID userId = UUID.fromString(name);
         authService.deleteAccount(userId);
         return ResponseEntity.noContent().build();
     }

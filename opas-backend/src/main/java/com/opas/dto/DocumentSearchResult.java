@@ -1,6 +1,7 @@
 package com.opas.dto;
 
 import java.util.UUID;
+import org.springframework.lang.Nullable;
 
-public record DocumentSearchResult(UUID id, String filename, double similarity) {
+public record DocumentSearchResult(UUID id, @Nullable String filename, double similarity) {
 }

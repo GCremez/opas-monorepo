@@ -6,13 +6,13 @@ import com.opas.dto.DocumentResponse;
 import com.opas.dto.UploadUrlRequest;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DocumentService {
@@ -22,11 +22,8 @@ public class DocumentService {
     private final StorageService storageService;
     private final Duration uploadTtl;
 
-    public DocumentService(
-            DocumentRepository documentRepository,
-            UserRepository userRepository,
-            StorageService storageService,
-            @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
+    public DocumentService(DocumentRepository documentRepository, UserRepository userRepository,
+            StorageService storageService, @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.storageService = storageService;
@@ -64,8 +61,7 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public List<DocumentResponse> listDocuments(UUID userId) {
         return documentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(doc -> toResponse(doc, null, generateDownloadUrl(doc)))
-                .toList();
+                .map(doc -> toResponse(doc, null, generateDownloadUrl(doc))).toList();
     }
 
     @Transactional(readOnly = true)
@@ -89,6 +85,7 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
+    @Nullable
     private String generateDownloadUrl(Document document) {
         if (!"uploaded".equals(document.getStatus()) && !"ready".equals(document.getStatus())) {
             return null;
@@ -97,16 +94,7 @@ public class DocumentService {
     }
 
     private static DocumentResponse toResponse(Document doc, String uploadUrl, String downloadUrl) {
-        return new DocumentResponse(
-                doc.getId(),
-                doc.getFilename(),
-                doc.getContentType(),
-                doc.getFileSize(),
-                doc.getStatus(),
-                doc.getCreatedAt(),
-                doc.getUpdatedAt(),
-                uploadUrl,
-                downloadUrl
-        );
+        return new DocumentResponse(doc.getId(), doc.getFilename(), doc.getContentType(), doc.getFileSize(),
+                doc.getStatus(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl);
     }
 }

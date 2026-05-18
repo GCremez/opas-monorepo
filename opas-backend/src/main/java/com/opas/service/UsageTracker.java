@@ -1,12 +1,11 @@
 package com.opas.service;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UsageTracker {
@@ -45,11 +44,8 @@ public class UsageTracker {
 
     private static Duration ttlUntilEndOfMonth() {
         Instant now = Instant.now();
-        long endOfMonthSeconds = now.atZone(ZoneOffset.UTC)
-                .with(TemporalAdjusters.lastDayOfMonth())
-                .plusDays(1)
-                .truncatedTo(java.time.temporal.ChronoUnit.DAYS)
-                .toEpochSecond();
+        long endOfMonthSeconds = now.atZone(ZoneOffset.UTC).with(TemporalAdjusters.lastDayOfMonth()).plusDays(1)
+                .truncatedTo(java.time.temporal.ChronoUnit.DAYS).toEpochSecond();
         return Duration.ofSeconds(Math.max(endOfMonthSeconds - now.getEpochSecond(), 1));
     }
 }
