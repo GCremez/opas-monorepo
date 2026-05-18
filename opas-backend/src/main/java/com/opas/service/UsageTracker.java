@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
 
@@ -39,17 +38,18 @@ public class UsageTracker {
     }
 
     private static String buildKey(String userId, String action) {
-        String month = LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM"));
+        String month = Instant.now().atZone(ZoneOffset.UTC)
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM"));
         return KEY_PREFIX + userId + ":" + action + ":" + month;
     }
 
     private static Duration ttlUntilEndOfMonth() {
-        LocalDate now = LocalDate.now();
-        LocalDate lastDay = now.with(TemporalAdjusters.lastDayOfMonth());
-        long seconds = now.atStartOfDay(ZoneOffset.UTC)
+        Instant now = Instant.now();
+        long endOfMonthSeconds = now.atZone(ZoneOffset.UTC)
                 .with(TemporalAdjusters.lastDayOfMonth())
                 .plusDays(1)
-                .toEpochSecond() - Instant.now().getEpochSecond();
-        return Duration.ofSeconds(Math.max(seconds, 1));
+                .truncatedTo(java.time.temporal.ChronoUnit.DAYS)
+                .toEpochSecond();
+        return Duration.ofSeconds(Math.max(endOfMonthSeconds - now.getEpochSecond(), 1));
     }
 }
