@@ -1,0 +1,112 @@
+package com.opas.service;
+
+import com.opas.domain.Document;
+import com.opas.domain.User;
+import com.opas.dto.DocumentResponse;
+import com.opas.dto.UploadUrlRequest;
+import com.opas.repository.DocumentRepository;
+import com.opas.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class DocumentService {
+
+    private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
+    private final StorageService storageService;
+    private final Duration uploadTtl;
+
+    public DocumentService(
+            DocumentRepository documentRepository,
+            UserRepository userRepository,
+            StorageService storageService,
+            @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
+        this.documentRepository = documentRepository;
+        this.userRepository = userRepository;
+        this.storageService = storageService;
+        this.uploadTtl = Duration.ofMinutes(uploadTtlMinutes);
+    }
+
+    @Transactional
+    public DocumentResponse requestUploadUrl(UUID userId, UploadUrlRequest request) {
+        User user = userRepository.getReferenceById(userId);
+        String s3Key = userId + "/" + UUID.randomUUID() + "/" + request.filename();
+
+        Document document = new Document();
+        document.setUser(user);
+        document.setFilename(request.filename());
+        document.setContentType(request.contentType());
+        document.setS3Key(s3Key);
+        document.setStatus("pending");
+        document = documentRepository.save(document);
+
+        String uploadUrl = storageService.generatePresignedUploadUrl(s3Key, request.contentType(), uploadTtl);
+        return toResponse(document, uploadUrl, null);
+    }
+
+    @Transactional
+    public void confirmUpload(UUID userId, UUID documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        if (!document.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Document does not belong to user");
+        }
+        document.setStatus("uploaded");
+        documentRepository.save(document);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DocumentResponse> listDocuments(UUID userId) {
+        return documentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(doc -> toResponse(doc, null, generateDownloadUrl(doc)))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public DocumentResponse getDocument(UUID userId, UUID documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        if (!document.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Document does not belong to user");
+        }
+        return toResponse(document, null, generateDownloadUrl(document));
+    }
+
+    @Transactional
+    public void deleteDocument(UUID userId, UUID documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        if (!document.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Document does not belong to user");
+        }
+        storageService.deleteObject(document.getS3Key());
+        documentRepository.delete(document);
+    }
+
+    private String generateDownloadUrl(Document document) {
+        if (!"uploaded".equals(document.getStatus()) && !"ready".equals(document.getStatus())) {
+            return null;
+        }
+        return storageService.generatePresignedDownloadUrl(document.getS3Key(), Duration.ofHours(1));
+    }
+
+    private static DocumentResponse toResponse(Document doc, String uploadUrl, String downloadUrl) {
+        return new DocumentResponse(
+                doc.getId(),
+                doc.getFilename(),
+                doc.getContentType(),
+                doc.getFileSize(),
+                doc.getStatus(),
+                doc.getCreatedAt(),
+                doc.getUpdatedAt(),
+                uploadUrl,
+                downloadUrl
+        );
+    }
+}
