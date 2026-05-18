@@ -1,10 +1,9 @@
 package com.opas.service;
 
+import java.time.Duration;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 @Service
 public class RefreshTokenService {
@@ -19,8 +18,7 @@ public class RefreshTokenService {
     }
 
     public void store(String userId, String tokenHash, Duration ttl) {
-        redis.opsForValue().set(KEY_PREFIX + userId + ":" + tokenHash, "1",
-                ttl != null ? ttl : DEFAULT_TTL);
+        redis.opsForValue().set(KEY_PREFIX + userId + ":" + tokenHash, "1", ttl != null ? ttl : DEFAULT_TTL);
     }
 
     public void store(String userId, String tokenHash) {
@@ -36,10 +34,7 @@ public class RefreshTokenService {
     }
 
     public void invalidateAll(String userId) {
-        var options = ScanOptions.scanOptions()
-                .match(KEY_PREFIX + userId + ":*")
-                .count(100)
-                .build();
+        var options = ScanOptions.scanOptions().match(KEY_PREFIX + userId + ":*").count(100).build();
         try (var cursor = redis.scan(options)) {
             cursor.forEachRemaining(key -> redis.delete(key));
         }

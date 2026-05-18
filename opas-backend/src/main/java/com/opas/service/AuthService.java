@@ -12,12 +12,7 @@ import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.SubscriptionRepository;
 import com.opas.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import io.jsonwebtoken.Claims;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -26,6 +21,10 @@ import java.time.Instant;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.lang.Nullable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -39,25 +38,19 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final TokenBlacklistService tokenBlacklistService;
 
-    public AuthService(
-        UserRepository userRepository,
-        SubscriptionRepository subscriptionRepository,
-        DecodeResultRepository decodeResultRepository,
-        DocumentRepository documentRepository,
-        StorageService storageService,
-        PasswordEncoder passwordEncoder,
-        JwtUtil jwtUtil,
-        RefreshTokenService refreshTokenService,
-        TokenBlacklistService tokenBlacklistService) {
-            this.userRepository = userRepository;
-            this.subscriptionRepository = subscriptionRepository;
-            this.decodeResultRepository = decodeResultRepository;
-            this.documentRepository = documentRepository;
-            this.storageService = storageService;
-            this.passwordEncoder = passwordEncoder;
-            this.jwtUtil = jwtUtil;
-            this.refreshTokenService = refreshTokenService;
-            this.tokenBlacklistService = tokenBlacklistService;
+    public AuthService(UserRepository userRepository, SubscriptionRepository subscriptionRepository,
+            DecodeResultRepository decodeResultRepository, DocumentRepository documentRepository,
+            StorageService storageService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+            RefreshTokenService refreshTokenService, TokenBlacklistService tokenBlacklistService) {
+        this.userRepository = userRepository;
+        this.subscriptionRepository = subscriptionRepository;
+        this.decodeResultRepository = decodeResultRepository;
+        this.documentRepository = documentRepository;
+        this.storageService = storageService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+        this.refreshTokenService = refreshTokenService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Transactional
@@ -132,8 +125,7 @@ public class AuthService {
     }
 
     /**
-     * Erases the user's application data and account (GDPR-style deletion).
-     * Idempotent if the user no longer exists.
+     * Erases the user's application data and account (GDPR-style deletion). Idempotent if the user no longer exists.
      */
     @Transactional
     public void deleteAccount(UUID userId) {
@@ -152,9 +144,7 @@ public class AuthService {
     }
 
     private AuthResponse generateAuthResponse(User user) {
-        String plan = subscriptionRepository.findByUserId(user.getId())
-                .map(Subscription::getTier)
-                .orElse("free");
+        String plan = subscriptionRepository.findByUserId(user.getId()).map(Subscription::getTier).orElse("free");
         String userId = user.getId().toString();
         String accessToken = jwtUtil.createAccessToken(userId, user.getEmail());
         String refreshToken = jwtUtil.createRefreshToken(userId);
@@ -162,6 +152,7 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken, plan);
     }
 
+    @Nullable
     private static String extractBearerToken(String authHeader) {
         if (authHeader == null || !authHeader.regionMatches(true, 0, "Bearer ", 0, 7)) {
             return null;
@@ -171,8 +162,7 @@ public class AuthService {
 
     private static String sha256Hex(String value) {
         try {
-            byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(value.getBytes(StandardCharsets.UTF_8));
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(digest);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);

@@ -14,22 +14,22 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class OpasApplicationTests {
 
     @Container
+    @SuppressWarnings("resource")
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("pgvector/pgvector:pg16")
             .withDatabaseName("opas_test")
             .withUsername("test")
             .withPassword("test");
 
     @Container
-    static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine")
-            .withExposedPorts(6379);
+    @SuppressWarnings("resource")
+    static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine").withExposedPorts(6379);
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.data.redis.url",
-                () -> "redis://" + redis.getHost() + ":" + redis.getFirstMappedPort());
+        registry.add("spring.data.redis.url", () -> "redis://" + redis.getHost() + ":" + redis.getFirstMappedPort());
     }
 
     @Test

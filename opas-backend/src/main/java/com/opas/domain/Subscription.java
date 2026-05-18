@@ -3,6 +3,7 @@ package com.opas.domain;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "subscriptions")
@@ -51,22 +52,79 @@ public class Subscription {
         updatedAt = Instant.now();
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-    public String getStripeCustomerId() { return stripeCustomerId; }
-    public void setStripeCustomerId(String stripeCustomerId) { this.stripeCustomerId = stripeCustomerId; }
-    public String getStripeSubscriptionId() { return stripeSubscriptionId; }
-    public void setStripeSubscriptionId(String stripeSubscriptionId) { this.stripeSubscriptionId = stripeSubscriptionId; }
-    public String getTier() { return tier; }
-    public void setTier(String tier) { this.tier = tier; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public Instant getCurrentPeriodStart() { return currentPeriodStart; }
-    public void setCurrentPeriodStart(Instant currentPeriodStart) { this.currentPeriodStart = currentPeriodStart; }
-    public Instant getCurrentPeriodEnd() { return currentPeriodEnd; }
-    public void setCurrentPeriodEnd(Instant currentPeriodEnd) { this.currentPeriodEnd = currentPeriodEnd; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Nullable
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
+    }
+
+    public void setStripeCustomerId(String stripeCustomerId) {
+        this.stripeCustomerId = stripeCustomerId;
+    }
+
+    @Nullable
+    public String getStripeSubscriptionId() {
+        return stripeSubscriptionId;
+    }
+
+    public void setStripeSubscriptionId(String stripeSubscriptionId) {
+        this.stripeSubscriptionId = stripeSubscriptionId;
+    }
+
+    public String getTier() {
+        return tier;
+    }
+
+    public void setTier(String tier) {
+        this.tier = tier;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Nullable
+    public Instant getCurrentPeriodStart() {
+        return currentPeriodStart;
+    }
+
+    public void setCurrentPeriodStart(Instant currentPeriodStart) {
+        this.currentPeriodStart = currentPeriodStart;
+    }
+
+    @Nullable
+    public Instant getCurrentPeriodEnd() {
+        return currentPeriodEnd;
+    }
+
+    public void setCurrentPeriodEnd(Instant currentPeriodEnd) {
+        this.currentPeriodEnd = currentPeriodEnd;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 }

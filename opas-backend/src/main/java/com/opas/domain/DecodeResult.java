@@ -3,6 +3,7 @@ package com.opas.domain;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "decode_results")
@@ -51,27 +52,102 @@ public class DecodeResult {
         createdAt = Instant.now();
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public Document getDocument() { return document; }
-    public void setDocument(Document document) { this.document = document; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-    public String getRawResponse() { return rawResponse; }
-    public void setRawResponse(String rawResponse) { this.rawResponse = rawResponse; }
-    public String getStructuredData() { return structuredData; }
-    public void setStructuredData(String structuredData) { this.structuredData = structuredData; }
-    public boolean isPiiScrubbed() { return piiScrubbed; }
-    public void setPiiScrubbed(boolean piiScrubbed) { this.piiScrubbed = piiScrubbed; }
-    public String getModel() { return model; }
-    public void setModel(String model) { this.model = model; }
-    public Integer getTokensIn() { return tokensIn; }
-    public void setTokensIn(Integer tokensIn) { this.tokensIn = tokensIn; }
-    public Integer getTokensOut() { return tokensOut; }
-    public void setTokensOut(Integer tokensOut) { this.tokensOut = tokensOut; }
-    public Instant getStartedAt() { return startedAt; }
-    public void setStartedAt(Instant startedAt) { this.startedAt = startedAt; }
-    public Instant getCompletedAt() { return completedAt; }
-    public void setCompletedAt(Instant completedAt) { this.completedAt = completedAt; }
-    public Instant getCreatedAt() { return createdAt; }
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Document getDocument() {
+        return document;
+    }
+
+    public void setDocument(Document document) {
+        this.document = document;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Nullable
+    public String getRawResponse() {
+        return rawResponse;
+    }
+
+    public void setRawResponse(String rawResponse) {
+        this.rawResponse = rawResponse;
+    }
+
+    @Nullable
+    public String getStructuredData() {
+        return structuredData;
+    }
+
+    public void setStructuredData(String structuredData) {
+        this.structuredData = structuredData;
+    }
+
+    public boolean isPiiScrubbed() {
+        return piiScrubbed;
+    }
+
+    public void setPiiScrubbed(boolean piiScrubbed) {
+        this.piiScrubbed = piiScrubbed;
+    }
+
+    @Nullable
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    @Nullable
+    public Integer getTokensIn() {
+        return tokensIn;
+    }
+
+    public void setTokensIn(Integer tokensIn) {
+        this.tokensIn = tokensIn;
+    }
+
+    @Nullable
+    public Integer getTokensOut() {
+        return tokensOut;
+    }
+
+    public void setTokensOut(Integer tokensOut) {
+        this.tokensOut = tokensOut;
+    }
+
+    @Nullable
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(Instant startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    @Nullable
+    public Instant getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(Instant completedAt) {
+        this.completedAt = completedAt;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }

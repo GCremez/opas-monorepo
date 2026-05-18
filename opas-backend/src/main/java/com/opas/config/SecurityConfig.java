@@ -26,25 +26,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> {})
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
-                .requestMatchers(HttpMethod.POST,
-                        "/api/v1/auth/register",
-                        "/api/v1/auth/login",
-                        "/api/v1/auth/refresh").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/webhooks/stripe").permitAll()
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .headers(headers -> headers
-                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
-                .frameOptions(fo -> fo.deny())
-                .httpStrictTransportSecurity(hsts -> hsts.maxAgeInSeconds(31536000).includeSubDomains(true))
-            );
+        http.cors(cors -> {
+        }).csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
+                                "/api/v1/auth/refresh")
+                        .permitAll().requestMatchers(HttpMethod.POST, "/api/v1/webhooks/stripe").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
+                        .frameOptions(fo -> fo.deny())
+                        .httpStrictTransportSecurity(hsts -> hsts.maxAgeInSeconds(31536000).includeSubDomains(true)));
 
         return http.build();
     }
