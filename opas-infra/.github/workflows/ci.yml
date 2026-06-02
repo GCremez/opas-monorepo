@@ -113,9 +113,47 @@ jobs:
         with:
           sarif_file: opas-infra/trivy-postgres.sarif
 
-  deploy-infra:
-    name: Deploy Infrastructure
+  deploy-infra-staging:
+    name: Deploy Infra — Staging
     needs: integration
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-north-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: opas-infra-deploy
+
+      - name: Deploy CloudFormation stack (staging)
+        run: |
+          aws cloudformation deploy \
+            --template-file cloudformation/ecs.yml \
+            --stack-name opas-infra-staging \
+            --parameter-overrides \
+              Environment=staging \
+              VpcId=${{ vars.INFRA_VPC_ID }} \
+              PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
+              CertificateArn=${{ vars.INFRA_CERT_ARN }} \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+      - name: Verify stack
+        run: |
+          aws cloudformation describe-stacks \
+            --stack-name opas-infra-staging \
+            --query 'Stacks[0].StackStatus' \
+            --no-cli-pager
+
+  deploy-infra-production:
+    name: Deploy Infra — Production
+    needs: deploy-infra-staging
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     environment: production
@@ -128,17 +166,25 @@ jobs:
         with:
           aws-region: eu-north-1
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: opas-infra-deploy
+          role-session-name: opas-infra-prod-deploy
 
-      - name: Deploy infrastructure changes
+      - name: Deploy CloudFormation stack (production)
         run: |
-          echo "Deploying infrastructure updates for commit ${{ github.sha }}"
-        #   aws cloudformation deploy \
-        #     --template-file opas-infra/cloudformation/template.yaml \
-        #     --stack-name opas-infra \
-        #     --capabilities CAPABILITY_IAM \
-        #     --no-fail-on-empty-changeset
+          aws cloudformation deploy \
+            --template-file cloudformation/ecs.yml \
+            --stack-name opas-infra-production \
+            --parameter-overrides \
+              Environment=production \
+              VpcId=${{ vars.INFRA_VPC_ID }} \
+              PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
+              CertificateArn=${{ vars.INFRA_CERT_ARN }} \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
 
-      - name: Notify deployment
+      - name: Verify stack
         run: |
-          echo "Infrastructure deployed: ${{ github.sha }}"
+          aws cloudformation describe-stacks \
+            --stack-name opas-infra-production \
+            --query 'Stacks[0].StackStatus' \
+            --no-cli-pager

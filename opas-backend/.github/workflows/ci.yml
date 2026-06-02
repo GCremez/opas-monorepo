@@ -117,24 +117,82 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     environment: staging
+    env:
+      ECS_CLUSTER: opas-staging
+      ECS_SERVICE: opas-backend
+      TASK_DEF_FILE: opas-infra/cloudformation/task-definition-staging.json
 
     steps:
-      - name: Deploy to ECS staging
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-north-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: opas-backend-deploy
+
+      - name: Render task definition
         run: |
-          echo "Deploy ${{ env.IMAGE }}:${{ github.sha }} to staging"
-          # aws ecs update-service --cluster opas-staging --service opas-backend \
-          #   --force-new-deployment
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          sed -e "s/ACCOUNT_ID_PLACEHOLDER/${ACCOUNT_ID}/g" \
+              "${TASK_DEF_FILE}" > /tmp/task-definition.json
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs deploy \
+            --cluster "${ECS_CLUSTER}" \
+            --service "${ECS_SERVICE}" \
+            --task-definition /tmp/task-definition.json \
+            --image-overrides "backend=${{ env.IMAGE }}:${{ github.sha }}" \
+            --codepipeline false \
+            --no-cli-pager
+
+      - name: Verify deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${ECS_CLUSTER}" \
+            --services "${ECS_SERVICE}"
 
   deploy-production:
     name: Deploy to Production
     needs: deploy-staging
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    environment: production   # requires manual approval in GitHub
+    environment: production
+    env:
+      ECS_CLUSTER: opas-prod
+      ECS_SERVICE: opas-backend
+      TASK_DEF_FILE: opas-infra/cloudformation/task-definition-production.json
 
     steps:
-      - name: Deploy to ECS production
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-north-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: opas-backend-prod-deploy
+
+      - name: Render task definition
         run: |
-          echo "Deploy ${{ env.IMAGE }}:${{ github.sha }} to production"
-          # aws ecs update-service --cluster opas-prod --service opas-backend \
-          #   --force-new-deployment
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          sed -e "s/ACCOUNT_ID_PLACEHOLDER/${ACCOUNT_ID}/g" \
+              "${TASK_DEF_FILE}" > /tmp/task-definition.json
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs deploy \
+            --cluster "${ECS_CLUSTER}" \
+            --service "${ECS_SERVICE}" \
+            --task-definition /tmp/task-definition.json \
+            --image-overrides "backend=${{ env.IMAGE }}:${{ github.sha }}" \
+            --codepipeline false \
+            --no-cli-pager
+
+      - name: Verify deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${ECS_CLUSTER}" \
+            --services "${ECS_SERVICE}"

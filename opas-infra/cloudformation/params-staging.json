@@ -1,0 +1,18 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "staging"
+  },
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "vpc-xxxxxxxx"
+  },
+  {
+    "ParameterKey": "PublicSubnets",
+    "ParameterValue": "subnet-xxxxxxxx,subnet-yyyyyyyy"
+  },
+  {
+    "ParameterKey": "CertificateArn",
+    "ParameterValue": ""
+  }
+]

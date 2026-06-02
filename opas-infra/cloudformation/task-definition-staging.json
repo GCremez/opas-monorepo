@@ -1,0 +1,47 @@
+[
+  {
+    "name": "backend",
+    "image": "ghcr.io/GCremez/opas-backend:IMAGE_TAG_PLACEHOLDER",
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 8080,
+        "protocol": "tcp"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/opas-backend-staging",
+        "awslogs-region": "eu-north-1",
+        "awslogs-stream-prefix": "backend"
+      }
+    },
+    "environment": [
+      { "name": "SPRING_PROFILES_ACTIVE", "value": "staging" },
+      { "name": "AWS_REGION", "value": "eu-north-1" },
+      { "name": "S3_BUCKET_NAME", "value": "opas-app-bucket-staging" },
+      { "name": "CORS_ALLOWED_ORIGINS", "value": "https://staging.opas.fi" },
+      { "name": "JWT_PRIVATE_KEY", "value": "{{resolve:secretsmanager:opas/staging/jwt-private-key}}" },
+      { "name": "JWT_PUBLIC_KEY", "value": "{{resolve:secretsmanager:opas/staging/jwt-public-key}}" },
+      { "name": "DATABASE_URL", "value": "{{resolve:secretsmanager:opas/staging/database-url}}" },
+      { "name": "DATABASE_USER", "value": "{{resolve:secretsmanager:opas/staging/database-user}}" },
+      { "name": "REDIS_URL", "value": "{{resolve:secretsmanager:opas/staging/redis-url}}" },
+      { "name": "RABBITMQ_URL", "value": "{{resolve:secretsmanager:opas/staging/rabbitmq-url}}" },
+      { "name": "PRESIDIO_SIDECAR_URL", "value": "{{resolve:secretsmanager:opas/staging/presidio-url}}" }
+    ],
+    "secrets": [
+      { "name": "DATABASE_PASSWORD", "valueFrom": "arn:aws:secretsmanager:eu-north-1:ACCOUNT_ID_PLACEHOLDER:secret:opas/staging/database-password" },
+      { "name": "ANTHROPIC_API_KEY", "valueFrom": "arn:aws:secretsmanager:eu-north-1:ACCOUNT_ID_PLACEHOLDER:secret:opas/staging/anthropic-api-key" },
+      { "name": "STRIPE_SECRET_KEY", "valueFrom": "arn:aws:secretsmanager:eu-north-1:ACCOUNT_ID_PLACEHOLDER:secret:opas/staging/stripe-secret-key" },
+      { "name": "STRIPE_WEBHOOK_SECRET", "valueFrom": "arn:aws:secretsmanager:eu-north-1:ACCOUNT_ID_PLACEHOLDER:secret:opas/staging/stripe-webhook-secret" }
+    ],
+    "healthCheck": {
+      "command": ["CMD-SHELL", "curl -sf http://localhost:8080/actuator/health || exit 1"],
+      "interval": 30,
+      "retries": 3,
+      "timeout": 5,
+      "startPeriod": 60
+    }
+  }
+]
