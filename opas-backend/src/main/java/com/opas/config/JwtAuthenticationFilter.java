@@ -40,7 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtUtil.parseToken(token);
 
-                if (!tokenBlacklistService.isBlacklisted(claims.getId())) {
+                String jti = claims.getId();
+                if (jti != null && !tokenBlacklistService.isBlacklisted(jti)) {
                     var auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null,
                             Collections.emptyList());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

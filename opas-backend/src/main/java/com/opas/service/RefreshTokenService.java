@@ -33,6 +33,12 @@ public class RefreshTokenService {
         redis.delete(KEY_PREFIX + userId + ":" + tokenHash);
     }
 
+    public boolean consume(String userId, String tokenHash) {
+        var key = KEY_PREFIX + userId + ":" + tokenHash;
+        Boolean deleted = redis.delete(key);
+        return Boolean.TRUE.equals(deleted);
+    }
+
     public void invalidateAll(String userId) {
         var options = ScanOptions.scanOptions().match(KEY_PREFIX + userId + ":*").count(100).build();
         try (var cursor = redis.scan(options)) {

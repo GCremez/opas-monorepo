@@ -92,11 +92,13 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid refresh token");
         }
         String userId = claims.getSubject();
-        String hash = sha256Hex(request.refreshToken());
-        if (!refreshTokenService.isValid(userId, hash)) {
+        if (userId == null) {
             throw new IllegalArgumentException("Invalid refresh token");
         }
-        refreshTokenService.delete(userId, hash);
+        String hash = sha256Hex(request.refreshToken());
+        if (!refreshTokenService.consume(userId, hash)) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
         User user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return generateAuthResponse(user);
@@ -114,13 +116,20 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid access token");
         }
         String jti = claims.getId();
-        Instant exp = claims.getExpiration().toInstant();
+        var expiration = claims.getExpiration();
+        if (jti == null || jti.isBlank() || expiration == null) {
+            return;
+        }
+        Instant exp = expiration.toInstant();
         Duration remaining = Duration.between(Instant.now(), exp);
-        if (jti != null && !jti.isBlank() && remaining.isPositive()) {
+        if (remaining.isPositive()) {
             tokenBlacklistService.blacklist(jti, remaining);
         }
         if (refreshToken != null && !refreshToken.isBlank()) {
-            refreshTokenService.delete(claims.getSubject(), sha256Hex(refreshToken));
+            String subject = claims.getSubject();
+            if (subject != null) {
+                refreshTokenService.delete(subject, sha256Hex(refreshToken));
+            }
         }
     }
 
