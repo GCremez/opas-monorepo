@@ -43,7 +43,7 @@ public class S3Config {
         var builder = S3Presigner.builder().region(Region.of(region));
 
         if (!endpoint.isBlank()) {
-            builder.endpointOverride(URI.create(endpoint));
+            builder.endpointOverride(URI.create(endpoint)).forcePathStyle(true);
         }
 
         builder.credentialsProvider(credentialsProvider);

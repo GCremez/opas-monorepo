@@ -32,11 +32,13 @@ public class DecodeService {
     private final UsageTracker usageTracker;
     private final ChatModel chatModel;
     private final int freeTierLimit;
+    private final String modelName;
 
     public DecodeService(DocumentRepository documentRepository, UserRepository userRepository,
             DecodeResultRepository decodeResultRepository, SubscriptionRepository subscriptionRepository,
             StorageService storageService, PresidioService presidioService, UsageTracker usageTracker,
-            ChatModel chatModel, @Value("${opas.free-tier.monthly-decode-limit}") int freeTierLimit) {
+            ChatModel chatModel, @Value("${opas.free-tier.monthly-decode-limit}") int freeTierLimit,
+            @Value("${spring.ai.anthropic.chat.options.model}") String modelName) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.decodeResultRepository = decodeResultRepository;
@@ -46,6 +48,7 @@ public class DecodeService {
         this.usageTracker = usageTracker;
         this.chatModel = chatModel;
         this.freeTierLimit = freeTierLimit;
+        this.modelName = modelName;
     }
 
     @Transactional
@@ -91,7 +94,7 @@ public class DecodeService {
         result.setUser(user);
         result.setRawResponse(rawText);
         result.setPiiScrubbed(request.scrubPii());
-        result.setModel("claude-sonnet-4-20250514");
+        result.setModel(modelName);
         result.setTokensIn(tokensIn);
         result.setTokensOut(tokensOut);
         result.setStartedAt(startedAt);
