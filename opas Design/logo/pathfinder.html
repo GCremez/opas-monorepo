@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Opas — Pathfinder Logo Refinement</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;
+  --surface:#1c1c1e;
+  --surface-2:#2c2c2e;
+  --fg:#f5f5f7;
+  --muted:#86868b;
+  --border:#38383a;
+  --accent:#92d9bb;
+  --accent-dim:#92d9bb22;
+  --accent-hover:#7eccac;
+  --radius-lg:16px;
+  --radius-md:10px;
+  --space-6:24px;
+  --font-display:'Lufga','Inter',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+body{
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  padding:48px 24px 80px;
+}
+::selection{background:var(--accent);color:var(--bg)}
+h1{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:4px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:8px}
+.intro{max-width:640px;margin-bottom:40px;color:var(--muted);font-size:14px;line-height:1.7}
+.badge{
+  display:inline-block;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:2px 10px;border-radius:4px;
+  background:var(--accent-dim);color:var(--accent);margin-bottom:12px;
+}
+.variants{display:flex;flex-direction:column;gap:56px;max-width:1200px}
+.variant-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:40px;
+  transition:border-color .15s;
+}
+.variant-card:hover{border-color:var(--accent)}
+.variant-card .v-header{display:flex;align-items:flex-start;gap:40px;margin-bottom:36px;flex-wrap:wrap}
+.v-preview{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:12px}
+.v-preview .v-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.sizes{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.sizes .s-item{display:flex;flex-direction:column;align-items:center;gap:8px}
+.sizes .s-label{font-size:11px;color:var(--muted);font-weight:500}
+.v-info{flex:1;min-width:240px}
+.v-info h2{
+  font-family:var(--font-display);font-size:20px;font-weight:600;
+  letter-spacing:-.02em;margin-bottom:4px;
+}
+.v-info .tagline{font-size:13px;color:var(--accent);margin-bottom:10px}
+.v-info p{font-size:14px;color:var(--fg);line-height:1.7;margin-bottom:6px}
+.v-info .detail{font-size:13px;color:var(--muted);line-height:1.6}
+.specs{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;
+  margin:20px 0 0;padding:20px 0 0;border-top:1px solid var(--border);
+}
+.spec{font-size:12px;color:var(--muted)}
+.spec strong{color:var(--fg);display:block;font-size:13px;margin-bottom:2px}
+.wordmarks{display:flex;align-items:center;gap:32px;margin:24px 0 0;padding:24px 0 0;border-top:1px solid var(--border);flex-wrap:wrap}
+.wordmark{display:flex;align-items:center;gap:10px}
+.wordmark .wm-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.wordmark .wm-text{font-family:'Lufga','Inter',system-ui,sans-serif;font-weight:600;letter-spacing:-.02em;color:var(--fg)}
+.wm-icon-preview{display:flex;gap:24px;margin:24px 0 0;flex-wrap:wrap}
+.wm-icon-preview .ip{display:flex;flex-direction:column;align-items:center;gap:6px}
+.wm-icon-preview .ip-label{font-size:11px;color:var(--muted);font-weight:500}
+.fav{color:var(--fg) !important;position:relative}
+.fav::after{content:"★";position:absolute;top:-8px;right:-20px;font-size:14px;color:var(--accent)}
+@media(max-width:600px){
+  .variant-card .v-header{flex-direction:column}
+  .sizes{gap:16px}
+  .wordmarks{gap:20px}
+}
+</style>
+</head>
+<body>
+
+<h1>Pathfinder — Refined</h1>
+<p class="sub">Circle-based app icon. 3 variations on the journey narrative. All hand-coded SVG.</p>
+<div class="intro">
+  <span class="badge">Your pick</span>
+  Building on the Pathfinder concept you liked — three nodes, unknown → guidance → arrival — but reimagined inside a circular icon shape. Each variant tells the same story with a different visual posture. Lufga + Inter + brand palette.
+</div>
+
+<div class="variants">
+
+<!-- ═══ VARIANT A: ARC PATH ═══ -->
+<div class="variant-card">
+  <div class="v-header">
+    <div class="v-preview">
+      <div class="sizes">
+        <div class="s-item">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="58" fill="none" stroke="#38383a" stroke-width="1"/>
+            <path d="M36.8 36.8 A 42 42 0 0 1 90.2 72.5" stroke="#3a3a3c" stroke-width="2.5" stroke-dasharray="4 5" stroke-linecap="round" fill="none"/>
+            <path d="M90.2 72.5 A 42 42 0 0 1 46.5 93.5" stroke="var(--accent, #92d9bb)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <circle cx="36.8" cy="36.8" r="11" fill="#3a3a3c" stroke="#3a3a3c" stroke-width="2"/>
+            <circle cx="36.8" cy="36.8" r="4" fill="#1c1c1e"/>
+            <circle cx="90.2" cy="72.5" r="11" fill="var(--accent, #92d9bb)" stroke="var(--accent, #92d9bb)" stroke-width="2"/>
+            <circle cx="90.2" cy="72.5" r="4" fill="#000"/>
+            <circle cx="46.5" cy="93.5" r="11" fill="var(--accent, #92d9bb)" stroke="var(--accent, #92d9bb)" stroke-width="2"/>
+            <circle cx="46.5" cy="93.5" r="4" fill="#000"/>
+            <path d="M54.5 95 L46.5 103 L40 95" stroke="var(--accent, #92d9bb)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">120px</span>
+        </div>
+        <div class="s-item">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <path d="M26.8 26.8 A 27 27 0 0 1 60.2 47.5" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="3 4" stroke-linecap="round" fill="none"/>
+            <path d="M60.2 47.5 A 27 27 0 0 1 32.5 62.5" stroke="var(--accent, #92d9bb)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <circle cx="26.8" cy="26.8" r="7.5" fill="#3a3a3c"/>
+            <circle cx="26.8" cy="26.8" r="2.5" fill="#1c1c1e"/>
+            <circle cx="60.2" cy="47.5" r="7.5" fill="var(--accent, #92d9bb)"/>
+            <circle cx="60.2" cy="47.5" r="2.5" fill="#000"/>
+            <circle cx="32.5" cy="62.5" r="7.5" fill="var(--accent, #92d9bb)"/>
+            <circle cx="32.5" cy="62.5" r="2.5" fill="#000"/>
+            <path d="M38 64 L32.5 70 L27 64" stroke="var(--accent, #92d9bb)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">80px</span>
+        </div>
+        <div class="s-item">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="14" cy="14" r="4.5" fill="#3a3a3c"/>
+            <circle cx="14" cy="14" r="1.5" fill="#1c1c1e"/>
+            <circle cx="29" cy="24" r="4.5" fill="var(--accent, #92d9bb)"/>
+            <circle cx="29" cy="24" r="1.5" fill="#000"/>
+            <circle cx="18" cy="30" r="4.5" fill="var(--accent, #92d9bb)"/>
+            <circle cx="18" cy="30" r="1.5" fill="#000"/>
+            <path d="M20 31.5 L18 35 L16 31.5" stroke="var(--accent, #92d9bb)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">40px</span>
+        </div>
+      </div>
+    </div>
+    <div class="v-info">
+      <h2>A — Arc Path</h2>
+      <p class="tagline">The journey as a curved arc — three waypoints along an orbital path.</p>
+      <p>Three nodes positioned along a 240° arc. The first segment is dashed (uncertainty before Opas), the second solid (clarity with guidance). The final node opens into an arrow — destination reached. The encircling ring frames the mark without boxing it in.</p>
+      <p class="detail">The arc suggests orbit, movement, progress — not a straight line from A to B but a journey with direction. The open arrow at the last node reads as "next" without needing a literal arrowhead.</p>
+      <div class="specs">
+        <div class="spec"><strong>Shape</strong>Circular boundary, orbital arc path</div>
+        <div class="spec"><strong>Nodes</strong>3 positions: start (grey), midpoint (accent), arrival (accent + arrow)</div>
+        <div class="spec"><strong>Path</strong>Dash→solid transition = clarity after Opas</div>
+        <div class="spec"><strong>Best for</strong>Openers, splash, onboarding hero</div>
+      </div>
+    </div>
+  </div>
+  <div class="wordmarks">
+    <div class="wordmark">
+      <div class="wm-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M10 10 A 9 9 0 0 1 21.5 16" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round" fill="none"/>
+          <path d="M21.5 16 A 9 9 0 0 1 12 22" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <circle cx="10" cy="10" r="3" fill="#3a3a3c"/>
+          <circle cx="10" cy="10" r="1" fill="#1c1c1e"/>
+          <circle cx="21.5" cy="16" r="3" fill="#92d9bb"/>
+          <circle cx="21.5" cy="16" r="1" fill="#000"/>
+          <circle cx="12" cy="22" r="3" fill="#92d9bb"/>
+          <circle cx="12" cy="22" r="1" fill="#000"/>
+          <path d="M13.5 22.5 L12 25 L10.5 22.5" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <span class="wm-text" style="font-size:22px">Opas</span>
+    </div>
+    <div class="wordmark">
+      <div class="wm-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M8 8 A 7 7 0 0 1 17 12.5" stroke="#3a3a3c" stroke-width="1.2" stroke-dasharray="2 2" stroke-linecap="round" fill="none"/>
+          <path d="M17 12.5 A 7 7 0 0 1 9.5 17" stroke="#92d9bb" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          <circle cx="8" cy="8" r="2.5" fill="#3a3a3c"/>
+          <circle cx="17" cy="12.5" r="2.5" fill="#92d9bb"/>
+          <circle cx="9.5" cy="17" r="2.5" fill="#92d9bb"/>
+        </svg>
+      </div>
+      <span class="wm-text" style="font-size:18px">Opas</span>
+    </div>
+  </div>
+  <div class="wm-icon-preview">
+    <div class="ip">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="60" fill="#000000"/>
+        <circle cx="60" cy="60" r="56" fill="none" stroke="#2c2c2e" stroke-width="1"/>
+        <path d="M36.8 36.8 A 42 42 0 0 1 90.2 72.5" stroke="#3a3a3c" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round" fill="none"/>
+        <path d="M90.2 72.5 A 42 42 0 0 1 46.5 93.5" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <circle cx="36.8" cy="36.8" r="11" fill="#3a3a3c"/>
+        <circle cx="36.8" cy="36.8" r="4" fill="#1c1c1e"/>
+        <circle cx="90.2" cy="72.5" r="11" fill="#92d9bb"/>
+        <circle cx="90.2" cy="72.5" r="4" fill="#000"/>
+        <circle cx="46.5" cy="93.5" r="11" fill="#92d9bb"/>
+        <circle cx="46.5" cy="93.5" r="4" fill="#000"/>
+        <path d="M54.5 95 L46.5 103 L40 95" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="60" cy="60" r="56" stroke="#38383a" stroke-width=".5"/>
+      </svg>
+      <span class="ip-label">App icon</span>
+    </div>
+    <div class="ip">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="30" fill="#000000"/>
+        <path d="M19.4 19.4 A 20 20 0 0 1 44 34.5" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="round" fill="none"/>
+        <path d="M44 34.5 A 20 20 0 0 1 24.5 45.5" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <circle cx="19.4" cy="19.4" r="5" fill="#3a3a3c"/>
+        <circle cx="19.4" cy="19.4" r="2" fill="#1c1c1e"/>
+        <circle cx="44" cy="34.5" r="5" fill="#92d9bb"/>
+        <circle cx="44" cy="34.5" r="2" fill="#000"/>
+        <circle cx="24.5" cy="45.5" r="5" fill="#92d9bb"/>
+        <circle cx="24.5" cy="45.5" r="2" fill="#000"/>
+        <path d="M27.5 47 L24.5 50.5 L22 47" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="ip-label">Spotlight</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VARIANT B: RING PATH ═══ -->
+<div class="variant-card">
+  <div class="v-header">
+    <div class="v-preview">
+      <div class="sizes">
+        <div class="s-item">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="48" stroke="#38383a" stroke-width="1" fill="none"/>
+            <circle cx="60" cy="60" r="36" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="10 8" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+            <circle cx="60" cy="60" r="36" stroke="#92d9bb" stroke-width="2" stroke-dasharray="38 70" stroke-dashoffset="-18" stroke-linecap="round" fill="none"/>
+            <circle cx="30" cy="42" r="10" fill="#3a3a3c"/>
+            <circle cx="30" cy="42" r="3.5" fill="#1c1c1e"/>
+            <circle cx="79" cy="34" r="10" fill="#92d9bb"/>
+            <circle cx="79" cy="34" r="3.5" fill="#000"/>
+            <circle cx="72" cy="84" r="10" fill="#92d9bb"/>
+            <circle cx="72" cy="84" r="3.5" fill="#000"/>
+            <path d="M79 87 L72 95 L66 87" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">120px</span>
+        </div>
+        <div class="s-item">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="24" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="7 5" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+            <circle cx="40" cy="40" r="24" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="25 47" stroke-dashoffset="-12" stroke-linecap="round" fill="none"/>
+            <circle cx="22" cy="30" r="7" fill="#3a3a3c"/>
+            <circle cx="22" cy="30" r="2.5" fill="#1c1c1e"/>
+            <circle cx="54" cy="26" r="7" fill="#92d9bb"/>
+            <circle cx="54" cy="26" r="2.5" fill="#000"/>
+            <circle cx="48" cy="56" r="7" fill="#92d9bb"/>
+            <circle cx="48" cy="56" r="2.5" fill="#000"/>
+            <path d="M52 58 L48 63 L44 58" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">80px</span>
+        </div>
+        <div class="s-item">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="12" cy="15" r="4" fill="#3a3a3c"/>
+            <circle cx="12" cy="15" r="1.5" fill="#1c1c1e"/>
+            <circle cx="27" cy="14" r="4" fill="#92d9bb"/>
+            <circle cx="27" cy="14" r="1.5" fill="#000"/>
+            <circle cx="24" cy="28" r="4" fill="#92d9bb"/>
+            <circle cx="24" cy="28" r="1.5" fill="#000"/>
+            <path d="M26 29 L24 32 L22 29" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">40px</span>
+        </div>
+      </div>
+    </div>
+    <div class="v-info">
+      <h2>B — Ring Path</h2>
+      <p class="tagline">The same story told around a continuous circular track.</p>
+      <p>Three waypoints on a dashed circular ring. The dashed track is the uncertain path; as the eye follows it clockwise, a solid green segment lights up where guidance takes over, ending at the third node with an arrival arrow. The outer ring frames everything without competing.</p>
+      <p class="detail">Stronger geometric precision than Arc Path — feels more "system" and less organic. The dashed-to-solid transition on the same circle creates a clear before/after reading.</p>
+      <div class="specs">
+        <div class="spec"><strong>Shape</strong>Dual-ring system: outer boundary + inner dashed track</div>
+        <div class="spec"><strong>Nodes</strong>3 positions clockwise at roughly 10, 2, and 7 o'clock</div>
+        <div class="spec"><strong>Path</strong>Full dashed ring with a green segment that lights up</div>
+        <div class="spec"><strong>Best for</strong>App icon, system settings, launcher</div>
+      </div>
+    </div>
+  </div>
+  <div class="wordmarks">
+    <div class="wordmark">
+      <div class="wm-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="8.5" stroke="#3a3a3c" stroke-width="1.2" stroke-dasharray="4 3" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+          <circle cx="14" cy="14" r="8.5" stroke="#92d9bb" stroke-width="1.2" stroke-dasharray="9 16" stroke-dashoffset="-4" stroke-linecap="round" fill="none"/>
+          <circle cx="8" cy="10" r="3" fill="#3a3a3c"/>
+          <circle cx="19" cy="10" r="3" fill="#92d9bb"/>
+          <circle cx="17" cy="20" r="3" fill="#92d9bb"/>
+        </svg>
+      </div>
+      <span class="wm-text" style="font-size:22px">Opas</span>
+    </div>
+    <div class="wordmark">
+      <div class="wm-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="6.5" stroke="#92d9bb" stroke-width="1" stroke-dasharray="7 10" stroke-linecap="round" fill="none"/>
+          <circle cx="7" cy="8" r="2.5" fill="#3a3a3c"/>
+          <circle cx="15" cy="8" r="2.5" fill="#92d9bb"/>
+          <circle cx="13.5" cy="15.5" r="2.5" fill="#92d9bb"/>
+        </svg>
+      </div>
+      <span class="wm-text" style="font-size:18px">Opas</span>
+    </div>
+  </div>
+  <div class="wm-icon-preview">
+    <div class="ip">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="60" fill="#000000"/>
+        <circle cx="60" cy="60" r="48" stroke="#2c2c2e" stroke-width="1" fill="none"/>
+        <circle cx="60" cy="60" r="36" stroke="#3a3a3c" stroke-width="3" stroke-dasharray="10 8" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+        <circle cx="60" cy="60" r="36" stroke="#92d9bb" stroke-width="3" stroke-dasharray="38 70" stroke-dashoffset="-18" stroke-linecap="round" fill="none"/>
+        <circle cx="30" cy="42" r="10" fill="#3a3a3c"/>
+        <circle cx="30" cy="42" r="3.5" fill="#1c1c1e"/>
+        <circle cx="79" cy="34" r="10" fill="#92d9bb"/>
+        <circle cx="79" cy="34" r="3.5" fill="#000"/>
+        <circle cx="72" cy="84" r="10" fill="#92d9bb"/>
+        <circle cx="72" cy="84" r="3.5" fill="#000"/>
+        <path d="M79 87 L72 95 L66 87" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="ip-label">App icon</span>
+    </div>
+    <div class="ip">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="30" fill="#000000"/>
+        <circle cx="30" cy="30" r="18" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="6 5" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+        <circle cx="30" cy="30" r="18" stroke="#92d9bb" stroke-width="2" stroke-dasharray="19 35" stroke-dashoffset="-9" stroke-linecap="round" fill="none"/>
+        <circle cx="16" cy="22" r="5" fill="#3a3a3c"/>
+        <circle cx="16" cy="22" r="2" fill="#1c1c1e"/>
+        <circle cx="40" cy="18" r="5" fill="#92d9bb"/>
+        <circle cx="40" cy="18" r="2" fill="#000"/>
+        <circle cx="36.5" cy="42" r="5" fill="#92d9bb"/>
+        <circle cx="36.5" cy="42" r="2" fill="#000"/>
+      </svg>
+      <span class="ip-label">Spotlight</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VARIANT C: NODE PATH ═══ -->
+<div class="variant-card">
+  <div class="v-header">
+    <div class="v-preview">
+      <div class="sizes">
+        <div class="s-item">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="58" fill="none" stroke="#38383a" stroke-width="1"/>
+            <path d="M42 42 L78 42 L90 78" stroke="#3a3a3c" stroke-width="2.5" stroke-dasharray="4 5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M42 42 L78 42 L90 78" stroke="#92d9bb" stroke-width="2.5" stroke-dasharray="32 100" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="42" cy="42" r="11" fill="#3a3a3c"/>
+            <circle cx="42" cy="42" r="4" fill="#1c1c1e"/>
+            <circle cx="78" cy="42" r="11" fill="#3a3a3c"/>
+            <circle cx="78" cy="42" r="4" fill="#1c1c1e"/>
+            <circle cx="90" cy="78" r="11" fill="#92d9bb"/>
+            <circle cx="90" cy="78" r="4" fill="#000"/>
+            <path d="M98 80 L90 90 L84 80" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">120px</span>
+        </div>
+        <div class="s-item">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <path d="M29 29 L52 29 L60 52" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="3 4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M29 29 L52 29 L60 52" stroke="#92d9bb" stroke-width="2" stroke-dasharray="22 70" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="29" cy="29" r="7.5" fill="#3a3a3c"/>
+            <circle cx="29" cy="29" r="2.5" fill="#1c1c1e"/>
+            <circle cx="52" cy="29" r="7.5" fill="#3a3a3c"/>
+            <circle cx="52" cy="29" r="2.5" fill="#1c1c1e"/>
+            <circle cx="60" cy="52" r="7.5" fill="#92d9bb"/>
+            <circle cx="60" cy="52" r="2.5" fill="#000"/>
+            <path d="M65 53.5 L60 60 L56 53.5" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="s-label">80px</span>
+        </div>
+        <div class="s-item">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="15" cy="15" r="4.5" fill="#3a3a3c"/>
+            <circle cx="15" cy="15" r="1.5" fill="#1c1c1e"/>
+            <circle cx="26" cy="15" r="4.5" fill="#3a3a3c"/>
+            <circle cx="26" cy="15" r="1.5" fill="#1c1c1e"/>
+            <circle cx="30" cy="27" r="4.5" fill="#92d9bb"/>
+            <circle cx="30" cy="27" r="1.5" fill="#000"/>
+          </svg>
+          <span class="s-label">40px</span>
+        </div>
+      </div>
+    </div>
+    <div class="v-info">
+      <h2>C — Node Path</h2>
+      <p class="tagline">Two nodes still searching, one node arrived. The before-and-after story.</p>
+      <p>Three positions in an L-shaped path: two grey nodes (the before — uncertainty, searching), one accent-green node with an arrival arrow (the after — guided, arrived). The path itself transitions from dashed (start→middle, still unsure) to solid (middle→end, clarity revealed).</p>
+      <p class="detail">Clearest narrative read of the three variants — you can "read" the story left to right, top to bottom. Two greys to one green literally shows: you're not alone, the system has already guided others.</p>
+      <div class="specs">
+        <div class="spec"><strong>Shape</strong>L-path within a circular boundary, right-angle turn</div>
+        <div class="spec"><strong>Nodes</strong>3: two dark (before), one accent (after) + arrow</div>
+        <div class="spec"><strong>Path</strong>Dashed three-quarter segment, solid final quarter</div>
+        <div class="spec"><strong>Best for</strong>Splash screens, widget icons, notifications</div>
+      </div>
+    </div>
+  </div>
+  <div class="wordmarks">
+    <div class="wordmark">
+      <div class="wm-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M10.5 10.5 L17.5 10.5 L20 17.5" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M10.5 10.5 L17.5 10.5 L20 17.5" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="8 25" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="10.5" cy="10.5" r="3" fill="#3a3a3c"/>
+          <circle cx="10.5" cy="10.5" r="1" fill="#1c1c1e"/>
+          <circle cx="17.5" cy="10.5" r="3" fill="#3a3a3c"/>
+          <circle cx="17.5" cy="10.5" r="1" fill="#1c1c1e"/>
+          <circle cx="20" cy="17.5" r="3" fill="#92d9bb"/>
+          <circle cx="20" cy="17.5" r="1" fill="#000"/>
+        </svg>
+      </div>
+      <span class="wm-text" style="font-size:22px">Opas</span>
+    </div>
+    <div class="wordmark">
+      <div class="wm-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M8.5 8.5 L13.5 8.5 L15.5 13.5" stroke="#92d9bb" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="8.5" cy="8.5" r="2.5" fill="#3a3a3c"/>
+          <circle cx="13.5" cy="8.5" r="2.5" fill="#3a3a3c"/>
+          <circle cx="15.5" cy="13.5" r="2.5" fill="#92d9bb"/>
+        </svg>
+      </div>
+      <span class="wm-text" style="font-size:18px">Opas</span>
+    </div>
+  </div>
+  <div class="wm-icon-preview">
+    <div class="ip">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="60" fill="#000000"/>
+        <path d="M42 42 L78 42 L90 78" stroke="#3a3a3c" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M42 42 L78 42 L90 78" stroke="#92d9bb" stroke-width="3" stroke-dasharray="32 100" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="42" cy="42" r="11" fill="#3a3a3c"/>
+        <circle cx="42" cy="42" r="4" fill="#1c1c1e"/>
+        <circle cx="78" cy="42" r="11" fill="#3a3a3c"/>
+        <circle cx="78" cy="42" r="4" fill="#1c1c1e"/>
+        <circle cx="90" cy="78" r="11" fill="#92d9bb"/>
+        <circle cx="90" cy="78" r="4" fill="#000"/>
+        <path d="M98 80 L90 90 L84 80" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="60" cy="60" r="58" stroke="#38383a" stroke-width=".5"/>
+      </svg>
+      <span class="ip-label">App icon</span>
+    </div>
+    <div class="ip">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="30" fill="#000000"/>
+        <path d="M21 21 L38 21 L44 38" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M21 21 L38 21 L44 38" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="15 40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="21" cy="21" r="5" fill="#3a3a3c"/>
+        <circle cx="21" cy="21" r="2" fill="#1c1c1e"/>
+        <circle cx="38" cy="21" r="5" fill="#3a3a3c"/>
+        <circle cx="38" cy="21" r="2" fill="#1c1c1e"/>
+        <circle cx="44" cy="38" r="5" fill="#92d9bb"/>
+        <circle cx="44" cy="38" r="2" fill="#000"/>
+        <path d="M47.5 39 L44 44 L41 39" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="ip-label">Spotlight</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div style="max-width:1200px;margin-top:64px;padding:32px 40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);text-align:center">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:12px">NEXT STEP</p>
+  <p style="font-size:16px;color:var(--fg);font-weight:500;line-height:1.6">Pick a variant, and I'll build the full logo asset pack: SVG + PNG exports, light/dark variants, favicon, wordmark lockups, and mobile nav icon integration.</p>
+</div>
+
+</body>
+</html>
