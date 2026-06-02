@@ -80,6 +80,8 @@ jwt:
   refresh-token-ttl-days: 30
 
 opas:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
   presidio:
     url: ${PRESIDIO_SIDECAR_URL:http://localhost:5001}
   s3:
