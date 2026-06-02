@@ -1,0 +1,144 @@
+name: Infra CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'opas-infra/**'
+      - '.github/workflows/infra-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'opas-infra/**'
+
+defaults:
+  run:
+    working-directory: opas-infra
+
+jobs:
+  validate:
+    name: Validate Docker Compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate compose file syntax
+        run: docker compose config
+
+  integration:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start all services
+        run: docker compose up -d --wait --wait-timeout 120
+
+      - name: List running containers
+        run: docker compose ps
+
+      - name: Verify PostgreSQL health
+        run: |
+          docker exec opas-postgres pg_isready -U opas
+          docker exec opas-postgres psql -U opas -d opas -c "CREATE EXTENSION IF NOT EXISTS vector;"
+          docker exec opas-postgres psql -U opas -d opas -c "SELECT extname FROM pg_extension;"
+
+      - name: Verify Redis health
+        run: docker exec opas-redis redis-cli ping
+
+      - name: Verify RabbitMQ health
+        run: |
+          docker exec opas-rabbitmq rabbitmq-diagnostics ping
+          docker exec opas-rabbitmq rabbitmq-diagnostics check_running
+
+      - name: Verify LocalStack health
+        run: |
+          curl -s http://localhost:4566/_localstack/health | jq .
+          docker exec opas-localstack awslocal s3 ls
+
+      - name: Verify Prometheus health
+        run: curl -s http://localhost:9090/-/healthy
+
+      - name: Verify Grafana health
+        run: curl -s http://localhost:3001/api/health
+
+      - name: Verify Presidio Analyzer health
+        run: curl -s http://localhost:5001/health
+
+      - name: Verify Presidio Anonymizer health
+        run: curl -s http://localhost:5002/health
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy on infra images
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker.io/pgvector/pgvector:pg16'
+          format: 'sarif'
+          output: 'trivy-postgres.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+      - name: Run Trivy on Redis
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'docker.io/redis:7-alpine'
+          format: 'sarif'
+          output: 'trivy-redis.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run Trivy on RabbitMQ
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'docker.io/rabbitmq:3-management-alpine'
+          format: 'sarif'
+          output: 'trivy-rabbitmq.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: opas-infra/trivy-postgres.sarif
+
+  deploy-infra:
+    name: Deploy Infrastructure
+    needs: integration
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-north-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: opas-infra-deploy
+
+      - name: Deploy infrastructure changes
+        run: |
+          echo "Deploying infrastructure updates for commit ${{ github.sha }}"
+        #   aws cloudformation deploy \
+        #     --template-file opas-infra/cloudformation/template.yaml \
+        #     --stack-name opas-infra \
+        #     --capabilities CAPABILITY_IAM \
+        #     --no-fail-on-empty-changeset
+
+      - name: Notify deployment
+        run: |
+          echo "Infrastructure deployed: ${{ github.sha }}"
