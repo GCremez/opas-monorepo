@@ -58,7 +58,7 @@ class DecodeServiceTest {
     @BeforeEach
     void setUp() {
         service = new DecodeService(documentRepository, userRepository, decodeResultRepository, subscriptionRepository,
-                storageService, presidioService, usageTracker, chatModel, 5);
+                storageService, presidioService, usageTracker, chatModel, 5, "claude-sonnet-4-20250514");
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);

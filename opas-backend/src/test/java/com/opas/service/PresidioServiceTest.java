@@ -37,7 +37,7 @@ class PresidioServiceTest {
 
     private void mockPostChain() {
         when(restClient.post()).thenReturn(uriSpec);
-        when(uriSpec.body(any())).thenReturn(uriSpec);
+        when(uriSpec.body(any(Object.class))).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
     }
 
