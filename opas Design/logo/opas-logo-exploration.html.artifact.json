@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Opas Logo Exploration — 4 Concepts",
+  "entry": "opas-logo-exploration.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-05-16T12:45:19.649Z",
+  "updatedAt": "2026-05-16T12:45:19.660Z",
+  "sourceSkillId": "agent-browser",
+  "metadata": {
+    "identifier": "opas-logo-exploration",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

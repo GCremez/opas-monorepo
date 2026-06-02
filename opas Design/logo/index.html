@@ -1,0 +1,765 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Opas — Logo Asset Pack (Ring Path)</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;
+  --surface:#1c1c1e;
+  --surface-2:#2c2c2e;
+  --fg:#f5f5f7;
+  --muted:#86868b;
+  --border:#38383a;
+  --accent:#92d9bb;
+  --accent-dim:#92d9bb22;
+  --accent-hover:#7eccac;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-xl:24px;
+  --font-display:'Lufga','Inter',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;
+}
+body{
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 80px;
+}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+::selection{background:var(--accent);color:var(--bg)}
+h1{
+  font-family:var(--font-display);font-size:32px;font-weight:700;
+  letter-spacing:-.03em;margin-bottom:4px;
+}
+h2{
+  font-family:var(--font-display);font-size:22px;font-weight:600;
+  letter-spacing:-.02em;margin-bottom:var(--space-6);padding-top:var(--space-10);
+}
+h3{font-size:16px;font-weight:600;margin-bottom:var(--space-4)}
+.sub{color:var(--muted);font-size:14px;margin-bottom:var(--space-8)}
+.badge{
+  display:inline-block;font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:2px 8px;border-radius:3px;
+  background:var(--accent-dim);color:var(--accent);margin-bottom:var(--space-2);
+}
+.section{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:var(--space-10);
+  margin-bottom:var(--space-8);
+}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-6)}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4)}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+.asset-card{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-6);
+  display:flex;flex-direction:column;align-items:center;gap:var(--space-3);
+}
+.asset-card .label{font-size:12px;color:var(--muted);font-weight:500}
+.asset-card .sub-label{font-size:11px;color:var(--muted)}
+.asset-card .code-btn{
+  font-family:var(--font-mono);font-size:11px;
+  padding:4px 10px;border-radius:4px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--accent);cursor:pointer;transition:all .15s;
+}
+.asset-card .code-btn:hover{background:var(--accent-dim);border-color:var(--accent)}
+.lockup-row{
+  display:flex;align-items:center;gap:var(--space-6);
+  padding:var(--space-4) 0;flex-wrap:wrap;
+}
+.lockup-row .lbl{font-size:12px;color:var(--muted);width:80px;flex-shrink:0}
+.copy-block{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-4);
+  font-family:var(--font-mono);font-size:12px;line-height:1.7;
+  overflow-x:auto;white-space:pre;color:var(--fg);
+  margin:var(--space-3) 0;
+}
+.guidelines li{
+  font-size:14px;color:var(--muted);line-height:1.8;
+  margin-bottom:var(--space-2);padding-left:var(--space-4);
+}
+.guidelines li strong{color:var(--fg)}
+.do-dont{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);
+  margin:var(--space-4) 0;
+}
+@media(max-width:600px){.do-dont{grid-template-columns:1fr}}
+.do,.dont{
+  padding:var(--space-5);border-radius:var(--radius-md);
+  border:1px solid var(--border);
+}
+.do{background:rgba(48,209,88,.08);border-color:rgba(48,209,88,.3)}
+.dont{background:rgba(255,69,58,.08);border-color:rgba(255,69,58,.3)}
+.do .head{color:var(--success);font-weight:600;font-size:13px;margin-bottom:var(--space-2)}
+.dont .head{color:var(--danger);font-weight:600;font-size:13px;margin-bottom:var(--space-2)}
+.do p,.dont p{font-size:13px;color:var(--muted);line-height:1.6}
+.hero{
+  padding:var(--space-16) 0 var(--space-10);
+  border-bottom:1px solid var(--border);
+  margin-bottom:var(--space-10);
+}
+.hero .final-mark{
+  display:flex;align-items:center;gap:var(--space-8);
+  margin:var(--space-8) 0;
+  flex-wrap:wrap;
+}
+.hero .final-mark .selected{position:relative}
+.hero .final-mark .selected::after{
+  content:"SELECTED";position:absolute;bottom:-24px;left:50%;
+  transform:translateX(-50%);
+  font-size:10px;font-weight:600;
+  letter-spacing:.1em;color:var(--accent);
+  white-space:nowrap;
+}
+.tabs{
+  display:flex;gap:var(--space-2);margin-bottom:var(--space-6);
+  border-bottom:1px solid var(--border);padding-bottom:0;
+  overflow-x:auto;
+}
+.tab{
+  padding:var(--space-2) var(--space-4);font-size:13px;font-weight:500;
+  color:var(--muted);border-bottom:2px solid transparent;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.tab:hover{color:var(--fg)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.file-badge{
+  display:inline-block;font-family:var(--font-mono);font-size:11px;
+  padding:2px 6px;border-radius:3px;
+  background:var(--accent-dim);color:var(--accent);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <span class="badge">Final — v1.0</span>
+  <h1>Opas Logo Asset Pack</h1>
+  <p class="sub">Pathfinder &middot; Ring Path variant &middot; Circle app icon &middot; Lufga + Inter &middot; Dark &amp; Light</p>
+
+  <div class="final-mark">
+    <div class="selected">
+      <svg width="140" height="140" viewBox="0 0 140 140" fill="none">
+        <circle cx="70" cy="70" r="58" stroke="#38383a" stroke-width="1" fill="none"/>
+        <circle cx="70" cy="70" r="44" stroke="#3a3a3c" stroke-width="2.5" stroke-dasharray="12 10" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+        <circle cx="70" cy="70" r="44" stroke="#92d9bb" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round" fill="none"/>
+        <circle cx="36" cy="50" r="12" fill="#3a3a3c"/>
+        <circle cx="36" cy="50" r="4.5" fill="#1c1c1e"/>
+        <circle cx="94" cy="42" r="12" fill="#92d9bb"/>
+        <circle cx="94" cy="42" r="4.5" fill="#000"/>
+        <circle cx="84" cy="98" r="12" fill="#92d9bb"/>
+        <circle cx="84" cy="98" r="4.5" fill="#000"/>
+        <path d="M92 102 L84 112 L77 102" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="11" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>
+          <circle cx="18" cy="18" r="11" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="11.5 21" stroke-dashoffset="-5.5" stroke-linecap="round" fill="none"/>
+          <circle cx="10" cy="13" r="3" fill="#3a3a3c"/>
+          <circle cx="24" cy="11" r="3" fill="#92d9bb"/>
+          <circle cx="21.5" cy="25" r="3" fill="#92d9bb"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.03em">Opas</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="7.5" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="8 12" stroke-linecap="round" fill="none"/>
+          <circle cx="7" cy="9" r="2" fill="#3a3a3c"/>
+          <circle cx="16" cy="8" r="2" fill="#92d9bb"/>
+          <circle cx="14.5" cy="17" r="2" fill="#92d9bb"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:20px;font-weight:600;letter-spacing:-.02em">Opas</span>
+      </div>
+    </div>
+  </div>
+  <p style="color:var(--muted);font-size:14px;max-width:600px">
+    The <strong>Ring Path</strong> mark tells the Opas story: three waypoints on a dashed circular track, 
+    with a solid green segment lighting up where guidance takes over. The arrow at the final node = arrived.
+    Built with the <span class="file-badge">Owl-Listener/designer-skills</span> naming convention framework.
+  </p>
+</div>
+
+<!-- ═══ SECTION 1: MASTER SVG EXPORT ═══ -->
+<h2>1. Master SVG — canonical source</h2>
+<div class="section">
+  <p style="color:var(--muted);font-size:14px;margin-bottom:var(--space-6);max-width:560px">
+    One source of truth. All other sizes and variants derive from this. ViewBox 0 0 140 140.
+  </p>
+  <div class="grid-2">
+    <div class="asset-card">
+      <svg width="200" height="200" viewBox="0 0 140 140" fill="none">
+        <circle cx="70" cy="70" r="58" stroke="#38383a" stroke-width="1" fill="none"/>
+        <circle cx="70" cy="70" r="44" stroke="#3a3a3c" stroke-width="2.5" stroke-dasharray="12 10" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+        <circle cx="70" cy="70" r="44" stroke="#92d9bb" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round" fill="none"/>
+        <circle cx="36" cy="50" r="12" fill="#3a3a3c"/>
+        <circle cx="36" cy="50" r="4.5" fill="#1c1c1e"/>
+        <circle cx="94" cy="42" r="12" fill="#92d9bb"/>
+        <circle cx="94" cy="42" r="4.5" fill="#000"/>
+        <circle cx="84" cy="98" r="12" fill="#92d9bb"/>
+        <circle cx="84" cy="98" r="4.5" fill="#000"/>
+        <path d="M92 102 L84 112 L77 102" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">Dark background</span>
+      <div style="display:flex;gap:var(--space-2)">
+        <button class="code-btn" onclick="copySVG(this,'master-dark')">Copy SVG</button>
+        <button class="code-btn" onclick="downloadSVG(this,'opas-logo-master-dark','140')">Download</button>
+      </div>
+    </div>
+    <div class="asset-card" style="background:#f5f5f7;border-color:#c6c6c8">
+      <div style="filter:invert(0)">
+        <svg width="200" height="200" viewBox="0 0 140 140" fill="none">
+          <circle cx="70" cy="70" r="58" stroke="#d1d1d6" stroke-width="1" fill="none"/>
+          <circle cx="70" cy="70" r="44" stroke="#c6c6c8" stroke-width="2.5" stroke-dasharray="12 10" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+          <circle cx="70" cy="70" r="44" stroke="#1a8a7a" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round" fill="none"/>
+          <circle cx="36" cy="50" r="12" fill="#c6c6c8"/>
+          <circle cx="36" cy="50" r="4.5" fill="#e8e8ed"/>
+          <circle cx="94" cy="42" r="12" fill="#1a8a7a"/>
+          <circle cx="94" cy="42" r="4.5" fill="#fff"/>
+          <circle cx="84" cy="98" r="12" fill="#1a8a7a"/>
+          <circle cx="84" cy="98" r="4.5" fill="#fff"/>
+          <path d="M92 102 L84 112 L77 102" stroke="#1a8a7a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <span class="label" style="color:#3c3c3c">Light background</span>
+      <div style="display:flex;gap:var(--space-2)">
+        <button class="code-btn" onclick="copySVG(this,'master-light')">Copy SVG</button>
+        <button class="code-btn" onclick="downloadSVG(this,'opas-logo-master-light','140')">Download</button>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:var(--space-4)">
+    <span class="file-badge" style="font-size:12px">Export naming: opas-logo-{context}-{size}.svg</span>
+    <span class="file-badge" style="font-size:12px;margin-left:var(--space-2)">Tokens: --accent stroke/fill, --surface-2 node bg</span>
+  </div>
+  <div class="copy-block" id="master-dark"><!-- Opas logo -- dark -- 140x140 -->
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="70" cy="70" r="58" stroke="#38383a" stroke-width="1"/>
+  <circle cx="70" cy="70" r="44" stroke="#3a3a3c" stroke-width="2.5" stroke-dasharray="12 10" stroke-linecap="round"/>
+  <circle cx="70" cy="70" r="44" stroke="#92d9bb" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round"/>
+  <circle cx="36" cy="50" r="12" fill="#3a3a3c"/>
+  <circle cx="36" cy="50" r="4.5" fill="#1c1c1e"/>
+  <circle cx="94" cy="42" r="12" fill="#92d9bb"/>
+  <circle cx="94" cy="42" r="4.5" fill="#000"/>
+  <circle cx="84" cy="98" r="12" fill="#92d9bb"/>
+  <circle cx="84" cy="98" r="4.5" fill="#000"/>
+  <path d="M92 102 L84 112 L77 102" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></div>
+  <div class="copy-block" id="master-light" style="display:none"><!-- Opas logo -- light -- 140x140 -->
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="70" cy="70" r="58" stroke="#d1d1d6" stroke-width="1"/>
+  <circle cx="70" cy="70" r="44" stroke="#c6c6c8" stroke-width="2.5" stroke-dasharray="12 10" stroke-linecap="round"/>
+  <circle cx="70" cy="70" r="44" stroke="#1a8a7a" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round"/>
+  <circle cx="36" cy="50" r="12" fill="#c6c6c8"/>
+  <circle cx="36" cy="50" r="4.5" fill="#e8e8ed"/>
+  <circle cx="94" cy="42" r="12" fill="#1a8a7a"/>
+  <circle cx="94" cy="42" r="4.5" fill="#fff"/>
+  <circle cx="84" cy="98" r="12" fill="#1a8a7a"/>
+  <circle cx="84" cy="98" r="4.5" fill="#fff"/>
+  <path d="M92 102 L84 112 L77 102" stroke="#1a8a7a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></div>
+</div>
+
+<!-- ═══ SECTION 2: SIZE VARIANTS ═══ -->
+<h2>2. Size variants</h2>
+<div class="section">
+  <div class="grid-4">
+    <div class="asset-card">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="48" stroke="#38383a" stroke-width="1" fill="none"/>
+        <circle cx="60" cy="60" r="36" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="10 8" stroke-linecap="round" fill="none"/>
+        <circle cx="60" cy="60" r="36" stroke="#92d9bb" stroke-width="2" stroke-dasharray="38 70" stroke-dashoffset="-18" stroke-linecap="round" fill="none"/>
+        <circle cx="30" cy="42" r="10" fill="#3a3a3c"/>
+        <circle cx="30" cy="42" r="3.5" fill="#1c1c1e"/>
+        <circle cx="79" cy="34" r="10" fill="#92d9bb"/>
+        <circle cx="79" cy="34" r="3.5" fill="#000"/>
+        <circle cx="72" cy="84" r="10" fill="#92d9bb"/>
+        <circle cx="72" cy="84" r="3.5" fill="#000"/>
+        <path d="M79 87 L72 95 L66 87" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">Logomark 120px</span>
+      <span class="sub-label">Hero / splash</span>
+      <button class="code-btn" onclick="copyInline(this,'size-120')">Copy inline SVG</button>
+    </div>
+    <div class="asset-card">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="24" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="7 5" stroke-linecap="round" fill="none"/>
+        <circle cx="40" cy="40" r="24" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="25 47" stroke-dashoffset="-12" stroke-linecap="round" fill="none"/>
+        <circle cx="22" cy="30" r="7" fill="#3a3a3c"/>
+        <circle cx="22" cy="30" r="2.5" fill="#1c1c1e"/>
+        <circle cx="54" cy="26" r="7" fill="#92d9bb"/>
+        <circle cx="54" cy="26" r="2.5" fill="#000"/>
+        <circle cx="48" cy="56" r="7" fill="#92d9bb"/>
+        <circle cx="48" cy="56" r="2.5" fill="#000"/>
+        <path d="M52 58 L48 63 L44 58" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">80px</span>
+      <span class="sub-label">Section headers</span>
+      <button class="code-btn" onclick="copyInline(this,'size-80')">Copy inline SVG</button>
+    </div>
+    <div class="asset-card">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="12" cy="15" r="4" fill="#3a3a3c"/>
+        <circle cx="12" cy="15" r="1.5" fill="#1c1c1e"/>
+        <circle cx="27" cy="14" r="4" fill="#92d9bb"/>
+        <circle cx="27" cy="14" r="1.5" fill="#000"/>
+        <circle cx="24" cy="28" r="4" fill="#92d9bb"/>
+        <circle cx="24" cy="28" r="1.5" fill="#000"/>
+        <path d="M26 29 L24 32 L22 29" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">40px</span>
+      <span class="sub-label">Nav bar / small UI</span>
+      <button class="code-btn" onclick="copyInline(this,'size-40')">Copy inline SVG</button>
+    </div>
+    <div class="asset-card">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="7.5" stroke="#92d9bb" stroke-width="1" stroke-dasharray="8 10" stroke-linecap="round" fill="none"/>
+        <circle cx="7" cy="9" r="2" fill="#3a3a3c"/>
+        <circle cx="16" cy="8" r="2" fill="#92d9bb"/>
+        <circle cx="14.5" cy="17" r="2" fill="#92d9bb"/>
+      </svg>
+      <span class="label">24px</span>
+      <span class="sub-label">Favicon base</span>
+      <button class="code-btn" onclick="copyInline(this,'size-24')">Copy inline SVG</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 3: APP ICON + SPOTLIGHT ═══ -->
+<h2>3. App icon &amp; OS assets</h2>
+<div class="section">
+  <div class="grid-3">
+    <div class="asset-card">
+      <svg width="180" height="180" viewBox="0 0 180 180" fill="none">
+        <circle cx="90" cy="90" r="90" fill="#000000"/>
+        <circle cx="90" cy="90" r="84" fill="none" stroke="#2c2c2e" stroke-width="1"/>
+        <circle cx="90" cy="90" r="54" stroke="#3a3a3c" stroke-width="3.5" stroke-dasharray="14 12" stroke-linecap="round" fill="none"/>
+        <circle cx="90" cy="90" r="54" stroke="#92d9bb" stroke-width="3.5" stroke-dasharray="57 105" stroke-dashoffset="-27" stroke-linecap="round" fill="none"/>
+        <circle cx="46" cy="64" r="14" fill="#3a3a3c"/>
+        <circle cx="46" cy="64" r="5" fill="#1c1c1e"/>
+        <circle cx="121" cy="54" r="14" fill="#92d9bb"/>
+        <circle cx="121" cy="54" r="5" fill="#000"/>
+        <circle cx="108" cy="128" r="14" fill="#92d9bb"/>
+        <circle cx="108" cy="128" r="5" fill="#000"/>
+        <path d="M118 133 L108 146 L99 133" stroke="#92d9bb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="90" cy="90" r="84" stroke="#38383a" stroke-width=".5"/>
+      </svg>
+      <span class="label">App icon 180px</span>
+      <span class="sub-label">iOS App Store / Android Play Store</span>
+      <button class="code-btn" onclick="copyInline(this,'app-icon')">Copy SVG</button>
+    </div>
+    <div class="asset-card">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="60" fill="#000000"/>
+        <circle cx="60" cy="60" r="48" stroke="#2c2c2e" stroke-width="1" fill="none"/>
+        <circle cx="60" cy="60" r="36" stroke="#3a3a3c" stroke-width="3" stroke-dasharray="10 8" stroke-linecap="round" fill="none"/>
+        <circle cx="60" cy="60" r="36" stroke="#92d9bb" stroke-width="3" stroke-dasharray="38 70" stroke-dashoffset="-18" stroke-linecap="round" fill="none"/>
+        <circle cx="30" cy="42" r="10" fill="#3a3a3c"/>
+        <circle cx="30" cy="42" r="3.5" fill="#1c1c1e"/>
+        <circle cx="79" cy="34" r="10" fill="#92d9bb"/>
+        <circle cx="79" cy="34" r="3.5" fill="#000"/>
+        <circle cx="72" cy="84" r="10" fill="#92d9bb"/>
+        <circle cx="72" cy="84" r="3.5" fill="#000"/>
+        <path d="M79 87 L72 95 L66 87" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">App icon 120px</span>
+      <span class="sub-label">iOS home screen</span>
+      <button class="code-btn" onclick="copyInline(this,'app-icon-120')">Copy SVG</button>
+    </div>
+    <div class="asset-card">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="40" fill="#000000"/>
+        <circle cx="40" cy="40" r="24" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="7 5" stroke-linecap="round" fill="none"/>
+        <circle cx="40" cy="40" r="24" stroke="#92d9bb" stroke-width="2" stroke-dasharray="25 47" stroke-dashoffset="-12" stroke-linecap="round" fill="none"/>
+        <circle cx="22" cy="30" r="7" fill="#3a3a3c"/>
+        <circle cx="22" cy="30" r="2.5" fill="#1c1c1e"/>
+        <circle cx="54" cy="26" r="7" fill="#92d9bb"/>
+        <circle cx="54" cy="26" r="2.5" fill="#000"/>
+        <circle cx="48" cy="56" r="7" fill="#92d9bb"/>
+        <circle cx="48" cy="56" r="2.5" fill="#000"/>
+        <path d="M52 58 L48 63 L44 58" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">Spotlight 80px</span>
+      <span class="sub-label">iOS spotlight search</span>
+      <button class="code-btn" onclick="copyInline(this,'spotlight')">Copy SVG</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:var(--space-4);margin-top:var(--space-4);flex-wrap:wrap">
+    <div class="asset-card" style="flex-direction:row;gap:var(--space-3);padding:var(--space-3) var(--space-4)">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="16" fill="#000000"/>
+        <circle cx="16" cy="16" r="10" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>
+        <circle cx="16" cy="16" r="10" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="10.5 19.5" stroke-dashoffset="-5" stroke-linecap="round" fill="none"/>
+        <circle cx="9" cy="11" r="3" fill="#3a3a3c"/>
+        <circle cx="22" cy="10" r="3" fill="#92d9bb"/>
+        <circle cx="19.5" cy="22" r="3" fill="#92d9bb"/>
+      </svg>
+      <span class="label">Favicon 32px</span>
+      <button class="code-btn" onclick="copyInline(this,'favicon')">Copy SVG</button>
+    </div>
+    <div class="asset-card" style="flex-direction:row;gap:var(--space-3);padding:var(--space-3) var(--space-4)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="12" fill="#000000"/>
+        <circle cx="12" cy="12" r="7.5" stroke="#92d9bb" stroke-width="1" stroke-dasharray="8 10" stroke-linecap="round" fill="none"/>
+        <circle cx="7" cy="9" r="2" fill="#3a3a3c"/>
+        <circle cx="16" cy="8" r="2" fill="#92d9bb"/>
+        <circle cx="14.5" cy="17" r="2" fill="#92d9bb"/>
+      </svg>
+      <span class="label">Favicon 24px (safari pinned tab)</span>
+      <button class="code-btn" onclick="copyInline(this,'favicon-24')">Copy SVG</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 4: WORDMARK LOCKUPS ═══ -->
+<h2>4. Wordmark lockups</h2>
+<div class="section">
+  <div class="grid-2">
+    <div class="asset-card" style="gap:var(--space-4)">
+      <span class="label">Horizontal — icon left</span>
+      <div style="display:flex;align-items:center;gap:14px">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="12" cy="15" r="4" fill="#3a3a3c"/>
+          <circle cx="12" cy="15" r="1.5" fill="#1c1c1e"/>
+          <circle cx="27" cy="14" r="4" fill="#92d9bb"/>
+          <circle cx="27" cy="14" r="1.5" fill="#000"/>
+          <circle cx="24" cy="28" r="4" fill="#92d9bb"/>
+          <circle cx="24" cy="28" r="1.5" fill="#000"/>
+          <path d="M26 29 L24 32 L22 29" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.03em;color:var(--fg)">Opas</span>
+      </div>
+      <span class="sub-label">Primary — nav bars, headers, splash</span>
+      <button class="code-btn" onclick="copyInline(this,'lockup-h')">Copy SVG</button>
+    </div>
+    <div class="asset-card" style="gap:var(--space-4)">
+      <span class="label">Horizontal — icon right (tagline)</span>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--fg)">Opas</span>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="9" cy="11" r="3" fill="#3a3a3c"/>
+          <circle cx="19" cy="10" r="3" fill="#92d9bb"/>
+          <circle cx="17" cy="20" r="3" fill="#92d9bb"/>
+        </svg>
+        <span style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;color:var(--muted)">— your guide</span>
+      </div>
+      <span class="sub-label">Tagline pair — about, footer, loading</span>
+      <button class="code-btn" onclick="copyInline(this,'lockup-tag')">Copy SVG</button>
+    </div>
+    <div class="asset-card" style="gap:var(--space-4)">
+      <span class="label">Vertical stack</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="14" cy="18" r="5" fill="#3a3a3c"/>
+          <circle cx="14" cy="18" r="1.5" fill="#1c1c1e"/>
+          <circle cx="33" cy="16" r="5" fill="#92d9bb"/>
+          <circle cx="33" cy="16" r="1.5" fill="#000"/>
+          <circle cx="29" cy="34" r="5" fill="#92d9bb"/>
+          <circle cx="29" cy="34" r="1.5" fill="#000"/>
+          <path d="M31.5 35.5 L29 39 L26.5 35.5" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--fg)">Opas</span>
+        <span style="font-family:'Inter',sans-serif;font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase">Your guide to Finland</span>
+      </div>
+      <span class="sub-label">Splash screen, loading state, app store</span>
+      <button class="code-btn" onclick="copyInline(this,'lockup-v')">Copy SVG</button>
+    </div>
+    <div class="asset-card" style="gap:var(--space-4)">
+      <span class="label">Icon only (no text)</span>
+      <div style="display:flex;align-items:center;gap:16px">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="9" cy="11" r="3" fill="#3a3a3c"/>
+          <circle cx="9" cy="11" r="1" fill="#1c1c1e"/>
+          <circle cx="19" cy="10" r="3" fill="#92d9bb"/>
+          <circle cx="19" cy="10" r="1" fill="#000"/>
+          <circle cx="17" cy="20" r="3" fill="#92d9bb"/>
+          <circle cx="17" cy="20" r="1" fill="#000"/>
+        </svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="7" cy="8" r="2" fill="#3a3a3c"/>
+          <circle cx="14" cy="7" r="2" fill="#92d9bb"/>
+          <circle cx="12.5" cy="14.5" r="2" fill="#92d9bb"/>
+        </svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="6" cy="6" r="1.5" fill="#92d9bb"/>
+          <circle cx="10" cy="6" r="1.5" fill="#92d9bb"/>
+          <circle cx="9" cy="11" r="1.5" fill="#92d9bb"/>
+        </svg>
+      </div>
+      <span class="sub-label">Tab bar icons, notifications, badges</span>
+      <button class="code-btn" onclick="copyInline(this,'lockup-icon')">Copy SVG</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 5: USAGE GUIDELINES ═══ -->
+<h2>5. Usage guidelines</h2>
+<div class="section">
+  <div class="grid-2">
+    <div>
+      <h3>Clear space</h3>
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-8);display:flex;justify-content:center">
+        <div style="position:relative;padding:20px;border:1px dashed var(--accent)">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="24" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="7 5" stroke-linecap="round" fill="none"/>
+            <circle cx="40" cy="40" r="24" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="25 47" stroke-dashoffset="-12" stroke-linecap="round" fill="none"/>
+            <circle cx="22" cy="30" r="7" fill="#3a3a3c"/>
+            <circle cx="54" cy="26" r="7" fill="#92d9bb"/>
+            <circle cx="48" cy="56" r="7" fill="#92d9bb"/>
+            <path d="M52 58 L48 63 L44 58" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--accent);font-weight:600;background:var(--surface-2);padding:0 6px">x</span>
+          <span style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--accent);font-weight:600;background:var(--surface-2);padding:0 6px">x</span>
+          <span style="position:absolute;left:-10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--accent);font-weight:600;background:var(--surface-2);padding:0 6px">x</span>
+          <span style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--accent);font-weight:600;background:var(--surface-2);padding:0 6px">x</span>
+        </div>
+      </div>
+      <ul class="guidelines" style="margin-top:var(--space-4)">
+        <li>Maintain clear space equal to <strong>1× the icon width</strong> on all sides</li>
+        <li>Minimum 24px for icon-only usage (still recognizable)</li>
+        <li>Minimum 32px for wordmark lockup</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Minimum sizes</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <tr><th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Usage</th>
+            <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Min size</th>
+            <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Format</th></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--border)">App icon</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">1024×1024</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">PNG (no JPG)</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--border)">Spotlight</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">80×80</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">PNG</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--border)">Favicon</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">32×32</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">SVG / ICO</td></tr>
+        <tr><td style="padding:8px 12px;border-bottom:1px solid var(--border)">Nav bar</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">28×28</td>
+            <td style="padding:8px 12px;border-bottom:1px solid var(--border)">SVG inline</td></tr>
+        <tr><td style="padding:8px 12px">Wordmark</td>
+            <td style="padding:8px 12px">32px wordmark height</td>
+            <td style="padding:8px 12px">SVG / PNG</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="do-dont" style="margin-top:var(--space-6)">
+    <div class="do">
+      <div class="head">✓ Do</div>
+      <p>Use the green accent (#92D9BB) on dark / (#1A8A7A) on light backgrounds.<br>
+      Keep the mark on a circular background for app icons.<br>
+      Use the lockup arrangement that fits the context (horizontal for nav, vertical for splash).<br>
+      Let the dashed ring be clearly visible — don't scale below 24px.</p>
+    </div>
+    <div class="dont">
+      <div class="head">✗ Don't</div>
+      <p>Recolor the accent to a different hue — keep it in the teal/green family.<br>
+      Stretch or distort the SVG aspect ratio.<br>
+      Place the mark on a busy background — the ring needs visual air.<br>
+      Use the icon-only mark below 20px (switch to wordmark or remove).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 6: COLOR VARIANTS ═══ -->
+<h2>6. Theme variants</h2>
+<div class="section">
+  <div class="grid-3">
+    <div class="asset-card">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="38" stroke="#38383a" stroke-width="1" fill="none"/>
+        <circle cx="50" cy="50" r="28" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round" fill="none"/>
+        <circle cx="50" cy="50" r="28" stroke="#92d9bb" stroke-width="2" stroke-dasharray="29 55" stroke-dashoffset="-14" stroke-linecap="round" fill="none"/>
+        <circle cx="26" cy="34" r="8" fill="#3a3a3c"/>
+        <circle cx="26" cy="34" r="3" fill="#1c1c1e"/>
+        <circle cx="67" cy="30" r="8" fill="#92d9bb"/>
+        <circle cx="67" cy="30" r="3" fill="#000"/>
+        <circle cx="61" cy="68" r="8" fill="#92d9bb"/>
+        <circle cx="61" cy="68" r="3" fill="#000"/>
+        <path d="M66 71 L61 78 L56 71" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">Dark theme (default)</span>
+      <span class="sub-label">--accent: #92d9bb on #000 bg</span>
+    </div>
+    <div class="asset-card" style="background:#f5f5f7;border-color:#c6c6c8">
+      <div style="filter:invert(0)">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="38" stroke="#d1d1d6" stroke-width="1" fill="none"/>
+          <circle cx="50" cy="50" r="28" stroke="#c6c6c8" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round" fill="none"/>
+          <circle cx="50" cy="50" r="28" stroke="#1a8a7a" stroke-width="2" stroke-dasharray="29 55" stroke-dashoffset="-14" stroke-linecap="round" fill="none"/>
+          <circle cx="26" cy="34" r="8" fill="#c6c6c8"/>
+          <circle cx="26" cy="34" r="3" fill="#e8e8ed"/>
+          <circle cx="67" cy="30" r="8" fill="#1a8a7a"/>
+          <circle cx="67" cy="30" r="3" fill="#fff"/>
+          <circle cx="61" cy="68" r="8" fill="#1a8a7a"/>
+          <circle cx="61" cy="68" r="3" fill="#fff"/>
+          <path d="M66 71 L61 78 L56 71" stroke="#1a8a7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <span class="label" style="color:#3c3c3c">Light theme</span>
+      <span class="sub-label" style="color:#8e8e93">--accent: #1a8a7a on #f5f5f7 bg</span>
+    </div>
+    <div class="asset-card" style="background:#0d1b2a;border-color:#1b2a3f">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="38" stroke="#1b2a3f" stroke-width="1" fill="none"/>
+        <circle cx="50" cy="50" r="28" stroke="#2a3f5a" stroke-width="2" stroke-dasharray="8 6" stroke-linecap="round" fill="none"/>
+        <circle cx="50" cy="50" r="28" stroke="#92d9bb" stroke-width="2" stroke-dasharray="29 55" stroke-dashoffset="-14" stroke-linecap="round" fill="none"/>
+        <circle cx="26" cy="34" r="8" fill="#2a3f5a"/>
+        <circle cx="26" cy="34" r="3" fill="#0d1b2a"/>
+        <circle cx="67" cy="30" r="8" fill="#92d9bb"/>
+        <circle cx="67" cy="30" r="3" fill="#0d1b2a"/>
+        <circle cx="61" cy="68" r="8" fill="#92d9bb"/>
+        <circle cx="61" cy="68" r="3" fill="#0d1b2a"/>
+        <path d="M66 71 L61 78 L56 71" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="label">Navy variant</span>
+      <span class="sub-label">Deep navy #0d1b2a (from your DOCX brand)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 7: NAV INTEGRATION ═══ -->
+<h2>7. Nav bar integration</h2>
+<div class="section">
+  <p style="color:var(--muted);font-size:14px;margin-bottom:var(--space-6);max-width:560px">
+    The Ring Path mark replaces the generic home icon in the bottom tab bar. 
+    At home-tab size (28px), the mark is simplified — nodes without inner dots, 
+    dashed ring without the outer boundary — to read clearly at small scale.
+  </p>
+  <div class="grid-3">
+    <div class="asset-card" style="flex-direction:row;gap:var(--space-4);padding:var(--space-4);align-items:center">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="8.5" stroke="#3a3a3c" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>
+        <circle cx="14" cy="14" r="8.5" stroke="#92d9bb" stroke-width="1.2" stroke-dasharray="9 16" stroke-dashoffset="-4" stroke-linecap="round" fill="none"/>
+        <circle cx="8" cy="10" r="3" fill="#3a3a3c"/>
+        <circle cx="19" cy="10" r="3" fill="#92d9bb"/>
+        <circle cx="17" cy="20" r="3" fill="#92d9bb"/>
+      </svg>
+      <span><span class="label">28px — Tab bar</span><br><span class="sub-label">Home tab icon</span></span>
+      <button class="code-btn" onclick="copyInline(this,'nav-home')">Copy</button>
+    </div>
+    <div class="asset-card" style="flex-direction:row;gap:var(--space-4);padding:var(--space-4);align-items:center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="7.5" stroke="#92d9bb" stroke-width="1" stroke-dasharray="8 10" stroke-linecap="round" fill="none"/>
+        <circle cx="7" cy="9" r="2" fill="#92d9bb"/>
+        <circle cx="16" cy="8" r="2" fill="#92d9bb"/>
+      </svg>
+      <span><span class="label">24px — Small UI</span><br><span class="sub-label">Contextual actions</span></span>
+      <button class="code-btn" onclick="copyInline(this,'nav-small')">Copy</button>
+    </div>
+    <div class="asset-card" style="flex-direction:row;gap:var(--space-4);padding:var(--space-4);align-items:center">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="6.5" stroke="#92d9bb" stroke-width="1" stroke-dasharray="7 10" stroke-linecap="round" fill="none"/>
+        <circle cx="6" cy="7" r="2" fill="#92d9bb"/>
+        <circle cx="14" cy="7" r="2" fill="#92d9bb"/>
+      </svg>
+      <span><span class="label">20px — Min</span><br><span class="sub-label">Badge / status</span></span>
+      <button class="code-btn" onclick="copyInline(this,'nav-min')">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 8: FILE EXPORTS ═══ -->
+<h2>8. Export summary</h2>
+<div class="section">
+  <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <tr><th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em">File</th>
+        <th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Size</th>
+        <th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Format</th>
+        <th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Use</th></tr>
+    <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)">opas-logo-master-dark.svg</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">140×140</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">SVG</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">Source of truth (dark)</td></tr>
+    <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)">opas-logo-master-light.svg</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">140×140</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">SVG</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">Source of truth (light)</td></tr>
+    <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)">opas-logo-app-icon.svg</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">180×180</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">SVG</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">App Store / Play Store icon</td></tr>
+    <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)">opas-logo-app-icon-120.svg</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">120×120</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">SVG</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">iOS home screen icon</td></tr>
+    <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)">opas-logo-spotlight.svg</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">80×80</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">SVG</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">iOS spotlight search</td></tr>
+    <tr><td style="padding:10px 12px;border-bottom:1px solid var(--border)">opas-favicon.svg</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">32×32</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">SVG</td>
+        <td style="padding:10px 12px;border-bottom:1px solid var(--border)">Browser tab icon</td></tr>
+    <tr><td style="padding:10px 12px">opas-logo-nav.svg</td>
+        <td style="padding:10px 12px">28×28</td>
+        <td style="padding:10px 12px">SVG</td>
+        <td style="padding:10px 12px">Tab bar / nav inline</td></tr>
+  </table>
+</div>
+
+</div><!-- /container -->
+
+<script>
+window.copyInline = function(btn, id) {
+  const svgEl = btn.closest('.asset-card').querySelector('svg');
+  if (!svgEl) return;
+  const clone = svgEl.cloneNode(true);
+  clone.removeAttribute('width');
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  const svgStr = new XMLSerializer().serializeToString(clone);
+  navigator.clipboard.writeText(svgStr).then(() => {
+    const t = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = t, 1500);
+  });
+};
+window.copySVG = function(btn, id) {
+  const block = document.getElementById(id);
+  if (!block) return;
+  navigator.clipboard.writeText(block.textContent.trim()).then(() => {
+    const t = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = t, 1500);
+  });
+};
+window.downloadSVG = function(btn, name, size) {
+  const card = btn.closest('.asset-card');
+  const wrapper = card.querySelector('[style*="filter"]') || card;
+  const svgEl = wrapper.querySelector('svg');
+  if (!svgEl) return;
+  const clone = svgEl.cloneNode(true);
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  const svgStr = new XMLSerializer().serializeToString(clone);
+  const blob = new Blob([svgStr], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name + '.svg'; a.click();
+  URL.revokeObjectURL(url);
+};
+</script>
+</body>
+</html>
+</｜｜DSML｜｜parameter>
+</｜｜DSML｜｜invoke>
+</｜｜DSML｜｜tool_calls>

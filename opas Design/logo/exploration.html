@@ -1,0 +1,450 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Opas — Logo Exploration</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;
+  --surface:#1c1c1e;
+  --surface-2:#2c2c2e;
+  --fg:#f5f5f7;
+  --muted:#86868b;
+  --border:#38383a;
+  --accent:#92d9bb;
+  --accent-dim:#92d9bb22;
+  --radius-lg:16px;
+  --font-display:'Lufga','Inter',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+}
+body{
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  padding:48px 24px 80px;
+}
+::selection{background:var(--accent);color:var(--bg)}
+h1{
+  font-family:var(--font-display);font-size:28px;font-weight:700;
+  letter-spacing:-.03em;margin-bottom:4px;
+}
+.sub{color:var(--muted);font-size:14px;margin-bottom:48px}
+.intro{max-width:640px;margin-bottom:48px;color:var(--muted);font-size:14px;line-height:1.7}
+.concepts{display:flex;flex-direction:column;gap:64px;max-width:1200px}
+.concept-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:40px;
+}
+.concept-header{display:flex;align-items:flex-start;gap:32px;margin-bottom:40px;flex-wrap:wrap}
+.concept-mark{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:12px}
+.concept-mark .mark-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.sizes{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:0}
+.sizes .size-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.sizes .size-label{font-size:11px;color:var(--muted);font-weight:500}
+.concept-info{flex:1;min-width:240px}
+.concept-info h2{
+  font-family:var(--font-display);font-size:20px;font-weight:600;
+  letter-spacing:-.02em;margin-bottom:4px;
+}
+.concept-info .tagline{font-size:13px;color:var(--muted);margin-bottom:12px}
+.concept-info p{font-size:14px;color:var(--fg);line-height:1.7;margin-bottom:8px}
+.concept-info .why{font-size:13px;color:var(--accent);line-height:1.6}
+.concept-actions{display:flex;gap:8px;margin-top:16px}
+.concept-actions .btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-body);font-size:13px;font-weight:500;
+  padding:8px 16px;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--fg);cursor:pointer;
+  transition:all .15s;text-decoration:none;
+}
+.concept-actions .btn:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.app-icon-previews{display:flex;gap:32px;margin-top:32px;padding-top:32px;border-top:1px solid var(--border)}
+.app-icon-previews .preview{display:flex;flex-direction:column;align-items:center;gap:8px}
+.app-icon-previews .preview-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+@media(max-width:600px){
+  .concept-header{flex-direction:column}
+  .app-icon-previews{flex-wrap:wrap;gap:16px}
+}
+</style>
+</head>
+<body>
+
+<h1>Opas — Logo mark</h1>
+<p class="sub">4 concepts &middot; Finnish for <em>Guide</em> &middot; AI document assistant for expats in Finland</p>
+<div class="intro">
+  Each concept explores a different metaphor: compass (guidance), document (core product), path (journey), north star (AI guidance). All use the brand palette — black foundation, #92D9BB accent, Lufga display. App icon and spotlight previews at real sizes.
+</div>
+
+<div class="concepts">
+
+<!-- ═══ CONCEPT 1: Compass O ═══ -->
+<div class="concept-card">
+  <div class="concept-header">
+    <div class="concept-mark">
+      <div class="sizes">
+        <div class="size-item">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="52" stroke="#92d9bb" stroke-width="3"/>
+            <circle cx="60" cy="60" r="44" stroke="#2c2c2e" stroke-width="1"/>
+            <line x1="60" y1="24" x2="60" y2="44" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="76" y1="60" x2="96" y2="60" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="60" y1="76" x2="60" y2="96" stroke="#3a3a3c" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="24" y1="60" x2="44" y2="60" stroke="#3a3a3c" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="60,32 66,54 60,50 54,54" fill="#92d9bb"/>
+            <polygon points="60,32 66,54 60,50" fill="#f5f5f7" opacity="0.9"/>
+            <circle cx="60" cy="60" r="3" fill="#92d9bb"/>
+          </svg>
+          <span class="size-label">Logomark 120px</span>
+        </div>
+        <div class="size-item">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="35" stroke="#92d9bb" stroke-width="2.5"/>
+            <line x1="40" y1="16" x2="40" y2="28" stroke="#92d9bb" stroke-width="2" stroke-linecap="round"/>
+            <line x1="52" y1="40" x2="64" y2="40" stroke="#92d9bb" stroke-width="2" stroke-linecap="round"/>
+            <polygon points="40,24 44,38 40,35 36,38" fill="#92d9bb"/>
+            <polygon points="40,24 44,38 40,35" fill="#f5f5f7" opacity="0.9"/>
+            <circle cx="40" cy="40" r="2" fill="#92d9bb"/>
+          </svg>
+          <span class="size-label">80px</span>
+        </div>
+        <div class="size-item">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" stroke="#92d9bb" stroke-width="2"/>
+            <polygon points="20,12 22,20 20,18 18,20" fill="#92d9bb"/>
+            <polygon points="20,12 22,20 20,18" fill="#f5f5f7" opacity="0.9"/>
+          </svg>
+          <span class="size-label">40px</span>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <h2>Compass O</h2>
+      <p class="tagline">The letter O contains a compass — guidance at the core of the name.</p>
+      <p>The outer circle is the letter <strong>O</strong> of Opas. Inside, a two-tone compass needle points NE (45°), suggesting forward motion and clarity. Only the north and east arms are lit — the south and west recede into the background. The mark says: <em>we show you which way to go</em>.</p>
+      <p class="why">Strongest name integration. The O-as-compass is ownable. Works as both logomark and app icon.</p>
+    </div>
+  </div>
+  <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" stroke="#92d9bb" stroke-width="2"/>
+          <polygon points="16,9 18,16 16,14.5 14,16" fill="#92d9bb"/>
+          <polygon points="16,9 18,16 16,14.5" fill="#f5f5f7" opacity="0.9"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--fg)">Opas</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#92d9bb" stroke-width="1.5"/>
+          <polygon points="12,7 13.5,12 12,11 10.5,12" fill="#92d9bb"/>
+          <polygon points="12,7 13.5,12 12,11" fill="#f5f5f7" opacity="0.9"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--fg)">Opas</span>
+      </div>
+    </div>
+  </div>
+  <div class="app-icon-previews">
+    <div class="preview">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <rect width="120" height="120" rx="26" fill="#000000"/>
+        <rect x="4" y="4" width="112" height="112" rx="22" stroke="#38383a" stroke-width="1"/>
+        <circle cx="60" cy="60" r="44" stroke="#92d9bb" stroke-width="3.5"/>
+        <polygon points="60,34 66,56 60,52 54,56" fill="#92d9bb"/>
+        <polygon points="60,34 66,56 60,52" fill="#f5f5f7" opacity="0.95"/>
+        <circle cx="60" cy="60" r="3" fill="#92d9bb"/>
+      </svg>
+      <span class="preview-label">App icon</span>
+    </div>
+    <div class="preview">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <rect width="60" height="60" rx="13" fill="#000000"/>
+        <circle cx="30" cy="30" r="22" stroke="#92d9bb" stroke-width="2.5"/>
+        <polygon points="30,18 33,30 30,27 27,30" fill="#92d9bb"/>
+        <polygon points="30,18 33,30 30,27" fill="#f5f5f7" opacity="0.95"/>
+      </svg>
+      <span class="preview-label">Spotlight</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONCEPT 2: The Guide Mark ═══ -->
+<div class="concept-card">
+  <div class="concept-header">
+    <div class="concept-mark">
+      <div class="sizes">
+        <div class="size-item">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="52" stroke="#2c2c2e" stroke-width="2"/>
+            <path d="M60 16 L66 54 L60 50 L54 54 Z" fill="#92d9bb"/>
+            <path d="M60 104 L54 66 L60 70 L66 66 Z" fill="#3a3a3c"/>
+            <path d="M16 60 L54 54 L50 60 L54 66 Z" fill="#3a3a3c"/>
+            <path d="M104 60 L66 66 L70 60 L66 54 Z" fill="#3a3a3c"/>
+            <circle cx="60" cy="60" r="4" fill="#92d9bb"/>
+          </svg>
+          <span class="size-label">120px</span>
+        </div>
+        <div class="size-item">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="35" stroke="#2c2c2e" stroke-width="1.5"/>
+            <path d="M40 12 L44 36 L40 33 L36 36 Z" fill="#92d9bb"/>
+            <path d="M40 68 L36 44 L40 47 L44 44 Z" fill="#3a3a3c"/>
+            <path d="M12 40 L36 36 L33 40 L36 44 Z" fill="#3a3a3c"/>
+            <path d="M68 40 L44 44 L47 40 L44 36 Z" fill="#3a3a3c"/>
+            <circle cx="40" cy="40" r="3" fill="#92d9bb"/>
+          </svg>
+          <span class="size-label">80px</span>
+        </div>
+        <div class="size-item">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" stroke="#2c2c2e" stroke-width="1.5"/>
+            <path d="M20 8 L22 20 L20 18 L18 20 Z" fill="#92d9bb"/>
+            <path d="M20 32 L18 20 L20 22 L22 20 Z" fill="#3a3a3c"/>
+            <path d="M8 20 L20 18 L18 20 L20 22 Z" fill="#3a3a3c"/>
+            <path d="M32 20 L20 22 L22 20 L20 18 Z" fill="#3a3a3c"/>
+            <circle cx="20" cy="20" r="2" fill="#92d9bb"/>
+          </svg>
+          <span class="size-label">40px</span>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <h2>The Guide Mark</h2>
+      <p class="tagline">A compass rose where only one direction is illuminated — the way forward.</p>
+      <p>Simplified 4-point compass. Three arms fade into dark grey; one arm (NE) is lit in the accent green. A small dot anchors the centre. The metaphor: <em>we cut through the noise to show you the one direction that matters.</em> Clean, tech-luxury, memorable.</p>
+      <p class="why">Best app-icon candidate. Strong silhouette at small sizes. The asymmetry (one lit arm) is distinctive and ownable.</p>
+    </div>
+  </div>
+  <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" stroke="#2c2c2e" stroke-width="1.5"/>
+          <path d="M16 6 L18 16 L16 14 L14 16 Z" fill="#92d9bb"/>
+          <path d="M16 26 L14 16 L16 18 L18 16 Z" fill="#3a3a3c"/>
+          <path d="M6 16 L16 14 L14 16 L16 18 Z" fill="#3a3a3c"/>
+          <path d="M26 16 L16 18 L18 16 L16 14 Z" fill="#3a3a3c"/>
+          <circle cx="16" cy="16" r="1.5" fill="#92d9bb"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--fg)">Opas</span>
+      </div>
+    </div>
+  </div>
+  <div class="app-icon-previews">
+    <div class="preview">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <rect width="120" height="120" rx="26" fill="#000000"/>
+        <rect x="4" y="4" width="112" height="112" rx="22" stroke="#38383a" stroke-width="1"/>
+        <circle cx="60" cy="60" r="42" stroke="#2c2c2e" stroke-width="2"/>
+        <path d="M60 20 L66 54 L60 50 L54 54 Z" fill="#92d9bb"/>
+        <path d="M60 100 L54 66 L60 70 L66 66 Z" fill="#3a3a3c"/>
+        <path d="M20 60 L54 54 L50 60 L54 66 Z" fill="#3a3a3c"/>
+        <path d="M100 60 L66 66 L70 60 L66 54 Z" fill="#3a3a3c"/>
+        <circle cx="60" cy="60" r="4" fill="#92d9bb"/>
+      </svg>
+      <span class="preview-label">App icon</span>
+    </div>
+    <div class="preview">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <rect width="60" height="60" rx="13" fill="#000000"/>
+        <circle cx="30" cy="30" r="24" stroke="#2c2c2e" stroke-width="1.5"/>
+        <path d="M30 12 L33 28 L30 26 L27 28 Z" fill="#92d9bb"/>
+        <circle cx="30" cy="30" r="2" fill="#92d9bb"/>
+      </svg>
+      <span class="preview-label">Spotlight</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONCEPT 3: Pathfinder ═══ -->
+<div class="concept-card">
+  <div class="concept-header">
+    <div class="concept-mark">
+      <div class="sizes">
+        <div class="size-item">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <line x1="30" y1="60" x2="54" y2="60" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="4 4"/>
+            <line x1="66" y1="60" x2="90" y2="60" stroke="#92d9bb" stroke-width="2"/>
+            <circle cx="30" cy="60" r="10" fill="#3a3a3c" stroke="#3a3a3c" stroke-width="1"/>
+            <circle cx="60" cy="60" r="10" fill="#92d9bb" stroke="#92d9bb" stroke-width="1"/>
+            <circle cx="60" cy="60" r="3" fill="#000"/>
+            <circle cx="90" cy="60" r="10" fill="#92d9bb" stroke="#92d9bb" stroke-width="1"/>
+            <circle cx="90" cy="60" r="3" fill="#000"/>
+            <path d="M96 54 L106 60 L96 66" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="size-label">120px</span>
+        </div>
+        <div class="size-item">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <line x1="20" y1="40" x2="36" y2="40" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <line x1="44" y1="40" x2="60" y2="40" stroke="#92d9bb" stroke-width="1.5"/>
+            <circle cx="20" cy="40" r="7" fill="#3a3a3c"/>
+            <circle cx="40" cy="40" r="7" fill="#92d9bb"/>
+            <circle cx="40" cy="40" r="2" fill="#000"/>
+            <circle cx="60" cy="40" r="7" fill="#92d9bb"/>
+            <circle cx="60" cy="40" r="2" fill="#000"/>
+            <path d="M64 36 L70 40 L64 44" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="size-label">80px</span>
+        </div>
+        <div class="size-item">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="10" cy="20" r="4" fill="#3a3a3c"/>
+            <circle cx="20" cy="20" r="4" fill="#92d9bb"/>
+            <circle cx="20" cy="20" r="1.5" fill="#000"/>
+            <circle cx="30" cy="20" r="4" fill="#92d9bb"/>
+            <circle cx="30" cy="20" r="1.5" fill="#000"/>
+            <path d="M33 17 L36 20 L33 23" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="size-label">40px</span>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <h2>Pathfinder</h2>
+      <p class="tagline">A journey in three steps — from unknown to guided to destination.</p>
+      <p>Three nodes on a line represent the user's journey: the first is dark (lost/before), the second is accent-green (guidance engaged), the third is accent-green with an arrow (arrival). The first segment is dashed (uncertainty), the second is solid (clarity). Minimal, sequential, hopeful.</p>
+      <p class="why">Best narrative fit. Tells the story of the product's value in one glance. Unusual — no other AI app uses a path metaphor this cleanly.</p>
+    </div>
+  </div>
+  <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="7" cy="14" r="3" fill="#3a3a3c"/>
+          <circle cx="14" cy="14" r="3" fill="#92d9bb"/>
+          <circle cx="14" cy="14" r="1" fill="#000"/>
+          <circle cx="21" cy="14" r="3" fill="#92d9bb"/>
+          <circle cx="21" cy="14" r="1" fill="#000"/>
+          <path d="M23 12 L25 14 L23 16" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--fg)">Opas</span>
+      </div>
+    </div>
+  </div>
+  <div class="app-icon-previews">
+    <div class="preview">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <rect width="120" height="120" rx="26" fill="#000000"/>
+        <rect x="4" y="4" width="112" height="112" rx="22" stroke="#38383a" stroke-width="1"/>
+        <line x1="26" y1="60" x2="46" y2="60" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="4 4"/>
+        <line x1="54" y1="60" x2="74" y2="60" stroke="#92d9bb" stroke-width="2"/>
+        <circle cx="24" cy="60" r="10" fill="#3a3a3c"/>
+        <circle cx="50" cy="60" r="10" fill="#92d9bb"/>
+        <circle cx="50" cy="60" r="3" fill="#000"/>
+        <circle cx="76" cy="60" r="10" fill="#92d9bb"/>
+        <circle cx="76" cy="60" r="3" fill="#000"/>
+        <path d="M84 54 L94 60 L84 66" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="preview-label">App icon</span>
+    </div>
+    <div class="preview">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <rect width="60" height="60" rx="13" fill="#000000"/>
+        <circle cx="12" cy="30" r="6" fill="#3a3a3c"/>
+        <circle cx="30" cy="30" r="6" fill="#92d9bb"/>
+        <circle cx="30" cy="30" r="2" fill="#000"/>
+        <circle cx="48" cy="30" r="6" fill="#92d9bb"/>
+        <circle cx="48" cy="30" r="2" fill="#000"/>
+        <path d="M52 27 L56 30 L52 33" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="preview-label">Spotlight</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONCEPT 4: North Star ═══ -->
+<div class="concept-card">
+  <div class="concept-header">
+    <div class="concept-mark">
+      <div class="sizes">
+        <div class="size-item">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <rect x="8" y="8" width="104" height="104" rx="20" stroke="#92d9bb" stroke-width="2" fill="none"/>
+            <line x1="60" y1="28" x2="60" y2="48" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="60" y1="72" x2="60" y2="92" stroke="#3a3a3c" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="28" y1="60" x2="48" y2="60" stroke="#3a3a3c" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="72" y1="60" x2="92" y2="60" stroke="#3a3a3c" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="60,32 66,54 60,50 54,54" fill="#92d9bb"/>
+            <polygon points="60,32 66,54 60,50" fill="#f5f5f7" opacity="0.9"/>
+            <circle cx="60" cy="60" r="3" fill="#92d9bb"/>
+          </svg>
+          <span class="size-label">120px</span>
+        </div>
+        <div class="size-item">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <rect x="6" y="6" width="68" height="68" rx="14" stroke="#92d9bb" stroke-width="1.5" fill="none"/>
+            <line x1="40" y1="19" x2="40" y2="32" stroke="#92d9bb" stroke-width="2" stroke-linecap="round"/>
+            <polygon points="40,22 44,36 40,33 36,36" fill="#92d9bb"/>
+            <polygon points="40,22 44,36 40,33" fill="#f5f5f7" opacity="0.9"/>
+            <circle cx="40" cy="40" r="2" fill="#92d9bb"/>
+          </svg>
+          <span class="size-label">80px</span>
+        </div>
+        <div class="size-item">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="3" y="3" width="34" height="34" rx="8" stroke="#92d9bb" stroke-width="1.5" fill="none"/>
+            <polygon points="20,9 22,18 20,16 18,18" fill="#92d9bb"/>
+            <polygon points="20,9 22,18 20,16" fill="#f5f5f7" opacity="0.9"/>
+          </svg>
+          <span class="size-label">40px</span>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <h2>North Star</h2>
+      <p class="tagline">A document-like square with a compass needle — guiding through paperwork.</p>
+      <p>A rounded square (document/app icon shape) frames a single compass needle pointing true north. The needle's upper half is lit accent green; the lower half is white. Clean duality: the container is the document, the needle is the guidance. Together they say: <em>we guide you through every document.</em></p>
+      <p class="why">Strongest product-story fit. The document shape + compass needle visually encodes the entire product value in one symbol. Works perfectly as an app icon.</p>
+    </div>
+  </div>
+  <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="2" width="24" height="24" rx="6" stroke="#92d9bb" stroke-width="1.5" fill="none"/>
+          <polygon points="14,5 15.5,12 14,11 12.5,12" fill="#92d9bb"/>
+          <polygon points="14,5 15.5,12 14,11" fill="#f5f5f7" opacity="0.9"/>
+        </svg>
+        <span style="font-family:'Lufga','Inter',sans-serif;font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--fg)">Opas</span>
+      </div>
+    </div>
+  </div>
+  <div class="app-icon-previews">
+    <div class="preview">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <rect width="120" height="120" rx="26" fill="#000000"/>
+        <rect x="4" y="4" width="112" height="112" rx="22" stroke="#38383a" stroke-width="1"/>
+        <rect x="18" y="18" width="84" height="84" rx="16" stroke="#92d9bb" stroke-width="2.5" fill="none"/>
+        <line x1="60" y1="30" x2="60" y2="50" stroke="#92d9bb" stroke-width="3" stroke-linecap="round"/>
+        <polygon points="60,34 67,58 60,53 53,58" fill="#92d9bb"/>
+        <polygon points="60,34 67,58 60,53" fill="#f5f5f7" opacity="0.95"/>
+        <circle cx="60" cy="60" r="4" fill="#92d9bb"/>
+      </svg>
+      <span class="preview-label">App icon</span>
+    </div>
+    <div class="preview">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <rect width="60" height="60" rx="13" fill="#000000"/>
+        <rect x="10" y="10" width="40" height="40" rx="8" stroke="#92d9bb" stroke-width="1.5" fill="none"/>
+        <polygon points="30,16 33,30 30,27 27,30" fill="#92d9bb"/>
+        <polygon points="30,16 33,30 30,27" fill="#f5f5f7" opacity="0.95"/>
+      </svg>
+      <span class="preview-label">Spotlight</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>
+</｜｜DSML｜｜parameter>
+</｜｜DSML｜｜invoke>
+</｜｜DSML｜｜tool_calls>
