@@ -5,7 +5,7 @@ CREATE TABLE documents (
     s3_key          VARCHAR(512) NOT NULL,
     content_type    VARCHAR(127),
     file_size       BIGINT,
-    status          VARCHAR(32)  NOT NULL DEFAULT 'uploaded',
+    status          VARCHAR(32)  NOT NULL DEFAULT 'pending',
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
