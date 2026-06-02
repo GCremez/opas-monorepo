@@ -1,0 +1,338 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'OPAS backend ECS infrastructure — cluster, ALB, IAM, security groups, log groups'
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: [staging, production]
+    ConstraintDescription: Must be staging or production
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC to deploy into
+
+  PublicSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: At least two public subnets across different AZs
+
+  CertificateArn:
+    Type: String
+    Default: ''
+    Description: ACM certificate ARN for HTTPS listener (leave empty for HTTP-only)
+
+  GitHubOwner:
+    Type: String
+    Default: GCremez
+    Description: GitHub owner/organization for the container registry
+
+Conditions:
+  HasCertificate: !Not [!Equals [!Ref CertificateArn, '']]
+  IsProduction: !Equals [!Ref Environment, production]
+
+Mappings:
+  EnvironmentConfig:
+    staging:
+      DesiredCount: 1
+      Cpu: 512
+      Memory: 1024
+      FargateSpotWeight: 1
+      LogRetentionDays: 7
+    production:
+      DesiredCount: 2
+      Cpu: 1024
+      Memory: 2048
+      FargateSpotWeight: 0
+      LogRetentionDays: 90
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub opas-${Environment}
+      CapacityProviders: [FARGATE, FARGATE_SPOT]
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+          Base: 1
+        - CapacityProvider: FARGATE_SPOT
+          Weight: !FindInMap [EnvironmentConfig, !Ref Environment, FargateSpotWeight]
+      Settings:
+        - Name: containerInsights
+          Value: enabled
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/opas-backend-${Environment}
+      RetentionInDays: !FindInMap [EnvironmentConfig, !Ref Environment, LogRetentionDays]
+
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub opas-backend-exec-${Environment}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub opas-backend-task-${Environment}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: opas-task-policy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::opas-app-bucket-${Environment}
+                  - !Sub arn:aws:s3:::opas-app-bucket-${Environment}/*
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/*
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Condition:
+                  StringLike:
+                    kms:ViaService: !Sub secretsmanager.${AWS::Region}.amazonaws.com
+
+  AlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub opas-alb-${Environment}
+      GroupDescription: !Sub ALB security group for opas-${Environment}
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS from internet
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: HTTP from internet
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  EcsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub opas-ecs-${Environment}
+      GroupDescription: !Sub ECS task security group for opas-${Environment}
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          SourceSecurityGroupId: !Ref AlbSecurityGroup
+          Description: Traffic from ALB
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub opas-${Environment}
+      Scheme: internet-facing
+      Type: application
+      SecurityGroups: [!Ref AlbSecurityGroup]
+      Subnets: !Ref PublicSubnets
+      IpAddressType: ipv4
+
+  HTTPListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: !If [HasCertificate, redirect, forward]
+          RedirectConfig: !If
+            - HasCertificate
+            - Protocol: HTTPS
+              Port: 443
+              Host: '#{host}'
+              Path: '/#{path}'
+              Query: '#{query}'
+              StatusCode: HTTP_301
+            - !Ref AWS::NoValue
+          TargetGroupArn: !If
+            - HasCertificate
+            - !Ref AWS::NoValue
+            - !Ref TargetGroup
+
+  HTTPSListener:
+    Condition: HasCertificate
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub opas-${Environment}
+      Port: 8080
+      Protocol: HTTP
+      ProtocolVersion: HTTP1
+      TargetType: ip
+      VpcId: !Ref VpcId
+      HealthCheckEnabled: true
+      HealthCheckPath: /actuator/health
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: 200
+
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn: [HTTPListener, TargetGroup]
+    Properties:
+      Cluster: !Ref ECSCluster
+      ServiceName: opas-backend
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: !FindInMap [EnvironmentConfig, !Ref Environment, DesiredCount]
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: [!Ref EcsSecurityGroup]
+          Subnets: !Ref PublicSubnets
+      LoadBalancers:
+        - ContainerName: backend
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub opas-backend-${Environment}
+      Cpu: !FindInMap [EnvironmentConfig, !Ref Environment, Cpu]
+      Memory: !FindInMap [EnvironmentConfig, !Ref Environment, Memory]
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ContainerDefinitions:
+        - Name: backend
+          Image: !Sub ghcr.io/${GitHubOwner}/opas-backend:latest
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: backend
+          Environment:
+            - Name: SPRING_PROFILES_ACTIVE
+              Value: !Ref Environment
+            - Name: DATABASE_URL
+              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/database-url}}'
+            - Name: DATABASE_USER
+              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/database-user}}'
+            - Name: REDIS_URL
+              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/redis-url}}'
+            - Name: RABBITMQ_URL
+              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/rabbitmq-url}}'
+            - Name: PRESIDIO_SIDECAR_URL
+              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/presidio-url}}'
+            - Name: S3_BUCKET_NAME
+              Value: !Sub opas-app-bucket-${Environment}
+            - Name: CORS_ALLOWED_ORIGINS
+              Value: !If
+                - IsProduction
+                - https://app.opas.fi
+                - !Sub https://staging.${ALB.DNSName}
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
+            - Name: JWT_PRIVATE_KEY
+              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/jwt-private-key}}'
+            - Name: JWT_PUBLIC_KEY
+              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/jwt-public-key}}'
+          Secrets:
+            - Name: DATABASE_PASSWORD
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/database-password
+            - Name: ANTHROPIC_API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/anthropic-api-key
+            - Name: STRIPE_SECRET_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/stripe-secret-key
+            - Name: STRIPE_WEBHOOK_SECRET
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/stripe-webhook-secret
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - curl -sf http://localhost:8080/actuator/health || exit 1
+            Interval: 30
+            Retries: 3
+            Timeout: 5
+            StartPeriod: 60
+
+Outputs:
+  ClusterName:
+    Description: ECS cluster name
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Sub ${AWS::StackName}-ClusterName
+
+  ServiceName:
+    Description: ECS service name
+    Value: !Ref ECSService
+    Export:
+      Name: !Sub ${AWS::StackName}-ServiceName
+
+  AlbDnsName:
+    Description: ALB DNS name
+    Value: !GetAtt ALB.DNSName
+    Export:
+      Name: !Sub ${AWS::StackName}-AlbDnsName
+
+  TaskDefinitionArn:
+    Description: Task definition ARN
+    Value: !Ref TaskDefinition
+    Export:
+      Name: !Sub ${AWS::StackName}-TaskDefinitionArn
+
+  LogGroupName:
+    Description: CloudWatch log group
+    Value: !Ref LogGroup
+    Export:
+      Name: !Sub ${AWS::StackName}-LogGroupName
