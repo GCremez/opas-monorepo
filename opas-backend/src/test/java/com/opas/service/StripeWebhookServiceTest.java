@@ -9,6 +9,7 @@ import com.opas.repository.SubscriptionRepository;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.Invoice;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import java.util.Optional;
@@ -169,14 +170,14 @@ class StripeWebhookServiceTest {
 
     @Test
     void handleInvoicePaidUpdatesPeriodEnd() {
-        com.stripe.model.Subscription stripeSub = mock(com.stripe.model.Subscription.class);
-        when(stripeSub.getId()).thenReturn("sub_456");
-        when(stripeSub.getCurrentPeriodEnd()).thenReturn(3000L);
+        Invoice invoice = mock(Invoice.class);
+        when(invoice.getSubscription()).thenReturn("sub_456");
+        when(invoice.getPeriodEnd()).thenReturn(3000L);
 
         Event event = mock(Event.class);
         when(event.getType()).thenReturn("invoice.paid");
         EventDataObjectDeserializer deserializer = mock(EventDataObjectDeserializer.class);
-        when(deserializer.getObject()).thenReturn(Optional.of(stripeSub));
+        when(deserializer.getObject()).thenReturn(Optional.of(invoice));
         when(event.getDataObjectDeserializer()).thenReturn(deserializer);
 
         Subscription sub = new Subscription();

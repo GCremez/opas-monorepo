@@ -29,25 +29,26 @@ public class EmbeddingService {
     }
 
     @Transactional(readOnly = true)
-    public List<UUID> searchSimilar(String query, int limit) {
+    public List<UUID> searchSimilar(UUID userId, String query, int limit) {
         float[] vector = embeddingModel.embed(query);
         PGvector pgVector = new PGvector(vector);
         @SuppressWarnings("unchecked")
         List<UUID> ids = entityManager.createNativeQuery(
-                "SELECT id FROM documents WHERE embedding IS NOT NULL ORDER BY embedding <=> ?1::vector LIMIT ?2")
-                .setParameter(1, pgVector).setParameter(2, limit).getResultList();
+                "SELECT id FROM documents WHERE user_id = ?3 AND embedding IS NOT NULL ORDER BY embedding <=> ?1::vector LIMIT ?2")
+                .setParameter(1, pgVector).setParameter(2, limit).setParameter(3, userId).getResultList();
         return ids;
     }
 
     @Transactional(readOnly = true)
-    public List<DocumentSearchResult> searchSimilarWithScore(String query, int limit) {
+    public List<DocumentSearchResult> searchSimilarWithScore(UUID userId, String query, int limit) {
         float[] vector = embeddingModel.embed(query);
         PGvector pgVector = new PGvector(vector);
         @SuppressWarnings("unchecked")
         List<Object[]> rows = entityManager
                 .createNativeQuery("SELECT id, filename, 1 - (embedding <=> ?1::vector) AS similarity "
-                        + "FROM documents WHERE embedding IS NOT NULL " + "ORDER BY embedding <=> ?1::vector LIMIT ?2")
-                .setParameter(1, pgVector).setParameter(2, limit).getResultList();
+                        + "FROM documents WHERE user_id = ?3 AND embedding IS NOT NULL "
+                        + "ORDER BY embedding <=> ?1::vector LIMIT ?2")
+                .setParameter(1, pgVector).setParameter(2, limit).setParameter(3, userId).getResultList();
         return rows.stream().filter(row -> row[0] != null).map(row -> new DocumentSearchResult((UUID) row[0],
                 row[1] != null ? (String) row[1] : null, row[2] != null ? ((Number) row[2]).doubleValue() : 0.0))
                 .toList();
