@@ -28,35 +28,43 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
+    private static UUID resolveUserId(Authentication authentication) {
+        String name = authentication.getName();
+        if (name == null) {
+            throw new IllegalArgumentException("Authentication name must not be null");
+        }
+        return UUID.fromString(name);
+    }
+
     @PostMapping("/upload-url")
     public ResponseEntity<DocumentResponse> requestUploadUrl(Authentication authentication,
             @Valid @RequestBody UploadUrlRequest request) {
-        UUID userId = UUID.fromString(authentication.getName());
+        UUID userId = resolveUserId(authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(documentService.requestUploadUrl(userId, request));
     }
 
     @PatchMapping("/{id}/confirm")
     public ResponseEntity<Void> confirmUpload(Authentication authentication, @PathVariable UUID id) {
-        UUID userId = UUID.fromString(authentication.getName());
+        UUID userId = resolveUserId(authentication);
         documentService.confirmUpload(userId, id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<DocumentResponse>> listDocuments(Authentication authentication) {
-        UUID userId = UUID.fromString(authentication.getName());
+        UUID userId = resolveUserId(authentication);
         return ResponseEntity.ok(documentService.listDocuments(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DocumentResponse> getDocument(Authentication authentication, @PathVariable UUID id) {
-        UUID userId = UUID.fromString(authentication.getName());
+        UUID userId = resolveUserId(authentication);
         return ResponseEntity.ok(documentService.getDocument(userId, id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(Authentication authentication, @PathVariable UUID id) {
-        UUID userId = UUID.fromString(authentication.getName());
+        UUID userId = resolveUserId(authentication);
         documentService.deleteDocument(userId, id);
         return ResponseEntity.noContent().build();
     }
