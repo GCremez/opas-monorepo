@@ -1,7 +1,5 @@
 package com.opas.dto;
 
-import org.springframework.lang.Nullable;
-
 public class AuthResponse {
     private String accessToken;
     private String refreshToken;
@@ -17,7 +15,6 @@ public class AuthResponse {
         this.plan = plan;
     }
 
-    @Nullable
     public String getAccessToken() {
         return accessToken;
     }
@@ -26,7 +23,6 @@ public class AuthResponse {
         this.accessToken = accessToken;
     }
 
-    @Nullable
     public String getRefreshToken() {
         return refreshToken;
     }
