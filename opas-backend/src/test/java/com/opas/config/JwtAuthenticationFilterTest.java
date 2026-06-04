@@ -79,6 +79,7 @@ class JwtAuthenticationFilterTest {
         when(request.getHeader("Authorization")).thenReturn("Bearer blacklisted-token");
         when(jwtUtil.parseToken("blacklisted-token")).thenReturn(claims);
         when(claims.getId()).thenReturn("jti-blacklisted");
+        when(claims.getSubject()).thenReturn("user-123");
         when(tokenBlacklistService.isBlacklisted("jti-blacklisted")).thenReturn(true);
 
         filter.doFilterInternal(request, response, chain);

@@ -41,9 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.parseToken(token);
 
                 String jti = claims.getId();
-                if (jti != null && !tokenBlacklistService.isBlacklisted(jti)) {
-                    var auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null,
-                            Collections.emptyList());
+                String subject = claims.getSubject();
+                if (jti != null && subject != null && !tokenBlacklistService.isBlacklisted(jti)) {
+                    var auth = new UsernamePasswordAuthenticationToken(subject, null, Collections.emptyList());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
