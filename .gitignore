@@ -4,6 +4,7 @@ target/
 *.jar
 *.war
 *.log
+*.pem
 .idea/
 *.iml
 .settings/

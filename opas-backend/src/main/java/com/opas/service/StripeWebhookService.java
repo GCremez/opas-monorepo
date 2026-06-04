@@ -6,6 +6,7 @@ import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.Price;
 import com.stripe.model.StripeObject;
+import com.stripe.model.Invoice;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import java.time.Instant;
@@ -127,13 +128,20 @@ public class StripeWebhookService {
     }
 
     private void handleInvoicePaid(Event event) {
-        com.stripe.model.Subscription stripeSub = deserialize(event, com.stripe.model.Subscription.class);
-        if (stripeSub == null)
+        Invoice invoice = deserialize(event, Invoice.class);
+        if (invoice == null)
             return;
 
-        subscriptionRepository.findByStripeSubscriptionId(stripeSub.getId()).ifPresent(sub -> {
-            if (stripeSub.getCurrentPeriodEnd() != null) {
-                sub.setCurrentPeriodEnd(Instant.ofEpochSecond(stripeSub.getCurrentPeriodEnd()));
+        String subscriptionId = invoice.getSubscription();
+        if (subscriptionId == null || subscriptionId.isBlank()) {
+            log.warn("Invoice {} has no subscription", invoice.getId());
+            return;
+        }
+
+        subscriptionRepository.findByStripeSubscriptionId(subscriptionId).ifPresent(sub -> {
+            Long periodEnd = invoice.getPeriodEnd();
+            if (periodEnd != null) {
+                sub.setCurrentPeriodEnd(Instant.ofEpochSecond(periodEnd));
             }
             subscriptionRepository.save(sub);
         });

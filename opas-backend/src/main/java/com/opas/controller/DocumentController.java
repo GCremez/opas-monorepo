@@ -28,50 +28,35 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
-    private static UUID resolveUserId(Authentication authentication) {
-        String name = authentication.getName();
-        return name != null ? UUID.fromString(name) : null;
-    }
-
     @PostMapping("/upload-url")
     public ResponseEntity<DocumentResponse> requestUploadUrl(Authentication authentication,
             @Valid @RequestBody UploadUrlRequest request) {
-        UUID userId = resolveUserId(authentication);
-        if (userId == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        UUID userId = UUID.fromString(authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(documentService.requestUploadUrl(userId, request));
     }
 
     @PatchMapping("/{id}/confirm")
     public ResponseEntity<Void> confirmUpload(Authentication authentication, @PathVariable UUID id) {
-        UUID userId = resolveUserId(authentication);
-        if (userId == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        UUID userId = UUID.fromString(authentication.getName());
         documentService.confirmUpload(userId, id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<DocumentResponse>> listDocuments(Authentication authentication) {
-        UUID userId = resolveUserId(authentication);
-        if (userId == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        UUID userId = UUID.fromString(authentication.getName());
         return ResponseEntity.ok(documentService.listDocuments(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DocumentResponse> getDocument(Authentication authentication, @PathVariable UUID id) {
-        UUID userId = resolveUserId(authentication);
-        if (userId == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        UUID userId = UUID.fromString(authentication.getName());
         return ResponseEntity.ok(documentService.getDocument(userId, id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(Authentication authentication, @PathVariable UUID id) {
-        UUID userId = resolveUserId(authentication);
-        if (userId == null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        UUID userId = UUID.fromString(authentication.getName());
         documentService.deleteDocument(userId, id);
         return ResponseEntity.noContent().build();
     }
