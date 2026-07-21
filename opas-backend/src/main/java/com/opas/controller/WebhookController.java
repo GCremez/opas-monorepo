@@ -24,6 +24,7 @@ public class WebhookController {
         this.idempotencyService = idempotencyService;
     }
 
+    @SuppressWarnings("null")
     @PostMapping("/stripe")
     public ResponseEntity<Void> handleStripeWebhook(HttpServletRequest request) {
         String payload;
@@ -38,6 +39,7 @@ public class WebhookController {
             return ResponseEntity.badRequest().build();
         }
 
+        @SuppressWarnings("null")
         Event event = stripeWebhookService.verifySignature(payload, sigHeader);
 
         if (idempotencyService.isProcessed(event.getId())) {
