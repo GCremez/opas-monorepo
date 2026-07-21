@@ -7,10 +7,11 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.opas.listener.DecodeMessageListener;
 
 @Configuration
 public class RabbitMQConfig {
@@ -55,19 +56,20 @@ public class RabbitMQConfig {
 
     @Bean
     public SimpleMessageListenerContainer decodeListenerContainer(ConnectionFactory connectionFactory,
-            MessageListenerAdapter decodeListenerAdapter) {
+            DecodeMessageListener decodeMessageListener) {
+        // decodeMessageListener implements ChannelAwareMessageListener directly (with its
+        // own manual ack/nack), so it's registered on the container as-is. Wrapping it in a
+        // MessageListenerAdapter here would be wrong: that adapter reflectively invokes the
+        // delegate with the *converted message payload* as the argument, not (Message,
+        // Channel) - it would never find a matching method and messages would never be
+        // processed.
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
         container.setQueueNames(QUEUE_DECODE);
-        container.setMessageListener(decodeListenerAdapter);
+        container.setMessageListener(decodeMessageListener);
         container.setPrefetchCount(5);
         container.setConcurrentConsumers(3);
         container.setMaxConcurrentConsumers(10);
         container.setDefaultRequeueRejected(false);
         return container;
-    }
-
-    @Bean
-    public MessageListenerAdapter decodeListenerAdapter(Object decodeMessageListener) {
-        return new MessageListenerAdapter(decodeMessageListener, "onMessage");
     }
 }
