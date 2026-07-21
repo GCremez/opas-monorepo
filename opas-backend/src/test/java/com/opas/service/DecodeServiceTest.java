@@ -8,6 +8,7 @@ import com.opas.domain.DecodeResult;
 import com.opas.domain.Document;
 import com.opas.domain.Subscription;
 import com.opas.domain.User;
+import com.opas.dto.DecodeMessage;
 import com.opas.dto.DecodeRequest;
 import com.opas.dto.DecodeResponse;
 import com.opas.repository.DecodeResultRepository;
@@ -72,13 +73,76 @@ class DecodeServiceTest {
     }
 
     @Test
-    void decodeSucceeds() {
+    void validateAndReserveSucceeds() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(usageTracker.tryReserve(eq(userId.toString()), eq("decodes"), eq(5))).thenReturn(4L);
+
+        DecodeMessage message = service.validateAndReserve(userId, documentId, true);
+
+        assertNotNull(message);
+        assertEquals(userId, message.userId());
+        assertEquals(documentId, message.documentId());
+        assertTrue(message.scrubPii());
+    }
+
+    @Test
+    void validateAndReserveThrowsWhenDocumentNotFound() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.validateAndReserve(userId, documentId, false));
+    }
+
+    @Test
+    void validateAndReserveThrowsWhenNotOwner() {
+        UUID otherUserId = UUID.randomUUID();
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.validateAndReserve(otherUserId, documentId, false));
+    }
+
+    @Test
+    void validateAndReserveThrowsWhenNotUploaded() {
+        document.setStatus("pending");
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.validateAndReserve(userId, documentId, false));
+    }
+
+    @Test
+    void validateAndReserveThrowsWhenMonthlyLimitReached() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(usageTracker.tryReserve(eq(userId.toString()), eq("decodes"), eq(5))).thenReturn(-1L);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.validateAndReserve(userId, documentId, false));
+    }
+
+    @Test
+    void premiumUsersBypassFreeTierLimit() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        Subscription sub = new Subscription();
+        sub.setTier("premium");
+        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.of(sub));
+        when(usageTracker.tryReserve(eq(userId.toString()), eq("decodes"), eq(Integer.MAX_VALUE)))
+                .thenReturn(Integer.MAX_VALUE - 1L);
+
+        DecodeMessage message = service.validateAndReserve(userId, documentId, false);
+
+        assertNotNull(message);
+        verify(usageTracker).tryReserve(eq(userId.toString()), eq("decodes"), eq(Integer.MAX_VALUE));
+    }
+
+    @Test
+    void processDecodeSucceeds() {
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
         when(userRepository.getReferenceById(userId)).thenReturn(user);
         when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
         when(presidioService.scrubPii(anyString())).thenReturn("scrubbed content");
-        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.empty());
-        when(usageTracker.getRemaining(eq(userId.toString()), eq("decodes"), eq(5))).thenReturn(3L);
 
         ChatResponse chatResponse = mock(ChatResponse.class);
         Generation generation = mock(Generation.class);
@@ -96,13 +160,31 @@ class DecodeServiceTest {
             return r;
         });
 
-        DecodeResponse response = service.decode(userId, documentId, new DecodeRequest(true));
+        DecodeMessage decodeMessage = new DecodeMessage(userId, documentId, true);
+        service.processDecode(decodeMessage);
 
-        assertNotNull(response);
-        assertEquals(documentId, response.documentId());
-        verify(usageTracker).increment(userId.toString(), "decodes");
         verify(documentRepository).save(document);
         assertEquals("ready", document.getStatus());
+    }
+
+    @Test
+    void processDecodeSkipsPiiScrubWhenFlagFalse() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(userRepository.getReferenceById(userId)).thenReturn(user);
+        when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
+
+        mockChatModel();
+
+        when(decodeResultRepository.save(any())).thenAnswer(invocation -> {
+            DecodeResult r = invocation.getArgument(0);
+            r.setId(UUID.randomUUID());
+            return r;
+        });
+
+        DecodeMessage decodeMessage = new DecodeMessage(userId, documentId, false);
+        service.processDecode(decodeMessage);
+
+        verify(presidioService, never()).scrubPii(anyString());
     }
 
     private void mockChatModel() {
@@ -115,88 +197,5 @@ class DecodeServiceTest {
         when(chatResponse.getMetadata()).thenReturn(mock(ChatResponseMetadata.class));
         when(chatResponse.getMetadata().getUsage()).thenReturn(mock(Usage.class));
         when(chatModel.call(any(Prompt.class))).thenReturn(chatResponse);
-    }
-
-    @Test
-    void decodeThrowsWhenDocumentNotFound() {
-        when(documentRepository.findById(documentId)).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class,
-                () -> service.decode(userId, documentId, new DecodeRequest(false)));
-    }
-
-    @Test
-    void decodeThrowsWhenNotOwner() {
-        UUID otherUserId = UUID.randomUUID();
-        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> service.decode(otherUserId, documentId, new DecodeRequest(false)));
-    }
-
-    @Test
-    void decodeThrowsWhenNotUploaded() {
-        document.setStatus("pending");
-        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> service.decode(userId, documentId, new DecodeRequest(false)));
-    }
-
-    @Test
-    void decodeThrowsWhenMonthlyLimitReached() {
-        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
-        when(userRepository.getReferenceById(userId)).thenReturn(user);
-        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.empty());
-        when(usageTracker.getRemaining(eq(userId.toString()), eq("decodes"), eq(5))).thenReturn(0L);
-
-        assertThrows(IllegalArgumentException.class,
-                () -> service.decode(userId, documentId, new DecodeRequest(false)));
-    }
-
-    @Test
-    void decodeSkipsPiiScrubWhenFlagFalse() {
-        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
-        when(userRepository.getReferenceById(userId)).thenReturn(user);
-        when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
-        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.empty());
-        when(usageTracker.getRemaining(eq(userId.toString()), eq("decodes"), eq(5))).thenReturn(3L);
-
-        mockChatModel();
-
-        when(decodeResultRepository.save(any())).thenAnswer(invocation -> {
-            DecodeResult r = invocation.getArgument(0);
-            r.setId(UUID.randomUUID());
-            return r;
-        });
-
-        service.decode(userId, documentId, new DecodeRequest(false));
-
-        verify(presidioService, never()).scrubPii(anyString());
-    }
-
-    @Test
-    void premiumUsersBypassFreeTierLimit() {
-        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
-        when(userRepository.getReferenceById(userId)).thenReturn(user);
-        when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
-        Subscription sub = new Subscription();
-        sub.setTier("premium");
-        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.of(sub));
-        when(usageTracker.getRemaining(eq(userId.toString()), eq("decodes"), eq(Integer.MAX_VALUE)))
-                .thenReturn(Integer.MAX_VALUE - 1L);
-
-        mockChatModel();
-
-        when(decodeResultRepository.save(any())).thenAnswer(invocation -> {
-            DecodeResult r = invocation.getArgument(0);
-            r.setId(UUID.randomUUID());
-            return r;
-        });
-
-        DecodeResponse response = service.decode(userId, documentId, new DecodeRequest(false));
-
-        assertNotNull(response);
-        verify(usageTracker).getRemaining(eq(userId.toString()), eq("decodes"), eq(Integer.MAX_VALUE));
     }
 }
