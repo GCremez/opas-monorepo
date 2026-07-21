@@ -50,7 +50,7 @@ public class S3Config {
         return builder.build();
     }
 
-    @Bean(destroyMethod = "close")
+    @Bean(destroyMethod = "")
     public AwsCredentialsProvider credentialsProvider() {
         if (!accessKey.isBlank() && !secretKey.isBlank()) {
             return () -> AwsBasicCredentials.create(accessKey, secretKey);

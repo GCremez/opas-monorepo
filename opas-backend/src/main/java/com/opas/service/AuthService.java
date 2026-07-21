@@ -8,6 +8,7 @@ import com.opas.dto.AuthResponse;
 import com.opas.dto.LoginRequest;
 import com.opas.dto.RefreshRequest;
 import com.opas.dto.RegisterRequest;
+import com.opas.dto.UserResponse;
 import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.SubscriptionRepository;
@@ -96,9 +97,10 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid refresh token");
         }
         String hash = sha256Hex(request.refreshToken());
-        if (!refreshTokenService.consume(userId, hash)) {
+        if (!refreshTokenService.isValid(userId, hash)) {
             throw new IllegalArgumentException("Invalid refresh token");
         }
+        refreshTokenService.delete(userId, hash);
         User user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return generateAuthResponse(user);
@@ -152,13 +154,31 @@ public class AuthService {
         userRepository.deleteById(userId);
     }
 
+    @Transactional
+    public void changePassword(UUID userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public UserResponse me(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        String plan = subscriptionRepository.findByUserId(user.getId()).map(Subscription::getTier).orElse("free");
+        return UserResponse.from(user, plan);
+    }
+
     private AuthResponse generateAuthResponse(User user) {
         String plan = subscriptionRepository.findByUserId(user.getId()).map(Subscription::getTier).orElse("free");
         String userId = user.getId().toString();
         String accessToken = jwtUtil.createAccessToken(userId, user.getEmail());
         String refreshToken = jwtUtil.createRefreshToken(userId);
         refreshTokenService.store(userId, sha256Hex(refreshToken));
-        return new AuthResponse(accessToken, refreshToken, plan);
+        return new AuthResponse(accessToken, refreshToken, plan, UserResponse.from(user, plan));
     }
 
     @Nullable
