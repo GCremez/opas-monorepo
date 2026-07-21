@@ -1,10 +1,13 @@
 package com.opas.controller;
 
+import com.opas.config.RabbitMQConfig;
+import com.opas.dto.DecodeMessage;
 import com.opas.dto.DecodeRequest;
-import com.opas.dto.DecodeResponse;
 import com.opas.service.DecodeService;
 import jakarta.validation.Valid;
+import java.util.Map;
 import java.util.UUID;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,19 +22,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class DecodeController {
 
     private final DecodeService decodeService;
+    private final RabbitTemplate rabbitTemplate;
 
-    public DecodeController(DecodeService decodeService) {
+    public DecodeController(DecodeService decodeService, RabbitTemplate rabbitTemplate) {
         this.decodeService = decodeService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @PostMapping
-    public ResponseEntity<DecodeResponse> decode(Authentication authentication, @PathVariable UUID documentId,
+    public ResponseEntity<Map<String, Object>> decode(Authentication authentication, @PathVariable UUID documentId,
             @Valid @RequestBody DecodeRequest request) {
         String name = authentication.getName();
         if (name == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         UUID userId = UUID.fromString(name);
-        return ResponseEntity.ok(decodeService.decode(userId, documentId, request));
+
+        DecodeMessage message = decodeService.validateAndReserve(userId, documentId, request.scrubPii());
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_DECODE, RabbitMQConfig.ROUTING_KEY_DECODE, message);
+
+        return ResponseEntity.accepted().body(Map.of(
+                "documentId", documentId,
+                "status", "queued",
+                "message", "Decode accepted and queued for processing"));
     }
 }

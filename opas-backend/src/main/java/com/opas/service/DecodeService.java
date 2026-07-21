@@ -4,7 +4,7 @@ import com.opas.domain.DecodeResult;
 import com.opas.domain.Document;
 import com.opas.domain.Subscription;
 import com.opas.domain.User;
-import com.opas.dto.DecodeRequest;
+import com.opas.dto.DecodeMessage;
 import com.opas.dto.DecodeResponse;
 import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DecodeService {
+
+    private static final Logger log = LoggerFactory.getLogger(DecodeService.class);
 
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
@@ -51,8 +55,11 @@ public class DecodeService {
         this.modelName = modelName;
     }
 
-    @Transactional
-    public DecodeResponse decode(UUID userId, UUID documentId, DecodeRequest request) {
+    /**
+     * Validate the request and atomically reserve quota. Runs synchronously on the
+     * HTTP thread — fast, no blocking I/O. Returns the message to enqueue.
+     */
+    public DecodeMessage validateAndReserve(UUID userId, UUID documentId, boolean scrubPii) {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found"));
         if (!document.getUser().getId().equals(userId)) {
@@ -62,19 +69,35 @@ public class DecodeService {
             throw new IllegalArgumentException("Document is not ready for decoding");
         }
 
-        User user = userRepository.getReferenceById(userId);
         int limit = resolveLimit(userId);
         String action = "decodes";
 
-        long remaining = usageTracker.getRemaining(userId.toString(), action, limit);
-        if (remaining <= 0) {
+        long remaining = usageTracker.tryReserve(userId.toString(), action, limit);
+        if (remaining < 0) {
             throw new IllegalArgumentException("Monthly decode limit reached");
         }
+
+        return new DecodeMessage(userId, documentId, scrubPii);
+    }
+
+    /**
+     * Heavy decode processing — S3 download, Presidio, Claude API call, DB save. Runs
+     * on a RabbitMQ consumer thread, not holding any HTTP request DB connection.
+     */
+    @Transactional
+    public void processDecode(DecodeMessage message) {
+        Document document = documentRepository.findById(message.documentId())
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        if (!document.getUser().getId().equals(message.userId())) {
+            throw new IllegalArgumentException("Document does not belong to user");
+        }
+
+        User user = userRepository.getReferenceById(message.userId());
 
         byte[] fileBytes = storageService.getObjectBytes(document.getS3Key());
         String content = new String(fileBytes, StandardCharsets.UTF_8);
 
-        if (request.scrubPii()) {
+        if (message.scrubPii()) {
             content = presidioService.scrubPii(content);
         }
 
@@ -93,7 +116,7 @@ public class DecodeService {
         result.setDocument(document);
         result.setUser(user);
         result.setRawResponse(rawText);
-        result.setPiiScrubbed(request.scrubPii());
+        result.setPiiScrubbed(message.scrubPii());
         result.setModel(modelName);
         result.setTokensIn(tokensIn);
         result.setTokensOut(tokensOut);
@@ -104,12 +127,22 @@ public class DecodeService {
         document.setStatus("ready");
         documentRepository.save(document);
 
-        usageTracker.increment(userId.toString(), action);
-
-        return toResponse(result);
+        if (tokensIn != null && tokensOut != null) {
+            double costInput = tokensIn * 3.00 / 1_000_000;
+            double costOutput = tokensOut * 15.00 / 1_000_000;
+            double totalCost = costInput + costOutput;
+            log.info("Decode cost: userId={}, documentId={}, tokensIn={}, tokensOut={}, model={}, cost=${}",
+                    message.userId(), message.documentId(), tokensIn, tokensOut, modelName,
+                    String.format("%.4f", totalCost));
+        }
     }
 
-    private int resolveLimit(UUID userId) {
+    public long getRemainingDecodes(UUID userId) {
+        int limit = resolveLimit(userId);
+        return usageTracker.getRemaining(userId.toString(), "decodes", limit);
+    }
+
+    public int resolveLimit(UUID userId) {
         return subscriptionRepository.findByUserId(userId).map(Subscription::getTier).filter("premium"::equals)
                 .map(tier -> Integer.MAX_VALUE).orElse(freeTierLimit);
     }
@@ -135,7 +168,7 @@ public class DecodeService {
                 .formatted(filename, content);
     }
 
-    private static DecodeResponse toResponse(DecodeResult result) {
+    public static DecodeResponse toResponse(DecodeResult result) {
         return new DecodeResponse(result.getId(), result.getDocument().getId(), result.getRawResponse(),
                 result.getStructuredData(), result.isPiiScrubbed(), result.getModel(),
                 result.getTokensIn() != null ? result.getTokensIn() : 0,

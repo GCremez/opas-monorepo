@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 
 @ExtendWith(MockitoExtension.class)
 class UsageTrackerTest {
@@ -109,5 +110,32 @@ class UsageTrackerTest {
         long count = tracker.increment("user-1", "decodes");
 
         assertEquals(0L, count);
+    }
+
+    @Test
+    void tryReserveReturnsRemainingWhenUnderLimit() {
+        doReturn(3L).when(redis).execute(any(DefaultRedisScript.class), anyList(), any(), any());
+
+        long remaining = tracker.tryReserve("user-1", "decodes", 5);
+
+        assertEquals(3L, remaining);
+    }
+
+    @Test
+    void tryReserveReturnsNegativeWhenLimitReached() {
+        doReturn(-1L).when(redis).execute(any(DefaultRedisScript.class), anyList(), any(), any());
+
+        long remaining = tracker.tryReserve("user-1", "decodes", 5);
+
+        assertEquals(-1L, remaining);
+    }
+
+    @Test
+    void tryReserveReturnsNegativeWhenRedisReturnsNull() {
+        doReturn(null).when(redis).execute(any(DefaultRedisScript.class), anyList(), any(), any());
+
+        long remaining = tracker.tryReserve("user-1", "decodes", 5);
+
+        assertEquals(-1L, remaining);
     }
 }
