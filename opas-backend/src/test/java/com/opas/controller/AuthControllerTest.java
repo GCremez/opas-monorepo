@@ -36,7 +36,7 @@ class AuthControllerTest {
     @Test
     void registerReturns201() {
         var request = new RegisterRequest("new@example.com", "password123", "New User");
-        when(authService.register(request)).thenReturn(new AuthResponse("at", "rt", "free"));
+        when(authService.register(request)).thenReturn(new AuthResponse("at", "rt", "free", null));
 
         var response = controller.register(request);
 
@@ -48,7 +48,7 @@ class AuthControllerTest {
     @Test
     void loginReturns200() {
         var request = new LoginRequest("test@example.com", "password123");
-        when(authService.login(request)).thenReturn(new AuthResponse("at", "rt", "free"));
+        when(authService.login(request)).thenReturn(new AuthResponse("at", "rt", "free", null));
 
         var response = controller.login(request);
 
@@ -59,7 +59,7 @@ class AuthControllerTest {
     @Test
     void refreshReturns200() {
         var request = new RefreshRequest("refresh-token");
-        when(authService.refresh(request)).thenReturn(new AuthResponse("new-at", "new-rt", "premium"));
+        when(authService.refresh(request)).thenReturn(new AuthResponse("new-at", "new-rt", "premium", null));
 
         var response = controller.refresh(request);
 

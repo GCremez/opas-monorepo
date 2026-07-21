@@ -97,10 +97,9 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid refresh token");
         }
         String hash = sha256Hex(request.refreshToken());
-        if (!refreshTokenService.isValid(userId, hash)) {
+        if (!refreshTokenService.consume(userId, hash)) {
             throw new IllegalArgumentException("Invalid refresh token");
         }
-        refreshTokenService.delete(userId, hash);
         User user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return generateAuthResponse(user);

@@ -100,7 +100,8 @@ class DocumentServiceTest {
     @Test
     void listDocumentsReturnsUserDocuments() {
         document.setStatus("uploaded");
-        when(documentRepository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(document));
+        when(documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(userId, "archived"))
+                .thenReturn(List.of(document));
         when(storageService.generatePresignedDownloadUrl(anyString(), any(Duration.class)))
                 .thenReturn("https://download.url");
 

@@ -35,6 +35,18 @@ public class RefreshTokenService {
         redis.delete(KEY_PREFIX + userId + ":" + tokenHash);
     }
 
+    /**
+     * Atomically check-and-consume a refresh token in one round-trip. Redis DELETE
+     * returns whether the key existed, so this is race-free: if two requests race to
+     * consume the same token, only one of them gets {@code true}. Use this instead of
+     * isValid() + delete(), which is a check-then-act race under concurrent refresh
+     * calls (e.g. a mobile client retrying a 401 from multiple in-flight requests).
+     */
+    public boolean consume(String userId, String tokenHash) {
+        Boolean deleted = redis.delete(KEY_PREFIX + userId + ":" + tokenHash);
+        return Boolean.TRUE.equals(deleted);
+    }
+
     public void invalidateAll(String userId) {
         ScanOptions options = ScanOptions.scanOptions()
         .match(KEY_PREFIX +userId + ":*")
