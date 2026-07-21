@@ -69,4 +69,11 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/archive")
+    public ResponseEntity<Void> archiveDocument(Authentication authentication, @PathVariable UUID id) {
+        UUID userId = resolveUserId(authentication);
+        documentService.archiveDocument(userId, id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

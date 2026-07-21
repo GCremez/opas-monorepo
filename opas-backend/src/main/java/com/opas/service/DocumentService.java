@@ -60,7 +60,7 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public List<DocumentResponse> listDocuments(UUID userId) {
-        return documentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+        return documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(userId, "archived").stream()
                 .map(doc -> toResponse(doc, null, generateDownloadUrl(doc))).toList();
     }
 
@@ -85,9 +85,23 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
+    @Transactional
+    public void archiveDocument(UUID userId, UUID documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+        if (!document.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Document does not belong to user");
+        }
+        document.setStatus("archived");
+        documentRepository.save(document);
+    }
+
     @Nullable
     private String generateDownloadUrl(Document document) {
         if (!"uploaded".equals(document.getStatus()) && !"ready".equals(document.getStatus())) {
+            return null;
+        }
+        if ("archived".equals(document.getStatus())) {
             return null;
         }
         return storageService.generatePresignedDownloadUrl(document.getS3Key(), Duration.ofHours(1));

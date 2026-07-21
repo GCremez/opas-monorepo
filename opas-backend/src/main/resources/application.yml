@@ -92,10 +92,12 @@ opas:
     endpoint: ${AWS_ENDPOINT_URL:}
     upload-ttl-minutes: 15
   stripe:
-    secret-key: ${STRIPE_SECRET_KEY}
-    webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+    enabled: ${STRIPE_ENABLED:false}
+    secret-key: ${STRIPE_SECRET_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    return-base-url: ${STRIPE_RETURN_BASE_URL:https://opas.app}
   free-tier:
-    monthly-decode-limit: 2
+    monthly-decode-limit: 5
 
 logging:
   pattern:
