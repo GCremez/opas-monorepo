@@ -1,6 +1,7 @@
 package com.opas.service;
 
 import com.opas.config.JwtUtil;
+import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Document;
 import com.opas.domain.Subscription;
 import com.opas.domain.User;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,13 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final TokenBlacklistService tokenBlacklistService;
 
+    /**
+     * A valid bcrypt hash computed once at startup. On login for a non-existent email
+     * we still run bcrypt against this so response time is independent of whether the
+     * account exists — closing the timing side-channel for account enumeration.
+     */
+    private final String dummyPasswordHash;
+
     public AuthService(UserRepository userRepository, SubscriptionRepository subscriptionRepository,
             DecodeResultRepository decodeResultRepository, DocumentRepository documentRepository,
             StorageService storageService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
@@ -52,12 +61,15 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.dummyPasswordHash = passwordEncoder.encode("opas-constant-time-login-placeholder");
     }
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already registered");
+            // Generic message: do not confirm that the email is already registered
+            // (account enumeration). Registration is also rate-limited (see AuthController).
+            throw new IllegalArgumentException("Registration could not be completed");
         }
 
         User user = new User();
@@ -76,12 +88,16 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        Optional<User> maybeUser = userRepository.findByEmail(request.email());
+        // Always perform a bcrypt comparison — against the real hash if the user
+        // exists, otherwise against a dummy hash — so the response time does not
+        // reveal whether the email is registered (timing account enumeration).
+        String hash = maybeUser.map(User::getPasswordHash).orElse(dummyPasswordHash);
+        boolean matches = passwordEncoder.matches(request.password(), hash);
+        if (maybeUser.isEmpty() || !matches) {
             throw new IllegalArgumentException("Invalid email or password");
         }
-        return generateAuthResponse(user);
+        return generateAuthResponse(maybeUser.get());
     }
 
     @Transactional
@@ -98,10 +114,14 @@ public class AuthService {
         }
         String hash = sha256Hex(request.refreshToken());
         if (!refreshTokenService.consume(userId, hash)) {
+            // The token is validly signed and unexpired, yet not in the store: it has
+            // already been rotated away. This is the classic refresh-token replay signal.
+            // Invalidate the whole family so a stolen-then-rotated token can't be used.
+            refreshTokenService.invalidateAll(userId);
             throw new IllegalArgumentException("Invalid refresh token");
         }
         User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         return generateAuthResponse(user);
     }
 
@@ -156,17 +176,20 @@ public class AuthService {
     @Transactional
     public void changePassword(UUID userId, String currentPassword, String newPassword) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
             throw new IllegalArgumentException("Current password is incorrect");
         }
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+        // Revoke all existing refresh tokens so a session opened with the old
+        // password (e.g. an attacker's) cannot survive the password change.
+        refreshTokenService.invalidateAll(userId.toString());
     }
 
     public UserResponse me(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         String plan = subscriptionRepository.findByUserId(user.getId()).map(Subscription::getTier).orElse("free");
         return UserResponse.from(user, plan);
     }
