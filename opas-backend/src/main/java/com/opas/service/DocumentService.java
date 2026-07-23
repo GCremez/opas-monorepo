@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Document;
 import com.opas.domain.User;
 import com.opas.dto.DocumentResponse;
@@ -50,9 +51,9 @@ public class DocumentService {
     @Transactional
     public void confirmUpload(UUID userId, UUID documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Document does not belong to user");
+            throw new ResourceNotFoundException();
         }
         document.setStatus("uploaded");
         documentRepository.save(document);
@@ -67,9 +68,9 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public DocumentResponse getDocument(UUID userId, UUID documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Document does not belong to user");
+            throw new ResourceNotFoundException();
         }
         return toResponse(document, null, generateDownloadUrl(document));
     }
@@ -77,9 +78,9 @@ public class DocumentService {
     @Transactional
     public void deleteDocument(UUID userId, UUID documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Document does not belong to user");
+            throw new ResourceNotFoundException();
         }
         storageService.deleteObject(document.getS3Key());
         documentRepository.delete(document);
@@ -88,9 +89,9 @@ public class DocumentService {
     @Transactional
     public void archiveDocument(UUID userId, UUID documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Document does not belong to user");
+            throw new ResourceNotFoundException();
         }
         document.setStatus("archived");
         documentRepository.save(document);
