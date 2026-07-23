@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.ResourceNotFoundException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -90,7 +91,7 @@ class DecodeServiceTest {
     void validateAndReserveThrowsWhenDocumentNotFound() {
         when(documentRepository.findById(documentId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> service.validateAndReserve(userId, documentId, false));
     }
 
@@ -99,7 +100,7 @@ class DecodeServiceTest {
         UUID otherUserId = UUID.randomUUID();
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> service.validateAndReserve(otherUserId, documentId, false));
     }
 
