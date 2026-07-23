@@ -3,8 +3,6 @@ package com.opas.service;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -12,8 +10,6 @@ import org.springframework.web.client.RestClient;
 
 @Service
 public class PresidioService {
-
-    private static final Logger log = LoggerFactory.getLogger(PresidioService.class);
 
     private final RestClient restClient;
 
@@ -23,12 +19,14 @@ public class PresidioService {
 
     public List<AnalysisResult> analyze(String text) {
         try {
-            return restClient.post().uri("/analyze").body(new AnalyzeRequest(text, "en")).retrieve()
-                    .body(new ParameterizedTypeReference<>() {
+            List<AnalysisResult> results = restClient.post().uri("/analyze").body(new AnalyzeRequest(text, "en"))
+                    .retrieve().body(new ParameterizedTypeReference<>() {
                     });
+            return results != null ? results : Collections.emptyList();
         } catch (Exception e) {
-            log.warn("Presidio analyze failed, returning empty", e);
-            return Collections.emptyList();
+            // Do NOT swallow and return empty — an empty result is indistinguishable
+            // from "no PII found", which would make the caller proceed with raw text.
+            throw new PresidioUnavailableException("Presidio analyze failed", e);
         }
     }
 
@@ -36,6 +34,12 @@ public class PresidioService {
         return !analyze(text).isEmpty();
     }
 
+    /**
+     * Returns the anonymized text. Fails closed: if Presidio is unreachable or errors,
+     * this throws {@link PresidioUnavailableException} rather than returning the
+     * original (un-scrubbed) text, so a scrub-requested decode aborts instead of
+     * leaking PII to the LLM.
+     */
     public String scrubPii(String text) {
         List<AnalysisResult> results = analyze(text);
         if (results.isEmpty()) {
@@ -44,10 +48,14 @@ public class PresidioService {
         try {
             var response = restClient.post().uri("/anonymize").body(new AnonymizeRequest(text, results)).retrieve()
                     .body(AnonymizeResponse.class);
-            return response != null ? response.text() : text;
+            if (response == null) {
+                throw new PresidioUnavailableException("Presidio anonymize returned no body", null);
+            }
+            return response.text();
+        } catch (PresidioUnavailableException e) {
+            throw e;
         } catch (Exception e) {
-            log.warn("Presidio anonymize failed, returning original text", e);
-            return text;
+            throw new PresidioUnavailableException("Presidio anonymize failed", e);
         }
     }
 
