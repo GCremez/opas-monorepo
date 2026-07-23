@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.ResourceNotFoundException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -86,7 +87,7 @@ class DocumentServiceTest {
     void confirmUploadThrowsWhenNotFound() {
         when(documentRepository.findById(documentId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.confirmUpload(userId, documentId));
+        assertThrows(ResourceNotFoundException.class, () -> service.confirmUpload(userId, documentId));
     }
 
     @Test
@@ -94,7 +95,7 @@ class DocumentServiceTest {
         UUID otherUserId = UUID.randomUUID();
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
 
-        assertThrows(IllegalArgumentException.class, () -> service.confirmUpload(otherUserId, documentId));
+        assertThrows(ResourceNotFoundException.class, () -> service.confirmUpload(otherUserId, documentId));
     }
 
     @Test
@@ -131,7 +132,7 @@ class DocumentServiceTest {
         UUID otherUserId = UUID.randomUUID();
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
 
-        assertThrows(IllegalArgumentException.class, () -> service.getDocument(otherUserId, documentId));
+        assertThrows(ResourceNotFoundException.class, () -> service.getDocument(otherUserId, documentId));
     }
 
     @Test
@@ -150,7 +151,7 @@ class DocumentServiceTest {
         UUID otherUserId = UUID.randomUUID();
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
 
-        assertThrows(IllegalArgumentException.class, () -> service.deleteDocument(otherUserId, documentId));
+        assertThrows(ResourceNotFoundException.class, () -> service.deleteDocument(otherUserId, documentId));
 
         verify(storageService, never()).deleteObject(any());
         verify(documentRepository, never()).delete(any());
