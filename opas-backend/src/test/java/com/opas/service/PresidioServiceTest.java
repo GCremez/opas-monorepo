@@ -56,13 +56,14 @@ class PresidioServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    void analyzeReturnsEmptyOnException() {
+    void analyzeThrowsOnException() {
+        // Fail closed: a transport error must NOT be reported as "no PII found".
         mockPostChain();
         when(uriSpec.uri("/analyze")).thenReturn(uriSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class)))
                 .thenThrow(new RuntimeException("Connection refused"));
 
-        assertTrue(service.analyze("John Doe").isEmpty());
+        assertThrows(PresidioUnavailableException.class, () -> service.analyze("John Doe"));
     }
 
     @SuppressWarnings("unchecked")
@@ -115,17 +116,17 @@ class PresidioServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    void scrubPiiReturnsOriginalOnAnonymizeFailure() {
-        // First call: analyze
+    void scrubPiiThrowsOnAnonymizeFailure() {
+        // Fail closed: if anonymization fails after PII was detected, the caller must
+        // abort — never return the original (un-scrubbed) text.
         mockPostChain();
         when(uriSpec.uri("/analyze")).thenReturn(uriSpec);
         when(responseSpec.body(any(ParameterizedTypeReference.class)))
                 .thenReturn(List.of(new PresidioService.AnalysisResult("PERSON", 0, 8, 0.99)));
 
-        // Second call: anonymize fails
         when(uriSpec.uri("/anonymize")).thenReturn(uriSpec);
         when(responseSpec.body(PresidioService.AnonymizeResponse.class)).thenThrow(new RuntimeException("Timeout"));
 
-        assertEquals("John Doe", service.scrubPii("John Doe"));
+        assertThrows(PresidioUnavailableException.class, () -> service.scrubPii("John Doe"));
     }
 }
