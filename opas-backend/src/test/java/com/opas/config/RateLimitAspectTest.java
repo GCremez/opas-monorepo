@@ -31,7 +31,8 @@ class RateLimitAspectTest {
         when(rateLimit.key()).thenReturn("test-key");
         when(rateLimit.limit()).thenReturn(10);
         when(rateLimit.windowSeconds()).thenReturn(60L);
-        when(rateLimiter.tryAcquire(eq("test-key"), eq(10), eq(Duration.ofSeconds(60)))).thenReturn(true);
+        // Key is now "<name>:<client-ip>"; no servlet request in a unit test → "…:unknown".
+        when(rateLimiter.tryAcquire(eq("test-key:unknown"), eq(10), eq(Duration.ofSeconds(60)))).thenReturn(true);
         when(joinPoint.proceed()).thenReturn("result");
 
         aspect.enforceRateLimit(joinPoint, rateLimit);
@@ -44,7 +45,7 @@ class RateLimitAspectTest {
         when(rateLimit.key()).thenReturn("test-key");
         when(rateLimit.limit()).thenReturn(10);
         when(rateLimit.windowSeconds()).thenReturn(60L);
-        when(rateLimiter.tryAcquire(eq("test-key"), eq(10), eq(Duration.ofSeconds(60)))).thenReturn(false);
+        when(rateLimiter.tryAcquire(eq("test-key:unknown"), eq(10), eq(Duration.ofSeconds(60)))).thenReturn(false);
 
         assertThrows(RateLimitExceededException.class, () -> aspect.enforceRateLimit(joinPoint, rateLimit));
 
