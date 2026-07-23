@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Document;
 import com.opas.domain.DraftLetter;
 import com.opas.domain.Subscription;
@@ -42,9 +43,9 @@ public class DraftLetterService {
     @Transactional(readOnly = true)
     public List<DraftLetterResponse> listDraftLetters(UUID userId, UUID documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Document does not belong to user");
+            throw new ResourceNotFoundException();
         }
         return draftLetterRepository.findByDocumentIdOrderByCreatedAtDesc(documentId).stream()
                 .map(this::toResponse).toList();
@@ -53,9 +54,9 @@ public class DraftLetterService {
     @Transactional
     public DraftLetterResponse generateDraft(UUID userId, UUID documentId, DraftLetterRequest request) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Document does not belong to user");
+            throw new ResourceNotFoundException();
         }
 
         boolean isPremium = subscriptionRepository.findByUserId(userId)
