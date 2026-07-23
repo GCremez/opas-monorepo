@@ -7,8 +7,8 @@ interface ToggleProps {
 
 export function Toggle({ on }: ToggleProps) {
   return (
-    <View className={`w-12 h-7 rounded-full items-start justify-center px-0.5 ${on ? 'bg-accent' : 'bg-surface-3'}`}>
-      <View className={`w-[22px] h-[22px] rounded-full bg-white shadow-sm ${on ? 'self-end' : 'self-start'}`} />
+    <View className={`w-12 h-7 rounded-pill items-start justify-center px-0.5 ${on ? 'bg-accent' : 'bg-surface-2'}`}>
+      <View className={`w-[22px] h-[22px] rounded-pill bg-bg ${on ? 'self-end' : 'self-start'}`} />
     </View>
   );
 }

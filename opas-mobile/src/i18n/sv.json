@@ -19,17 +19,24 @@
   },
   "onboarding": {
     "skip": "Hoppa över",
+    "step": "Opas · {{n}} / 3",
+    "eyebrow_1": "Välkommen till Opas",
+    "eyebrow_2": "Missa aldrig en tidsfrist",
+    "eyebrow_3": "Allt på ett ställe",
+    "illo_caption": "skanna → guide i klarspråk",
     "next": "Nästa",
     "get_started": "Kom igång",
-    "slide_1_title": "Skanna vilket officiellt brev som helst",
-    "slide_1_desc": "Fotografera ett brev från Kela, Vero, Migri eller andra finska myndigheter — OPAS digitaliserar det direkt.",
-    "slide_2_title": "Vet vad du ska göra",
-    "slide_2_desc": "OPAS extraherar viktiga detaljer, deadliner och åtgärder så att du aldrig missar det som är viktigt.",
-    "slide_3_title": "Håll dig organiserad",
-    "slide_3_desc": "Automatiskt sorterade i mappar — skatt, boende, förmåner och mer. Håll koll på deadliner på ett ställe."
+    "slide_1_title": "Förstå varje officiellt brev.",
+    "slide_1_desc": "Skanna vilket dokument som helst från Kela, skatteverket eller Migri. Opas gör om det till klarspråk — och säger exakt vad du ska göra.",
+    "slide_2_title": "Vet vad du ska göra — och när.",
+    "slide_2_desc": "Opas hämtar varje datum och åtgärd ur dina brev och påminner dig innan något förfaller.",
+    "slide_3_title": "Allt, prydligt ordnat.",
+    "slide_3_desc": "Dina dokument arkiveras per myndighet och är alltid sökbara — inget försvinner i en byrålåda igen."
   },
   "auth": {
-    "welcome_back": "Välkommen tillbaka",
+    "welcome_back": "Välkommen tillbaka.",
+    "start_record": "Börja ditt register.",
+    "forgot": "Glömt lösenord?",
     "welcome_to": "Välkommen till Opas",
     "get_started": "Kom igång med ditt konto",
     "sign_in_to": "Logga in på ditt Opas-konto",
@@ -53,10 +60,48 @@
   },
   "tabs": {
     "home": "Hem",
+    "record": "Register",
     "search": "Sök",
     "scan": "Skanna",
     "docs": "Dokument",
-    "profile": "Profil"
+    "files": "Filer",
+    "alerts": "Påminnelser",
+    "profile": "Profil",
+    "you": "Du"
+  },
+  "record": {
+    "eyebrow": "Opas · Ditt register",
+    "needs_you": "Kräver dig",
+    "your_documents": "Dina dokument",
+    "see_all": "Visa alla →",
+    "all_clear": "Allt är i ordning.",
+    "one_thing": " En sak kräver dig den här veckan.",
+    "nothing_needs": "Inget kräver dig just nu. Du har koll.",
+    "footer_one": "Registrerad i Finland · {{count}} dokument sparat.",
+    "footer_other": "Registrerad i Finland · {{count}} dokument sparade.",
+    "explore": "Utforska Opas",
+    "ask_opas": "Fråga Opas",
+    "ask_opas_meta": "Svar grundade i ditt register",
+    "guides": "Guider",
+    "guides_meta": "Steg-för-steg för vanliga uppgifter",
+    "journey": "Resa",
+    "journey_meta": "Din tidslinje för livsadmin",
+    "empty_title": "Ditt register är tomt.",
+    "empty_desc": "Skanna ditt första brev — från Kela, skatteverket, var som helst — så börjar Opas hålla ordning på det.",
+    "scan_first": "Skanna ditt första dokument",
+    "see_how": "Se hur Opas fungerar",
+    "welcome": "Välkommen"
+  },
+  "alerts": {
+    "eyebrow": "Opas · Påminnelser",
+    "title": "Tidsfrister &\npåminnelser.",
+    "this_week": "Denna vecka",
+    "later": "Senare denna månad",
+    "done": "Klart",
+    "no_alerts": "Inga tidsfrister",
+    "no_alerts_desc": "När ett dokument har en tidsfrist visas det här.",
+    "days_left": "{{count}} dgr",
+    "day_left": "{{count}} dg"
   },
   "home": {
     "title": "Hem",
@@ -118,7 +163,13 @@
     "show_all": "Visa alla",
     "result_count": "{{count}} resultat",
     "result_count_plural": "{{count}} resultat",
-    "filters": { "all": "Alla", "kela": "Kela", "vero": "Vero", "migri": "Migri", "suomi": "Suomi.fi" }
+    "filters": {
+      "all": "Alla",
+      "kela": "Kela",
+      "vero": "Vero",
+      "migri": "Migri",
+      "suomi": "Suomi.fi"
+    }
   },
   "scan": {
     "title": "Skanna dokument",
@@ -138,9 +189,12 @@
     "scan_another": "Skanna ett till",
     "scan_failed_title": "Kunde inte skanna dokumentet",
     "scan_failed_desc": "Se till att dokumentet är väl upplyst, plant och helt synligt i bilden. Undvik blänk och skuggor.",
-    "step_uploading": "Laddar upp dokument",
-    "step_analyzing": "Analyserar innehåll",
-    "step_extracting": "Extraherar åtgärder"
+    "step_uploading": "Döljer personuppgifter",
+    "step_analyzing": "Översätter FI → EN",
+    "step_extracting": "Hittar datum och åtgärder",
+    "reading": "Läser ditt brev…",
+    "please_wait": "Vänta",
+    "privacy_note": "Ditt dokument lämnar aldrig din kontroll. Personuppgifter döljs innan något läses."
   },
   "documents": {
     "title": "Dokument",
@@ -201,6 +255,10 @@
   "profile": {
     "title": "Profil",
     "app_language": "App-språk",
+    "appearance": "Utseende",
+    "appearance_paper": "Papper",
+    "appearance_ink": "Bläck",
+    "appearance_system": "System",
     "settings": "Inställningar",
     "account": "Konto",
     "sign_out": "Logga ut",
@@ -257,7 +315,10 @@
     "lang_fi": "Suomi",
     "lang_fi_native": "Finska",
     "lang_sv": "Svenska",
-    "lang_sv_native": "Svenska"
+    "lang_sv_native": "Svenska",
+    "deadline_reminders": "Påminnelser om tidsfrister",
+    "on": "På",
+    "off": "Av"
   },
   "document": {
     "title": "Dokument",
@@ -306,7 +367,10 @@
     "event_notes": "Från dokument: {{filename}}"
   },
   "welcome": {
-    "tagline": "Din guide genom finsk byråkrati",
+    "tagline": "Din guide till finskt pappersarbete",
+    "subtitle": "Skanna vilket officiellt brev som helst. Förstå det i klarspråk. Missa aldrig det viktiga.",
+    "get_started": "Kom igång",
+    "have_account": "Jag har redan ett konto",
     "free_features_label": "Gratis",
     "feature_scan": "Skanna officiella brev från finska myndigheter",
     "feature_ai": "AI extraherar deadlines och instruktioner på klarspråk",
@@ -316,7 +380,7 @@
     "demo": "Fortsätt som gäst"
   },
   "subscription": {
-    "title": "Uppgradera till Premium",
+    "title": "Allt,\nfixat.",
     "monthly": "Månadsvis",
     "yearly": "Årsvis",
     "subscribe": "Prenumerera",
@@ -325,12 +389,15 @@
     "already_premium_desc": "Obegränsad analys och alla premiumfunktioner — allt ditt.",
     "cancel_anytime": "Avbryt när som helst. Inga frågor.",
     "features": {
-      "unlimited_decodes": "Obegränsad dokumentanalys",
-      "draft_letters": "Utkast till svar med ett knapptryck",
-      "export_pdf": "Spara eller dela som PDF",
-      "calendar_sync": "Deadliner visas i din kalender automatiskt",
-      "priority_support": "Hjälp när du behöver det"
+      "f1": "Obegränsade dokumentskanningar",
+      "f2": "Skriv svarsbrev på finska",
+      "f3": "Exportera & arkivera vad som helst",
+      "f4": "Påminnelser som aldrig missar"
     },
-    "checkout_error": "Något gick fel. Försök igen."
+    "checkout_error": "Något gick fel. Försök igen.",
+    "premium_eyebrow": "Opas Premium",
+    "save_yearly": "Spara 20% per år",
+    "free_trial": "Starta 7 dagars gratis provperiod",
+    "trial_note": "Sedan 4,99 €/månad. Avsluta när som helst."
   }
 }

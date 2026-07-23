@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { View, Text } from 'react-native';
 import { CheckIcon, XIcon, AlertIcon, BellIcon } from '../icons';
+import { useThemeColors } from '../../store/themeStore';
 
 type AlertVariant = 'success' | 'warning' | 'danger' | 'info';
 
@@ -9,26 +10,28 @@ interface AlertProps {
   children: React.ReactNode;
 }
 
-const alertStyles: Record<AlertVariant, { bg: string; border: string; text: string; icon: string }> = {
-  success: { bg: 'bg-[#30d15810]', border: 'border-success', text: 'text-success', icon: 'text-success' },
-  warning: { bg: 'bg-[#ff9f0a10]', border: 'border-warning', text: 'text-warning', icon: 'text-warning' },
-  danger: { bg: 'bg-[#ff453a10]', border: 'border-danger', text: 'text-danger', icon: 'text-danger' },
-  info: { bg: 'bg-[#5e5ce610]', border: 'border-info', text: 'text-info', icon: 'text-info' },
-};
-
-const alertIcons: Record<AlertVariant, React.ReactNode> = {
-  success: <CheckIcon size={14} color="#30d158" />,
-  warning: <BellIcon size={14} color="#ff9f0a" />,
-  danger: <XIcon size={14} color="#ff453a" />,
-  info: <AlertIcon size={14} color="#5e5ce6" />,
+// v2 folds success into accent (pine reads positive). Rendered as a surface
+// inset with a semantic accent bar + icon — status is never colour-only.
+const alertText: Record<AlertVariant, string> = {
+  success: 'text-accent',
+  warning: 'text-warning',
+  danger: 'text-danger',
+  info: 'text-info',
 };
 
 export function Alert({ variant = 'info', children }: AlertProps) {
-  const s = alertStyles[variant];
+  const c = useThemeColors();
+  const iconColor = variant === 'success' ? c.accent : variant === 'warning' ? c.warning : variant === 'danger' ? c.danger : c.info;
+  const icon =
+    variant === 'success' ? <CheckIcon size={14} color={iconColor} />
+    : variant === 'warning' ? <BellIcon size={14} color={iconColor} />
+    : variant === 'danger' ? <XIcon size={14} color={iconColor} />
+    : <AlertIcon size={14} color={iconColor} />;
+
   return (
-    <View className={`flex-row gap-2 items-start px-3 py-3 rounded-md border ${s.bg} ${s.border} mb-2`}>
-      <View className="mt-0.5">{alertIcons[variant]}</View>
-      <Text className={`flex-1 text-[13px] leading-[1.6] ${s.text}`}>{children}</Text>
+    <View className="flex-row gap-2.5 items-start px-4 py-3 rounded-md bg-surface mb-2">
+      <View className="mt-0.5">{icon}</View>
+      <Text className={`flex-1 font-body text-body-sm ${alertText[variant]}`}>{children}</Text>
     </View>
   );
 }

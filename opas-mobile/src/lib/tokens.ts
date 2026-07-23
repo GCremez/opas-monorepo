@@ -1,64 +1,90 @@
-export const colors = {
-  bg: '#000000',
-  surface: '#1c1c1e',
-  'surface-2': '#2c2c2e',
-  'surface-3': '#3a3a3c',
-  fg: '#f5f5f7',
-  muted: '#86868b',
-  border: '#38383a',
-  accent: '#92d9bb',
-  'accent-hover': '#7eccac',
-  'accent-dim': 'rgba(146, 217, 187, 0.13)',
-  danger: '#ff453a',
-  warning: '#ff9f0a',
-  success: '#30d158',
-  info: '#5e5ce6',
+// src/lib/tokens.ts — Opas v2 "Personal Record" design tokens.
+// Dual theme (paper / ink). Use `colors` for the light default; use
+// `themes.paper` / `themes.ink` when passing hex strings to SVG icons
+// (per convention: icons take hex, not class names). NativeWind classes
+// (bg-bg, text-fg, border-hairline, bg-accent, text-warning…) resolve to
+// the active theme automatically via the CSS variables in global.css.
+
+export const themes = {
+  paper: {
+    bg:        '#f2ede2', // background
+    surface:   '#eae3d3', // raised panel / inset
+    'surface-2':'#e3dbc8',
+    fg:        '#211e16', // primary text
+    'fg-soft': '#4c473c', // body / secondary
+    muted:     '#8a8272', // metadata, labels
+    hairline:  'rgba(33,30,22,0.12)', // row divider
+    rule:      'rgba(33,30,22,0.22)', // section header underline
+    accent:    '#35503f', // pine — primary / positive
+    'on-accent':'#f2ede2',
+    warning:   '#916219', // ochre — deadlines
+    danger:    '#9c3a2c', // brick — urgent / destructive
+    info:      '#42606f', // slate — neutral emphasis
+    node:      '#cdbfa6', // logo start-waypoint / disabled dot
+  },
+  ink: {
+    bg:        '#16150e',
+    surface:   '#201e16',
+    'surface-2':'#2a2820',
+    fg:        '#ece6d8',
+    'fg-soft': '#b6ae9e',
+    muted:     '#857e6f',
+    hairline:  'rgba(236,230,216,0.13)',
+    rule:      'rgba(236,230,216,0.24)',
+    accent:    '#8fbb9f',
+    'on-accent':'#16150e',
+    warning:   '#d8a552',
+    danger:    '#d5745f',
+    info:      '#7fa0b3',
+    node:      '#6f6a5c',
+  },
 } as const;
 
+export type ThemeName = keyof typeof themes;
+export type ThemeColors = (typeof themes)[ThemeName];
+
+// Light is the default theme.
+export const colors = themes.paper;
+
 export const space = {
-  1: 4,
-  2: 8,
-  3: 12,
-  4: 16,
-  5: 20,
-  6: 24,
-  8: 32,
-  10: 40,
-  12: 48,
-  16: 64,
-  20: 80,
+  1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32, 10: 40, 12: 48, 16: 64, 20: 80,
 } as const;
 
 export const radius = {
-  sm: 6,
-  md: 10,
-  lg: 16,
-  xl: 20,
+  sm: 8, md: 12, lg: 18, xl: 24, pill: 999,
 } as const;
 
+// RN loads a distinct family per weight (no synthetic weights).
 export const font = {
-  display: 'Lufga',
-  body: 'system-ui',
-  mono: 'JetBrains Mono',
+  display: 'Newsreader_500Medium',      // headlines, screen titles
+  displaySemibold: 'Newsreader_600SemiBold',
+  serif: 'Newsreader_400Regular',       // document prose / summaries
+  serifItalic: 'Newsreader_400Regular_Italic',
+  body: 'InstrumentSans_400Regular',    // UI / body
+  bodyMedium: 'InstrumentSans_500Medium',
+  bodySemibold: 'InstrumentSans_600SemiBold', // tracked caps labels
+  mono: 'JetBrainsMono_400Regular',     // dates, amounts, refs, metadata
+  monoMedium: 'JetBrainsMono_500Medium',
 } as const;
 
 export const fontSize = {
-  display: 32,
-  headingXl: 24,
-  headingL: 20,
-  headingM: 17,
-  body: 15,
-  bodySm: 13,
-  caption: 12,
-  mono: 13,
+  display:  32, // Newsreader 500 — greetings / screen titles
+  title:    24, // Newsreader 500 — document titles
+  heading:  17, // Instrument 600 — row titles
+  body:     15, // Instrument 400
+  prose:    16, // Newsreader 400 — the "human voice"
+  bodySm:   13,
+  label:    10.5, // Instrument 600, uppercase, .18em
+  data:     13, // JetBrains Mono 500
+  meta:     11, // JetBrains Mono
 } as const;
 
-export const duration = {
-  fast: 150,
-  normal: 250,
-  slow: 400,
+// Tracking presets (letter-spacing) for the tracked-caps label style.
+export const tracking = {
+  label:  '0.18em',
+  eyebrow:'0.20em',
+  meta:   '0.05em',
 } as const;
 
-export const touch = {
-  min: 44,
-} as const;
+export const duration = { fast: 150, normal: 250, slow: 400 } as const;
+export const touch = { min: 44 } as const;

@@ -4,15 +4,14 @@ import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Badge } from '../../src/components/ui/Badge';
-import { ErrorState, EmptyState } from '../../src/components/ui/EmptyState';
-import { SearchIcon, ProfileIcon, DocumentIcon, FolderIcon, ScanIcon, CalendarIcon, ClockIcon } from '../../src/components/icons';
+import { ErrorState } from '../../src/components/ui/EmptyState';
+import { Button } from '../../src/components/ui/Button';
+import { SearchIcon } from '../../src/components/icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { useDocumentStore } from '../../src/store/documentStore';
 import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { usePremium } from '../../src/hooks/usePremium';
-import { ChevronRightIcon } from '../../src/components/icons';
-import type { Document } from '../../src/types';
+import { useThemeColors } from '../../src/store/themeStore';
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -21,43 +20,97 @@ function getGreeting() {
   return 'good_evening';
 }
 
-type UserStage = 'new' | 'onboarding' | 'active';
-
-function getUserStage(docs: Document[]): UserStage {
-  if (docs.length === 0) return 'new';
-  if (!docs.some((d) => d.status === 'ready')) return 'onboarding';
-  return 'active';
+// Section header — tracked caps over a rule underline (v2 signature).
+function SectionHeader({ title, onSeeAll, seeAllLabel }: { title: string; onSeeAll?: () => void; seeAllLabel?: string }) {
+  return (
+    <View className="flex-row items-baseline justify-between pb-2.5 border-b border-rule">
+      <Text className="font-semibold text-label uppercase text-fg">{title}</Text>
+      {onSeeAll && (
+        <Pressable onPress={onSeeAll} accessibilityRole="button">
+          <Text className="font-semibold text-[10px] tracking-[0.14em] uppercase text-muted">{seeAllLabel}</Text>
+        </Pressable>
+      )}
+    </View>
+  );
 }
 
-const sampleDocs = [
-  {
-    id: 'sample-1',
-    name: 'KELA Housing Benefit',
-    meta: 'Scanned 2h ago \u2022 3 pages',
-    badge: { label: 'New', variant: 'accent' as const },
-  },
-  {
-    id: 'sample-2',
-    name: 'Tax Card 2025',
-    meta: 'Scanned yesterday \u2022 1 page',
-    badge: { label: 'Translated', variant: 'success' as const },
-  },
-  {
-    id: 'sample-3',
-    name: 'Residence Permit Extension',
-    meta: 'Scanned 3d ago \u2022 5 pages',
-    badge: { label: 'Deadline Jun 30', variant: 'warning' as const },
-  },
+// "Needs you" ledger row — serif title, mono authority, dated status.
+function ActionRow({
+  title, meta, date, note, urgency, onPress,
+}: {
+  title: string; meta: string; date: string; note: string;
+  urgency: 'danger' | 'warning' | 'muted'; onPress?: () => void;
+}) {
+  const tone = urgency === 'danger' ? 'text-danger' : urgency === 'warning' ? 'text-warning' : 'text-muted';
+  return (
+    <Pressable
+      onPress={onPress}
+      className="flex-row items-center justify-between gap-3.5 py-4 border-b border-hairline"
+      accessibilityRole="button"
+      accessibilityLabel={`${title} — ${note}`}
+    >
+      <View className="flex-1">
+        <Text className="font-display text-heading text-fg" numberOfLines={1}>{title}</Text>
+        <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted mt-1">{meta}</Text>
+      </View>
+      <View className="items-end">
+        <Text className={`font-mono-medium text-data ${tone}`}>{date}</Text>
+        <Text className={`font-semibold text-[9px] tracking-[0.11em] uppercase mt-1 ${tone}`}>{note}</Text>
+      </View>
+    </Pressable>
+  );
+}
+
+// "Your documents" ledger row — name + mono value + age.
+function DocRow({
+  name, value, age, valueTone = 'text-accent', onPress,
+}: {
+  name: string; value: string; age: string; valueTone?: string; onPress?: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className="flex-row items-baseline justify-between gap-3 py-3.5 border-b border-hairline"
+      accessibilityRole="button"
+      accessibilityLabel={name}
+    >
+      <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{name}</Text>
+      <View className="flex-row items-baseline gap-2.5">
+        <Text className={`font-mono-medium text-data ${valueTone}`}>{value}</Text>
+        <Text className="font-mono text-[10px] tracking-[0.04em] text-muted">{age}</Text>
+      </View>
+    </Pressable>
+  );
+}
+
+const demoActions = [
+  { title: 'Extend residence permit', meta: 'MIGRI · APPLY ONLINE', date: '30 JUN', note: '9 days left', urgency: 'danger' as const, id: 'sample-3' },
+  { title: 'Report income change', meta: 'KELA · HOUSING BENEFIT', date: '14 JUL', note: 'In 2 weeks', urgency: 'warning' as const, id: 'sample-1' },
 ];
 
-export default function HomeScreen() {
+const demoDocs = [
+  { name: 'KELA Housing Benefit', value: '€387.20/mo', age: '2H', tone: 'text-accent', id: 'sample-1' },
+  { name: 'Tax Card 2025', value: '21.5%', age: '1D', tone: 'text-fg', id: 'sample-2' },
+  { name: 'Residence Permit', value: 'TO 30 JUN', age: '3D', tone: 'text-danger', id: 'sample-3' },
+];
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff / 3_600_000);
+  if (h < 1) return 'NOW';
+  if (h < 24) return `${h}H`;
+  return `${Math.floor(h / 24)}D`;
+}
+
+export default function RecordScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const c = useThemeColors();
   const { documents, loading, error, fetchDocuments, clearError } = useDocumentStore();
   const { usage, fetchUsage } = useSubscriptionStore();
   const { user, isDemo } = useAuthStore();
-  const { isFree, isPremium: premium } = usePremium();
-  const userStage = getUserStage(documents);
+  const { isFree } = usePremium();
+  const firstName = user?.name ? user.name.split(' ')[0] : '';
 
   useEffect(() => {
     fetchDocuments();
@@ -68,195 +121,152 @@ export default function HomeScreen() {
     fetchDocuments();
   }, [fetchDocuments]);
 
+  const showRich = isDemo || documents.length > 0;
+  const docCount = isDemo ? 12 : documents.length;
+
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
       <ScrollView
-        className="flex-1 px-5"
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor="#92d9bb" />}
+        contentContainerStyle={{ paddingBottom: 32 }}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
       >
-        <View className="flex-row items-center justify-between mt-2 mb-5">
-          <Text className="font-display text-[24px] font-bold tracking-[-0.03em] text-fg">
-            {t('home.title')}
-          </Text>
-          <View className="flex-row gap-2">
+        {/* Masthead */}
+        <View className="px-6 pt-3 pb-6">
+          <View className="flex-row items-start justify-between">
+            <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">
+              {t('record.eyebrow')}
+            </Text>
             <Pressable
               onPress={() => router.push('/(tabs)/search')}
-              className="w-11 h-11 rounded-full items-center justify-center"
+              className="w-9 h-9 -mt-2 items-center justify-center"
               accessibilityLabel={t('tabs.search')}
             >
-              <SearchIcon size={20} color="#f5f5f7" />
-            </Pressable>
-            <Pressable
-              onPress={() => router.push('/(tabs)/profile')}
-              className="w-11 h-11 rounded-full items-center justify-center"
-              accessibilityLabel={t('tabs.profile')}
-            >
-              <ProfileIcon size={20} color="#f5f5f7" />
+              <SearchIcon size={20} color={c.muted} />
             </Pressable>
           </View>
+          <Text className="font-display text-[31px] leading-[34px] tracking-[-0.01em] text-fg mt-2">
+            {t(`home.${getGreeting()}`)},{firstName ? `\n${firstName}.` : '.'}
+          </Text>
+          {showRich && (
+            <Text className="font-serif text-[15px] leading-[23px] text-fg-soft mt-3">
+              {t('record.all_clear')}
+              <Text className="text-danger">{t('record.one_thing')}</Text>
+            </Text>
+          )}
         </View>
 
-          <View className="bg-surface border border-border rounded-lg p-5 mb-5">
-            <Text className="font-display text-[20px] font-bold tracking-[-0.02em] text-fg mb-0.5">
-              {t(`home.${getGreeting()}`)}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}
-            </Text>
-            <View className="flex-row items-center">
-              <View className={`w-2 h-2 rounded-full mr-1.5 ${userStage === 'active' ? 'bg-success' : 'bg-accent'}`} />
-              <Text className="text-body-sm text-muted">
-                {userStage === 'new' && t('home.status_new')}
-                {userStage === 'onboarding' && t('home.status_onboarding')}
-                {userStage === 'active' && t('home.status_ok')}
-              </Text>
-            </View>
+        {error && (
+          <ErrorState
+            title={error}
+            description={documents.length === 0
+              ? 'Make sure the backend server is running and your device is on the same network. Pull down to retry.'
+              : 'Pull down to retry.'}
+            onRetry={() => { clearError(); fetchDocuments(); }}
+          />
+        )}
+
+        {!error && !loading && !showRich && (
+          <View className="px-6 pt-6">
+            <Text className="font-display text-[27px] leading-[30px] tracking-[-0.01em] text-fg">{t('record.empty_title')}</Text>
+            <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mt-3 mb-7">{t('record.empty_desc')}</Text>
+            <Button variant="primary" size="lg" block onPress={() => router.push('/(tabs)/scan')}>
+              {t('record.scan_first')}
+            </Button>
+            <Pressable onPress={() => router.push('/(onboarding)')} className="items-center py-3.5 mt-3 min-h-touch justify-center">
+              <Text className="font-semibold text-[11px] tracking-[0.06em] uppercase text-muted">{t('record.see_how')}</Text>
+            </Pressable>
           </View>
-
-        {error && documents.length === 0 && (
-          <ErrorState
-            title={error}
-            description="Make sure the backend server is running and your device is on the same network. Pull down to retry."
-            onRetry={() => { clearError(); fetchDocuments(); }}
-          />
-        )}
-        {error && documents.length > 0 && (
-          <ErrorState
-            title={error}
-            description="Pull down to retry."
-            onRetry={() => { clearError(); fetchDocuments(); }}
-          />
         )}
 
-        {!error && !loading && documents.length === 0 && !isDemo && (
-          <EmptyState
-            title={t('home.no_documents')}
-            description={t('home.no_documents_desc')}
-            actionLabel={t('home.scan_first')}
-            onAction={() => router.push('/(tabs)/scan')}
-          />
-        )}
-
+        {/* Needs you */}
         {isDemo && (
-          <Pressable
-            onPress={() => router.push('/document/sample-3')}
-            className="flex-row items-center bg-warning/10 border border-warning/20 rounded-md p-4 mb-5"
-            accessibilityLabel={`${t('home.deadline_title')} — ${t('home.days_left')}`}
-          >
-            <View className="w-11 h-11 rounded-full bg-warning/20 items-center justify-center mr-3">
-              <ClockIcon size={18} color="#ff9f0a" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-body font-semibold text-fg">{t('home.deadline_title')}</Text>
-              <Text className="text-body-sm text-muted">{t('home.deadline_desc')}</Text>
-            </View>
-            <View className="items-end">
-              <Text className="font-display text-[18px] font-bold text-warning">7</Text>
-              <Text className="text-caption text-muted">{t('home.days_left')}</Text>
-            </View>
-          </Pressable>
+          <View className="px-6 mb-1">
+            <SectionHeader title={t('record.needs_you')} onSeeAll={() => router.push('/(tabs)/alerts')} seeAllLabel={t('record.see_all')} />
+            {demoActions.map((a) => (
+              <ActionRow key={a.title} {...a} onPress={() => router.push(`/document/${a.id}`)} />
+            ))}
+          </View>
         )}
 
-        {isFree && !isDemo && (
+        {/* Your documents */}
+        {showRich && (
+          <View className="px-6 mt-6">
+            <SectionHeader
+              title={t('record.your_documents')}
+              onSeeAll={() => router.push('/(tabs)/docs')}
+              seeAllLabel={t('record.see_all')}
+            />
+            {isDemo
+              ? demoDocs.map((d) => (
+                  <DocRow key={d.name} name={d.name} value={d.value} age={d.age} valueTone={d.tone} onPress={() => router.push(`/document/${d.id}`)} />
+                ))
+              : documents.slice(0, 6).map((d) => (
+                  <DocRow
+                    key={d.id}
+                    name={d.filename}
+                    value={d.status === 'ready' ? 'READ' : d.status.toUpperCase()}
+                    age={timeAgo(d.updatedAt)}
+                    valueTone={d.status === 'ready' ? 'text-accent' : 'text-muted'}
+                    onPress={() => router.push(`/document/${d.id}`)}
+                  />
+                ))}
+            <Text className="font-serif-italic text-[14px] leading-[22px] text-muted pt-4">
+              {t(docCount === 1 ? 'record.footer_one' : 'record.footer_other', { count: docCount })}
+            </Text>
+          </View>
+        )}
+
+        {/* Explore Opas — new guided features */}
+        {showRich && (
+          <View className="px-6 mt-8">
+            <SectionHeader title={t('record.explore')} />
+            {[
+              { label: t('record.ask_opas'), meta: t('record.ask_opas_meta'), route: '/ask' as const },
+              { label: t('record.guides'), meta: t('record.guides_meta'), route: '/guide/register-address' as const },
+              { label: t('record.journey'), meta: t('record.journey_meta'), route: '/journey' as const },
+            ].map((item) => (
+              <Pressable
+                key={item.route}
+                onPress={() => router.push(item.route)}
+                className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
+              >
+                <View className="flex-1">
+                  <Text className="font-display text-heading text-fg">{item.label}</Text>
+                  <Text className="font-body text-body-sm text-muted mt-0.5">{item.meta}</Text>
+                </View>
+                <Text className="font-mono text-[13px] text-muted">›</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+
+        {/* Free-tier nudge */}
+        {isFree && !isDemo && documents.length > 0 && (
           <Pressable
             onPress={() => router.push('/subscription')}
-            className="bg-accent/10 border border-accent/20 rounded-lg p-4 mb-5"
+            className="mx-6 mt-8 p-5 rounded-lg bg-surface border border-hairline"
           >
-            <View className="flex-row items-center">
-              <View className="flex-1">
-                <Text className="text-body font-semibold text-fg">{t('profile.upgrade_title')}</Text>
-                <Text className="text-body-sm text-muted">{t('profile.upgrade_desc')}</Text>
-              </View>
-              <ChevronRightIcon size={18} color="#92d9bb" />
-            </View>
+            <Text className="font-semibold text-label uppercase text-warning mb-1.5">
+              {t('profile.upgrade_title')}
+            </Text>
+            <Text className="font-serif text-prose text-fg-soft">{t('profile.upgrade_desc')}</Text>
             {usage && (
-              <View className="flex-row items-center gap-2 mt-2 pt-2 border-t border-accent/20">
-                <View className="flex-1 h-1.5 bg-surface-3 rounded-full overflow-hidden">
+              <View className="flex-row items-center gap-3 mt-4 pt-3 border-t border-hairline">
+                <View className="flex-1 h-1.5 bg-surface-2 rounded-pill overflow-hidden">
                   <View
-                    className="h-full bg-accent rounded-full"
+                    className="h-full bg-accent rounded-pill"
                     style={{ width: `${Math.min(100, (usage.remaining / Math.max(usage.limit, 1)) * 100)}%` }}
                   />
                 </View>
-                <Text className="text-caption text-muted">
+                <Text className="font-mono text-[11px] text-muted">
                   {t('profile.remaining_decodes', { remaining: usage.remaining, limit: usage.limit })}
                 </Text>
               </View>
             )}
           </Pressable>
         )}
-
-        {isDemo && (
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="font-display text-heading-m text-fg">
-              {t('home.recent_documents')}
-            </Text>
-            <Pressable
-              onPress={() => router.push('/(tabs)/search')}
-              accessibilityLabel={t('common.see_all')}
-            >
-              <Text className="text-body-sm text-accent">{t('common.see_all')}</Text>
-            </Pressable>
-          </View>
-        )}
-
-        {isDemo && (
-          <View className="mb-6">
-            {sampleDocs.map((doc) => (
-              <Pressable
-                key={doc.id}
-                onPress={() => router.push(`/document/${doc.id}`)}
-                className="flex-row items-center min-h-touch px-2"
-                accessibilityLabel={doc.name}
-              >
-                <View className="w-11 h-11 rounded-md bg-accent-dim items-center justify-center mr-3">
-                  <DocumentIcon size={20} color="#92d9bb" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-body font-medium text-fg" numberOfLines={1}>
-                    {doc.name}
-                  </Text>
-                  <Text className="text-body-sm text-muted">{doc.meta}</Text>
-                </View>
-                <Badge variant={doc.badge.variant}>{doc.badge.label}</Badge>
-              </Pressable>
-            ))}
-          </View>
-        )}
-
-        <Text className="font-display text-heading-m text-fg mb-4">
-          {t('home.quick_actions')}
-        </Text>
-        <View className="bg-surface border border-border rounded-lg overflow-hidden mb-6">
-          {(userStage === 'new' ? [
-            { key: 'scan_first', icon: ScanIcon, action: '/(tabs)/scan', labelKey: 'scan_first', descKey: 'scan_first_desc', ctaKey: 'quick_action_open' },
-            { key: 'browse_folders', icon: FolderIcon, action: '/(tabs)/docs', labelKey: 'browse_folders', descKey: 'browse_folders_desc', ctaKey: 'quick_action_open' },
-            { key: 'how_opas_works', icon: SearchIcon, action: '/(tabs)/search', labelKey: 'how_opas_works', descKey: 'how_opas_works_desc', ctaKey: 'quick_action_open' },
-          ] : userStage === 'onboarding' ? [
-            { key: 'scan_first', icon: ScanIcon, action: '/(tabs)/scan', labelKey: 'scan_first', descKey: 'scan_first_desc', ctaKey: 'quick_action_open' },
-            { key: 'browse_documents', icon: DocumentIcon, action: '/(tabs)/docs', labelKey: 'browse_documents', descKey: 'browse_documents_desc', ctaKey: 'quick_action_open' },
-            { key: 'upcoming_deadlines', icon: CalendarIcon, action: '/(tabs)/docs', labelKey: 'upcoming_deadlines', descKey: 'upcoming_deadlines_desc', ctaKey: 'quick_action_view' },
-          ] : [
-            { key: 'continue_scanning', icon: ScanIcon, action: '/(tabs)/scan', labelKey: 'continue_scanning', descKey: 'continue_scanning_desc', ctaKey: 'quick_action_open' },
-            { key: 'upcoming_deadlines', icon: CalendarIcon, action: '/(tabs)/docs', labelKey: 'upcoming_deadlines', descKey: 'upcoming_deadlines_desc', ctaKey: 'quick_action_view' },
-            { key: 'browse_documents', icon: DocumentIcon, action: '/(tabs)/docs', labelKey: 'browse_documents', descKey: 'browse_documents_desc', ctaKey: 'quick_action_open' },
-          ]).map((item, i, arr) => (
-            <React.Fragment key={item.key}>
-              <Pressable
-                onPress={() => router.push(item.action as any)}
-                className="flex-row items-center px-4 py-3.5 min-h-touch active:opacity-60"
-                accessibilityLabel={t(`home.${item.labelKey}`)}
-              >
-                <View className="w-11 h-11 rounded-full bg-accent-dim items-center justify-center mr-3.5">
-                  <item.icon size={20} color="#92d9bb" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-body font-semibold text-fg">{t(`home.${item.labelKey}`)}</Text>
-                  <Text className="text-body-sm text-muted">{t(`home.${item.descKey}`)}</Text>
-                </View>
-                <Text className="text-body-sm text-accent font-medium">{t(`home.${item.ctaKey}`)}</Text>
-              </Pressable>
-              {i < arr.length - 1 && <View className="h-[1px] bg-border mx-4" />}
-            </React.Fragment>
-          ))}
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

@@ -34,18 +34,18 @@ export function Toast({
 
   return (
     <Animated.View
-      className="self-center px-5 py-2.5 rounded-full bg-surface border border-border/60"
+      className="self-center px-5 py-2.5 rounded-pill bg-surface border border-hairline"
       style={{
         opacity,
         transform: [{ translateY }],
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.2,
         shadowRadius: 16,
         elevation: 8,
       }}
     >
-      <Text className="text-[13px] text-fg font-medium text-center leading-[1.3]">
+      <Text className="font-medium text-body-sm text-fg text-center">
         {message}
       </Text>
     </Animated.View>

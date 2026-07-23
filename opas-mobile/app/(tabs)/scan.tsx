@@ -1,17 +1,18 @@
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Animated } from 'react-native';
+import { View, Text, Pressable, Animated, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import Svg, { Path, Line } from 'react-native-svg';
-import { XIcon, FlashIcon, GalleryIcon, CheckIcon } from '../../src/components/icons';
+import { XIcon, FlashIcon, GalleryIcon } from '../../src/components/icons';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { Button } from '../../src/components/ui/Button';
 import { useDocumentStore } from '../../src/store/documentStore';
 import { useToast } from '../../src/components/ui/ToastProvider';
+import { useThemeColors } from '../../src/store/themeStore';
 
 type ScanState = 'ready' | 'scanning' | 'processing' | 'success' | 'error';
 
@@ -21,19 +22,12 @@ const STEPS = [
   { key: 'extracting', duration: 2500 },
 ];
 
-function ScanProgress() {
+// Privacy-first "reading" checklist (design 3e): steps tick off in order,
+// with a reassurance line. Steps map to PII scrub → translate → extract.
+function ScanProgress({ filename }: { filename?: string }) {
   const { t } = useTranslation();
+  const c = useThemeColors();
   const [stepIndex, setStepIndex] = useState(0);
-  const progressAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const total = STEPS.reduce((s, step) => s + step.duration, 0);
-    Animated.timing(progressAnim, {
-      toValue: 1,
-      duration: total,
-      useNativeDriver: false,
-    }).start();
-  }, [progressAnim]);
 
   useEffect(() => {
     if (stepIndex >= STEPS.length - 1) return;
@@ -41,44 +35,31 @@ function ScanProgress() {
     return () => clearTimeout(timer);
   }, [stepIndex]);
 
-  const progressWidth = progressAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
-  });
-
-  const scanY = progressAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [36, 172],
-  });
-
   return (
-    <View className="items-center">
-      <View className="w-[160px] h-[200px] relative mb-10">
-        <View className="absolute top-0 left-0 w-8 h-8 border-t-[2px] border-l-[2px] border-accent/30 rounded-tl-[4px]" />
-        <View className="absolute top-0 right-0 w-8 h-8 border-t-[2px] border-r-[2px] border-accent/30 rounded-tr-[4px]" />
-        <View className="absolute bottom-0 left-0 w-8 h-8 border-b-[2px] border-l-[2px] border-accent/30 rounded-bl-[4px]" />
-        <View className="absolute bottom-0 right-0 w-8 h-8 border-b-[2px] border-r-[2px] border-accent/30 rounded-br-[4px]" />
-        <Animated.View
-          className="absolute left-3 right-3 h-[2px] bg-accent rounded-full"
-          style={{
-            top: scanY,
-            shadowColor: '#92d9bb',
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.6,
-            shadowRadius: 10,
-            elevation: 4,
-          }}
-        />
-      </View>
-      <Text className="font-display text-[18px] font-semibold text-fg text-center mb-6">
-        {t(`scan.step_${STEPS[stepIndex].key}`)}
+    <View className="w-full px-8">
+      <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted">
+        {(filename ?? 'document').toUpperCase()}
       </Text>
-      <View className="w-[200px] h-[3px] bg-surface-2 rounded-full overflow-hidden">
-        <Animated.View
-          className="h-full bg-accent rounded-full"
-          style={{ width: progressWidth }}
-        />
-      </View>
+      <Text className="font-semibold text-[10px] tracking-[0.18em] uppercase text-muted mt-6">{t('scan.please_wait')}</Text>
+      <Text className="font-display text-[27px] leading-[30px] tracking-[-0.01em] text-fg mt-2 mb-8">{t('scan.reading')}</Text>
+
+      {STEPS.map((step, i) => {
+        const done = i < stepIndex;
+        const active = i === stepIndex;
+        return (
+          <View key={step.key} className="flex-row items-center gap-3 py-3 border-b border-hairline">
+            <Text className={`font-mono text-[13px] ${done ? 'text-accent' : active ? 'text-warning' : 'text-muted'}`}>
+              {done ? '✓' : active ? '◌' : '·'}
+            </Text>
+            <Text className={`font-mono text-[12px] tracking-[0.04em] uppercase ${active || done ? 'text-fg' : 'text-muted'}`}>
+              {t(`scan.step_${step.key}`)}{active ? '…' : ''}
+            </Text>
+          </View>
+        );
+      })}
+
+      <Text className="font-serif-italic text-[14px] leading-[22px] text-muted mt-6">{t('scan.privacy_note')}</Text>
+      <ActivityIndicator size="small" color={c.accent} className="mt-6 self-start" />
     </View>
   );
 }
@@ -104,6 +85,7 @@ function FadeIn({ children }: { children: React.ReactNode }) {
 export default function ScanScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const c = useThemeColors();
   const { uploadAndDecode, error, clearError } = useDocumentStore();
   const { showToast } = useToast();
   const [permission, requestPermission] = useCameraPermissions();
@@ -206,9 +188,9 @@ export default function ScanScreen() {
   if (!permission.granted) {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-heading-m text-fg mb-2">Camera access needed</Text>
-          <Text className="text-body text-muted text-center mb-6">Grant camera access in Settings to scan documents.</Text>
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="font-display text-title text-fg text-center mb-2">Camera access needed</Text>
+          <Text className="font-serif text-prose text-fg-soft text-center mb-6">Grant camera access in Settings to scan documents.</Text>
           <Button variant="primary" onPress={requestPermission}>Grant permission</Button>
         </View>
       </SafeAreaView>
@@ -218,12 +200,11 @@ export default function ScanScreen() {
   if (state === 'scanning') {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
-        <View className="flex-1 items-center justify-center px-5">
+        <View className="flex-1 items-center justify-center px-8">
           <View className="w-72 h-80 border-2 border-accent rounded-lg items-center justify-center mb-8">
-            <Text className="text-5xl mb-4">📷</Text>
-            <Text className="text-body text-muted text-center">{t('scan.align_in_frame')}</Text>
+            <Text className="font-serif text-prose text-fg-soft text-center">{t('scan.align_in_frame')}</Text>
           </View>
-          <Text className="text-body-sm text-muted text-center mb-8">
+          <Text className="font-body text-body-sm text-muted text-center mb-8">
             {t('scan.auto_capturing')}
           </Text>
           <Button variant="ghost" onPress={handleClose}>{t('common.cancel')}</Button>
@@ -235,9 +216,9 @@ export default function ScanScreen() {
   if (state === 'processing') {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
-        <View className="flex-1 items-center justify-center px-5">
-          <ScanProgress />
-          <View className="mt-10">
+        <View className="flex-1 justify-center">
+          <ScanProgress filename="KELA_päätös.pdf · 2 pages" />
+          <View className="px-8 mt-8">
             <Button variant="ghost" onPress={handleCancel}>{t('common.cancel')}</Button>
           </View>
         </View>
@@ -251,19 +232,19 @@ export default function ScanScreen() {
         <View className="flex-1 items-center justify-center px-8">
           <FadeIn>
             <View className="items-center">
-              <View className="w-16 h-16 rounded-full bg-surface border border-border items-center justify-center mb-6">
+              <View className="w-16 h-16 rounded-full bg-surface items-center justify-center mb-6">
                 <Svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <Path d="M3 7V5a2 2 0 0 1 2-2h2" stroke="#ff453a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Path d="M17 3h2a2 2 0 0 1 2 2v2" stroke="#ff453a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Path d="M21 17v2a2 2 0 0 1-2 2h-2" stroke="#ff453a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Path d="M7 21H5a2 2 0 0 1-2-2v-2" stroke="#ff453a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Line x1="6" y1="6" x2="18" y2="18" stroke="#ff453a" strokeWidth="2" strokeLinecap="round" />
+                  <Path d="M3 7V5a2 2 0 0 1 2-2h2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d="M17 3h2a2 2 0 0 1 2 2v2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d="M21 17v2a2 2 0 0 1-2 2h-2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d="M7 21H5a2 2 0 0 1-2-2v-2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <Line x1="6" y1="6" x2="18" y2="18" stroke={c.danger} strokeWidth="2" strokeLinecap="round" />
                 </Svg>
               </View>
-              <Text className="font-display text-heading-l text-fg text-center mb-2">
+              <Text className="font-display text-title text-fg text-center mb-2">
                 {t('scan.scan_failed_title')}
               </Text>
-              <Text className="text-body-sm text-muted text-center leading-[1.6] mb-8 max-w-[300px]">
+              <Text className="font-serif text-prose text-fg-soft text-center mb-8 max-w-[300px]">
                 {error || t('scan.scan_failed_desc')}
               </Text>
               <View className="gap-3 w-full max-w-[280px]">
@@ -288,15 +269,15 @@ export default function ScanScreen() {
   if (state === 'success') {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
-        <View className="flex-1 items-center justify-center px-5">
-          <View className="w-20 h-20 rounded-full bg-success items-center justify-center mb-6">
-            <CheckIcon size={32} color="#000" />
+        <View className="flex-1 items-center justify-center px-8">
+          <View className="w-20 h-20 rounded-full bg-accent items-center justify-center mb-6">
+            <Text className="font-display text-[34px] text-on-accent">✓</Text>
           </View>
-          <Text className="font-display text-heading-l text-fg text-center mb-2">
+          <Text className="font-display text-title text-fg text-center mb-2">
             {t('scan.document_decoded')}
           </Text>
           {lastResult && (
-            <Text className="text-body-sm text-muted text-center mb-6">
+            <Text className="font-mono text-[11px] text-muted text-center mb-6">
               {lastResult.name}
             </Text>
           )}

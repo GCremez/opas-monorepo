@@ -19,17 +19,24 @@
   },
   "onboarding": {
     "skip": "Skip",
+    "step": "Opas · {{n}} / 3",
+    "eyebrow_1": "Welcome to Opas",
+    "eyebrow_2": "Never miss a deadline",
+    "eyebrow_3": "All in one place",
+    "illo_caption": "scan → plain-language guide",
     "next": "Next",
     "get_started": "Get Started",
-    "slide_1_title": "Scan Any Official Letter",
-    "slide_1_desc": "Photograph any letter from Kela, Vero, Migri, or other Finnish authorities — OPAS digitizes it instantly.",
-    "slide_2_title": "Know What to Do",
-    "slide_2_desc": "OPAS extracts key details, deadlines, and action items so you never miss what matters.",
-    "slide_3_title": "Stay Organized",
-    "slide_3_desc": "Auto-sorted into folders — tax, residence, benefits and more. Track deadlines in one place."
+    "slide_1_title": "Understand every official letter.",
+    "slide_1_desc": "Scan any document from Kela, the tax office or Migri. Opas turns it into plain English — and tells you exactly what to do next.",
+    "slide_2_title": "Know what to do — and by when.",
+    "slide_2_desc": "Opas pulls every date and required action out of your letters, then reminds you before anything is due.",
+    "slide_3_title": "Everything, kept in order.",
+    "slide_3_desc": "Your documents are filed by authority and always searchable — so nothing gets lost in a drawer again."
   },
   "auth": {
-    "welcome_back": "Welcome back",
+    "welcome_back": "Welcome back.",
+    "start_record": "Start your record.",
+    "forgot": "Forgot password?",
     "welcome_to": "Welcome to Opas",
     "get_started": "Get started with your account",
     "sign_in_to": "Sign in to your Opas account",
@@ -53,10 +60,48 @@
   },
   "tabs": {
     "home": "Home",
+    "record": "Record",
     "search": "Search",
     "scan": "Scan",
     "docs": "Docs",
-    "profile": "Me"
+    "files": "Files",
+    "alerts": "Alerts",
+    "profile": "Me",
+    "you": "You"
+  },
+  "record": {
+    "eyebrow": "Opas · Your record",
+    "needs_you": "Needs you",
+    "your_documents": "Your documents",
+    "see_all": "See all →",
+    "all_clear": "Everything's in order.",
+    "one_thing": " One thing needs you this week.",
+    "nothing_needs": "Nothing needs you right now. You're on top of it.",
+    "footer_one": "Registered in Finland · {{count}} document kept.",
+    "footer_other": "Registered in Finland · {{count}} documents kept.",
+    "explore": "Explore Opas",
+    "ask_opas": "Ask Opas",
+    "ask_opas_meta": "Answers grounded in your record",
+    "guides": "Guides",
+    "guides_meta": "Step-by-step for common tasks",
+    "journey": "Journey",
+    "journey_meta": "Your life-admin timeline",
+    "empty_title": "Your record is empty.",
+    "empty_desc": "Scan your first letter — from Kela, the tax office, anywhere — and Opas will start keeping it in order for you.",
+    "scan_first": "Scan your first document",
+    "see_how": "See how Opas works",
+    "welcome": "Welcome"
+  },
+  "alerts": {
+    "eyebrow": "Opas · Alerts",
+    "title": "Deadlines &\nreminders.",
+    "this_week": "This week",
+    "later": "Later this month",
+    "done": "Done",
+    "no_alerts": "No deadlines",
+    "no_alerts_desc": "When a document has a deadline, it shows up here.",
+    "days_left": "{{count}} days",
+    "day_left": "{{count}} day"
   },
   "home": {
     "title": "Home",
@@ -144,9 +189,12 @@
     "scan_another": "Scan another",
     "scan_failed_title": "Couldn't scan this document",
     "scan_failed_desc": "Make sure the document is well-lit, flat, and fully visible in the frame. Avoid glare and shadows.",
-    "step_uploading": "Uploading document",
-    "step_analyzing": "Analyzing content",
-    "step_extracting": "Extracting actions"
+    "step_uploading": "Hiding personal info",
+    "step_analyzing": "Translating FI → EN",
+    "step_extracting": "Finding dates & actions",
+    "reading": "Reading your letter…",
+    "please_wait": "Please wait",
+    "privacy_note": "Your document never leaves your control. Personal details are hidden before anything is read."
   },
   "documents": {
     "title": "Documents",
@@ -207,6 +255,10 @@
   "profile": {
     "title": "Profile",
     "app_language": "App Language",
+    "appearance": "Appearance",
+    "appearance_paper": "Paper",
+    "appearance_ink": "Ink",
+    "appearance_system": "System",
     "settings": "Settings",
     "account": "Account",
     "sign_out": "Sign out",
@@ -263,7 +315,10 @@
     "lang_fi": "Suomi",
     "lang_fi_native": "Finnish",
     "lang_sv": "Svenska",
-    "lang_sv_native": "Swedish"
+    "lang_sv_native": "Swedish",
+    "deadline_reminders": "Deadline reminders",
+    "on": "On",
+    "off": "Off"
   },
   "document": {
     "title": "Document",
@@ -312,7 +367,10 @@
     "event_notes": "From document: {{filename}}"
   },
   "welcome": {
-    "tagline": "Your guide through Finnish bureaucracy",
+    "tagline": "Your guide to Finnish paperwork",
+    "subtitle": "Scan any official letter. Understand it in plain words. Never miss what matters.",
+    "get_started": "Get started",
+    "have_account": "I already have an account",
     "free_features_label": "Free",
     "feature_scan": "Scan official letters from Finnish authorities",
     "feature_ai": "AI extracts deadlines and instructions in plain language",
@@ -322,7 +380,7 @@
     "demo": "Continue as Guest"
   },
   "subscription": {
-    "title": "Upgrade to Premium",
+    "title": "Everything,\nhandled.",
     "monthly": "Monthly",
     "yearly": "Yearly",
     "subscribe": "Subscribe",
@@ -331,12 +389,15 @@
     "already_premium_desc": "Unlimited analysis and all premium features — all yours.",
     "cancel_anytime": "Cancel anytime. No questions asked.",
     "features": {
-      "unlimited_decodes": "Unlimited document analysis",
-      "draft_letters": "Draft reply letters with one tap",
-      "export_pdf": "Save or share as PDF",
-      "calendar_sync": "Deadlines appear on your calendar automatically",
-      "priority_support": "Help when you need it"
+      "f1": "Unlimited document scans",
+      "f2": "Draft reply letters in Finnish",
+      "f3": "Export & archive anything",
+      "f4": "Deadline reminders that never miss"
     },
-    "checkout_error": "Something went wrong. Please try again."
+    "checkout_error": "Something went wrong. Please try again.",
+    "premium_eyebrow": "Opas Premium",
+    "save_yearly": "Save 20% yearly",
+    "free_trial": "Start 7-day free trial",
+    "trial_note": "Then €4.99/month. Cancel anytime."
   }
 }

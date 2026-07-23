@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, Text, Modal, TouchableWithoutFeedback } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 
@@ -25,37 +26,21 @@ export function ConfirmSheet({
   onCancel,
 }: ConfirmSheetProps) {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onCancel}
-    >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <TouchableWithoutFeedback onPress={onCancel}>
-        <View className="flex-1 justify-end bg-black/60">
+        <View className="flex-1 justify-end bg-black/50">
           <TouchableWithoutFeedback>
             <View
-              className="bg-surface rounded-t-[20px] pt-4 pb-8 px-4"
-              style={{
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: -4 },
-                shadowOpacity: 0.55,
-                shadowRadius: 24,
-                elevation: 16,
-              }}
+              className="bg-bg rounded-t-xl pt-5 px-6"
+              style={{ paddingBottom: insets.bottom + 16 }}
             >
-              <View className="w-8 h-1 rounded-full bg-surface-3 mx-auto mb-4" />
-              <Text className="text-heading-m text-fg mb-2">{title}</Text>
-              <Text className="text-body-sm text-muted mb-6 leading-[1.6]">
-                {message}
-              </Text>
+              <View className="w-9 h-1 rounded-pill bg-surface-2 mx-auto mb-5" />
+              <Text className="font-display text-title text-fg mb-2">{title}</Text>
+              <Text className="font-serif text-prose text-fg-soft mb-6">{message}</Text>
               <View className="flex-col gap-2">
-                <Button
-                  variant={destructive ? 'danger' : 'primary'}
-                  block
-                  onPress={onConfirm}
-                >
+                <Button variant={destructive ? 'danger' : 'primary'} block onPress={onConfirm}>
                   {confirmLabel}
                 </Button>
                 <Button variant="ghost" block onPress={onCancel}>

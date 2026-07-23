@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { easeOutQuart } from './ui/animation';
+import { useThemeColors } from '../store/themeStore';
 
 const LOGO_SIZE = 88;
 const HALF = LOGO_SIZE / 2;
@@ -72,7 +73,7 @@ function ParticleView({ p }: { p: Particle }) {
   );
 }
 
-function ShockwaveRing({ ring }: { ring: { r: number; w: number; delay: number } }) {
+function ShockwaveRing({ ring, color }: { ring: { r: number; w: number; delay: number }; color: string }) {
   const anim = useSharedValue(0);
 
   useEffect(() => {
@@ -91,7 +92,7 @@ function ShockwaveRing({ ring }: { ring: { r: number; w: number; delay: number }
       pointerEvents="none"
     >
       <Svg width={LOGO_SIZE} height={LOGO_SIZE} viewBox="0 0 140 140" fill="none">
-        <Circle cx="70" cy="70" r={ring.r} stroke="#92d9bb" strokeWidth={ring.w} opacity={0.6} />
+        <Circle cx="70" cy="70" r={ring.r} stroke={color} strokeWidth={ring.w} opacity={0.6} />
       </Svg>
     </Animated.View>
   );
@@ -100,6 +101,7 @@ function ShockwaveRing({ ring }: { ring: { r: number; w: number; delay: number }
 export function LaunchScreen() {
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
+  const c = useThemeColors();
 
   const ignition = useSharedValue(0);
   const flash = useSharedValue(0);
@@ -171,14 +173,14 @@ export function LaunchScreen() {
                 <ParticleView key={i} p={p} />
               ))}
               {SHOCK_RINGS.map((ring, i) => (
-                <ShockwaveRing key={i} ring={ring} />
+                <ShockwaveRing key={i} ring={ring} color={c.accent} />
               ))}
             </>
           )}
 
           <Animated.View
-            className="absolute rounded-full"
-            style={[{ width: 8, height: 8, backgroundColor: '#92d9bb' }, ignitionStyle]}
+            className="absolute rounded-full bg-accent"
+            style={[{ width: 8, height: 8 }, ignitionStyle]}
             pointerEvents="none"
           />
 
@@ -192,45 +194,42 @@ export function LaunchScreen() {
 
           <Animated.View style={[{ width: LOGO_SIZE, height: LOGO_SIZE }, logoAnimated]}>
             <Svg width={LOGO_SIZE} height={LOGO_SIZE} viewBox="0 0 140 140" fill="none">
-              <Circle cx="70" cy="70" r="58" stroke="#38383a" strokeWidth={1} />
+              <Circle cx="70" cy="70" r="56" stroke={c.accent} strokeWidth={2} />
               <Circle
-                cx="70" cy="70" r="44" stroke="#3a3a3c" strokeWidth={2.5}
-                strokeDasharray="12 10" strokeLinecap="round"
+                cx="70" cy="70" r="43" stroke={c.node} strokeWidth={2.5}
+                strokeDasharray="8.5 9" strokeLinecap="round"
               />
               <Circle
-                cx="70" cy="70" r="44" stroke="#92d9bb" strokeWidth={2.5}
-                strokeDasharray="46 86" strokeDashoffset="-22" strokeLinecap="round"
+                cx="70" cy="70" r="43" stroke={c.accent} strokeWidth={3}
+                strokeDasharray="70 200" strokeDashoffset="-150" strokeLinecap="round"
               />
-              <Circle cx="36" cy="50" r="12" fill="#3a3a3c" />
-              <Circle cx="36" cy="50" r="4.5" fill="#1c1c1e" />
-              <Circle cx="94" cy="42" r="12" fill="#92d9bb" />
-              <Circle cx="94" cy="42" r="4.5" fill="#000" />
-              <Circle cx="84" cy="98" r="12" fill="#92d9bb" />
-              <Circle cx="84" cy="98" r="4.5" fill="#000" />
+              <Circle cx="40" cy="52" r="9.5" fill={c.node} />
+              <Circle cx="96" cy="44" r="9.5" fill={c.accent} />
+              <Circle cx="82" cy="98" r="10.5" fill={c.warning} />
               <Path
-                d="M92 102 L84 112 L77 102" stroke="#92d9bb"
-                strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"
+                d="M90 104 L82 115 L74 104" stroke={c.warning}
+                strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round"
               />
             </Svg>
           </Animated.View>
         </View>
 
-        <Animated.View className="items-center mt-7 mb-2" style={wordmarkStyle}>
-          <Text className="font-display text-[36px] font-bold text-fg tracking-[-0.03em] text-center">
+        <Animated.View className="items-center mt-7 mb-3" style={wordmarkStyle}>
+          <Text className="font-display text-[46px] text-fg tracking-[-0.02em] text-center">
             Opas
           </Text>
         </Animated.View>
 
         <Animated.View style={taglineStyle}>
-          <Text className="text-body-sm text-muted/70 max-w-[260px] text-center leading-[1.6]">
-            Never miss a deadline from Finnish authorities
+          <Text className="font-serif-italic text-prose text-fg-soft max-w-[280px] text-center">
+            Scan any official letter. Understand it in plain words.
           </Text>
         </Animated.View>
       </View>
 
       <View className="items-center" style={{ paddingBottom: insets.bottom + 40 }}>
-        <Text className="text-[11px] text-muted/30 font-mono tracking-[0.08em]">
-          v1.0.0
+        <Text className="font-mono text-[11px] text-muted tracking-[0.08em]">
+          v2.0.0
         </Text>
       </View>
     </View>

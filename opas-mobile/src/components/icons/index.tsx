@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Svg, { Circle, Path, Line, Polyline, Rect } from 'react-native-svg';
+import { useThemeColors } from '../../store/themeStore';
 
 type IconProps = {
   size?: number;
@@ -293,19 +294,19 @@ type LogoMarkProps = {
   size?: number;
 };
 
+// v2 "Personal Record" mark — a waypoint compass. Colours follow the active
+// theme (pine/ochre on paper, sage/amber on ink).
 export function LogoMark({ size = 80 }: LogoMarkProps) {
+  const c = useThemeColors();
   return (
     <Svg width={size} height={size} viewBox="0 0 140 140" fill="none">
-      <Circle cx="70" cy="70" r="58" stroke="#38383a" strokeWidth={1} />
-      <Circle cx="70" cy="70" r="44" stroke="#3a3a3c" strokeWidth={2.5} strokeDasharray="12 10" strokeLinecap="round" />
-      <Circle cx="70" cy="70" r="44" stroke="#92d9bb" strokeWidth={2.5} strokeDasharray="46 86" strokeDashoffset="-22" strokeLinecap="round" />
-      <Circle cx="36" cy="50" r="12" fill="#3a3a3c" />
-      <Circle cx="36" cy="50" r="4.5" fill="#1c1c1e" />
-      <Circle cx="94" cy="42" r="12" fill="#92d9bb" />
-      <Circle cx="94" cy="42" r="4.5" fill="#000" />
-      <Circle cx="84" cy="98" r="12" fill="#92d9bb" />
-      <Circle cx="84" cy="98" r="4.5" fill="#000" />
-      <Path d="M92 102 L84 112 L77 102" stroke="#92d9bb" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <Circle cx="70" cy="70" r="56" stroke={c.accent} strokeWidth={2} />
+      <Circle cx="70" cy="70" r="43" stroke={c.node} strokeWidth={2.5} strokeDasharray="8.5 9" strokeLinecap="round" />
+      <Circle cx="70" cy="70" r="43" stroke={c.accent} strokeWidth={3} strokeDasharray="70 200" strokeDashoffset="-150" strokeLinecap="round" />
+      <Circle cx="40" cy="52" r="9.5" fill={c.node} />
+      <Circle cx="96" cy="44" r="9.5" fill={c.accent} />
+      <Circle cx="82" cy="98" r="10.5" fill={c.warning} />
+      <Path d="M90 104 L82 115 L74 104" stroke={c.warning} strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 }
