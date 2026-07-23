@@ -7,6 +7,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +44,13 @@ public class RabbitMQConfig {
 
     @Bean
     public Jackson2JsonMessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        // Restrict deserialization to our own DTOs so a compromised/poisoned broker
+        // can't drive the JSON type mapper into instantiating arbitrary classes.
+        DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
+        typeMapper.setTrustedPackages("com.opas.dto");
+        converter.setJavaTypeMapper(typeMapper);
+        return converter;
     }
 
     @Bean
