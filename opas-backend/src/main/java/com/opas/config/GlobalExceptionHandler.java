@@ -15,8 +15,24 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ProblemDetail handleNotFound(ResourceNotFoundException e) {
+        // Generic body — must be identical whether the resource is absent or the
+        // caller simply doesn't own it, so the endpoint can't be used as an oracle.
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,
+                "The requested resource was not found.");
+        detail.setType(URI.create("about:blank"));
+        detail.setTitle("Not Found");
+        return detail;
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleBadRequest(IllegalArgumentException e) {
+        // IllegalArgumentException is used only for client-safe business-rule
+        // violations (e.g. "Monthly decode limit reached"). Ownership/existence
+        // failures use ResourceNotFoundException, and enumeration-sensitive flows
+        // (register) throw a fixed generic message — so echoing the message here
+        // no longer leaks internal state.
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
         detail.setType(URI.create("about:blank"));
         detail.setTitle("Bad Request");
