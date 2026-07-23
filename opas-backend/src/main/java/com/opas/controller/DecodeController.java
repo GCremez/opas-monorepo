@@ -1,6 +1,7 @@
 package com.opas.controller;
 
 import com.opas.config.RabbitMQConfig;
+import com.opas.config.RateLimit;
 import com.opas.dto.DecodeMessage;
 import com.opas.dto.DecodeRequest;
 import com.opas.service.DecodeService;
@@ -29,6 +30,7 @@ public class DecodeController {
         this.rabbitTemplate = rabbitTemplate;
     }
 
+    @RateLimit(key = "decode", limit = 20, windowSeconds = 60)
     @PostMapping
     public ResponseEntity<Map<String, Object>> decode(Authentication authentication, @PathVariable UUID documentId,
             @Valid @RequestBody DecodeRequest request) {
