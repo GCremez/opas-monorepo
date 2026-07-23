@@ -8,20 +8,22 @@ interface BadgeProps {
   children: React.ReactNode;
 }
 
-const badgeStyles: Record<BadgeVariant, { bg: string; text: string }> = {
-  accent: { bg: 'bg-accent-dim', text: 'text-accent' },
-  success: { bg: 'bg-[#30d15822]', text: 'text-success' },
-  warning: { bg: 'bg-[#ff9f0a22]', text: 'text-warning' },
-  danger: { bg: 'bg-[#ff453a22]', text: 'text-danger' },
-  info: { bg: 'bg-[#5e5ce622]', text: 'text-info' },
-  neutral: { bg: 'bg-surface-2', text: 'text-muted' },
+// v2 status is tracked-caps text in a semantic colour (pine reads positive,
+// ochre = deadline, brick = urgent). "success" folds into accent per the
+// v1→v2 mapping. Never colour-only in isolation — pair with a label.
+const badgeText: Record<BadgeVariant, string> = {
+  accent: 'text-accent',
+  success: 'text-accent',
+  warning: 'text-warning',
+  danger: 'text-danger',
+  info: 'text-info',
+  neutral: 'text-muted',
 };
 
 export function Badge({ variant = 'neutral', children }: BadgeProps) {
-  const s = badgeStyles[variant];
   return (
-    <View className={`self-start px-2 py-0.5 rounded-[3px] ${s.bg}`}>
-      <Text className={`text-[10px] font-semibold tracking-wide uppercase ${s.text}`}>
+    <View className="self-start rounded-sm bg-surface px-2 py-1">
+      <Text className={`font-semibold text-[9px] tracking-[0.11em] uppercase ${badgeText[variant]}`}>
         {children}
       </Text>
     </View>
@@ -35,20 +37,23 @@ interface PillProps {
   children: React.ReactNode;
 }
 
-const pillStyles: Record<PillVariant, { bg: string; text: string; border: string }> = {
-  accent: { bg: 'bg-accent-dim', text: 'text-accent', border: 'border-accent' },
-  success: { bg: 'bg-[#30d15822]', text: 'text-success', border: 'border-success' },
-  warning: { bg: 'bg-[#ff9f0a22]', text: 'text-warning', border: 'border-warning' },
-  danger: { bg: 'bg-[#ff453a22]', text: 'text-danger', border: 'border-danger' },
-  info: { bg: 'bg-[#5e5ce622]', text: 'text-info', border: 'border-info' },
-  neutral: { bg: 'bg-transparent', text: 'text-muted', border: 'border-border' },
+// Bordered status pill, e.g. the document "Approved" chip.
+const pillStyles: Record<PillVariant, { text: string; border: string }> = {
+  accent: { text: 'text-accent', border: 'border-accent' },
+  success: { text: 'text-accent', border: 'border-accent' },
+  warning: { text: 'text-warning', border: 'border-warning' },
+  danger: { text: 'text-danger', border: 'border-danger' },
+  info: { text: 'text-info', border: 'border-info' },
+  neutral: { text: 'text-muted', border: 'border-rule' },
 };
 
 export function Pill({ variant = 'neutral', children }: PillProps) {
   const s = pillStyles[variant];
   return (
-    <View className={`self-start px-4 py-1.5 rounded-md border min-h-[34px] items-center justify-center ${s.bg} ${s.border}`}>
-      <Text className={`text-[10px] font-medium tracking-wide ${s.text}`}>{children}</Text>
+    <View className={`self-start rounded-pill border px-3 py-1.5 items-center justify-center ${s.border}`}>
+      <Text className={`font-semibold text-[9.5px] tracking-[0.12em] uppercase ${s.text}`}>
+        {children}
+      </Text>
     </View>
   );
 }

@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, ScrollView, Pressable, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Alert } from 'react-native';
 import { Button } from '../../src/components/ui/Button';
-import { Badge } from '../../src/components/ui/Badge';
-import { CheckIcon, ChevronLeftIcon } from '../../src/components/icons';
+import { XIcon } from '../../src/components/icons';
 import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { useAuthStore } from '../../src/store/authStore';
+import { useThemeColors } from '../../src/store/themeStore';
 
 type BillingInterval = 'monthly' | 'yearly';
 
@@ -19,23 +18,22 @@ const YEARLY_PRICE_ID = 'price_yearly';
 export default function SubscriptionScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const c = useThemeColors();
   const { plan, setPlan } = useAuthStore();
   const { checkout, fetchSubscription } = useSubscriptionStore();
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [loading, setLoading] = useState(false);
 
   const features = [
-    t('subscription.features.unlimited_decodes'),
-    t('subscription.features.draft_letters'),
-    t('subscription.features.export_pdf'),
-    t('subscription.features.calendar_sync'),
-    t('subscription.features.priority_support'),
+    t('subscription.features.f1'),
+    t('subscription.features.f2'),
+    t('subscription.features.f3'),
+    t('subscription.features.f4'),
   ];
 
-  const prices = {
-    monthly: { label: '€9.99', period: `/${t('subscription.monthly').toLowerCase()}` },
-    yearly: { label: '€99.99', period: `/${t('subscription.yearly').toLowerCase()}`, badge: 'Save 17%' },
-  };
+  const price = interval === 'monthly'
+    ? { amount: '€4.99', period: `/ ${t('subscription.monthly')}` }
+    : { amount: '€47.90', period: `/ ${t('subscription.yearly')}` };
 
   const handleSubscribe = async () => {
     setLoading(true);
@@ -53,10 +51,7 @@ export default function SubscriptionScreen() {
       return;
     }
     try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      }
+      if (await Linking.canOpenURL(url)) await Linking.openURL(url);
     } catch {
       Alert.alert('Could not open checkout URL');
     }
@@ -65,19 +60,11 @@ export default function SubscriptionScreen() {
   if (plan === 'premium') {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
-        <View className="flex-1 items-center justify-center px-5">
-          <View className="w-20 h-20 rounded-full bg-accent items-center justify-center mb-6">
-            <CheckIcon size={32} color="#000" />
-          </View>
-          <Text className="font-display text-heading-l text-fg text-center mb-2">
-            {t('subscription.already_premium_title')}
-          </Text>
-          <Text className="text-body-sm text-muted text-center mb-6">
-            {t('subscription.already_premium_desc')}
-          </Text>
-          <Button variant="ghost" onPress={() => router.back()}>
-            {t('common.done')}
-          </Button>
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="font-display text-[40px] text-accent mb-4">✓</Text>
+          <Text className="font-display text-title text-fg text-center mb-2">{t('subscription.already_premium_title')}</Text>
+          <Text className="font-serif text-prose text-fg-soft text-center mb-8">{t('subscription.already_premium_desc')}</Text>
+          <Button variant="outline" onPress={() => router.back()}>{t('common.done')}</Button>
         </View>
       </SafeAreaView>
     );
@@ -85,78 +72,54 @@ export default function SubscriptionScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
-      <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="min-h-touch flex-row items-center gap-1.5 mb-4"
-          accessibilityLabel={t('common.back')}
-        >
-          <ChevronLeftIcon size={18} color="#92d9bb" />
-          <Text className="text-accent text-body">{t('common.back')}</Text>
-        </TouchableOpacity>
-
-        <Text className="font-display text-heading-xl text-fg mb-2">
-          {t('subscription.title')}
-        </Text>
-        <Text className="text-body-sm text-muted mb-8">
-          {t('profile.upgrade_desc')}
-        </Text>
-
-        <View className="flex-row bg-surface-2 rounded-md p-1 mb-8">
-          <TouchableOpacity
-            onPress={() => setInterval('monthly')}
-            className={`flex-1 py-3 rounded-md items-center ${
-              interval === 'monthly' ? 'bg-surface' : ''
-            }`}
-          >
-            <Text className={`text-body font-medium ${interval === 'monthly' ? 'text-fg' : 'text-muted'}`}>
-              {t('subscription.monthly')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setInterval('yearly')}
-            className={`flex-1 py-3 rounded-md items-center flex-row justify-center gap-2 ${
-              interval === 'yearly' ? 'bg-surface' : ''
-            }`}
-          >
-            <Text className={`text-body font-medium ${interval === 'yearly' ? 'text-fg' : 'text-muted'}`}>
-              {t('subscription.yearly')}
-            </Text>
-            {interval === 'yearly' && (
-              <Badge variant="accent">{prices.yearly.badge}</Badge>
-            )}
-          </TouchableOpacity>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
+        {/* Close */}
+        <View className="flex-row justify-end px-6 pt-2">
+          <Pressable onPress={() => router.back()} hitSlop={8} accessibilityLabel={t('common.close')}>
+            <XIcon size={22} color={c['fg-soft']} />
+          </Pressable>
         </View>
 
-        <View className="bg-surface border border-accent/30 rounded-lg p-6 mb-8">
-          <Text className="font-display text-display text-accent">
-            {prices[interval].label}
-            <Text className="text-body text-muted font-body">{prices[interval].period}</Text>
-          </Text>
+        {/* Masthead */}
+        <View className="px-6 pt-2 pb-6">
+          <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-accent">{t('subscription.premium_eyebrow')}</Text>
+          <Text className="font-display text-[32px] leading-[35px] tracking-[-0.01em] text-fg mt-2.5">{t('subscription.title')}</Text>
+        </View>
 
-          <View className="border-t border-border my-5" />
+        {/* Price + yearly toggle */}
+        <View className="px-6">
+          <View className="flex-row items-end justify-between">
+            <Text className="font-display text-[44px] leading-[44px] text-fg">
+              {price.amount}
+              <Text className="font-mono text-[11px] tracking-[0.05em] uppercase text-muted"> {price.period}</Text>
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => setInterval((iv) => (iv === 'monthly' ? 'yearly' : 'monthly'))}
+            className={`self-start mt-3 rounded-pill border px-3 py-1.5 ${interval === 'yearly' ? 'bg-accent border-accent' : 'border-rule'}`}
+          >
+            <Text className={`font-semibold text-[9.5px] tracking-[0.11em] uppercase ${interval === 'yearly' ? 'text-on-accent' : 'text-accent'}`}>
+              {t('subscription.save_yearly')}
+            </Text>
+          </Pressable>
+        </View>
 
+        {/* Features */}
+        <View className="px-6 pt-8">
           {features.map((feature, i) => (
-            <View key={i} className="flex-row items-center gap-3 mb-4">
-              <CheckIcon size={16} color="#92d9bb" />
-              <Text className="text-body text-fg flex-1">{feature}</Text>
+            <View key={i} className="flex-row items-baseline gap-3 py-3.5 border-b border-hairline">
+              <Text className="font-mono text-[13px] text-accent">✓</Text>
+              <Text className="font-serif text-[16px] leading-[24px] text-fg flex-1">{feature}</Text>
             </View>
           ))}
+        </View>
 
-          <Button
-            variant="primary"
-            size="lg"
-            block
-            loading={loading}
-            onPress={handleSubscribe}
-            className="mt-4"
-          >
-            {`${t('subscription.subscribe')} — ${prices[interval].label}`}
+        {/* CTA */}
+        <View className="px-6 pt-8">
+          <Button variant="primary" size="lg" block loading={loading} onPress={handleSubscribe}>
+            {t('subscription.free_trial')}
           </Button>
-
-          <Text className="text-caption text-muted text-center mt-4">
-            {t('subscription.cancel_anytime')}
-          </Text>
+          <Text className="font-serif-italic text-[14px] text-muted text-center mt-3">{t('subscription.trial_note')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

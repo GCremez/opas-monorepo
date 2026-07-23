@@ -1,40 +1,46 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../src/components/ui/Button';
-import { Input } from '../../src/components/ui/Input';
-import { LogoMark } from '../../src/components/icons';
+import { ChevronLeftIcon } from '../../src/components/icons';
 import { useAuthStore } from '../../src/store/authStore';
+import { useThemeColors } from '../../src/store/themeStore';
 
-function BackgroundArc() {
+function Field({
+  label, value, onChangeText, placeholder, ...rest
+}: {
+  label: string; value: string; onChangeText: (v: string) => void; placeholder: string;
+} & React.ComponentProps<typeof TextInput>) {
+  const c = useThemeColors();
   return (
-    <View className="absolute top-0 left-0 right-0 items-center" pointerEvents="none">
-      <Svg width="100%" height="280" viewBox="0 0 375 280" preserveAspectRatio="xMidYMin meet">
-        <Circle cx="187" cy="80" r="180" stroke="#2c2c2e" strokeWidth={1} opacity={0.3} />
-        <Path
-          d="M 187 80 m -130 0 a 130 130 0 0 1 260 0"
-          stroke="#92d9bb"
-          strokeWidth={1}
-          strokeLinecap="round"
-          opacity={0.12}
-          fill="none"
+    <>
+      <Text className="font-semibold text-[9.5px] tracking-[0.14em] uppercase text-muted mb-2">{label}</Text>
+      <View className="border-b border-rule pb-2 mb-7">
+        <TextInput
+          className="font-body text-[17px] text-fg"
+          placeholder={placeholder}
+          placeholderTextColor={c.muted}
+          value={value}
+          onChangeText={onChangeText}
+          {...rest}
         />
-      </Svg>
-    </View>
+      </View>
+    </>
   );
 }
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const c = useThemeColors();
   const register = useAuthStore((s) => s.register);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -54,6 +60,8 @@ export default function RegisterScreen() {
       await SecureStore.setItemAsync('has_registered', 'true');
       router.replace('/(tabs)');
     } catch {
+      // Uniform generic message — must not reveal whether the email is already
+      // registered (account enumeration) or that the server errored.
       setError(t('auth.registration_failed'));
     } finally {
       setLoading(false);
@@ -61,72 +69,60 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-bg"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <BackgroundArc />
-      <ScrollView
-        contentContainerClassName="flex-1 justify-center px-6"
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="items-center mb-12">
-          <View className="mb-5">
-            <LogoMark size={72} />
-          </View>
-          <Text className="font-display text-heading-xl text-fg text-center">
-            {t('auth.create_account')}
-          </Text>
-          <Text className="text-body-sm text-muted/70 text-center mt-1.5">
-            {t('auth.start_managing')}
-          </Text>
-        </View>
+    <KeyboardAvoidingView className="flex-1 bg-bg" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <View className="flex-row items-center gap-2 px-6 pt-2">
+        <Pressable onPress={() => router.back()} hitSlop={8} accessibilityLabel={t('common.back')}>
+          <ChevronLeftIcon size={22} color={c['fg-soft']} />
+        </Pressable>
+        <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">{t('auth.create_account')}</Text>
+      </View>
+
+      <ScrollView contentContainerClassName="flex-grow px-6 pt-8" keyboardShouldPersistTaps="handled">
+        <Text className="font-display text-[32px] leading-[35px] tracking-[-0.01em] text-fg mb-9">{t('auth.start_record')}</Text>
 
         {error ? (
-          <View className="bg-danger/10 border border-danger/30 rounded-md px-4 py-3 mb-5" accessibilityRole="alert">
-            <Text className="text-body-sm text-danger">{error}</Text>
+          <View className="bg-surface rounded-md px-4 py-3 mb-6" accessibilityRole="alert">
+            <Text className="font-body text-body-sm text-danger">{error}</Text>
           </View>
         ) : null}
 
-        <Input
-          label={t('auth.full_name')}
-          placeholder={t('auth.name_placeholder')}
-          value={name}
-          onChangeText={setName}
-          autoCapitalize="words"
-        />
-        <Input
+        <Field label={t('auth.full_name')} value={name} onChangeText={setName} placeholder={t('auth.name_placeholder')} autoCapitalize="words" />
+        <Field
           label={t('auth.email')}
-          placeholder={t('auth.email_placeholder')}
           value={email}
           onChangeText={setEmail}
+          placeholder={t('auth.email_placeholder')}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
         />
-        <Input
-          label={t('auth.password')}
-          placeholder="At least 8 characters"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoComplete="new-password"
-        />
-        <Button
-          variant="primary"
-          block
-          size="lg"
-          loading={loading}
-          onPress={handleRegister}
-          className="mt-3"
-        >
+
+        <View className="flex-row items-center justify-between mb-2">
+          <Text className="font-semibold text-[9.5px] tracking-[0.14em] uppercase text-muted">{t('auth.password')}</Text>
+          <Pressable onPress={() => setShowPw((s) => !s)} hitSlop={6}>
+            <Text className="font-semibold text-[9.5px] tracking-[0.08em] uppercase text-muted">{showPw ? t('common.hide') : t('common.show')}</Text>
+          </Pressable>
+        </View>
+        <View className="border-b border-rule pb-2 mb-8">
+          <TextInput
+            className="font-body text-[17px] text-fg"
+            placeholder="••••••••"
+            placeholderTextColor={c.muted}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPw}
+            autoComplete="new-password"
+          />
+        </View>
+
+        <Button variant="primary" block size="lg" loading={loading} onPress={handleRegister}>
           {t('auth.create_account')}
         </Button>
 
-        <View className="flex-row justify-center mt-8">
-          <Text className="text-body-sm text-muted">{t('auth.has_account')} </Text>
+        <View className="flex-row justify-center mt-5">
+          <Text className="font-serif-italic text-[14px] text-muted">{t('auth.has_account')} </Text>
           <Link href="/(auth)/login" asChild>
-            <Text className="text-body-sm text-accent font-semibold">{t('auth.sign_in')}</Text>
+            <Pressable><Text className="font-serif-italic text-[14px] text-accent">{t('auth.sign_in')}</Text></Pressable>
           </Link>
         </View>
       </ScrollView>

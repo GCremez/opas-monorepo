@@ -1,20 +1,15 @@
 import * as React from 'react';
-import { useEffect } from 'react';
 import { View, Text, Pressable } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { HomeIcon, SearchIcon, ScanIcon, DocsIcon, ProfileIcon } from './icons';
 
-type TabKey = 'index' | 'search' | 'scan' | 'docs' | 'profile';
+// v2 "Personal Record" bottom nav — typographic, not icon-based.
+// Record · Files · Scan (pill) · Alerts · You
+export type TabKey = 'index' | 'docs' | 'scan' | 'alerts' | 'profile';
 
 interface TabConfig {
   key: TabKey;
   labelKey: string;
-  icon: React.FC<{ size?: number; color?: string; strokeWidth?: number }>;
   scan?: boolean;
 }
 
@@ -24,15 +19,12 @@ interface BottomTabBarProps {
 }
 
 const tabs: TabConfig[] = [
-  { key: 'index', labelKey: 'tabs.home', icon: HomeIcon },
-  { key: 'search', labelKey: 'tabs.search', icon: SearchIcon },
-  { key: 'scan', labelKey: 'tabs.scan', icon: ScanIcon, scan: true },
-  { key: 'docs', labelKey: 'tabs.docs', icon: DocsIcon },
-  { key: 'profile', labelKey: 'tabs.profile', icon: ProfileIcon },
+  { key: 'index', labelKey: 'tabs.record' },
+  { key: 'docs', labelKey: 'tabs.files' },
+  { key: 'scan', labelKey: 'tabs.scan', scan: true },
+  { key: 'alerts', labelKey: 'tabs.alerts' },
+  { key: 'profile', labelKey: 'tabs.you' },
 ];
-
-const ACTIVE = '#92d9bb';
-const INACTIVE = '#86868b';
 
 function TabItem({
   tab,
@@ -44,54 +36,34 @@ function TabItem({
   onPress: () => void;
 }) {
   const { t } = useTranslation();
-  const activeProgress = useSharedValue(isActive ? 1 : 0);
 
-  useEffect(() => {
-    activeProgress.value = withTiming(isActive ? 1 : 0, { duration: 250 });
-  }, [isActive]);
-
-  const activeIconStyle = useAnimatedStyle(() => ({
-    opacity: activeProgress.value,
-  }));
-
-  const inactiveIconStyle = useAnimatedStyle(() => ({
-    opacity: 1 - activeProgress.value,
-  }));
-
-  const Icon = tab.icon;
+  if (tab.scan) {
+    return (
+      <Pressable
+        onPress={onPress}
+        className="bg-accent rounded-pill px-5 py-3 min-h-touch items-center justify-center"
+        accessibilityRole="button"
+        accessibilityLabel={t(tab.labelKey)}
+      >
+        <Text className="font-semibold text-on-accent text-[9.5px] uppercase tracking-[0.15em]">
+          {t(tab.labelKey)}
+        </Text>
+      </Pressable>
+    );
+  }
 
   return (
     <Pressable
       onPress={onPress}
-      className="items-center justify-center"
-      style={{ width: 64, height: 60 }}
+      className="min-h-touch px-2 items-center justify-center"
+      accessibilityRole="button"
+      accessibilityState={{ selected: isActive }}
+      accessibilityLabel={t(tab.labelKey)}
     >
-      {tab.scan ? (
-        <View
-          className="w-12 h-12 rounded-full items-center justify-center"
-          style={{
-            backgroundColor: '#2c2c2e',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 12,
-            elevation: 6,
-          }}
-        >
-          <ScanIcon size={24} color={INACTIVE} strokeWidth={2} />
-        </View>
-      ) : (
-        <View className="w-6 h-6 items-center justify-center">
-          <Animated.View style={[inactiveIconStyle, { position: 'absolute' }]}>
-            <Icon size={22} color={INACTIVE} strokeWidth={2} />
-          </Animated.View>
-          <Animated.View style={[activeIconStyle, { position: 'absolute' }]}>
-            <Icon size={22} color={ACTIVE} strokeWidth={2.5} />
-          </Animated.View>
-        </View>
-      )}
       <Text
-        className={`text-[10px] font-medium tracking-wide mt-1 text-center ${isActive ? 'text-accent' : 'text-muted'}`}
+        className={`font-semibold text-[9.5px] uppercase tracking-[0.13em] ${
+          isActive ? 'text-fg' : 'text-muted'
+        }`}
       >
         {t(tab.labelKey)}
       </Text>
@@ -100,18 +72,11 @@ function TabItem({
 }
 
 export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
   return (
     <View
-      className="absolute bottom-6 self-center z-50 flex-row items-center px-4 py-2 rounded-[34px] border"
-      style={{
-        backgroundColor: 'rgba(28, 28, 30, 0.78)',
-        borderColor: 'rgba(255, 255, 255, 0.07)',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.55,
-        shadowRadius: 24,
-        elevation: 10,
-      }}
+      className="flex-row items-center justify-between bg-bg px-6 pt-4"
+      style={{ paddingBottom: Math.max(insets.bottom, 16) }}
     >
       {tabs.map((tab) => (
         <TabItem

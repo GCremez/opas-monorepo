@@ -12,12 +12,12 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <View className="items-center justify-center px-5 py-10 max-w-[360px] mx-auto">
+    <View className="items-center justify-center px-5 py-12 max-w-[360px] mx-auto">
       {icon && (
-        <Text className="text-[40px] mb-4 opacity-30">{icon}</Text>
+        <Text className="font-display text-[40px] mb-4 text-muted">{icon}</Text>
       )}
-      <Text className="text-heading-m text-fg text-center mb-2">{title}</Text>
-      <Text className="text-body-sm text-muted text-center leading-[1.6] mb-5">
+      <Text className="font-display text-title text-fg text-center mb-2">{title}</Text>
+      <Text className="font-serif text-prose text-fg-soft text-center mb-6">
         {description}
       </Text>
       {actionLabel && onAction && (
@@ -31,7 +31,7 @@ export function EmptyState({ icon, title, description, actionLabel, onAction }: 
 
 export function ErrorState({
   title = 'Connection lost',
-  description = 'Your documents are saved locally. We\'ll sync them automatically when your connection returns.',
+  description = "Your documents are saved locally. We'll sync them automatically when your connection returns.",
   onRetry,
 }: {
   title?: string;
@@ -39,14 +39,14 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <View className="items-center justify-center px-5 py-10 max-w-[360px] mx-auto">
-      <Text className="text-[40px] mb-4 opacity-50 text-danger">⚠</Text>
-      <Text className="text-heading-m text-fg text-center mb-2">{title}</Text>
-      <Text className="text-body-sm text-muted text-center leading-[1.6] mb-5">
+    <View className="items-center justify-center px-5 py-12 max-w-[360px] mx-auto">
+      <Text className="font-display text-[36px] mb-3 text-danger">⚠</Text>
+      <Text className="font-display text-title text-fg text-center mb-2">{title}</Text>
+      <Text className="font-serif text-prose text-fg-soft text-center mb-6">
         {description}
       </Text>
       {onRetry && (
-        <Button variant="secondary" onPress={onRetry}>
+        <Button variant="outline" onPress={onRetry}>
           Try again
         </Button>
       )}

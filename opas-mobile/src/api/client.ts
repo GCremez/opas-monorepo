@@ -11,7 +11,7 @@ if (__DEV__ && !extra?.apiBaseUrl) {
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 30_000,
+  timeout: 15_000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -29,7 +29,12 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
-    if (error.response?.status === 401 && !original._retry) {
+    // A 401 from the auth endpoints themselves means bad credentials / bad
+    // refresh token — NOT an expired access token. Don't attempt a refresh
+    // there, or a simple wrong-password login gets slow and mislabeled.
+    const url: string = original?.url ?? '';
+    const isAuthEndpoint = /\/auth\/(login|register|refresh|logout)/.test(url);
+    if (error.response?.status === 401 && !original._retry && !isAuthEndpoint) {
       original._retry = true;
       try {
         const refreshToken = await SecureStore.getItemAsync('refresh_token');

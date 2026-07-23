@@ -19,17 +19,24 @@
   },
   "onboarding": {
     "skip": "Ohita",
+    "step": "Opas · {{n}} / 3",
+    "eyebrow_1": "Tervetuloa Opasiin",
+    "eyebrow_2": "Älä koskaan missaa määräaikaa",
+    "eyebrow_3": "Kaikki yhdessä paikassa",
+    "illo_caption": "skannaa → selkokielinen opas",
     "next": "Seuraava",
     "get_started": "Aloita",
-    "slide_1_title": "Skannaa mikä tahansa virallinen kirje",
-    "slide_1_desc": "Kuvaa mikä tahansa kirje Kelasta, Verosta, Migristä tai muilta suomalaisilta viranomaisilta — OPAS digitoi sen hetkessä.",
-    "slide_2_title": "Tiedä, mitä tehdä",
-    "slide_2_desc": "OPAS poimii tärkeät tiedot, määräajat ja toimenpiteet, jotta et koskaan missaa olennaista.",
-    "slide_3_title": "Pysy järjestyksessä",
-    "slide_3_desc": "Automaattinen lajittelu kansioihin — vero, asuminen, etuudet ja paljon muuta. Seuraa määräaikoja yhdestä paikasta."
+    "slide_1_title": "Ymmärrä jokainen virallinen kirje.",
+    "slide_1_desc": "Skannaa mikä tahansa asiakirja Kelalta, verottajalta tai Migriltä. Opas kääntää sen selkokielelle — ja kertoo, mitä sinun pitää tehdä.",
+    "slide_2_title": "Tiedä, mitä tehdä — ja mihin mennessä.",
+    "slide_2_desc": "Opas poimii kirjeistäsi jokaisen päivämäärän ja toimenpiteen ja muistuttaa ennen määräaikaa.",
+    "slide_3_title": "Kaikki tallessa ja järjestyksessä.",
+    "slide_3_desc": "Asiakirjasi on lajiteltu viranomaisen mukaan ja aina haettavissa — mikään ei katoa laatikon pohjalle."
   },
   "auth": {
-    "welcome_back": "Tervetuloa takaisin",
+    "welcome_back": "Tervetuloa takaisin.",
+    "start_record": "Aloita tietosi.",
+    "forgot": "Unohtuiko salasana?",
     "welcome_to": "Tervetuloa Opasiin",
     "get_started": "Aloita tilisi käyttö",
     "sign_in_to": "Kirjaudu sisään Opas-tilillesi",
@@ -53,10 +60,48 @@
   },
   "tabs": {
     "home": "Koti",
+    "record": "Tiedot",
     "search": "Haku",
     "scan": "Skannaa",
     "docs": "Asiakirjat",
-    "profile": "Profiili"
+    "files": "Tiedostot",
+    "alerts": "Muistutukset",
+    "profile": "Profiili",
+    "you": "Sinä"
+  },
+  "record": {
+    "eyebrow": "Opas · Tietosi",
+    "needs_you": "Vaatii huomiotasi",
+    "your_documents": "Asiakirjasi",
+    "see_all": "Näytä kaikki →",
+    "all_clear": "Kaikki on kunnossa.",
+    "one_thing": " Yksi asia vaatii huomiotasi tällä viikolla.",
+    "nothing_needs": "Mikään ei vaadi huomiotasi juuri nyt. Olet ajan tasalla.",
+    "footer_one": "Rekisteröity Suomeen · {{count}} asiakirja tallennettu.",
+    "footer_other": "Rekisteröity Suomeen · {{count}} asiakirjaa tallennettu.",
+    "explore": "Tutustu Opasiin",
+    "ask_opas": "Kysy Opasilta",
+    "ask_opas_meta": "Vastaukset tietojesi pohjalta",
+    "guides": "Oppaat",
+    "guides_meta": "Vaiheittaiset ohjeet",
+    "journey": "Polku",
+    "journey_meta": "Elämänhallinnan aikajana",
+    "empty_title": "Tietosi ovat tyhjät.",
+    "empty_desc": "Skannaa ensimmäinen kirjeesi — Kelasta, verottajalta, mistä tahansa — ja Opas alkaa pitää sitä järjestyksessä.",
+    "scan_first": "Skannaa ensimmäinen asiakirjasi",
+    "see_how": "Katso miten Opas toimii",
+    "welcome": "Tervetuloa"
+  },
+  "alerts": {
+    "eyebrow": "Opas · Muistutukset",
+    "title": "Määräajat ja\nmuistutukset.",
+    "this_week": "Tällä viikolla",
+    "later": "Myöhemmin tässä kuussa",
+    "done": "Valmis",
+    "no_alerts": "Ei määräaikoja",
+    "no_alerts_desc": "Kun asiakirjalla on määräaika, se näkyy täällä.",
+    "days_left": "{{count}} pv",
+    "day_left": "{{count}} pv"
   },
   "home": {
     "title": "Koti",
@@ -118,7 +163,13 @@
     "show_all": "Näytä kaikki",
     "result_count": "{{count}} tulos",
     "result_count_plural": "{{count}} tulosta",
-    "filters": { "all": "Kaikki", "kela": "Kela", "vero": "Vero", "migri": "Migri", "suomi": "Suomi.fi" }
+    "filters": {
+      "all": "Kaikki",
+      "kela": "Kela",
+      "vero": "Vero",
+      "migri": "Migri",
+      "suomi": "Suomi.fi"
+    }
   },
   "scan": {
     "title": "Skannaa asiakirja",
@@ -138,9 +189,12 @@
     "scan_another": "Skannaa toinen",
     "scan_failed_title": "Asiakirjaa ei voitu skannata",
     "scan_failed_desc": "Varmista, että asiakirja on hyvin valaistu, tasainen ja kokonaan kuvassa. Vältä heijastuksia ja varjoja.",
-    "step_uploading": "Ladataan asiakirjaa",
-    "step_analyzing": "Analysoidaan sisältöä",
-    "step_extracting": "Poimitaan toimenpiteitä"
+    "step_uploading": "Piilotetaan henkilötiedot",
+    "step_analyzing": "Käännetään FI → EN",
+    "step_extracting": "Etsitään päivämääriä ja toimia",
+    "reading": "Luetaan kirjettäsi…",
+    "please_wait": "Odota hetki",
+    "privacy_note": "Asiakirjasi pysyy hallinnassasi. Henkilötiedot piilotetaan ennen kuin mitään luetaan."
   },
   "documents": {
     "title": "Asiakirjat",
@@ -201,6 +255,10 @@
   "profile": {
     "title": "Profiili",
     "app_language": "Sovelluksen kieli",
+    "appearance": "Ulkoasu",
+    "appearance_paper": "Paperi",
+    "appearance_ink": "Muste",
+    "appearance_system": "Järjestelmä",
     "settings": "Asetukset",
     "account": "Tili",
     "sign_out": "Kirjaudu ulos",
@@ -257,7 +315,10 @@
     "lang_fi": "Suomi",
     "lang_fi_native": "Suomi",
     "lang_sv": "Svenska",
-    "lang_sv_native": "Ruotsi"
+    "lang_sv_native": "Ruotsi",
+    "deadline_reminders": "Määräaikamuistutukset",
+    "on": "Päällä",
+    "off": "Pois"
   },
   "document": {
     "title": "Asiakirja",
@@ -306,7 +367,10 @@
     "event_notes": "Asiakirjasta: {{filename}}"
   },
   "welcome": {
-    "tagline": "Oppaasi suomalaisen byrokratian läpi",
+    "tagline": "Oppaasi suomalaiseen byrokratiaan",
+    "subtitle": "Skannaa mikä tahansa virallinen kirje. Ymmärrä se selkokielellä. Älä koskaan missaa tärkeää.",
+    "get_started": "Aloita",
+    "have_account": "Minulla on jo tili",
     "free_features_label": "Ilmainen",
     "feature_scan": "Skannaa virallisia kirjeitä suomalaisilta viranomaisilta",
     "feature_ai": "Tekoäly poimii määräajat ja ohjeet selkokielellä",
@@ -316,7 +380,7 @@
     "demo": "Jatka vieraana"
   },
   "subscription": {
-    "title": "Päivitä Premiumiin",
+    "title": "Kaikki\nhoidettu.",
     "monthly": "Kuukausittain",
     "yearly": "Vuosittain",
     "subscribe": "Tilaa",
@@ -325,12 +389,15 @@
     "already_premium_desc": "Rajaton analyysi ja kaikki premium-ominaisuudet — kaikki sinun.",
     "cancel_anytime": "Peruuta milloin tahansa. Ei kysymyksiä.",
     "features": {
-      "unlimited_decodes": "Rajaton asiakirja-analyysi",
-      "draft_letters": "Laadi vastauskirjeitä yhdellä napautuksella",
-      "export_pdf": "Tallenna tai jaa PDF-muodossa",
-      "calendar_sync": "Määräajat siirtyvät kalenteriisi automaattisesti",
-      "priority_support": "Apua, kun sitä tarvitset"
+      "f1": "Rajattomasti asiakirjaskannauksia",
+      "f2": "Vastauskirjeet suomeksi",
+      "f3": "Vie ja arkistoi mitä tahansa",
+      "f4": "Muistutukset, jotka eivät petä"
     },
-    "checkout_error": "Jotain meni pieleen. Yritä uudelleen."
+    "checkout_error": "Jotain meni pieleen. Yritä uudelleen.",
+    "premium_eyebrow": "Opas Premium",
+    "save_yearly": "Säästä 20% vuodessa",
+    "free_trial": "Aloita 7 päivän ilmainen kokeilu",
+    "trial_note": "Sitten 4,99 €/kk. Peru milloin tahansa."
   }
 }
