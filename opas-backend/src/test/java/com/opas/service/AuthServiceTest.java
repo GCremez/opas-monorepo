@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.ResourceNotFoundException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -226,7 +227,7 @@ class AuthServiceTest {
         when(refreshTokenService.consume(anyString(), anyString())).thenReturn(true);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> service.refresh(new RefreshRequest("valid-token")));
     }
 
