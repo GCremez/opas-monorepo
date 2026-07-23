@@ -1,8 +1,8 @@
 package com.opas.controller;
 
-import com.opas.domain.Subscription;
 import com.opas.dto.CheckoutRequest;
 import com.opas.dto.CheckoutResponse;
+import com.opas.dto.SubscriptionResponse;
 import com.opas.dto.UsageResponse;
 import com.opas.service.DecodeService;
 import com.opas.service.SubscriptionService;
@@ -41,11 +41,11 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public ResponseEntity<Subscription> getSubscription(Authentication authentication) {
+    public ResponseEntity<SubscriptionResponse> getSubscription(Authentication authentication) {
         String userId = authentication.getName();
         if (userId == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(subscriptionService.getSubscription(UUID.fromString(userId)));
+        return ResponseEntity.ok(SubscriptionResponse.from(subscriptionService.getSubscription(UUID.fromString(userId))));
     }
 
     @PostMapping("/checkout")
