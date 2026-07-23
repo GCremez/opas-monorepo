@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Subscription;
 import com.opas.domain.User;
 import com.opas.repository.SubscriptionRepository;
@@ -8,7 +9,10 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.param.billingportal.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,17 +29,21 @@ public class SubscriptionService {
     private final boolean stripeEnabled;
     private final String stripeSecretKey;
     private final String returnBaseUrl;
+    private final Set<String> allowedPriceIds;
 
     public SubscriptionService(SubscriptionRepository subscriptionRepository,
             UserRepository userRepository,
             @Value("${opas.stripe.enabled}") boolean stripeEnabled,
             @Value("${opas.stripe.secret-key}") String stripeSecretKey,
-            @Value("${opas.stripe.return-base-url:https://opas.app}") String returnBaseUrl) {
+            @Value("${opas.stripe.return-base-url:https://opas.app}") String returnBaseUrl,
+            @Value("${opas.stripe.premium-price-ids:}") String premiumPriceIds) {
         this.subscriptionRepository = subscriptionRepository;
         this.userRepository = userRepository;
         this.stripeEnabled = stripeEnabled;
         this.stripeSecretKey = stripeSecretKey;
         this.returnBaseUrl = returnBaseUrl;
+        this.allowedPriceIds = Arrays.stream(premiumPriceIds.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toUnmodifiableSet());
     }
 
     @PostConstruct
@@ -51,13 +59,20 @@ public class SubscriptionService {
     @Transactional(readOnly = true)
     public Subscription getSubscription(UUID userId) {
         return subscriptionRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Transactional
     public String createCheckoutSession(UUID userId, String priceId) {
+        // Only allow checkout with a known premium price. Without this an attacker
+        // could pass any Stripe price id (e.g. a $0/trial price) and still be
+        // upgraded to premium by the checkout.session.completed webhook.
+        if (!allowedPriceIds.contains(priceId)) {
+            throw new IllegalArgumentException("Invalid plan");
+        }
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(ResourceNotFoundException::new);
 
         if (!stripeEnabled) {
             log.info("Mock checkout: userId={}, priceId={}", userId, priceId);
