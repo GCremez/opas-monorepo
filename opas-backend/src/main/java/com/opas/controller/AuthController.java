@@ -1,5 +1,6 @@
 package com.opas.controller;
 
+import com.opas.config.RateLimit;
 import com.opas.dto.AuthResponse;
 import com.opas.dto.ChangePasswordRequest;
 import com.opas.dto.LoginRequest;
@@ -30,16 +31,19 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @RateLimit(key = "auth-register", limit = 5, windowSeconds = 3600)
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
+    @RateLimit(key = "auth-login", limit = 10, windowSeconds = 300)
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @RateLimit(key = "auth-refresh", limit = 30, windowSeconds = 300)
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ResponseEntity.ok(authService.refresh(request));
@@ -52,6 +56,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @RateLimit(key = "auth-change-password", limit = 5, windowSeconds = 3600)
     @PostMapping("/change-password")
     public ResponseEntity<Void> changePassword(Authentication authentication,
             @Valid @RequestBody ChangePasswordRequest request) {
