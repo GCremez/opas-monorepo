@@ -3,8 +3,10 @@ spring:
     name: opas-backend
 
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://opas-database.ct88sic8yy3s.eu-north-1.rds.amazonaws.com:5432/postgres}
-    username: ${DATABASE_USER:opas_db}
+    # No production host as a default — that leaks infra and risks silently
+    # falling back to the prod DB when DATABASE_URL is unset. Default to local dev.
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/opas}
+    username: ${DATABASE_USER:opas}
     password: ${DATABASE_PASSWORD}
     hikari:
       maximum-pool-size: 20
@@ -96,6 +98,10 @@ opas:
     secret-key: ${STRIPE_SECRET_KEY:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
     return-base-url: ${STRIPE_RETURN_BASE_URL:https://opas.app}
+    # Comma-separated Stripe price IDs the client is allowed to check out with.
+    # Without this allowlist a user could check out with any (e.g. $0) price and
+    # still be upgraded to premium by the webhook.
+    premium-price-ids: ${STRIPE_PREMIUM_PRICE_IDS:}
   free-tier:
     monthly-decode-limit: 5
 
@@ -104,4 +110,6 @@ logging:
     console: '{"time":"%d{ISO8601}","level":"%p","logger":"%logger{36}","msg":"%msg","trace":"%X{traceId}"}%n'
   level:
     root: INFO
-    com.opas: DEBUG
+    # INFO by default in all deployed environments; raise to DEBUG locally via
+    # LOGGING_LEVEL_COM_OPAS=DEBUG rather than baking verbose logging into the image.
+    com.opas: ${LOGGING_LEVEL_COM_OPAS:INFO}
