@@ -69,6 +69,15 @@ public class StripeWebhookService {
         if (session == null)
             return;
 
+        // Defense-in-depth: only upgrade on a genuinely paid checkout. Combined with
+        // the server-side price allowlist at session creation, this stops upgrades
+        // from unpaid / $0 / incomplete sessions.
+        if (!"paid".equals(session.getPaymentStatus())) {
+            log.warn("Ignoring checkout session {} with payment_status={}", session.getId(),
+                    session.getPaymentStatus());
+            return;
+        }
+
         String customerId = session.getCustomer();
         String subscriptionId = session.getSubscription();
         String clientReferenceId = session.getClientReferenceId();
