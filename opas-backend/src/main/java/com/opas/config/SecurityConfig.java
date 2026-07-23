@@ -49,7 +49,10 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource())).csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
+                        // Only liveness/readiness probes are public. /info and /prometheus
+                        // leak build + internal metrics, so they now require authentication
+                        // (scrape them over an internal network / management port instead).
+                        .requestMatchers("/actuator/health/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
                                 "/api/v1/auth/refresh")
                         .permitAll().requestMatchers(HttpMethod.POST, "/api/v1/webhooks/stripe").permitAll()
