@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Folder;
 import com.opas.domain.User;
 import com.opas.dto.FolderRequest;
@@ -48,9 +49,9 @@ public class FolderService {
     @Transactional(readOnly = true)
     public FolderResponse get(UUID userId, UUID folderId) {
         Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!folder.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Folder does not belong to user");
+            throw new ResourceNotFoundException();
         }
         long docCount = documentRepository.countByUserId(userId);
         return FolderResponse.from(folder, docCount);
@@ -59,9 +60,9 @@ public class FolderService {
     @Transactional
     public void delete(UUID userId, UUID folderId) {
         Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!folder.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Folder does not belong to user");
+            throw new ResourceNotFoundException();
         }
         folderRepository.delete(folder);
     }
@@ -69,9 +70,9 @@ public class FolderService {
     @Transactional
     public FolderResponse update(UUID userId, UUID folderId, FolderRequest request) {
         Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found"));
+                .orElseThrow(ResourceNotFoundException::new);
         if (!folder.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Folder does not belong to user");
+            throw new ResourceNotFoundException();
         }
         folder.setName(request.name());
         folder.setDescription(request.description());
