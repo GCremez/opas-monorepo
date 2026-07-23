@@ -60,6 +60,7 @@ class StripeWebhookServiceTest {
 
         EventDataObjectDeserializer deserializer = mock(EventDataObjectDeserializer.class);
         Session session = mock(Session.class);
+        when(session.getPaymentStatus()).thenReturn("paid");
         when(session.getCustomer()).thenReturn(customerId);
         when(session.getSubscription()).thenReturn(subscriptionId);
         when(session.getClientReferenceId()).thenReturn(clientReferenceId);
@@ -106,6 +107,25 @@ class StripeWebhookServiceTest {
         verify(subscriptionRepository).findByUserId(userId);
         assertEquals("active", sub.getStatus());
         assertEquals("premium", sub.getTier());
+    }
+
+    @Test
+    void handleCheckoutCompletedIgnoresUnpaidSession() {
+        Event event = mock(Event.class);
+        when(event.getType()).thenReturn("checkout.session.completed");
+        EventDataObjectDeserializer deserializer = mock(EventDataObjectDeserializer.class);
+        Session session = mock(Session.class);
+        when(session.getPaymentStatus()).thenReturn("unpaid");
+        when(session.getId()).thenReturn("cs_test_unpaid");
+        when(deserializer.getObject()).thenReturn(Optional.of(session));
+        when(event.getDataObjectDeserializer()).thenReturn(deserializer);
+
+        service.handleEvent(event);
+
+        // An unpaid / $0 / incomplete checkout must never grant premium.
+        verify(subscriptionRepository, never()).save(any());
+        verify(subscriptionRepository, never()).findByStripeCustomerId(any());
+        verify(subscriptionRepository, never()).findByUserId(any());
     }
 
     private Event mockSubscriptionEvent(String type, String subscriptionId) {
