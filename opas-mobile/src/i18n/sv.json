@@ -56,7 +56,15 @@
     "fill_all_fields": "Fyll i alla fält",
     "enter_email_password": "Ange din e-post och ditt lösenord",
     "invalid_credentials": "E-post eller lösenord är felaktigt. Försök igen.",
-    "registration_failed": "Kunde inte skapa konto. Försök igen."
+    "registration_failed": "Kunde inte skapa konto. Försök igen.",
+    "reset_eyebrow": "Återställ lösenord",
+    "reset_title": "Inga problem.",
+    "reset_body": "Ange din e-postadress så skickar vi en länk för att ange ett nytt lösenord.",
+    "reset_send": "Skicka återställningslänk",
+    "reset_sent_title": "Kolla din e-post.",
+    "reset_sent_body": "Om det finns ett konto för {{email}} har vi skickat en länk för att återställa lösenordet.",
+    "back_to_sign_in": "Tillbaka till inloggning",
+    "enter_email": "Ange din e-postadress"
   },
   "tabs": {
     "home": "Hem",

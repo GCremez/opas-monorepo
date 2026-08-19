@@ -56,7 +56,15 @@
     "fill_all_fields": "Please fill in all fields",
     "enter_email_password": "Please enter your email and password",
     "invalid_credentials": "Email or password is incorrect. Please try again.",
-    "registration_failed": "Could not create account. Please try again."
+    "registration_failed": "Could not create account. Please try again.",
+    "reset_eyebrow": "Reset password",
+    "reset_title": "No trouble.",
+    "reset_body": "Enter your email and we'll send you a link to set a new password.",
+    "reset_send": "Send reset link",
+    "reset_sent_title": "Check your email.",
+    "reset_sent_body": "If an account exists for {{email}}, we've sent a link to reset your password.",
+    "back_to_sign_in": "Back to sign in",
+    "enter_email": "Please enter your email"
   },
   "tabs": {
     "home": "Home",
