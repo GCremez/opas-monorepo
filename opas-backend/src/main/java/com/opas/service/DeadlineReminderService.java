@@ -1,11 +1,12 @@
 package com.opas.service;
 
-import com.opas.domain.Document;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.PushTokenRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,41 +30,36 @@ public class DeadlineReminderService {
     }
 
     @Scheduled(cron = "0 0 9 * * *")
+    @SchedulerLock(name = "remindUndecodedDocuments", lockAtLeastFor = "PT1M", lockAtMostFor = "PT10M")
     @Transactional(readOnly = true)
     public void remindUndecodedDocuments() {
         Instant cutoff = Instant.now().minus(Duration.ofHours(24));
-        pushTokenRepository.findAll().stream()
-                .map(t -> t.getUser().getId())
-                .distinct()
-                .forEach(userId -> {
-                    List<Document> stale = documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(
-                            userId, "archived").stream()
-                            .filter(d -> "uploaded".equals(d.getStatus()))
-                            .filter(d -> d.getCreatedAt().isBefore(cutoff))
-                            .toList();
-                    if (!stale.isEmpty()) {
-                        notificationService.sendToUser(userId,
-                                "Pending Documents",
-                                "You have " + stale.size() + " document(s) waiting to be decoded.");
-                        log.info("Reminded user {} about {} undecoded document(s)", userId, stale.size());
-                    }
-                });
+        // Iterate the distinct users that have a push token, and use count queries
+        // instead of loading each user's whole document list just to size it.
+        List<UUID> userIds = pushTokenRepository.findDistinctUserIds();
+        for (UUID userId : userIds) {
+            long stale = documentRepository.countByUserIdAndStatusAndCreatedAtBefore(userId, "uploaded", cutoff);
+            if (stale > 0) {
+                notificationService.sendToUser(userId,
+                        "Pending Documents",
+                        "You have " + stale + " document(s) waiting to be decoded.");
+                log.info("Reminded user {} about {} undecoded document(s)", userId, stale);
+            }
+        }
     }
 
     @Scheduled(cron = "0 0 10 * * 1")
+    @SchedulerLock(name = "weeklySummary", lockAtLeastFor = "PT1M", lockAtMostFor = "PT10M")
     @Transactional(readOnly = true)
     public void weeklySummary() {
-        pushTokenRepository.findAll().stream()
-                .map(t -> t.getUser().getId())
-                .distinct()
-                .forEach(userId -> {
-                    long total = documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(
-                            userId, "archived").size();
-                    if (total > 0) {
-                        notificationService.sendToUser(userId,
-                                "Weekly Summary",
-                                "You have " + total + " document(s) in your Opas library.");
-                    }
-                });
+        List<UUID> userIds = pushTokenRepository.findDistinctUserIds();
+        for (UUID userId : userIds) {
+            long total = documentRepository.countByUserIdAndStatusNot(userId, "archived");
+            if (total > 0) {
+                notificationService.sendToUser(userId,
+                        "Weekly Summary",
+                        "You have " + total + " document(s) in your Opas library.");
+            }
+        }
     }
 }

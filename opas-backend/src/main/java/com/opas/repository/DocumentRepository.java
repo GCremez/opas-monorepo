@@ -13,5 +13,13 @@ public interface DocumentRepository extends JpaRepository<Document, UUID> {
 
     long countByUserId(UUID userId);
 
+    long countByFolderId(UUID folderId);
+
+    long countByUserIdAndStatus(UUID userId, String status);
+
+    long countByUserIdAndStatusAndCreatedAtBefore(UUID userId, String status, java.time.Instant createdAt);
+
+    long countByUserIdAndStatusNot(UUID userId, String status);
+
     void deleteByUser_Id(UUID userId);
 }
