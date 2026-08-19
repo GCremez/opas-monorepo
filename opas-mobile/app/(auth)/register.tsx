@@ -105,7 +105,7 @@ export default function RegisterScreen() {
               <Text className="font-semibold text-[9.5px] tracking-[0.08em] uppercase text-muted">{showPw ? t('common.hide') : t('common.show')}</Text>
             </Pressable>
           </View>
-          <View className="border-b border-rule pb-2 mb-8">
+          <View className="border-b border-rule pb-2">
             <TextInput
               className="font-body text-[17px] text-fg"
               placeholder="••••••••"
@@ -117,11 +117,14 @@ export default function RegisterScreen() {
             />
           </View>
 
+          {/* Spacer pushes the action to the bottom of the screen, per the design. */}
+          <View className="flex-1 min-h-[32px]" />
+
           <Button variant="primary" block size="lg" loading={loading} onPress={handleRegister}>
             {t('auth.create_account')}
           </Button>
 
-          <View className="flex-row justify-center mt-5">
+          <View className="flex-row justify-center mt-5 pb-2">
             <Text className="font-serif-italic text-[14px] text-muted">{t('auth.has_account')} </Text>
             <Link href="/(auth)/login" asChild>
               <Pressable><Text className="font-serif-italic text-[14px] text-accent">{t('auth.sign_in')}</Text></Pressable>

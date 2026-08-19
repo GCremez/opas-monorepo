@@ -106,15 +106,19 @@ export default function LoginScreen() {
             />
           </View>
 
-          <Pressable className="self-start mb-8" hitSlop={6} onPress={() => router.push('/(auth)/reset-password')}>
-            <Text className="font-semibold text-[9.5px] tracking-[0.1em] uppercase text-accent">{t('auth.forgot')}</Text>
+          {/* Right-aligned, muted — per the design. */}
+          <Pressable className="self-end" hitSlop={6} onPress={() => router.push('/(auth)/reset-password')}>
+            <Text className="font-semibold text-[9.5px] tracking-[0.08em] uppercase text-muted">{t('auth.forgot')}</Text>
           </Pressable>
+
+          {/* Spacer pushes the action to the bottom of the screen, per the design. */}
+          <View className="flex-1 min-h-[32px]" />
 
           <Button variant="primary" block size="lg" loading={loading} onPress={handleLogin}>
             {t('auth.sign_in')}
           </Button>
 
-          <View className="flex-row justify-center mt-5">
+          <View className="flex-row justify-center mt-5 pb-2">
             <Text className="font-serif-italic text-[14px] text-muted">{t('auth.no_account')} </Text>
             <Link href="/(auth)/register" asChild>
               <Pressable><Text className="font-serif-italic text-[14px] text-accent">{t('auth.sign_up')}</Text></Pressable>
