@@ -73,6 +73,7 @@ export default function DocumentDetailScreen() {
         id,
         filename: 'KELA Housing Benefit Decision',
         status: 'ready',
+        folderId: null,
         contentType: 'application/pdf',
         fileSize: 0,
         createdAt: new Date().toISOString(),

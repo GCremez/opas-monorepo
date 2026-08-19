@@ -6,6 +6,18 @@ export async function getDocuments(): Promise<Document[]> {
   return data;
 }
 
+export interface DocumentSearchResult {
+  id: string;
+  filename: string | null;
+  similarity: number;
+}
+
+// Semantic search over the user's decoded documents (backed by embeddings).
+export async function searchDocuments(query: string, limit = 20): Promise<DocumentSearchResult[]> {
+  const { data } = await apiClient.get('/documents/search', { params: { q: query, limit } });
+  return data;
+}
+
 export async function getDocument(id: string): Promise<Document> {
   const { data } = await apiClient.get(`/documents/${id}`);
   return data;
@@ -26,4 +38,10 @@ export async function deleteDocument(id: string): Promise<void> {
 
 export async function archiveDocument(id: string): Promise<void> {
   await apiClient.patch(`/documents/${id}/archive`);
+}
+
+// File a document under a folder, or pass null to remove it from its folder.
+export async function assignFolder(id: string, folderId: string | null): Promise<Document> {
+  const { data } = await apiClient.patch(`/documents/${id}/folder`, { folderId });
+  return data;
 }

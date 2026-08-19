@@ -32,6 +32,11 @@ public class Document {
     @Column(nullable = false)
     private String status;
 
+    // Optional folder this document is filed under (nullable = unfiled). Maps the
+    // existing folder_id column added in V6 so documents can actually be organized.
+    @Column(name = "folder_id")
+    private UUID folderId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -105,6 +110,15 @@ public class Document {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Nullable
+    public UUID getFolderId() {
+        return folderId;
+    }
+
+    public void setFolderId(UUID folderId) {
+        this.folderId = folderId;
     }
 
     public Instant getCreatedAt() {

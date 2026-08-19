@@ -6,6 +6,7 @@ import com.opas.domain.User;
 import com.opas.dto.DocumentResponse;
 import com.opas.dto.UploadUrlRequest;
 import com.opas.repository.DocumentRepository;
+import com.opas.repository.FolderRepository;
 import com.opas.repository.UserRepository;
 import java.time.Duration;
 import java.util.List;
@@ -20,15 +21,39 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
+    private final FolderRepository folderRepository;
     private final StorageService storageService;
     private final Duration uploadTtl;
 
     public DocumentService(DocumentRepository documentRepository, UserRepository userRepository,
-            StorageService storageService, @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
+            FolderRepository folderRepository, StorageService storageService,
+            @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
+        this.folderRepository = folderRepository;
         this.storageService = storageService;
         this.uploadTtl = Duration.ofMinutes(uploadTtlMinutes);
+    }
+
+    /**
+     * File a document under a folder, or pass a null folderId to unfile it. Both the
+     * document and (when present) the target folder must belong to the caller.
+     */
+    @Transactional
+    public DocumentResponse assignFolder(UUID userId, UUID documentId, @Nullable UUID folderId) {
+        Document document = documentRepository.findById(documentId).orElseThrow(ResourceNotFoundException::new);
+        if (!document.getUser().getId().equals(userId)) {
+            throw new ResourceNotFoundException();
+        }
+        if (folderId != null) {
+            var folder = folderRepository.findById(folderId).orElseThrow(ResourceNotFoundException::new);
+            if (!folder.getUser().getId().equals(userId)) {
+                throw new ResourceNotFoundException();
+            }
+        }
+        document.setFolderId(folderId);
+        document = documentRepository.save(document);
+        return toResponse(document, null, generateDownloadUrl(document));
     }
 
     @Transactional
@@ -110,6 +135,6 @@ public class DocumentService {
 
     private static DocumentResponse toResponse(Document doc, String uploadUrl, String downloadUrl) {
         return new DocumentResponse(doc.getId(), doc.getFilename(), doc.getContentType(), doc.getFileSize(),
-                doc.getStatus(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl);
+                doc.getStatus(), doc.getFolderId(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl);
     }
 }

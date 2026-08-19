@@ -42,7 +42,7 @@ public class FolderService {
     public List<FolderResponse> list(UUID userId) {
         List<Folder> folders = folderRepository.findByUserIdOrderByCreatedAtDesc(userId);
         return folders.stream()
-                .map(f -> FolderResponse.from(f, documentRepository.countByUserId(userId)))
+                .map(f -> FolderResponse.from(f, documentRepository.countByFolderId(f.getId())))
                 .toList();
     }
 
@@ -53,7 +53,7 @@ public class FolderService {
         if (!folder.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
         }
-        long docCount = documentRepository.countByUserId(userId);
+        long docCount = documentRepository.countByFolderId(folderId);
         return FolderResponse.from(folder, docCount);
     }
 
@@ -77,7 +77,7 @@ public class FolderService {
         folder.setName(request.name());
         folder.setDescription(request.description());
         folder = folderRepository.save(folder);
-        long docCount = documentRepository.countByUserId(userId);
+        long docCount = documentRepository.countByFolderId(folderId);
         return FolderResponse.from(folder, docCount);
     }
 }

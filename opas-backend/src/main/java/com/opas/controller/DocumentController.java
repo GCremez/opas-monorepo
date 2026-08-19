@@ -1,5 +1,6 @@
 package com.opas.controller;
 
+import com.opas.dto.AssignFolderRequest;
 import com.opas.dto.DocumentResponse;
 import com.opas.dto.UploadUrlRequest;
 import com.opas.service.DocumentService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final com.opas.service.EmbeddingService embeddingService;
 
-    public DocumentController(DocumentService documentService) {
+    public DocumentController(DocumentService documentService,
+            com.opas.service.EmbeddingService embeddingService) {
         this.documentService = documentService;
+        this.embeddingService = embeddingService;
     }
 
     private static UUID resolveUserId(Authentication authentication) {
@@ -56,6 +61,18 @@ public class DocumentController {
         return ResponseEntity.ok(documentService.listDocuments(userId));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<com.opas.dto.DocumentSearchResult>> search(Authentication authentication,
+            @RequestParam("q") String query,
+            @RequestParam(name = "limit", defaultValue = "20") int limit) {
+        UUID userId = resolveUserId(authentication);
+        if (query == null || query.isBlank()) {
+            return ResponseEntity.ok(List.of());
+        }
+        int bounded = Math.max(1, Math.min(limit, 50));
+        return ResponseEntity.ok(embeddingService.searchSimilarWithScore(userId, query, bounded));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<DocumentResponse> getDocument(Authentication authentication, @PathVariable UUID id) {
         UUID userId = resolveUserId(authentication);
@@ -74,6 +91,13 @@ public class DocumentController {
         UUID userId = resolveUserId(authentication);
         documentService.archiveDocument(userId, id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/folder")
+    public ResponseEntity<DocumentResponse> assignFolder(Authentication authentication, @PathVariable UUID id,
+            @RequestBody AssignFolderRequest request) {
+        UUID userId = resolveUserId(authentication);
+        return ResponseEntity.ok(documentService.assignFolder(userId, id, request.folderId()));
     }
 
 }
