@@ -66,10 +66,12 @@ export function Button({
           rounded-pill flex-row items-center justify-center gap-2
           min-h-touch ${s.padding} ${v.bg} ${v.border} border
           ${block ? 'w-full' : ''}
-          ${disabled || loading ? 'opacity-40' : ''}
           ${className}
         `}
-        style={style}
+        style={(state) => [
+          typeof style === 'function' ? style(state) : style,
+          (disabled || loading) ? { opacity: 0.4 } : undefined,
+        ]}
         {...props}
       >
         {loading ? (

@@ -27,7 +27,7 @@ export async function addToCalendar(event: {
     if (Platform.OS === 'ios') {
       calendarId = await Calendar.createCalendarAsync({
         title: CALENDAR_TITLE,
-        color: '#92d9bb',
+        color: '#35503f',
         entityType: Calendar.EntityTypes.EVENT,
         source: { isLocalAccount: true, name: CALENDAR_TITLE, type: 'local' },
         name: CALENDAR_TITLE,
@@ -37,7 +37,7 @@ export async function addToCalendar(event: {
     } else {
       calendarId = await Calendar.createCalendarAsync({
         title: CALENDAR_TITLE,
-        color: '#92d9bb',
+        color: '#35503f',
         entityType: Calendar.EntityTypes.EVENT,
         name: CALENDAR_TITLE,
         ownerAccount: CALENDAR_TITLE,

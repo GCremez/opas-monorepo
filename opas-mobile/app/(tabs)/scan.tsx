@@ -336,7 +336,7 @@ export default function ScanScreen() {
             onPress={() => setFlashOn(!flashOn)}
             className="w-[52px] h-[52px] rounded-full bg-[rgba(28,28,30,.6)] border border-[rgba(255,255,255,.1)] items-center justify-center"
           >
-            <FlashIcon size={20} color={flashOn ? '#92d9bb' : 'rgba(255,255,255,.7)'} />
+            <FlashIcon size={20} color={flashOn ? '#8fbb9f' : 'rgba(255,255,255,.7)'} />
           </Pressable>
           <Pressable
             onPress={handleCapture}

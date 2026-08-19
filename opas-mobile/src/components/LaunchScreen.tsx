@@ -189,7 +189,7 @@ export function LaunchScreen() {
             style={[{ width: LOGO_SIZE + 20, height: LOGO_SIZE + 20 }, flashStyle]}
             pointerEvents="none"
           >
-            <View className="flex-1 rounded-full bg-accent/40" />
+            <View style={{ flex: 1, borderRadius: 9999, backgroundColor: `${c.accent}66` }} />
           </Animated.View>
 
           <Animated.View style={[{ width: LOGO_SIZE, height: LOGO_SIZE }, logoAnimated]}>
