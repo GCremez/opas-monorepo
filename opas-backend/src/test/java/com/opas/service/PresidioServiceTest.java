@@ -32,7 +32,7 @@ class PresidioServiceTest {
     void setUp() {
         when(restClientBuilder.baseUrl(anyString())).thenReturn(restClientBuilder);
         when(restClientBuilder.build()).thenReturn(restClient);
-        service = new PresidioService(restClientBuilder, "http://localhost:5001");
+        service = new PresidioService(restClientBuilder, "http://localhost:5001", "en");
     }
 
     private void mockPostChain() {
