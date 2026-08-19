@@ -39,6 +39,17 @@ public class S3Config {
     }
 
     @Bean(destroyMethod = "close")
+    public software.amazon.awssdk.services.textract.TextractClient textractClient(
+            AwsCredentialsProvider credentialsProvider) {
+        var builder = software.amazon.awssdk.services.textract.TextractClient.builder().region(Region.of(region));
+        if (!endpoint.isBlank()) {
+            builder.endpointOverride(URI.create(endpoint));
+        }
+        builder.credentialsProvider(credentialsProvider);
+        return builder.build();
+    }
+
+    @Bean(destroyMethod = "close")
     public S3Presigner s3Presigner(AwsCredentialsProvider credentialsProvider) {
         var builder = S3Presigner.builder().region(Region.of(region));
 

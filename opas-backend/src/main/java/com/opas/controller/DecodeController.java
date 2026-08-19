@@ -4,6 +4,7 @@ import com.opas.config.RabbitMQConfig;
 import com.opas.config.RateLimit;
 import com.opas.dto.DecodeMessage;
 import com.opas.dto.DecodeRequest;
+import com.opas.dto.DecodeResponse;
 import com.opas.service.DecodeService;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,5 +49,19 @@ public class DecodeController {
                 "documentId", documentId,
                 "status", "queued",
                 "message", "Decode accepted and queued for processing"));
+    }
+
+    @GetMapping
+    public ResponseEntity<DecodeResponse> getResult(Authentication authentication, @PathVariable UUID documentId) {
+        String name = authentication.getName();
+        if (name == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        DecodeResponse result = decodeService.getResult(UUID.fromString(name), documentId);
+        // 404 while the background worker is still running; the client polls until 200.
+        if (result == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result);
     }
 }
