@@ -42,8 +42,21 @@ public class SubscriptionService {
         this.stripeEnabled = stripeEnabled;
         this.stripeSecretKey = stripeSecretKey;
         this.returnBaseUrl = returnBaseUrl;
+        // LinkedHashSet: keep the configured order so the client can present plans
+        // (e.g. monthly then yearly) in a stable, intentional sequence.
         this.allowedPriceIds = Arrays.stream(premiumPriceIds.split(","))
-                .map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toUnmodifiableSet());
+                .map(String::trim).filter(s -> !s.isEmpty())
+                .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
+    }
+
+    /**
+     * The Stripe price IDs the client may check out with, in configured order. The app
+     * fetches these instead of hard-coding IDs into the bundle, so plans are correct
+     * per environment. Configure via STRIPE_PREMIUM_PRICE_IDS with real Stripe IDs.
+     */
+    @Transactional(readOnly = true)
+    public java.util.List<String> getPlans() {
+        return java.util.List.copyOf(allowedPriceIds);
     }
 
     @PostConstruct
