@@ -12,14 +12,17 @@ import org.springframework.web.client.RestClient;
 public class PresidioService {
 
     private final RestClient restClient;
+    private final String language;
 
-    public PresidioService(RestClient.Builder restClientBuilder, @Value("${opas.presidio.url}") String presidioUrl) {
+    public PresidioService(RestClient.Builder restClientBuilder, @Value("${opas.presidio.url}") String presidioUrl,
+            @Value("${opas.presidio.language:en}") String language) {
         this.restClient = restClientBuilder.baseUrl(presidioUrl).build();
+        this.language = language;
     }
 
     public List<AnalysisResult> analyze(String text) {
         try {
-            List<AnalysisResult> results = restClient.post().uri("/analyze").body(new AnalyzeRequest(text, "en"))
+            List<AnalysisResult> results = restClient.post().uri("/analyze").body(new AnalyzeRequest(text, language))
                     .retrieve().body(new ParameterizedTypeReference<>() {
                     });
             return results != null ? results : Collections.emptyList();
