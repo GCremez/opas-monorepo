@@ -43,6 +43,13 @@ apiClient.interceptors.response.use(
           refreshToken,
         });
         await SecureStore.setItemAsync('access_token', data.accessToken);
+        // The backend ROTATES refresh tokens: each refresh consumes the old one and
+        // issues a new one. Persist the new refresh token, otherwise the next refresh
+        // replays the now-consumed token, trips the server's theft detection, and the
+        // whole session is invalidated (a silent logout after the 2nd refresh).
+        if (data.refreshToken) {
+          await SecureStore.setItemAsync('refresh_token', data.refreshToken);
+        }
         original.headers.Authorization = `Bearer ${data.accessToken}`;
         return apiClient(original);
       } catch (err) {
