@@ -362,6 +362,10 @@ export default function DocumentDetailScreen() {
                     <Text className="font-body text-body text-fg">{typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}</Text>
                   </View>
                 ))}
+              {/* Prominent draft-reply CTA on the Actions tab, per the design (4a). */}
+              <Button variant="primary" block size="lg" className="mt-7" onPress={handleDraftLetter}>
+                {t('document.draft_letter')}
+              </Button>
             </View>
           )}
         </ScrollView>

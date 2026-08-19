@@ -79,8 +79,8 @@ export default function SubscriptionScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
+    <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Close */}
         <View className="flex-row justify-end px-6 pt-2">
           <Pressable onPress={() => router.back()} hitSlop={8} accessibilityLabel={t('common.close')}>
@@ -121,15 +121,15 @@ export default function SubscriptionScreen() {
             </View>
           ))}
         </View>
-
-        {/* CTA */}
-        <View className="px-6 pt-8">
-          <Button variant="primary" size="lg" block loading={loading} onPress={handleSubscribe}>
-            {t('subscription.free_trial')}
-          </Button>
-          <Text className="font-serif-italic text-[14px] text-muted text-center mt-3">{t('subscription.trial_note')}</Text>
-        </View>
       </ScrollView>
+
+      {/* CTA — pinned to the bottom, per the design (margin-top:auto). */}
+      <View className="px-6 pt-4 pb-2">
+        <Button variant="primary" size="lg" block loading={loading} onPress={handleSubscribe}>
+          {t('subscription.free_trial')}
+        </Button>
+        <Text className="font-serif-italic text-[14px] text-muted text-center mt-3">{t('subscription.trial_note')}</Text>
+      </View>
     </SafeAreaView>
   );
 }
