@@ -30,6 +30,8 @@ class DocumentServiceTest {
     private UserRepository userRepository;
     @Mock
     private StorageService storageService;
+    @Mock
+    private com.opas.repository.FolderRepository folderRepository;
 
     private DocumentService service;
     private UUID userId;
@@ -39,7 +41,7 @@ class DocumentServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new DocumentService(documentRepository, userRepository, storageService, 15);
+        service = new DocumentService(documentRepository, userRepository, folderRepository, storageService, 15);
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);
