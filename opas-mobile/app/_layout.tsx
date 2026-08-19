@@ -1,10 +1,11 @@
 import '../global.css';
-import * as React from 'react';
+import '../src/i18n';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { vars } from 'nativewind';
 import { useFonts } from 'expo-font';
 import {
   Newsreader_400Regular,
@@ -21,22 +22,26 @@ import {
   JetBrainsMono_400Regular,
   JetBrainsMono_500Medium,
 } from '@expo-google-fonts/jetbrains-mono';
-import { ToastProvider } from '../src/components/ui/ToastProvider';
 import { LaunchScreen } from '../src/components/LaunchScreen';
+import { ToastProvider } from '../src/components/ui/ToastProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { useThemeStore } from '../src/store/themeStore';
+import { themeVars } from '../src/lib/tokens';
 import { registerForPushNotifications } from '../src/utils/notifications';
-import '../src/i18n';
-
-const MIN_SPLASH_MS = 2000;
 
 export default function RootLayout() {
-  const { isLoading, hydrate, isAuthenticated, isDemo } = useAuthStore();
+  const hydrateAuth = useAuthStore((s) => s.hydrate);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isDemo = useAuthStore((s) => s.isDemo);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
+  const active = useThemeStore((s) => s.active);
   const isDark = useThemeStore((s) => s.isDark);
-  const [ready, setReady] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
-  const [fontsLoaded] = useFonts({
+  // Load the exact weights the design tokens reference (src/lib/tokens.ts). Until
+  // these resolve, NativeWind's font-display/body/mono classes fall back to the
+  // system font — so gate the app behind them.
+  const [fontsReady] = useFonts({
     Newsreader_400Regular,
     Newsreader_400Regular_Italic,
     Newsreader_500Medium,
@@ -48,21 +53,13 @@ export default function RootLayout() {
     JetBrainsMono_500Medium,
   });
 
+  // Restore the saved appearance and the logged-in session so both survive a restart.
   useEffect(() => {
-    const start = Date.now();
-    Promise.all([hydrateTheme(), hydrate()]).then(() => {
-      const elapsed = Date.now() - start;
-      const remaining = MIN_SPLASH_MS - elapsed;
-      if (remaining > 0) {
-        setTimeout(() => setReady(true), remaining);
-      } else {
-        setReady(true);
-      }
-    });
+    Promise.all([hydrateTheme(), hydrateAuth()]).finally(() => setHydrated(true));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Register this device for push once, after a real (non-demo) sign-in.
   const registered = useRef(false);
-
   useEffect(() => {
     if (isAuthenticated && !isDemo && !registered.current) {
       registered.current = true;
@@ -70,12 +67,16 @@ export default function RootLayout() {
     }
   }, [isAuthenticated, isDemo]);
 
-  if (isLoading || !ready || !fontsLoaded) {
+  // Theme tokens are applied as CSS variables on the root wrapper (via vars) so every
+  // token utility resolves from them and switching Paper <-> Ink reverts both ways.
+  const themeStyle = vars(themeVars(active));
+
+  if (!fontsReady || !hydrated) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View className={isDark ? 'dark flex-1' : 'flex-1'}>
+        <View style={themeStyle} className="flex-1 bg-bg">
           <StatusBar style={isDark ? 'light' : 'dark'} />
-          {fontsLoaded ? <LaunchScreen /> : <View className="flex-1 bg-bg" />}
+          {fontsReady ? <LaunchScreen /> : null}
         </View>
       </GestureHandlerRootView>
     );
@@ -83,7 +84,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View className={isDark ? 'dark flex-1' : 'flex-1'}>
+      <View style={themeStyle} className="flex-1 bg-bg">
         <StatusBar style={isDark ? 'light' : 'dark'} />
         <ToastProvider>
           <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>

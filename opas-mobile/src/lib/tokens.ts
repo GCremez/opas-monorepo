@@ -46,6 +46,22 @@ export type ThemeColors = (typeof themes)[ThemeName];
 // Light is the default theme.
 export const colors = themes.paper;
 
+/**
+ * CSS-variable map for a theme, e.g. { '--bg': '#f2ede2', ... }. Applied via
+ * NativeWind's `vars()` on the root wrapper so the token utilities (bg-bg, text-fg,
+ * border-hairline …) resolve from these. This drives theming inline and switches
+ * reliably in BOTH directions — unlike the `.dark:root` selector approach, which did
+ * not revert Ink → Paper on native.
+ */
+export function themeVars(name: ThemeName): Record<string, string> {
+  const theme = themes[name];
+  const out: Record<string, string> = {};
+  for (const key of Object.keys(theme) as (keyof ThemeColors)[]) {
+    out[`--${key}`] = theme[key];
+  }
+  return out;
+}
+
 export const space = {
   1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32, 10: 40, 12: 48, 16: 64, 20: 80,
 } as const;
