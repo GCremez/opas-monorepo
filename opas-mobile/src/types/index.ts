@@ -18,7 +18,7 @@ export interface AuthResponse {
 
 export type SubscriptionTier = 'free' | 'premium';
 
-export type DocumentStatus = 'pending' | 'uploaded' | 'ready';
+export type DocumentStatus = 'pending' | 'uploaded' | 'processing' | 'ready' | 'failed' | 'archived';
 
 export interface Document {
   id: string;
@@ -26,6 +26,7 @@ export interface Document {
   contentType: string | null;
   fileSize: number | null;
   status: DocumentStatus;
+  folderId: string | null;
   createdAt: string;
   updatedAt: string;
   uploadUrl: string | null;
