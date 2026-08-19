@@ -42,12 +42,22 @@ public class WebhookController {
         @SuppressWarnings("null")
         Event event = stripeWebhookService.verifySignature(payload, sigHeader);
 
-        if (idempotencyService.isProcessed(event.getId())) {
+        // Claim the event atomically BEFORE handling it. Stripe delivers at-least-once
+        // and retries overlap, so a check-then-handle-then-mark sequence lets two
+        // concurrent copies of one event both pass the check and both apply the side
+        // effect. setIfAbsent returns true only for the copy that wins the claim.
+        if (!idempotencyService.markProcessed(event.getId(), Duration.ofHours(24))) {
             return ResponseEntity.ok().build();
         }
 
-        stripeWebhookService.handleEvent(event);
-        idempotencyService.markProcessed(event.getId(), Duration.ofHours(24));
+        try {
+            stripeWebhookService.handleEvent(event);
+        } catch (RuntimeException e) {
+            // Handling failed after we claimed the key. Release it so Stripe's retry
+            // can re-deliver and be processed, instead of being swallowed as "done".
+            idempotencyService.release(event.getId());
+            throw e;
+        }
         return ResponseEntity.ok().build();
     }
 }
