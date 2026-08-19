@@ -23,7 +23,7 @@
   --node:      #cdbfa6;
 }
 
-.dark {
+.dark:root {
   --bg:        #16150e;
   --surface:   #201e16;
   --surface-2: #2a2820;

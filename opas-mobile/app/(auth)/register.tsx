@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useTranslation } from 'react-i18next';
@@ -69,63 +70,65 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView className="flex-1 bg-bg" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <View className="flex-row items-center gap-2 px-6 pt-2">
-        <Pressable onPress={() => router.back()} hitSlop={8} accessibilityLabel={t('common.back')}>
-          <ChevronLeftIcon size={22} color={c['fg-soft']} />
-        </Pressable>
-        <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">{t('auth.create_account')}</Text>
-      </View>
-
-      <ScrollView contentContainerClassName="flex-grow px-6 pt-8" keyboardShouldPersistTaps="handled">
-        <Text className="font-display text-[32px] leading-[35px] tracking-[-0.01em] text-fg mb-9">{t('auth.start_record')}</Text>
-
-        {error ? (
-          <View className="bg-surface rounded-md px-4 py-3 mb-6" accessibilityRole="alert">
-            <Text className="font-body text-body-sm text-danger">{error}</Text>
-          </View>
-        ) : null}
-
-        <Field label={t('auth.full_name')} value={name} onChangeText={setName} placeholder={t('auth.name_placeholder')} autoCapitalize="words" />
-        <Field
-          label={t('auth.email')}
-          value={email}
-          onChangeText={setEmail}
-          placeholder={t('auth.email_placeholder')}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-        />
-
-        <View className="flex-row items-center justify-between mb-2">
-          <Text className="font-semibold text-[9.5px] tracking-[0.14em] uppercase text-muted">{t('auth.password')}</Text>
-          <Pressable onPress={() => setShowPw((s) => !s)} hitSlop={6}>
-            <Text className="font-semibold text-[9.5px] tracking-[0.08em] uppercase text-muted">{showPw ? t('common.hide') : t('common.show')}</Text>
+    <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
+      <KeyboardAvoidingView className="flex-1 bg-bg" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <View className="flex-row items-center gap-2 px-6 pt-2">
+          <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/welcome'))} hitSlop={8} accessibilityLabel={t('common.back')}>
+            <ChevronLeftIcon size={22} color={c['fg-soft']} />
           </Pressable>
+          <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">{t('auth.create_account')}</Text>
         </View>
-        <View className="border-b border-rule pb-2 mb-8">
-          <TextInput
-            className="font-body text-[17px] text-fg"
-            placeholder="••••••••"
-            placeholderTextColor={c.muted}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPw}
-            autoComplete="new-password"
+
+        <ScrollView contentContainerClassName="flex-grow px-6 pt-8" keyboardShouldPersistTaps="handled">
+          <Text className="font-display text-[32px] leading-[35px] tracking-[-0.01em] text-fg mb-9">{t('auth.start_record')}</Text>
+
+          {error ? (
+            <View className="bg-surface rounded-md px-4 py-3 mb-6" accessibilityRole="alert">
+              <Text className="font-body text-body-sm text-danger">{error}</Text>
+            </View>
+          ) : null}
+
+          <Field label={t('auth.full_name')} value={name} onChangeText={setName} placeholder={t('auth.name_placeholder')} autoCapitalize="words" />
+          <Field
+            label={t('auth.email')}
+            value={email}
+            onChangeText={setEmail}
+            placeholder={t('auth.email_placeholder')}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
           />
-        </View>
 
-        <Button variant="primary" block size="lg" loading={loading} onPress={handleRegister}>
-          {t('auth.create_account')}
-        </Button>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="font-semibold text-[9.5px] tracking-[0.14em] uppercase text-muted">{t('auth.password')}</Text>
+            <Pressable onPress={() => setShowPw((s) => !s)} hitSlop={6}>
+              <Text className="font-semibold text-[9.5px] tracking-[0.08em] uppercase text-muted">{showPw ? t('common.hide') : t('common.show')}</Text>
+            </Pressable>
+          </View>
+          <View className="border-b border-rule pb-2 mb-8">
+            <TextInput
+              className="font-body text-[17px] text-fg"
+              placeholder="••••••••"
+              placeholderTextColor={c.muted}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPw}
+              autoComplete="new-password"
+            />
+          </View>
 
-        <View className="flex-row justify-center mt-5">
-          <Text className="font-serif-italic text-[14px] text-muted">{t('auth.has_account')} </Text>
-          <Link href="/(auth)/login" asChild>
-            <Pressable><Text className="font-serif-italic text-[14px] text-accent">{t('auth.sign_in')}</Text></Pressable>
-          </Link>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          <Button variant="primary" block size="lg" loading={loading} onPress={handleRegister}>
+            {t('auth.create_account')}
+          </Button>
+
+          <View className="flex-row justify-center mt-5">
+            <Text className="font-serif-italic text-[14px] text-muted">{t('auth.has_account')} </Text>
+            <Link href="/(auth)/login" asChild>
+              <Pressable><Text className="font-serif-italic text-[14px] text-accent">{t('auth.sign_in')}</Text></Pressable>
+            </Link>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

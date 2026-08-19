@@ -28,7 +28,7 @@ export function BottomSheet({ visible, title, actions, onClose }: BottomSheetPro
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View className="flex-1 justify-end bg-black/50">
+        <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <TouchableWithoutFeedback>
             <View
               className="bg-bg rounded-t-xl pt-4 px-6"

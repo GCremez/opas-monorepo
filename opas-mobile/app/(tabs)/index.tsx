@@ -83,17 +83,6 @@ function DocRow({
   );
 }
 
-const demoActions = [
-  { title: 'Extend residence permit', meta: 'MIGRI · APPLY ONLINE', date: '30 JUN', note: '9 days left', urgency: 'danger' as const, id: 'sample-3' },
-  { title: 'Report income change', meta: 'KELA · HOUSING BENEFIT', date: '14 JUL', note: 'In 2 weeks', urgency: 'warning' as const, id: 'sample-1' },
-];
-
-const demoDocs = [
-  { name: 'KELA Housing Benefit', value: '€387.20/mo', age: '2H', tone: 'text-accent', id: 'sample-1' },
-  { name: 'Tax Card 2025', value: '21.5%', age: '1D', tone: 'text-fg', id: 'sample-2' },
-  { name: 'Residence Permit', value: 'TO 30 JUN', age: '3D', tone: 'text-danger', id: 'sample-3' },
-];
-
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const h = Math.floor(diff / 3_600_000);
@@ -108,7 +97,7 @@ export default function RecordScreen() {
   const c = useThemeColors();
   const { documents, loading, error, fetchDocuments, clearError } = useDocumentStore();
   const { usage, fetchUsage } = useSubscriptionStore();
-  const { user, isDemo } = useAuthStore();
+  const { user } = useAuthStore();
   const { isFree } = usePremium();
   const firstName = user?.name ? user.name.split(' ')[0] : '';
 
@@ -121,8 +110,8 @@ export default function RecordScreen() {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  const showRich = isDemo || documents.length > 0;
-  const docCount = isDemo ? 12 : documents.length;
+  const hasDocuments = documents.length > 0;
+  const docCount = documents.length;
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
@@ -149,7 +138,7 @@ export default function RecordScreen() {
           <Text className="font-display text-[31px] leading-[34px] tracking-[-0.01em] text-fg mt-2">
             {t(`home.${getGreeting()}`)},{firstName ? `\n${firstName}.` : '.'}
           </Text>
-          {showRich && (
+          {hasDocuments && (
             <Text className="font-serif text-[15px] leading-[23px] text-fg-soft mt-3">
               {t('record.all_clear')}
               <Text className="text-danger">{t('record.one_thing')}</Text>
@@ -167,7 +156,7 @@ export default function RecordScreen() {
           />
         )}
 
-        {!error && !loading && !showRich && (
+        {!error && !loading && !hasDocuments && (
           <View className="px-6 pt-6">
             <Text className="font-display text-[27px] leading-[30px] tracking-[-0.01em] text-fg">{t('record.empty_title')}</Text>
             <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mt-3 mb-7">{t('record.empty_desc')}</Text>
@@ -180,70 +169,54 @@ export default function RecordScreen() {
           </View>
         )}
 
-        {/* Needs you */}
-        {isDemo && (
-          <View className="px-6 mb-1">
-            <SectionHeader title={t('record.needs_you')} onSeeAll={() => router.push('/(tabs)/alerts')} seeAllLabel={t('record.see_all')} />
-            {demoActions.map((a) => (
-              <ActionRow key={a.title} {...a} onPress={() => router.push(`/document/${a.id}`)} />
-            ))}
-          </View>
-        )}
-
         {/* Your documents */}
-        {showRich && (
+        {hasDocuments && (
           <View className="px-6 mt-6">
             <SectionHeader
               title={t('record.your_documents')}
               onSeeAll={() => router.push('/(tabs)/docs')}
               seeAllLabel={t('record.see_all')}
             />
-            {isDemo
-              ? demoDocs.map((d) => (
-                  <DocRow key={d.name} name={d.name} value={d.value} age={d.age} valueTone={d.tone} onPress={() => router.push(`/document/${d.id}`)} />
-                ))
-              : documents.slice(0, 6).map((d) => (
-                  <DocRow
-                    key={d.id}
-                    name={d.filename}
-                    value={d.status === 'ready' ? 'READ' : d.status.toUpperCase()}
-                    age={timeAgo(d.updatedAt)}
-                    valueTone={d.status === 'ready' ? 'text-accent' : 'text-muted'}
-                    onPress={() => router.push(`/document/${d.id}`)}
-                  />
-                ))}
+            {documents.slice(0, 6).map((d) => (
+              <DocRow
+                key={d.id}
+                name={d.filename}
+                value={d.status === 'ready' ? 'READ' : d.status.toUpperCase()}
+                age={timeAgo(d.updatedAt)}
+                valueTone={d.status === 'ready' ? 'text-accent' : 'text-muted'}
+                onPress={() => router.push(`/document/${d.id}`)}
+              />
+            ))}
             <Text className="font-serif-italic text-[14px] leading-[22px] text-muted pt-4">
               {t(docCount === 1 ? 'record.footer_one' : 'record.footer_other', { count: docCount })}
             </Text>
           </View>
         )}
 
-        {/* Explore Opas — new guided features */}
-        {showRich && (
-          <View className="px-6 mt-8">
-            <SectionHeader title={t('record.explore')} />
-            {[
-              { label: t('record.ask_opas'), meta: t('record.ask_opas_meta'), route: '/ask' as const },
-              { label: t('record.guides'), meta: t('record.guides_meta'), route: '/guide/register-address' as const },
-              { label: t('record.journey'), meta: t('record.journey_meta'), route: '/journey' as const },
-            ].map((item) => (
-              <Pressable
-                key={item.route}
-                onPress={() => router.push(item.route)}
-                className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
-              >
-                <View className="flex-1">
-                  <Text className="font-display text-heading text-fg">{item.label}</Text>
-                  <Text className="font-body text-body-sm text-muted mt-0.5">{item.meta}</Text>
-                </View>
-                <Text className="font-mono text-[13px] text-muted">›</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
+        {/* Explore Opas — always show for all users */}
+        <View className="px-6 mt-8">
+          <SectionHeader title={t('record.explore')} />
+          {[
+            { label: t('record.ask_opas'), meta: t('record.ask_opas_meta'), route: '/ask' as const },
+            { label: t('record.guides'), meta: t('record.guides_meta'), route: '/guide/register-address' as const },
+            { label: t('record.journey'), meta: t('record.journey_meta'), route: '/journey' as const },
+          ].map((item) => (
+            <Pressable
+              key={item.route}
+              onPress={() => router.push(item.route)}
+              className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
+            >
+              <View className="flex-1">
+                <Text className="font-display text-heading text-fg">{item.label}</Text>
+                <Text className="font-body text-body-sm text-muted mt-0.5">{item.meta}</Text>
+              </View>
+              <Text className="font-mono text-[13px] text-muted">›</Text>
+            </Pressable>
+          ))}
+        </View>
 
         {/* Free-tier nudge */}
-        {isFree && !isDemo && documents.length > 0 && (
+        {isFree && hasDocuments && (
           <Pressable
             onPress={() => router.push('/subscription')}
             className="mx-6 mt-8 p-5 rounded-lg bg-surface border border-hairline"
