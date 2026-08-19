@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    @ExceptionHandler(QuotaExceededException.class)
+    public ProblemDetail handleQuotaExceeded(QuotaExceededException e) {
+        // 402 so the client can distinguish "out of plan quota" from a validation
+        // error and route the user to the upgrade screen.
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
+        detail.setType(URI.create("about:blank"));
+        detail.setTitle("Quota Exceeded");
+        return detail;
+    }
+
     @ExceptionHandler(RateLimitExceededException.class)
     public ProblemDetail handleRateLimit(RateLimitExceededException e) {
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, e.getMessage());

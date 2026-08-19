@@ -18,9 +18,11 @@ import com.opas.listener.DecodeMessageListener;
 public class RabbitMQConfig {
 
     public static final String EXCHANGE_DECODE = "opas.decode";
+    public static final String EXCHANGE_DECODE_DLQ = "opas.decode.dlx";
     public static final String QUEUE_DECODE = "opas.decode.queue";
     public static final String QUEUE_DECODE_DLQ = "opas.decode.dlq";
     public static final String ROUTING_KEY_DECODE = "decode.request";
+    public static final String ROUTING_KEY_DECODE_DLQ = "decode.dead";
 
     @Bean
     public DirectExchange decodeExchange() {
@@ -28,8 +30,20 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public DirectExchange decodeDlqExchange() {
+        return new DirectExchange(EXCHANGE_DECODE_DLQ);
+    }
+
+    @Bean
     public Queue decodeQueue() {
-        return new Queue(QUEUE_DECODE, true);
+        // Rejected messages (basicNack requeue=false) are dead-lettered to the DLQ
+        // instead of being discarded, so failed decodes can be inspected and replayed.
+        // NOTE: a pre-existing queue without these arguments must be deleted once so it
+        // is redeclared with the dead-letter config.
+        return org.springframework.amqp.core.QueueBuilder.durable(QUEUE_DECODE)
+                .withArgument("x-dead-letter-exchange", EXCHANGE_DECODE_DLQ)
+                .withArgument("x-dead-letter-routing-key", ROUTING_KEY_DECODE_DLQ)
+                .build();
     }
 
     @Bean
@@ -40,6 +54,11 @@ public class RabbitMQConfig {
     @Bean
     public Binding decodeBinding(DirectExchange decodeExchange, Queue decodeQueue) {
         return BindingBuilder.bind(decodeQueue).to(decodeExchange).with(ROUTING_KEY_DECODE);
+    }
+
+    @Bean
+    public Binding decodeDlqBinding(DirectExchange decodeDlqExchange, Queue decodeDlq) {
+        return BindingBuilder.bind(decodeDlq).to(decodeDlqExchange).with(ROUTING_KEY_DECODE_DLQ);
     }
 
     @Bean

@@ -59,6 +59,19 @@ public class UsageTracker {
         return result != null ? result : -1;
     }
 
+    /**
+     * Return one reserved unit to the user's monthly count, never going below zero.
+     * Called when a decode job fails after its quota was reserved at enqueue time, so
+     * a failed decode does not permanently burn a paid credit.
+     */
+    public void release(String userId, String action) {
+        String key = buildKey(userId, action);
+        Long current = redis.opsForValue().increment(key, -1);
+        if (current != null && current < 0) {
+            redis.opsForValue().set(key, "0", ttlUntilEndOfMonth());
+        }
+    }
+
     public long getCount(String userId, String action) {
         String value = redis.opsForValue().get(buildKey(userId, action));
         return value != null ? Long.parseLong(value) : 0;

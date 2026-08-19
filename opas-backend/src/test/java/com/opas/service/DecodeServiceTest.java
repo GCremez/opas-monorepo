@@ -47,6 +47,10 @@ class DecodeServiceTest {
     @Mock
     private PresidioService presidioService;
     @Mock
+    private TextExtractionService textExtractionService;
+    @Mock
+    private EmbeddingService embeddingService;
+    @Mock
     private UsageTracker usageTracker;
     @Mock
     private ChatModel chatModel;
@@ -60,7 +64,8 @@ class DecodeServiceTest {
     @BeforeEach
     void setUp() {
         service = new DecodeService(documentRepository, userRepository, decodeResultRepository, subscriptionRepository,
-                storageService, presidioService, usageTracker, chatModel, 5, "claude-sonnet-4-20250514");
+                storageService, presidioService, textExtractionService, embeddingService, usageTracker, chatModel,
+                new com.fasterxml.jackson.databind.ObjectMapper(), 5, "claude-sonnet-4-20250514");
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);
@@ -119,7 +124,7 @@ class DecodeServiceTest {
         when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.empty());
         when(usageTracker.tryReserve(eq(userId.toString()), eq("decodes"), eq(5))).thenReturn(-1L);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(com.opas.config.QuotaExceededException.class,
                 () -> service.validateAndReserve(userId, documentId, false));
     }
 
@@ -143,6 +148,7 @@ class DecodeServiceTest {
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
         when(userRepository.getReferenceById(userId)).thenReturn(user);
         when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
+        when(textExtractionService.extract(any(), any())).thenReturn("file content");
         when(presidioService.scrubPii(anyString())).thenReturn("scrubbed content");
 
         ChatResponse chatResponse = mock(ChatResponse.class);
@@ -173,6 +179,7 @@ class DecodeServiceTest {
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
         when(userRepository.getReferenceById(userId)).thenReturn(user);
         when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
+        when(textExtractionService.extract(any(), any())).thenReturn("file content");
 
         mockChatModel();
 

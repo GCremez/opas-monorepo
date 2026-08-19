@@ -32,6 +32,14 @@ public class DecodeMessageListener implements ChannelAwareMessageListener {
             log.info("Decode completed: userId={}, documentId={}", decodeMessage.userId(), decodeMessage.documentId());
         } catch (Exception e) {
             log.error("Decode failed: userId={}, documentId={}", decodeMessage.userId(), decodeMessage.documentId(), e);
+            try {
+                // Mark the document failed and refund the reserved credit. Runs in its
+                // own transaction (processDecode's transaction has rolled back by now).
+                decodeService.markDecodeFailed(decodeMessage.userId(), decodeMessage.documentId());
+            } catch (Exception cleanupError) {
+                log.error("Failed to mark decode as failed: documentId={}", decodeMessage.documentId(), cleanupError);
+            }
+            // requeue=false: route to the dead-letter queue rather than loop forever.
             channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
         }
     }
