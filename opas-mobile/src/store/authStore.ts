@@ -11,6 +11,7 @@ interface AuthState {
   user: Pick<User, 'name' | 'email'> | null;
   setPlan: (plan: 'free' | 'premium') => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
   deleteAccount: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
@@ -48,6 +49,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   changePassword: async (currentPassword, newPassword) => {
     await apiClient.post('/auth/change-password', { currentPassword, newPassword });
+  },
+
+  requestPasswordReset: async (email) => {
+    await apiClient.post('/auth/forgot-password', { email });
   },
 
   deleteAccount: async () => {

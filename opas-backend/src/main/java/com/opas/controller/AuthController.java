@@ -49,6 +49,14 @@ public class AuthController {
         return ResponseEntity.ok(authService.refresh(request));
     }
 
+    @RateLimit(key = "auth-forgot-password", limit = 5, windowSeconds = 3600)
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody com.opas.dto.ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request.email());
+        // 204 regardless of whether the email exists — no account enumeration.
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization,
             @Valid @RequestBody RefreshRequest request) {

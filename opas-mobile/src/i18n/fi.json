@@ -56,7 +56,15 @@
     "fill_all_fields": "Täytä kaikki kentät",
     "enter_email_password": "Syötä sähköpostisi ja salasanasi",
     "invalid_credentials": "Sähköposti tai salasana on virheellinen. Yritä uudelleen.",
-    "registration_failed": "Tilin luonti epäonnistui. Yritä uudelleen."
+    "registration_failed": "Tilin luonti epäonnistui. Yritä uudelleen.",
+    "reset_eyebrow": "Palauta salasana",
+    "reset_title": "Ei hätää.",
+    "reset_body": "Anna sähköpostiosoitteesi, niin lähetämme linkin uuden salasanan asettamiseen.",
+    "reset_send": "Lähetä palautuslinkki",
+    "reset_sent_title": "Tarkista sähköpostisi.",
+    "reset_sent_body": "Jos osoitteelle {{email}} löytyy tili, lähetimme linkin salasanan palauttamiseksi.",
+    "back_to_sign_in": "Takaisin kirjautumiseen",
+    "enter_email": "Anna sähköpostiosoitteesi"
   },
   "tabs": {
     "home": "Koti",

@@ -106,7 +106,7 @@ export default function LoginScreen() {
             />
           </View>
 
-          <Pressable className="self-start mb-8" hitSlop={6}>
+          <Pressable className="self-start mb-8" hitSlop={6} onPress={() => router.push('/(auth)/reset-password')}>
             <Text className="font-semibold text-[9.5px] tracking-[0.1em] uppercase text-accent">{t('auth.forgot')}</Text>
           </Pressable>
 

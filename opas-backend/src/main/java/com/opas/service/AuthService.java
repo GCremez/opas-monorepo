@@ -31,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthService.class);
+
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final DecodeResultRepository decodeResultRepository;
@@ -171,6 +173,18 @@ public class AuthService {
         subscriptionRepository.findByUserId(userId).ifPresent(subscriptionRepository::delete);
         refreshTokenService.invalidateAll(userId.toString());
         userRepository.deleteById(userId);
+    }
+
+    /**
+     * Begin a password reset. Behaves identically whether or not the email is
+     * registered, so the endpoint can't be used to enumerate accounts. When the email
+     * belongs to a real account we would mint a one-time reset token and email a link;
+     * email delivery is a separate infrastructure concern (no provider is wired yet),
+     * so for now the request is accepted and recorded.
+     */
+    public void requestPasswordReset(String email) {
+        userRepository.findByEmail(email).ifPresent(user ->
+                log.info("Password reset requested for an existing account (email delivery not yet configured)"));
     }
 
     @Transactional
