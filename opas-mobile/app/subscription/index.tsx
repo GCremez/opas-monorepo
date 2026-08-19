@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -9,11 +9,9 @@ import { XIcon } from '../../src/components/icons';
 import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
+import { getPlans } from '../../src/api/subscription';
 
 type BillingInterval = 'monthly' | 'yearly';
-
-const MONTHLY_PRICE_ID = 'price_monthly';
-const YEARLY_PRICE_ID = 'price_yearly';
 
 export default function SubscriptionScreen() {
   const { t } = useTranslation();
@@ -23,6 +21,12 @@ export default function SubscriptionScreen() {
   const { checkout, fetchSubscription } = useSubscriptionStore();
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [loading, setLoading] = useState(false);
+  // Real Stripe price IDs come from the backend (configured per environment), not
+  // hardcoded here. Order is [monthly, yearly].
+  const [plans, setPlans] = useState<string[]>([]);
+  useEffect(() => {
+    getPlans().then(setPlans).catch(() => setPlans([]));
+  }, []);
 
   const features = [
     t('subscription.features.f1'),
@@ -36,8 +40,12 @@ export default function SubscriptionScreen() {
     : { amount: '€47.90', period: `/ ${t('subscription.yearly')}` };
 
   const handleSubscribe = async () => {
+    const priceId = interval === 'monthly' ? plans[0] : plans[1];
+    if (!priceId) {
+      Alert.alert(t('common.error'), t('subscription.checkout_error'));
+      return;
+    }
     setLoading(true);
-    const priceId = interval === 'monthly' ? MONTHLY_PRICE_ID : YEARLY_PRICE_ID;
     const url = await checkout(priceId);
     setLoading(false);
     if (!url) {

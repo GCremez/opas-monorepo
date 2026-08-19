@@ -29,6 +29,11 @@ public class SubscriptionController {
         this.decodeService = decodeService;
     }
 
+    @GetMapping("/plans")
+    public ResponseEntity<java.util.List<String>> getPlans() {
+        return ResponseEntity.ok(subscriptionService.getPlans());
+    }
+
     @GetMapping("/usage")
     public ResponseEntity<UsageResponse> getUsage(Authentication authentication) {
         String userId = authentication.getName();
