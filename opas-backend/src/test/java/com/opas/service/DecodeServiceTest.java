@@ -16,6 +16,7 @@ import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.SubscriptionRepository;
 import com.opas.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -145,6 +146,7 @@ class DecodeServiceTest {
 
     @Test
     void processDecodeSucceeds() {
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of());
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
         when(userRepository.getReferenceById(userId)).thenReturn(user);
         when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
@@ -176,6 +178,7 @@ class DecodeServiceTest {
 
     @Test
     void processDecodeSkipsPiiScrubWhenFlagFalse() {
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of());
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
         when(userRepository.getReferenceById(userId)).thenReturn(user);
         when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
@@ -193,6 +196,21 @@ class DecodeServiceTest {
         service.processDecode(decodeMessage);
 
         verify(presidioService, never()).scrubPii(anyString());
+    }
+
+    @Test
+    void processDecodeSkipsIfResultAlreadyExists() {
+        DecodeResult existingResult = new DecodeResult();
+        existingResult.setId(UUID.randomUUID());
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of(existingResult));
+
+        DecodeMessage decodeMessage = new DecodeMessage(userId, documentId, true);
+        service.processDecode(decodeMessage);
+
+        // Should NOT have touched the document or storage — the guard short-circuits.
+        verify(documentRepository, never()).findById(any());
+        verify(storageService, never()).getObjectBytes(any());
+        verify(chatModel, never()).call(any(Prompt.class));
     }
 
     private void mockChatModel() {

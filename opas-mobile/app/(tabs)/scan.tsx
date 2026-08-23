@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import Svg, { Path, Line } from 'react-native-svg';
 import { XIcon, FlashIcon, GalleryIcon } from '../../src/components/icons';
+import { OrbitLoader, SnagError } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { Button } from '../../src/components/ui/Button';
 import { useDocumentStore } from '../../src/store/documentStore';
@@ -59,7 +60,7 @@ function ScanProgress({ filename }: { filename?: string }) {
       })}
 
       <Text className="font-serif-italic text-[14px] leading-[22px] text-muted mt-6">{t('scan.privacy_note')}</Text>
-      <ActivityIndicator size="small" color={c.accent} className="mt-6 self-start" />
+      <View className="mt-6 self-start"><OrbitLoader size={40} /></View>
     </View>
   );
 }
@@ -231,35 +232,14 @@ export default function ScanScreen() {
       <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
         <View className="flex-1 items-center justify-center px-8">
           <FadeIn>
-            <View className="items-center">
-              <View className="w-16 h-16 rounded-full bg-surface items-center justify-center mb-6">
-                <Svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <Path d="M3 7V5a2 2 0 0 1 2-2h2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Path d="M17 3h2a2 2 0 0 1 2 2v2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Path d="M21 17v2a2 2 0 0 1-2 2h-2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Path d="M7 21H5a2 2 0 0 1-2-2v-2" stroke={c.danger} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <Line x1="6" y1="6" x2="18" y2="18" stroke={c.danger} strokeWidth="2" strokeLinecap="round" />
-                </Svg>
-              </View>
-              <Text className="font-display text-title text-fg text-center mb-2">
-                {t('scan.scan_failed_title')}
-              </Text>
-              <Text className="font-serif text-prose text-fg-soft text-center mb-8 max-w-[300px]">
-                {error || t('scan.scan_failed_desc')}
-              </Text>
-              <View className="gap-3 w-full max-w-[280px]">
-                <Button
-                  variant="primary"
-                  block
-                  onPress={() => { clearError(); setState('ready'); }}
-                >
-                  {t('common.retry')}
-                </Button>
-                <Button variant="ghost" block onPress={handleClose}>
-                  {t('common.close')}
-                </Button>
-              </View>
-            </View>
+            <SnagError
+              title={t('scan.scan_failed_title')}
+              body={error || t('scan.scan_failed_desc')}
+              primaryLabel={t('common.retry')}
+              secondaryLabel={t('common.close')}
+              onPrimary={() => { clearError(); setState('ready'); }}
+              onSecondary={handleClose}
+            />
           </FadeIn>
         </View>
       </SafeAreaView>

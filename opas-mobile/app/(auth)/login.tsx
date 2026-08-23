@@ -38,7 +38,14 @@ export default function LoginScreen() {
     try {
       await login(email, password);
       router.replace('/(tabs)');
-    } catch {
+    } catch (e: any) {
+      // Correct credentials but an unverified email → route to verification.
+      // The backend returns 403 with code "email_not_verified" only after a
+      // correct password, so this is safe to distinguish from a bad login.
+      if (e?.response?.status === 403 && e?.response?.data?.code === 'email_not_verified') {
+        router.push({ pathname: '/(auth)/verify', params: { email } });
+        return;
+      }
       // Uniform generic message — never reveal whether it was the email, the
       // password, connectivity, or the server (prevents account enumeration
       // and backend-state disclosure).

@@ -26,6 +26,22 @@ public class S3Config {
     @Value("${opas.s3.secret-key:}")
     private String secretKey;
 
+    // Dedicated SES settings so transactional email can hit real AWS while S3/Textract
+    // stay on LocalStack in local dev. Empty values fall back to the shared S3
+    // configuration (region + default credential chain) — the deployed ECS posture,
+    // where the task role supplies credentials and no endpoint override exists.
+    @Value("${opas.ses.region:}")
+    private String sesRegion;
+
+    @Value("${opas.ses.access-key:}")
+    private String sesAccessKey;
+
+    @Value("${opas.ses.secret-key:}")
+    private String sesSecretKey;
+
+    @Value("${opas.ses.endpoint:}")
+    private String sesEndpoint;
+
     @Bean(destroyMethod = "close")
     public S3Client s3Client(AwsCredentialsProvider credentialsProvider) {
         var builder = S3Client.builder().region(Region.of(region));
@@ -46,6 +62,24 @@ public class S3Config {
             builder.endpointOverride(URI.create(endpoint));
         }
         builder.credentialsProvider(credentialsProvider);
+        return builder.build();
+    }
+
+    @Bean(destroyMethod = "close")
+    public software.amazon.awssdk.services.sesv2.SesV2Client sesV2Client(AwsCredentialsProvider credentialsProvider) {
+        var builder = software.amazon.awssdk.services.sesv2.SesV2Client.builder()
+                .region(Region.of(sesRegion.isBlank() ? region : sesRegion));
+        // Never inherit the S3 endpoint override — SES must reach real AWS even when
+        // S3 is pointed at LocalStack. A dedicated override can still be set via
+        // opas.ses.endpoint for tests.
+        if (!sesEndpoint.isBlank()) {
+            builder.endpointOverride(URI.create(sesEndpoint));
+        }
+        if (!sesAccessKey.isBlank() && !sesSecretKey.isBlank()) {
+            builder.credentialsProvider(() -> AwsBasicCredentials.create(sesAccessKey, sesSecretKey));
+        } else {
+            builder.credentialsProvider(credentialsProvider);
+        }
         return builder.build();
     }
 

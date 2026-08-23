@@ -14,7 +14,9 @@ interface AuthState {
   requestPasswordReset: (email: string) => Promise<void>;
   deleteAccount: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<{ email: string }>;
+  verifyEmail: (email: string, code: string) => Promise<void>;
+  resendVerification: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   hydrate: () => Promise<void>;
   fetchProfile: () => Promise<void>;
@@ -75,7 +77,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   register: async (name, email, password) => {
+    // Registration no longer logs the user in. The backend creates an unverified
+    // account and emails a 6-digit code; the caller must route to the verify screen.
     const { data } = await apiClient.post('/auth/register', { name, email, password });
+    return { email: data.email ?? email };
+  },
+
+  verifyEmail: async (email, code) => {
+    const { data } = await apiClient.post('/auth/verify-email', { email, code });
     await SecureStore.setItemAsync('access_token', data.accessToken);
     await SecureStore.setItemAsync('refresh_token', data.refreshToken);
     set({
@@ -84,6 +93,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       plan: data.plan ?? 'free',
       user: data.user ?? null,
     });
+  },
+
+  resendVerification: async (email) => {
+    await apiClient.post('/auth/resend-verification', { email });
   },
 
   demoLogin: () => {

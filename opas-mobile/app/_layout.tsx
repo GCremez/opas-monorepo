@@ -98,6 +98,7 @@ export default function RootLayout() {
             <Stack.Screen name="journey" />
             <Stack.Screen name="guide/[id]" />
             <Stack.Screen name="application/[id]" />
+            <Stack.Screen name="motion-gallery" />
           </Stack>
         </ToastProvider>
       </View>

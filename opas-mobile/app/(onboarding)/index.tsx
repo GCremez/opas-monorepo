@@ -141,14 +141,14 @@ export default function OnboardingScreen() {
       <View className="px-[30px] pt-6 pb-8">
         {isLast ? (
           <>
-            <View className="flex-row gap-1.5 mb-5">
+            <Pressable onPress={complete} className="bg-accent rounded-pill py-4 items-center justify-center min-h-touch">
+              <Text className="font-semibold text-[13px] tracking-[0.04em] text-on-accent">{t('onboarding.get_started')}</Text>
+            </Pressable>
+            <View className="flex-row justify-center gap-1.5 mt-5">
               {slides.map((_, i) => (
                 <View key={i} className="h-1.5 rounded-pill" style={{ width: i === index ? 20 : 6, backgroundColor: i === index ? c.accent : c.node }} />
               ))}
             </View>
-            <Pressable onPress={complete} className="bg-accent rounded-pill py-4 items-center justify-center min-h-touch">
-              <Text className="font-semibold text-[13px] tracking-[0.04em] text-on-accent">{t('onboarding.get_started')}</Text>
-            </Pressable>
           </>
         ) : (
           <View className="flex-row items-center justify-between">

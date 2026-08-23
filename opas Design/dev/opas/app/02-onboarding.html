@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Opas — Onboarding</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+#onboarding-screen{display:flex;flex-direction:column;padding:0 24px;height:100%}
+.onb-content{flex:1;display:flex;flex-direction:column;justify-content:center}
+.onb-step{display:none;text-align:center;padding:0 16px}
+.onb-step.active{display:block;animation:fadeIn .35s ease-out}
+.onb-step .icon{margin-bottom:32px}
+.onb-step h2{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:12px}
+.onb-step p{font-size:15px;color:var(--muted);line-height:1.7;max-width:320px;margin:0 auto}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.onb-footer{flex-shrink:0;padding:16px 0 40px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.onb-footer .btn{max-width:320px;width:100%}
+</style>
+</head>
+<body>
+<div id="onboarding-screen">
+  <div class="onb-content">
+    <div class="onb-step active">
+      <div class="icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+          <circle cx="36" cy="36" r="30" stroke="#92d9bb" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>
+          <circle cx="36" cy="36" r="30" stroke="#92d9bb" stroke-width="2" stroke-dasharray="18 18" stroke-dashoffset="-8"/>
+          <circle cx="21" cy="24" r="7" fill="#3a3a3c"/>
+          <circle cx="48" cy="20" r="7" fill="#92d9bb"/><circle cx="48" cy="20" r="2.5" fill="#000"/>
+          <circle cx="43" cy="52" r="7" fill="#92d9bb"/><circle cx="43" cy="52" r="2.5" fill="#000"/>
+          <path d="M49 54 L43 62 L38 54" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Welcome to Opas</h2>
+      <p>Your AI-powered guide through Finnish government documents, letters, and administrative forms.</p>
+    </div>
+    <div class="onb-step">
+      <div class="icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+          <rect x="14" y="18" width="44" height="44" rx="6" stroke="#92d9bb" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M14 28h44" stroke="#92d9bb" stroke-width="2"/>
+          <circle cx="32" cy="44" r="8" stroke="#fff" stroke-width="1.5" fill="none"/>
+          <path d="M38 44l8 8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="21" cy="36" r="2" fill="#92d9bb"/>
+        </svg>
+      </div>
+      <h2>Scan & Translate</h2>
+      <p>Snap a photo of any document — KELA letter, tax card, residence permit — and get an instant translation with explanations.</p>
+    </div>
+    <div class="onb-step">
+      <div class="icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+          <circle cx="36" cy="36" r="30" stroke="#92d9bb" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="49" cy="26" r="3" fill="#92d9bb"/>
+          <circle cx="49" cy="36" r="3" fill="#3a3a3c"/>
+          <circle cx="49" cy="46" r="3" fill="#3a3a3c"/>
+          <path d="M25 20l4 4-4 4" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M25 48l4 4-4 4" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 23v-5h5M22 49v5h5" stroke="#92d9bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Stay Organized</h2>
+      <p>Set reminders for deadlines, sort documents into folders, and export translations — all in one place.</p>
+    </div>
+    <div class="dots">
+      <div class="dot onb-dot active"></div>
+      <div class="dot onb-dot"></div>
+      <div class="dot onb-dot"></div>
+    </div>
+  </div>
+  <div class="onb-footer">
+    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+    <button class="btn btn-ghost" onclick="showScreen('03-home')" style="font-size:14px">Skip onboarding</button>
+  </div>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

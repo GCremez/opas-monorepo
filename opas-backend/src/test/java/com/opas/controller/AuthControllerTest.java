@@ -8,6 +8,9 @@ import com.opas.dto.AuthResponse;
 import com.opas.dto.LoginRequest;
 import com.opas.dto.RefreshRequest;
 import com.opas.dto.RegisterRequest;
+import com.opas.dto.RegisterResponse;
+import com.opas.dto.ResendVerificationRequest;
+import com.opas.dto.VerifyEmailRequest;
 import com.opas.service.AuthService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,15 +37,39 @@ class AuthControllerTest {
     }
 
     @Test
-    void registerReturns201() {
+    void registerReturns202RequiringVerification() {
         var request = new RegisterRequest("new@example.com", "password123", "New User");
-        when(authService.register(request)).thenReturn(new AuthResponse("at", "rt", "free", null));
+        when(authService.register(request))
+                .thenReturn(RegisterResponse.verificationRequired("new@example.com"));
 
         var response = controller.register(request);
 
-        assertEquals(201, response.getStatusCode().value());
+        assertEquals(202, response.getStatusCode().value());
         assertNotNull(response.getBody());
+        assertTrue(response.getBody().verificationRequired());
+        assertEquals("new@example.com", response.getBody().email());
+    }
+
+    @Test
+    void verifyEmailReturns200WithTokens() {
+        var request = new VerifyEmailRequest("new@example.com", "123456");
+        when(authService.verifyEmail("new@example.com", "123456"))
+                .thenReturn(new AuthResponse("at", "rt", "free", null));
+
+        var response = controller.verifyEmail(request);
+
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("at", response.getBody().getAccessToken());
+    }
+
+    @Test
+    void resendVerificationReturns204() {
+        var request = new ResendVerificationRequest("new@example.com");
+        doNothing().when(authService).resendVerification("new@example.com");
+
+        var response = controller.resendVerification(request);
+
+        assertEquals(204, response.getStatusCode().value());
     }
 
     @Test

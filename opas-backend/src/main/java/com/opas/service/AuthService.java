@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.EmailNotVerifiedException;
 import com.opas.config.JwtUtil;
 import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Document;
@@ -9,9 +10,11 @@ import com.opas.dto.AuthResponse;
 import com.opas.dto.LoginRequest;
 import com.opas.dto.RefreshRequest;
 import com.opas.dto.RegisterRequest;
+import com.opas.dto.RegisterResponse;
 import com.opas.dto.UserResponse;
 import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
+import com.opas.repository.FolderRepository;
 import com.opas.repository.SubscriptionRepository;
 import com.opas.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -37,11 +40,13 @@ public class AuthService {
     private final SubscriptionRepository subscriptionRepository;
     private final DecodeResultRepository decodeResultRepository;
     private final DocumentRepository documentRepository;
+    private final FolderRepository folderRepository;
     private final StorageService storageService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final EmailVerificationService emailVerificationService;
 
     /**
      * A valid bcrypt hash computed once at startup. On login for a non-existent email
@@ -52,22 +57,26 @@ public class AuthService {
 
     public AuthService(UserRepository userRepository, SubscriptionRepository subscriptionRepository,
             DecodeResultRepository decodeResultRepository, DocumentRepository documentRepository,
+            FolderRepository folderRepository,
             StorageService storageService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-            RefreshTokenService refreshTokenService, TokenBlacklistService tokenBlacklistService) {
+            RefreshTokenService refreshTokenService, TokenBlacklistService tokenBlacklistService,
+            EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.decodeResultRepository = decodeResultRepository;
         this.documentRepository = documentRepository;
+        this.folderRepository = folderRepository;
         this.storageService = storageService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.emailVerificationService = emailVerificationService;
         this.dummyPasswordHash = passwordEncoder.encode("opas-constant-time-login-placeholder");
     }
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             // Generic message: do not confirm that the email is already registered
             // (account enumeration). Registration is also rate-limited (see AuthController).
@@ -78,6 +87,10 @@ public class AuthService {
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setName(request.name());
+        user.setLanguage(normalizeLanguage(request.language()));
+        // Hard verification gate: the account starts unverified and cannot log in until
+        // the emailed code is confirmed. No tokens are issued here.
+        user.setEmailVerified(false);
         user = userRepository.save(user);
 
         Subscription subscription = new Subscription();
@@ -86,7 +99,9 @@ public class AuthService {
         subscription.setStatus("active");
         subscriptionRepository.save(subscription);
 
-        return generateAuthResponse(user);
+        emailVerificationService.generateAndSend(user);
+
+        return RegisterResponse.verificationRequired(user.getEmail());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -99,7 +114,46 @@ public class AuthService {
         if (maybeUser.isEmpty() || !matches) {
             throw new IllegalArgumentException("Invalid email or password");
         }
-        return generateAuthResponse(maybeUser.get());
+        User user = maybeUser.get();
+        if (!user.isEmailVerified()) {
+            // Credentials are correct but the address is unverified. Surface a distinct
+            // 403 so the client routes to the verification screen. This is only reachable
+            // after a correct password, so it does not add an enumeration oracle beyond
+            // what a successful login already reveals.
+            throw new EmailNotVerifiedException("Email not verified");
+        }
+        return generateAuthResponse(user);
+    }
+
+    /**
+     * Confirms an emailed verification code. On success the account is marked verified
+     * and tokens are issued (the user is logged straight in). Uses a generic error on
+     * every failure path so it can't be used to probe which emails are registered.
+     */
+    @Transactional
+    public AuthResponse verifyEmail(String email, String code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired verification code"));
+        if (user.isEmailVerified()) {
+            // Already verified — treat as success and log the user in (idempotent).
+            return generateAuthResponse(user);
+        }
+        if (!emailVerificationService.verify(user, code)) {
+            throw new IllegalArgumentException("Invalid or expired verification code");
+        }
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        return generateAuthResponse(user);
+    }
+
+    /**
+     * Re-sends a verification code. Behaves identically whether or not the email maps to
+     * an existing unverified account, so it can't be used to enumerate accounts.
+     */
+    public void resendVerification(String email) {
+        userRepository.findByEmail(email)
+                .filter(u -> !u.isEmailVerified())
+                .ifPresent(emailVerificationService::generateAndSend);
     }
 
     @Transactional
@@ -170,6 +224,9 @@ public class AuthService {
             storageService.deleteObject(document.getS3Key());
         }
         documentRepository.deleteByUser_Id(userId);
+        // folders.user_id has no ON DELETE cascade, so folders must be removed
+        // explicitly or the final user delete fails the FK check.
+        folderRepository.deleteByUser_Id(userId);
         subscriptionRepository.findByUserId(userId).ifPresent(subscriptionRepository::delete);
         refreshTokenService.invalidateAll(userId.toString());
         userRepository.deleteById(userId);

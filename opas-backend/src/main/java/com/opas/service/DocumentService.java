@@ -3,8 +3,10 @@ package com.opas.service;
 import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Document;
 import com.opas.domain.User;
+import com.opas.dto.ConfirmUploadRequest;
 import com.opas.dto.DocumentResponse;
 import com.opas.dto.UploadUrlRequest;
+import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.FolderRepository;
 import com.opas.repository.UserRepository;
@@ -22,15 +24,18 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final FolderRepository folderRepository;
+    private final DecodeResultRepository decodeResultRepository;
     private final StorageService storageService;
     private final Duration uploadTtl;
 
     public DocumentService(DocumentRepository documentRepository, UserRepository userRepository,
-            FolderRepository folderRepository, StorageService storageService,
+            FolderRepository folderRepository, DecodeResultRepository decodeResultRepository,
+            StorageService storageService,
             @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.folderRepository = folderRepository;
+        this.decodeResultRepository = decodeResultRepository;
         this.storageService = storageService;
         this.uploadTtl = Duration.ofMinutes(uploadTtlMinutes);
     }
@@ -66,19 +71,46 @@ public class DocumentService {
         document.setFilename(request.filename());
         document.setContentType(request.contentType());
         document.setS3Key(s3Key);
+        document.setFileSize(request.fileSize());
         document.setStatus("pending");
         document = documentRepository.save(document);
 
-        String uploadUrl = storageService.generatePresignedUploadUrl(s3Key, request.contentType(), uploadTtl);
+        String uploadUrl = storageService.generatePresignedUploadUrl(s3Key, request.contentType(),
+                request.fileSize(), uploadTtl);
         return toResponse(document, uploadUrl, null);
     }
 
     @Transactional
-    public void confirmUpload(UUID userId, UUID documentId) {
+    public void confirmUpload(UUID userId, UUID documentId, ConfirmUploadRequest request) {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
+        }
+        // HEAD the S3 object to verify what the client actually uploaded matches what
+        // was declared at upload-url time. The presigned URL bakes in contentLength,
+        // so S3 itself already rejected oversized PUTs — but we still verify the
+        // stored content-type, because the client could have uploaded via a different
+        // method or the presigned URL content-type header might not have been enforced
+        // by an S3-compatible backend.
+        var head = storageService.headObject(document.getS3Key());
+        if (head == null) {
+            throw new IllegalArgumentException(
+                    "Upload not found: the S3 object does not exist. Did the client upload?");
+        }
+        // Verify content-type matches what was declared at upload-url time.
+        String actualContentType = head.contentType();
+        if (actualContentType != null && !actualContentType.equals(document.getContentType())) {
+            throw new IllegalArgumentException("Content type mismatch: S3 object is "
+                    + actualContentType + " but document was created with " + document.getContentType());
+        }
+        // Verify file size matches the declared size (the presigned URL should have
+        // enforced this, but S3-compatible backends may not).
+        Long actualSize = head.contentLength();
+        if (actualSize != null && document.getFileSize() != null
+                && actualSize.longValue() != document.getFileSize().longValue()) {
+            throw new IllegalArgumentException("File size mismatch: S3 object is "
+                    + actualSize + " bytes but declared size was " + document.getFileSize());
         }
         document.setStatus("uploaded");
         documentRepository.save(document);
@@ -107,6 +139,10 @@ public class DocumentService {
         if (!document.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
         }
+        // decode_results.document_id has no ON DELETE cascade, so its rows must be
+        // removed before the document itself, otherwise the FK check fails.
+        // (draft_letters cascade on document delete and need no explicit cleanup.)
+        decodeResultRepository.deleteByDocumentId(documentId);
         storageService.deleteObject(document.getS3Key());
         documentRepository.delete(document);
     }

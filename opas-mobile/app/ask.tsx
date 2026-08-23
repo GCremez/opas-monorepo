@@ -51,11 +51,16 @@ export default function AskOpasScreen() {
           <View className="w-6" />
         </View>
 
-        <ScrollView ref={scrollRef} className="flex-1 px-6" contentContainerStyle={{ paddingTop: 12, paddingBottom: 12 }} showsVerticalScrollIndicator={false}>
+        <ScrollView ref={scrollRef} className="flex-1 px-6" contentContainerStyle={{ flexGrow: 1, paddingTop: 12, paddingBottom: 12 }} showsVerticalScrollIndicator={false}>
           {messages.length === 0 && (
-            <Text className="font-serif-italic text-[15px] leading-[23px] text-muted mb-6">
-              Ask anything about your documents — or life in Finland.
-            </Text>
+            <View className="flex-1 items-center justify-center px-2">
+              <Text className="font-display text-[27px] leading-[31px] tracking-[-0.01em] text-fg text-center mb-3">
+                Ask Opas anything
+              </Text>
+              <Text className="font-serif-italic text-[15px] leading-[23px] text-muted text-center max-w-[300px]">
+                Ask anything about your documents — or life in Finland.
+              </Text>
+            </View>
           )}
           {messages.map((m, i) =>
             m.role === 'user' ? (

@@ -64,6 +64,9 @@ public class FolderService {
         if (!folder.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
         }
+        // Unfile any documents in this folder first; documents.folder_id has no
+        // cascade, so deleting a non-empty folder would otherwise fail the FK check.
+        documentRepository.clearFolder(folderId);
         folderRepository.delete(folder);
     }
 

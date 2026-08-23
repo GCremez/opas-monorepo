@@ -25,6 +25,11 @@ Parameters:
     Default: GCremez
     Description: GitHub owner/organization for the container registry
 
+  MailFromAddress:
+    Type: String
+    Default: 'no-reply@opas.fi'
+    Description: Verified SES sender identity (From address) for transactional email
+
 Conditions:
   HasCertificate: !Not [!Equals [!Ref CertificateArn, '']]
   IsProduction: !Equals [!Ref Environment, production]
@@ -113,6 +118,20 @@ Resources:
                 Condition:
                   StringLike:
                     kms:ViaService: !Sub secretsmanager.${AWS::Region}.amazonaws.com
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                Resource:
+                  # Covers both verification styles: a single address identity or the
+                  # whole domain identity. The FromAddress condition pins sends to the
+                  # configured sender even when the domain is verified.
+                  - !Sub arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${MailFromAddress}
+                  - !Sub
+                    - arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${Domain}
+                    - Domain: !Select [1, !Split ['@', !Ref MailFromAddress]]
+                Condition:
+                  StringEquals:
+                    ses:FromAddress: !Ref MailFromAddress
 
   AlbSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -284,6 +303,10 @@ Resources:
                 - !Sub https://staging.${ALB.DNSName}
             - Name: AWS_REGION
               Value: !Ref AWS::Region
+            - Name: MAIL_ENABLED
+              Value: 'true'
+            - Name: MAIL_FROM
+              Value: !Ref MailFromAddress
             - Name: JWT_PRIVATE_KEY
               Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/jwt-private-key}}'
             - Name: JWT_PUBLIC_KEY

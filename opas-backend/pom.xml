@@ -132,6 +132,12 @@
             <artifactId>textract</artifactId>
             <version>2.25.0</version>
         </dependency>
+        <!-- AWS SES v2 SDK — transactional email (verification codes) -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sesv2</artifactId>
+            <version>2.25.0</version>
+        </dependency>
         <!-- Apache PDFBox — text layer extraction for digital PDFs -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>

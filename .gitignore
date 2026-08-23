@@ -38,3 +38,8 @@ AGENTS.md
 
 # macOS
 .DS_Store
+
+# Local dev process artifacts (machine-specific)
+*.pid
+expo.log
+opas-mobile/start-expo.sh

@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Button } from '../../src/components/ui/Button';
-import { Spinner } from '../../src/components/ui/Loading';
+import { AssemblyLoader } from '../../src/components/motion';
 import { ChevronLeftIcon } from '../../src/components/icons';
 import { generateDraftLetter } from '../../src/api/draftLetters';
 import { usePremium } from '../../src/hooks/usePremium';
@@ -85,10 +85,10 @@ export default function DraftLetterScreen() {
         <Text className="font-display text-[26px] leading-[30px] tracking-[-0.01em] text-fg">{t('draftLetter.title')}</Text>
       </View>
 
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
+      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}>
         {!draft && !loading && (
-          <View className="pt-2">
-            <Text className="font-semibold text-label uppercase text-fg pb-2.5 mb-4 border-b border-rule">{t('draftLetter.tone_formal')}</Text>
+          <View className="flex-1 pt-2">
+            <Text className="font-semibold text-label uppercase text-fg pb-2.5 mb-4 border-b border-rule">{t('draftLetter.tone')}</Text>
             <View className="flex-row gap-2 mb-6">
               {(['formal', 'professional'] as const).map((tn) => {
                 const active = tone === tn;
@@ -113,12 +113,18 @@ export default function DraftLetterScreen() {
               <Text className="font-body text-body text-fg">{t('draftLetter.include_details')}</Text>
             </TouchableOpacity>
 
-            <Button block onPress={handleGenerate} className="mt-6">{t('draftLetter.title')}</Button>
+            {/* Spacer pushes the primary action to the bottom, per the app's
+                bottom-anchored CTA pattern (auth, register, subscription). */}
+            <View className="flex-1 min-h-[24px]" />
+            <Button block onPress={handleGenerate}>{t('draftLetter.title')}</Button>
           </View>
         )}
 
         {loading && (
-          <View className="items-center pt-12"><Spinner size="lg" label={t('draftLetter.generating')} /></View>
+          <View className="items-center pt-12 gap-6">
+            <AssemblyLoader size={130} />
+            <Text className="font-body text-body-sm text-muted">{t('draftLetter.generating')}</Text>
+          </View>
         )}
 
         {error && !loading && (

@@ -6,7 +6,10 @@ import com.opas.dto.ChangePasswordRequest;
 import com.opas.dto.LoginRequest;
 import com.opas.dto.RefreshRequest;
 import com.opas.dto.RegisterRequest;
+import com.opas.dto.RegisterResponse;
+import com.opas.dto.ResendVerificationRequest;
 import com.opas.dto.UserResponse;
+import com.opas.dto.VerifyEmailRequest;
 import com.opas.service.AuthService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -33,8 +36,24 @@ public class AuthController {
 
     @RateLimit(key = "auth-register", limit = 5, windowSeconds = 3600)
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        // 202 Accepted: the account exists but is not yet usable — the client must verify
+        // the emailed code before any tokens are issued.
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(authService.register(request));
+    }
+
+    @RateLimit(key = "auth-verify-email", limit = 10, windowSeconds = 300)
+    @PostMapping("/verify-email")
+    public ResponseEntity<AuthResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        return ResponseEntity.ok(authService.verifyEmail(request.email(), request.code()));
+    }
+
+    @RateLimit(key = "auth-resend-verification", limit = 5, windowSeconds = 3600)
+    @PostMapping("/resend-verification")
+    public ResponseEntity<Void> resendVerification(@Valid @RequestBody ResendVerificationRequest request) {
+        authService.resendVerification(request.email());
+        // 204 regardless of whether the email exists — no account enumeration.
+        return ResponseEntity.noContent().build();
     }
 
     @RateLimit(key = "auth-login", limit = 10, windowSeconds = 300)

@@ -64,7 +64,18 @@
     "reset_sent_title": "Kolla din e-post.",
     "reset_sent_body": "Om det finns ett konto för {{email}} har vi skickat en länk för att återställa lösenordet.",
     "back_to_sign_in": "Tillbaka till inloggning",
-    "enter_email": "Ange din e-postadress"
+    "enter_email": "Ange din e-postadress",
+    "verify_eyebrow": "Verifiera e-post",
+    "verify_title": "Kolla din inkorg.",
+    "verify_body": "Vi skickade en 6-siffrig kod till {{email}}. Ange den nedan för att bekräfta att det är du.",
+    "verify_code_label": "Verifieringskod",
+    "verify_cta": "Verifiera",
+    "verify_enter_code": "Ange den 6-siffriga koden",
+    "verify_invalid": "Koden är ogiltig eller har gått ut. Försök igen eller begär en ny.",
+    "verify_no_code": "Fick du den inte?",
+    "verify_resend": "Skicka koden igen",
+    "verify_resend_in": "Skicka igen om {{seconds}} s",
+    "verify_resent": "En ny kod är på väg om e-postadressen är registrerad."
   },
   "tabs": {
     "home": "Hem",
@@ -81,6 +92,7 @@
     "eyebrow": "Opas · Ditt register",
     "needs_you": "Kräver dig",
     "your_documents": "Dina dokument",
+    "needs_you": "Kräver dig",
     "see_all": "Visa alla →",
     "all_clear": "Allt är i ordning.",
     "one_thing": " En sak kräver dig den här veckan.",
@@ -289,6 +301,7 @@
     "auto_archive_desc": "Håll din dokumentlista organiserad",
     "subscription": "Prenumeration",
     "subscription_value": "Pro · Hantera ↗",
+    "subscription_value_free": "Uppgradera ↗",
     "remaining_decodes": "{{remaining}} av {{limit}} dokument kvar",
     "decodes_used": "Analyserade dokument denna månad",
     "help": "Hjälp & FAQ",
@@ -364,6 +377,7 @@
     "copied": "Kopierat!",
     "error": "Det gick inte att skapa utkastet. Försök igen.",
     "generated_on": "Skapad",
+    "tone": "Ton",
     "tone_formal": "Formell",
     "tone_professional": "Professionell",
     "include_details": "Inkludera dokumentinformation"

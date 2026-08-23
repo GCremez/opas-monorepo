@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '../../src/components/ui/Button';
 import { Pill } from '../../src/components/ui/Badge';
 import { Spinner } from '../../src/components/ui/Loading';
+import { DecodeScramble, StreamingText, CountdownRing } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { getDocument } from '../../src/api/documents';
 import { decodeDocument } from '../../src/api/decode';
@@ -69,20 +70,24 @@ export default function DocumentDetailScreen() {
   useEffect(() => {
     if (!id) return;
     if (isDemo) {
-      setDoc({
-        id,
-        filename: 'KELA Housing Benefit Decision',
-        status: 'ready',
-        folderId: null,
-        contentType: 'application/pdf',
-        fileSize: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        uploadUrl: null,
-        downloadUrl: null,
-      });
-      setLoading(false);
-      return;
+      // Brief hold so the Orbit loader (The Orbit) actually plays on open.
+      setLoading(true);
+      const timer = setTimeout(() => {
+        setDoc({
+          id,
+          filename: 'KELA Housing Benefit Decision',
+          status: 'ready',
+          folderId: null,
+          contentType: 'application/pdf',
+          fileSize: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          uploadUrl: null,
+          downloadUrl: null,
+        });
+        setLoading(false);
+      }, 900);
+      return () => clearTimeout(timer);
     }
     setLoading(true);
     getDocument(id).then(setDoc).finally(() => setLoading(false));
@@ -233,7 +238,7 @@ export default function DocumentDetailScreen() {
           )}
 
           {decoding && (
-            <View className="pt-10 items-center"><Spinner size="lg" label={t('scan.decoding')} /></View>
+            <View className="pt-12 items-center"><DecodeScramble label={t('scan.decoding')} /></View>
           )}
 
           {/* SUMMARY — demo */}
@@ -245,7 +250,9 @@ export default function DocumentDetailScreen() {
                 </Text>
                 <Pill variant="accent">Approved</Pill>
               </View>
-              <Text className="font-serif text-prose text-fg-soft mt-4">{mockSummary}</Text>
+              <View className="mt-4">
+                <StreamingText text={mockSummary} className="text-prose text-fg-soft" />
+              </View>
 
               <Text className="font-semibold text-label uppercase text-fg mt-6 pb-2.5 border-b border-rule">{t('document.key_points')}</Text>
               {mockKeyPoints.map((p) => (
@@ -318,6 +325,11 @@ export default function DocumentDetailScreen() {
           {!decoding && activeTab === 'dates' && (
             <View className="px-6 pt-5">
               <Text className="font-display text-title text-fg mb-4">{t('document.extracted_dates')}</Text>
+              {isDemo && (
+                <View className="items-center mb-6">
+                  <CountdownRing days={7} total={30} />
+                </View>
+              )}
               {(isDemo ? mockDates : []).map((item) => (
                 <View key={item.label} className="flex-row items-baseline justify-between py-3.5 border-b border-hairline">
                   <Text className="font-body text-body text-fg-soft">{item.label}</Text>

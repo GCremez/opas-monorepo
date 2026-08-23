@@ -71,7 +71,7 @@ function ValueRow({
       <Text className="font-medium text-body text-fg">{label}</Text>
       <View className="flex-row items-center gap-1.5">
         {value ? <Text className={`font-mono text-[10px] tracking-[0.05em] uppercase ${valueTone}`}>{value}</Text> : null}
-        {!hideChevron && <ChevronRightIcon size={15} color={c.muted} />}
+        {hideChevron ? <View className="w-[15px]" /> : <ChevronRightIcon size={15} color={c.muted} />}
       </View>
     </TouchableOpacity>
   );
@@ -242,7 +242,9 @@ export default function ProfileScreen() {
                 <View className="flex-row items-center gap-1.5">
                   {item.valueKey && (
                     <Text className={`font-body text-body-sm ${item.accent ? 'text-accent' : 'text-muted'}`}>
-                      {t(`profile.${item.valueKey}`)}
+                      {item.key === 'subscription'
+                        ? t(tier === 'premium' ? 'profile.subscription_value' : 'profile.subscription_value_free')
+                        : t(`profile.${item.valueKey}`)}
                     </Text>
                   )}
                   {!item.destructive && <ChevronRightIcon size={16} color={c.muted} />}

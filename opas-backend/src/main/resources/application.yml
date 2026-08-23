@@ -97,6 +97,14 @@ opas:
     secret-key: ${AWS_SECRET_ACCESS_KEY:}
     endpoint: ${AWS_ENDPOINT_URL:}
     upload-ttl-minutes: 15
+  ses:
+    # Dedicated SES client config. Unset in deployments — falls back to the S3 region
+    # and the default credential chain (ECS task role). Set locally to send real
+    # email while S3 stays on LocalStack.
+    region: ${SES_REGION:}
+    access-key: ${SES_ACCESS_KEY:}
+    secret-key: ${SES_SECRET_KEY:}
+    endpoint: ${SES_ENDPOINT_URL:}
   stripe:
     enabled: ${STRIPE_ENABLED:false}
     secret-key: ${STRIPE_SECRET_KEY:}
@@ -106,6 +114,13 @@ opas:
     # Without this allowlist a user could check out with any (e.g. $0) price and
     # still be upgraded to premium by the webhook.
     premium-price-ids: ${STRIPE_PREMIUM_PRICE_IDS:}
+  mail:
+    # MUST be true in every deployed environment, otherwise the hard email-verification
+    # gate can never be satisfied (codes are only logged, not sent). Left false by default
+    # so local dev works without an SES sender identity — read the code from the app log.
+    enabled: ${MAIL_ENABLED:false}
+    # A verified SES sender identity (address or domain) in the configured AWS region.
+    from: ${MAIL_FROM:no-reply@opas.fi}
   free-tier:
     monthly-decode-limit: 5
 

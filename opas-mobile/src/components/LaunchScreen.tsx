@@ -1,100 +1,69 @@
 import { useEffect } from 'react';
 import { View, Text } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
+  useAnimatedProps,
   withTiming,
-  withSpring,
   withDelay,
+  withSpring,
   useReducedMotion,
-  Easing,
   interpolate,
+  type SharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { easeOutQuart } from './ui/animation';
 import { useThemeColors } from '../store/themeStore';
+import { easing, ring as ringToken, spring as springTokens } from '../lib/motion';
 
-const LOGO_SIZE = 88;
-const HALF = LOGO_SIZE / 2;
+// ── The Arrival ────────────────────────────────────────────────────
+// App-launch splash. The dashed track sweeps in, then the three waypoints fly
+// to their seats and settle with an overshoot — the Ring Path assembling
+// itself before the wordmark rises. Source: "Opas Motion — Loaders.dc.html".
 
-const easeOutExpo = Easing.bezier(0.16, 1, 0.3, 1);
+const VB = 140;
+const LOGO_SIZE = 132;
+const SCALE = LOGO_SIZE / VB;
+const TRACK_R = ringToken.trackRadius; // 43
+const TRACK_CIRC = 2 * Math.PI * TRACK_R;
 
-interface Particle {
-  x: number;
-  y: number;
-  r: number;
-  delay: number;
-}
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const PARTICLES: Particle[] = [
-  { x: 100, y: -10, r: 2.5, delay: 0 },
-  { x: 75, y: -80, r: 2, delay: 50 },
-  { x: -30, y: -95, r: 2, delay: 90 },
-  { x: -95, y: -40, r: 1.5, delay: 30 },
-  { x: -90, y: 45, r: 2.5, delay: 70 },
-  { x: -35, y: 95, r: 2, delay: 110 },
-  { x: 45, y: 85, r: 2, delay: 40 },
-  { x: 105, y: 40, r: 1.5, delay: 80 },
-  { x: 60, y: -60, r: 1.5, delay: 60 },
-  { x: -70, y: -60, r: 1.5, delay: 100 },
-  { x: -60, y: 70, r: 1.5, delay: 20 },
-  { x: 70, y: 65, r: 1.5, delay: 120 },
-];
+// Waypoint seats (viewBox coords) + fly-in offsets, straight from the token.
+const SEATS = ringToken.waypoints.map((w) => ({
+  ox: (w.cx - VB / 2) * SCALE, // seated offset from center, px
+  oy: (w.cy - VB / 2) * SCALE,
+  from: w.from,
+  token: w.token as 'accent' | 'warning' | 'danger',
+}));
 
-const SHOCK_RINGS = [
-  { r: 30, w: 2, delay: 120 },
-  { r: 50, w: 1, delay: 60 },
-];
-
-function ParticleView({ p }: { p: Particle }) {
-  const fly = useSharedValue(0);
-  const fade = useSharedValue(0);
-
-  useEffect(() => {
-    fly.value = withDelay(p.delay, withTiming(1, { duration: 500, easing: easeOutExpo }));
-    fade.value = withDelay(p.delay, withTiming(1, { duration: 400, easing: easeOutQuart }));
-  }, []);
-
-  const style = useAnimatedStyle(() => ({
-    opacity: interpolate(fade.value, [0, 0.5, 1], [0.8, 0.4, 0]),
-    transform: [
-      { translateX: interpolate(fly.value, [0, 1], [0, p.x]) },
-      { translateY: interpolate(fly.value, [0, 1], [0, p.y]) },
-    ],
-  }));
-
+function Waypoint({
+  seat,
+  color,
+  seatV,
+}: {
+  seat: (typeof SEATS)[number];
+  color: string;
+  seatV: SharedValue<number>;
+}) {
+  const size = 14 * SCALE;
+  const style = useAnimatedStyle(() => {
+    const p = seatV.value; // 0 = scattered, 1 = seated
+    return {
+      opacity: interpolate(p, [0, 0.4, 1], [0, 1, 1]),
+      transform: [
+        { translateX: seat.ox + interpolate(p, [0, 1], [seat.from.x, 0]) },
+        { translateY: seat.oy + interpolate(p, [0, 1], [seat.from.y, 0]) },
+        { scale: interpolate(p, [0, 1], [0.35, 1]) },
+      ],
+    };
+  });
   return (
     <Animated.View
-      className="absolute rounded-full bg-accent"
-      style={[{ width: p.r * 2, height: p.r * 2, left: HALF - p.r, top: HALF - p.r }, style]}
       pointerEvents="none"
+      className="absolute rounded-full"
+      style={[{ width: size, height: size, left: '50%', top: '50%', marginLeft: -size / 2, marginTop: -size / 2, backgroundColor: color }, style]}
     />
-  );
-}
-
-function ShockwaveRing({ ring, color }: { ring: { r: number; w: number; delay: number }; color: string }) {
-  const anim = useSharedValue(0);
-
-  useEffect(() => {
-    anim.value = withDelay(ring.delay, withTiming(1, { duration: 600, easing: easeOutExpo }));
-  }, []);
-
-  const style = useAnimatedStyle(() => ({
-    opacity: interpolate(anim.value, [0, 0.4, 1], [0.6, 0.3, 0]),
-    transform: [{ scale: interpolate(anim.value, [0, 1], [0.2, 2.0]) }],
-  }));
-
-  return (
-    <Animated.View
-      className="absolute"
-      style={[{ width: LOGO_SIZE, height: LOGO_SIZE }, style]}
-      pointerEvents="none"
-    >
-      <Svg width={LOGO_SIZE} height={LOGO_SIZE} viewBox="0 0 140 140" fill="none">
-        <Circle cx="70" cy="70" r={ring.r} stroke={color} strokeWidth={ring.w} opacity={0.6} />
-      </Svg>
-    </Animated.View>
   );
 }
 
@@ -103,121 +72,76 @@ export function LaunchScreen() {
   const reduced = useReducedMotion();
   const c = useThemeColors();
 
-  const ignition = useSharedValue(0);
-  const flash = useSharedValue(0);
-  const flashFade = useSharedValue(0);
-  const logoScale = useSharedValue(0);
+  const track = useSharedValue(0); // dashed track sweep-in
+  const seats = [useSharedValue(0), useSharedValue(0), useSharedValue(0)];
   const wordmark = useSharedValue(0);
   const tagline = useSharedValue(0);
 
   useEffect(() => {
     if (reduced) {
-      ignition.value = 1;
-      flash.value = 1;
-      flashFade.value = 0;
-      logoScale.value = 1;
+      track.value = 1;
+      seats.forEach((s) => (s.value = 1));
       wordmark.value = 1;
       tagline.value = 1;
       return;
     }
-
-    ignition.value = withDelay(80, withTiming(1, { duration: 120, easing: easeOutQuart }));
-
-    flash.value = withDelay(200, withTiming(1, { duration: 200, easing: easeOutExpo }));
-    flashFade.value = withDelay(200, withTiming(1, { duration: 200, easing: easeOutQuart }));
-
-    logoScale.value = withDelay(
-      380,
-      withSpring(1, { damping: 10, stiffness: 95, mass: 0.25 }),
-    );
-
-    wordmark.value = withDelay(750, withTiming(1, { duration: 400, easing: easeOutQuart }));
-    tagline.value = withDelay(1000, withTiming(1, { duration: 400, easing: easeOutQuart }));
+    // 1 · track sweeps in
+    track.value = withTiming(1, { duration: 620, easing: easing.settle });
+    // 2 · waypoints fly to their seats with overshoot, staggered
+    seats.forEach((s, i) => {
+      s.value = withDelay(300 + i * 200, withSpring(1, springTokens.overshoot));
+    });
+    // 3 · wordmark + tagline rise
+    wordmark.value = withDelay(1050, withTiming(1, { duration: 420, easing: easing.settle }));
+    tagline.value = withDelay(1300, withTiming(1, { duration: 420, easing: easing.settle }));
   }, []);
 
-  const ignitionStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(ignition.value, [0, 1], [0, 0.9]),
-    transform: [{ scale: interpolate(ignition.value, [0, 1], [0, 0.5]) }],
+  const trackStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(track.value, [0, 0.4, 1], [0, 1, 1]),
+    transform: [{ rotate: `${interpolate(track.value, [0, 1], [-40, 0])}deg` }],
   }));
-
-  const flashStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(flashFade.value, [0, 0.3, 1], [1, 0.4, 0]),
-    transform: [{ scale: interpolate(flash.value, [0, 1], [0.3, 3.5]) }],
-  }));
-
-  const logoAnimated = useAnimatedStyle(() => ({
-    opacity: interpolate(logoScale.value, [0, 0.2, 1], [0, 0, 1]),
-    transform: [{ scale: logoScale.value }],
+  const trackDashProps = useAnimatedProps(() => ({
+    strokeDashoffset: TRACK_CIRC * (1 - track.value),
   }));
 
   const wordmarkStyle = useAnimatedStyle(() => ({
-    opacity: reduced ? 1 : wordmark.value,
-    transform: [{ translateY: reduced ? 0 : interpolate(wordmark.value, [0, 1], [28, 0]) }],
+    opacity: wordmark.value,
+    transform: [{ translateY: interpolate(wordmark.value, [0, 1], [16, 0]) }],
   }));
-
   const taglineStyle = useAnimatedStyle(() => ({
-    opacity: reduced ? 1 : tagline.value,
-    transform: [{ translateY: reduced ? 0 : interpolate(tagline.value, [0, 1], [20, 0]) }],
+    opacity: tagline.value,
+    transform: [{ translateY: interpolate(tagline.value, [0, 1], [12, 0]) }],
   }));
 
   return (
     <View className="flex-1 bg-bg items-center justify-center">
       <View className="flex-1 items-center justify-center px-8">
-        <View
-          className="items-center justify-center"
-          style={{ width: LOGO_SIZE + 60, height: LOGO_SIZE + 60 }}
-        >
-          {!reduced && (
-            <>
-              {PARTICLES.map((p, i) => (
-                <ParticleView key={i} p={p} />
-              ))}
-              {SHOCK_RINGS.map((ring, i) => (
-                <ShockwaveRing key={i} ring={ring} color={c.accent} />
-              ))}
-            </>
-          )}
-
-          <Animated.View
-            className="absolute rounded-full bg-accent"
-            style={[{ width: 8, height: 8 }, ignitionStyle]}
-            pointerEvents="none"
-          />
-
-          <Animated.View
-            className="absolute rounded-full"
-            style={[{ width: LOGO_SIZE + 20, height: LOGO_SIZE + 20 }, flashStyle]}
-            pointerEvents="none"
-          >
-            <View style={{ flex: 1, borderRadius: 9999, backgroundColor: `${c.accent}66` }} />
-          </Animated.View>
-
-          <Animated.View style={[{ width: LOGO_SIZE, height: LOGO_SIZE }, logoAnimated]}>
-            <Svg width={LOGO_SIZE} height={LOGO_SIZE} viewBox="0 0 140 140" fill="none">
-              <Circle cx="70" cy="70" r="56" stroke={c.accent} strokeWidth={2} />
-              <Circle
-                cx="70" cy="70" r="43" stroke={c.node} strokeWidth={2.5}
-                strokeDasharray="8.5 9" strokeLinecap="round"
-              />
-              <Circle
-                cx="70" cy="70" r="43" stroke={c.accent} strokeWidth={3}
-                strokeDasharray="70 200" strokeDashoffset="-150" strokeLinecap="round"
-              />
-              <Circle cx="40" cy="52" r="9.5" fill={c.node} />
-              <Circle cx="96" cy="44" r="9.5" fill={c.accent} />
-              <Circle cx="82" cy="98" r="10.5" fill={c.warning} />
-              <Path
-                d="M90 104 L82 115 L74 104" stroke={c.warning}
-                strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round"
+        <View className="items-center justify-center" style={{ width: LOGO_SIZE, height: LOGO_SIZE }}>
+          {/* Dashed track assembling */}
+          <Animated.View style={[{ position: 'absolute', inset: 0 } as object, trackStyle]}>
+            <Svg width={LOGO_SIZE} height={LOGO_SIZE} viewBox={`0 0 ${VB} ${VB}`} fill="none">
+              <Circle cx={70} cy={70} r={56} stroke={c.accent} strokeWidth={2} opacity={0.6} />
+              <AnimatedCircle
+                cx={70}
+                cy={70}
+                r={TRACK_R}
+                stroke={c.node}
+                strokeWidth={2.5}
+                strokeDasharray="3 9"
+                strokeLinecap="round"
+                animatedProps={trackDashProps}
               />
             </Svg>
           </Animated.View>
+
+          {/* Waypoints flying to their seats */}
+          <Waypoint seat={SEATS[0]} color={c.accent} seatV={seats[0]} />
+          <Waypoint seat={SEATS[1]} color={c.warning} seatV={seats[1]} />
+          <Waypoint seat={SEATS[2]} color={c.danger} seatV={seats[2]} />
         </View>
 
-        <Animated.View className="items-center mt-7 mb-3" style={wordmarkStyle}>
-          <Text className="font-display text-[46px] text-fg tracking-[-0.02em] text-center">
-            Opas
-          </Text>
+        <Animated.View className="items-center mt-8 mb-3" style={wordmarkStyle}>
+          <Text className="font-display text-[46px] text-fg tracking-[-0.02em] text-center">Opas</Text>
         </Animated.View>
 
         <Animated.View style={taglineStyle}>
@@ -228,9 +152,7 @@ export function LaunchScreen() {
       </View>
 
       <View className="items-center" style={{ paddingBottom: insets.bottom + 40 }}>
-        <Text className="font-mono text-[11px] text-muted tracking-[0.08em]">
-          v2.0.0
-        </Text>
+        <Text className="font-mono text-[11px] text-muted tracking-[0.08em]">v1.0.0</Text>
       </View>
     </View>
   );
