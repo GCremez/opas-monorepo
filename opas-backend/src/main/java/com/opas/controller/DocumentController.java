@@ -1,6 +1,7 @@
 package com.opas.controller;
 
 import com.opas.dto.AssignFolderRequest;
+import com.opas.dto.ConfirmUploadRequest;
 import com.opas.dto.DocumentResponse;
 import com.opas.dto.UploadUrlRequest;
 import com.opas.service.DocumentService;
@@ -49,9 +50,10 @@ public class DocumentController {
     }
 
     @PatchMapping("/{id}/confirm")
-    public ResponseEntity<Void> confirmUpload(Authentication authentication, @PathVariable UUID id) {
+    public ResponseEntity<Void> confirmUpload(Authentication authentication, @PathVariable UUID id,
+            @Valid @RequestBody(required = false) ConfirmUploadRequest request) {
         UUID userId = resolveUserId(authentication);
-        documentService.confirmUpload(userId, id);
+        documentService.confirmUpload(userId, id, request);
         return ResponseEntity.noContent().build();
     }
 

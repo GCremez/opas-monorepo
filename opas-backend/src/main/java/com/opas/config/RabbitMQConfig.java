@@ -12,6 +12,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.opas.listener.DecodeDlqListener;
 import com.opas.listener.DecodeMessageListener;
 
 @Configuration
@@ -95,6 +96,17 @@ public class RabbitMQConfig {
         container.setPrefetchCount(5);
         container.setConcurrentConsumers(3);
         container.setMaxConcurrentConsumers(10);
+        container.setDefaultRequeueRejected(false);
+        return container;
+    }
+
+    @Bean
+    public SimpleMessageListenerContainer decodeDlqListenerContainer(ConnectionFactory connectionFactory,
+            DecodeDlqListener decodeDlqListener) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
+        container.setQueueNames(QUEUE_DECODE_DLQ);
+        container.setMessageListener(decodeDlqListener);
+        container.setConcurrentConsumers(1);
         container.setDefaultRequeueRejected(false);
         return container;
     }

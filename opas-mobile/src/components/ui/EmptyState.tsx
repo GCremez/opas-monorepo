@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { View, Text } from 'react-native';
 import { Button } from './Button';
+import { EmptyRecord } from '../motion';
 
 interface EmptyStateProps {
   icon?: string;
@@ -10,21 +11,12 @@ interface EmptyStateProps {
   onAction?: () => void;
 }
 
-export function EmptyState({ icon, title, description, actionLabel, onAction }: EmptyStateProps) {
+// The Empty Record — a breathing dashed folder with the logo mark inside,
+// an invitation rather than a void. Source: "Opas Motion — Loaders.dc.html".
+export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <View className="items-center justify-center px-5 py-12 max-w-[360px] mx-auto">
-      {icon && (
-        <Text className="font-display text-[40px] mb-4 text-muted">{icon}</Text>
-      )}
-      <Text className="font-display text-title text-fg text-center mb-2">{title}</Text>
-      <Text className="font-serif text-prose text-fg-soft text-center mb-6">
-        {description}
-      </Text>
-      {actionLabel && onAction && (
-        <Button variant="primary" onPress={onAction}>
-          {actionLabel}
-        </Button>
-      )}
+    <View className="items-center justify-center px-5 py-8 max-w-[360px] mx-auto">
+      <EmptyRecord title={title} body={description} cta={actionLabel} onPress={onAction} />
     </View>
   );
 }

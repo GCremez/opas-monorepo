@@ -22,6 +22,13 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
+
+    // Interface language chosen at signup (en/fi/sv) — drives localized email.
+    @Column(nullable = false)
+    private String language = "en";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -70,6 +77,22 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public Instant getCreatedAt() {

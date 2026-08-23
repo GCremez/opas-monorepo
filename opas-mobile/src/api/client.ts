@@ -33,7 +33,7 @@ apiClient.interceptors.response.use(
     // refresh token — NOT an expired access token. Don't attempt a refresh
     // there, or a simple wrong-password login gets slow and mislabeled.
     const url: string = original?.url ?? '';
-    const isAuthEndpoint = /\/auth\/(login|register|refresh|logout)/.test(url);
+    const isAuthEndpoint = /\/auth\/(login|register|refresh|logout|verify-email|resend-verification)/.test(url);
     if (error.response?.status === 401 && !original._retry && !isAuthEndpoint) {
       original._retry = true;
       try {

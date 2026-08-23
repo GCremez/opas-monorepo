@@ -64,7 +64,18 @@
     "reset_sent_title": "Check your email.",
     "reset_sent_body": "If an account exists for {{email}}, we've sent a link to reset your password.",
     "back_to_sign_in": "Back to sign in",
-    "enter_email": "Please enter your email"
+    "enter_email": "Please enter your email",
+    "verify_eyebrow": "Verify email",
+    "verify_title": "Check your inbox.",
+    "verify_body": "We sent a 6-digit code to {{email}}. Enter it below to confirm it's really you.",
+    "verify_code_label": "Verification code",
+    "verify_cta": "Verify",
+    "verify_enter_code": "Enter the 6-digit code",
+    "verify_invalid": "That code is invalid or expired. Try again or resend a new one.",
+    "verify_no_code": "Didn't get it?",
+    "verify_resend": "Resend code",
+    "verify_resend_in": "Resend in {{seconds}}s",
+    "verify_resent": "A new code is on its way if the email is registered."
   },
   "tabs": {
     "home": "Home",
@@ -81,6 +92,7 @@
     "eyebrow": "Opas · Your record",
     "needs_you": "Needs you",
     "your_documents": "Your documents",
+    "needs_you": "Needs you",
     "see_all": "See all →",
     "all_clear": "Everything's in order.",
     "one_thing": " One thing needs you this week.",
@@ -289,6 +301,7 @@
     "auto_archive_desc": "Keep your document list organized",
     "subscription": "Subscription",
     "subscription_value": "Pro · Manage ↗",
+    "subscription_value_free": "Upgrade ↗",
     "remaining_decodes": "{{remaining}} of {{limit}} documents remaining",
     "decodes_used": "Documents analyzed this month",
     "help": "Help & FAQ",
@@ -364,6 +377,7 @@
     "copied": "Copied!",
     "error": "Failed to generate draft letter. Please try again.",
     "generated_on": "Generated",
+    "tone": "Tone",
     "tone_formal": "Formal",
     "tone_professional": "Professional",
     "include_details": "Include document details"

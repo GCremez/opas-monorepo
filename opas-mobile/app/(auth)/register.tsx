@@ -57,10 +57,12 @@ export default function RegisterScreen() {
     setLoading(true);
     setError('');
     try {
-      await register(name, email, password);
+      const { email: registeredEmail } = await register(name, email, password);
       await SecureStore.setItemAsync('has_registered', 'true');
-      router.replace('/(tabs)');
-    } catch {
+      // Hard verification gate: no session yet — collect the emailed code next.
+      router.replace({ pathname: '/(auth)/verify', params: { email: registeredEmail } });
+    } catch (e: any) {
+      console.error('[register] failed:', e?.message, e?.code, e?.config?.baseURL, e?.config?.url);
       // Uniform generic message — must not reveal whether the email is already
       // registered (account enumeration) or that the server errored.
       setError(t('auth.registration_failed'));

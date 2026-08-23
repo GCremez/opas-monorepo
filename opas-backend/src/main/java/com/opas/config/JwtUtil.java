@@ -57,8 +57,8 @@ public class JwtUtil {
 
     private static PrivateKey loadPrivateKey(String pem) {
         try {
-            String cleaned = pem.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
-                    .replaceAll("\\s", "");
+            String cleaned = pem.replace("\\n", "\n").replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "").replaceAll("\\s", "");
             byte[] encoded = Base64.getDecoder().decode(cleaned);
             return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(encoded));
         } catch (Exception e) {
@@ -68,8 +68,8 @@ public class JwtUtil {
 
     private static PublicKey loadPublicKey(String pem) {
         try {
-            String cleaned = pem.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")
-                    .replaceAll("\\s", "");
+            String cleaned = pem.replace("\\n", "\n").replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "").replaceAll("\\s", "");
             byte[] encoded = Base64.getDecoder().decode(cleaned);
             return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(encoded));
         } catch (Exception e) {

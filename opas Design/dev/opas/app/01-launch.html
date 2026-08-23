@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Opas — Launch</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+#launch-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 32px;height:100%}
+.launch-content{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1}
+.launch-logo{margin-bottom:32px;animation:fadeSlideUp .8s cubic-bezier(0.33,1,0.68,1)}
+.launch-logo svg{display:block;margin:0 auto}
+.launch-title{font-family:var(--font-display);font-size:36px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px;animation:fadeSlideUp .8s .1s both}
+.launch-sub{font-size:16px;color:var(--muted);margin-bottom:48px;animation:fadeSlideUp .8s .2s both;max-width:280px}
+.launch-loader{animation:fadeSlideUp .8s .35s both}
+.launch-loader .bar{width:120px;height:3px;background:var(--surface-2);border-radius:2px;margin:0 auto;overflow:hidden}
+.launch-loader .bar .fill{height:100%;background:var(--accent);border-radius:2px;animation:loadBar 2s cubic-bezier(0.33,1,0.68,1) infinite}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes loadBar{0%{width:0}50%{width:70%}100%{width:100%}}
+.launch-footer{flex-shrink:0;padding-bottom:40px}
+.launch-version{font-size:12px;color:var(--muted);opacity:.5}
+</style>
+</head>
+<body>
+<div id="launch-screen">
+  <div class="launch-content">
+    <div class="launch-logo">
+      <svg width="80" height="80" viewBox="0 0 140 140" fill="none">
+        <circle cx="70" cy="70" r="58" stroke="#38383a" stroke-width="1"/>
+        <circle cx="70" cy="70" r="44" stroke="#3a3a3c" stroke-width="2.5" stroke-dasharray="12 10" stroke-linecap="round"/>
+        <circle cx="70" cy="70" r="44" stroke="#92d9bb" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round"/>
+        <circle cx="36" cy="50" r="12" fill="#3a3a3c"/>
+        <circle cx="94" cy="42" r="12" fill="#92d9bb"/><circle cx="94" cy="42" r="4.5" fill="#000"/>
+        <circle cx="84" cy="98" r="12" fill="#92d9bb"/><circle cx="84" cy="98" r="4.5" fill="#000"/>
+        <path d="M92 102 L84 112 L77 102" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="launch-title">Opas</h1>
+    <p class="launch-sub">Your guide through Finnish bureaucracy</p>
+    <div class="launch-loader"><div class="bar"><div class="fill"></div></div></div>
+  </div>
+  <div class="launch-footer">
+    <div class="launch-version">v1.0.0</div>
+  </div>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

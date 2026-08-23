@@ -83,6 +83,19 @@ function DocRow({
   );
 }
 
+// The nearest deadline the home surfaces under "Needs you" — mirrors the Alerts
+// THIS WEEK ledger so the masthead's "one thing needs you" promise has a payoff.
+const NEEDS_YOU = [
+  {
+    id: 'sample-3',
+    title: 'Extend residence permit',
+    meta: 'MIGRI',
+    date: '30 JUN',
+    note: '9 DAYS',
+    urgency: 'danger' as const,
+  },
+];
+
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const h = Math.floor(diff / 3_600_000);
@@ -118,7 +131,7 @@ export default function RecordScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 32 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
       >
         {/* Masthead */}
@@ -157,9 +170,13 @@ export default function RecordScreen() {
         )}
 
         {!error && !loading && !hasDocuments && (
-          <View className="px-6 pt-6">
-            <Text className="font-display text-[27px] leading-[30px] tracking-[-0.01em] text-fg">{t('record.empty_title')}</Text>
-            <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mt-3 mb-7">{t('record.empty_desc')}</Text>
+          <View className="flex-1 items-center justify-center px-8">
+            {/* Centered empty state, per the design (3d). */}
+            <View className="w-16 h-16 rounded-full border border-rule items-center justify-center mb-7">
+              <Text className="font-display text-[30px] leading-[30px] text-accent">+</Text>
+            </View>
+            <Text className="font-display text-[27px] leading-[31px] tracking-[-0.01em] text-fg text-center">{t('record.empty_title')}</Text>
+            <Text className="font-serif text-[16px] leading-[26px] text-fg-soft text-center mt-3 mb-8">{t('record.empty_desc')}</Text>
             <Button variant="primary" size="lg" block onPress={() => router.push('/(tabs)/scan')}>
               {t('record.scan_first')}
             </Button>
@@ -169,9 +186,32 @@ export default function RecordScreen() {
           </View>
         )}
 
+        {/* Needs you — the nearest deadline, surfaced above the record so the
+            masthead's "one thing needs you" line resolves to a real action. */}
+        {hasDocuments && NEEDS_YOU.length > 0 && (
+          <View className="px-6 mt-2">
+            <SectionHeader
+              title={t('record.needs_you')}
+              onSeeAll={() => router.push('/(tabs)/alerts')}
+              seeAllLabel={t('record.see_all')}
+            />
+            {NEEDS_YOU.map((a) => (
+              <ActionRow
+                key={a.id}
+                title={a.title}
+                meta={a.meta}
+                date={a.date}
+                note={a.note}
+                urgency={a.urgency}
+                onPress={() => router.push('/(tabs)/alerts')}
+              />
+            ))}
+          </View>
+        )}
+
         {/* Your documents */}
         {hasDocuments && (
-          <View className="px-6 mt-6">
+          <View className="px-6 mt-8">
             <SectionHeader
               title={t('record.your_documents')}
               onSeeAll={() => router.push('/(tabs)/docs')}
@@ -192,28 +232,6 @@ export default function RecordScreen() {
             </Text>
           </View>
         )}
-
-        {/* Explore Opas — always show for all users */}
-        <View className="px-6 mt-8">
-          <SectionHeader title={t('record.explore')} />
-          {[
-            { label: t('record.ask_opas'), meta: t('record.ask_opas_meta'), route: '/ask' as const },
-            { label: t('record.guides'), meta: t('record.guides_meta'), route: '/guide/register-address' as const },
-            { label: t('record.journey'), meta: t('record.journey_meta'), route: '/journey' as const },
-          ].map((item) => (
-            <Pressable
-              key={item.route}
-              onPress={() => router.push(item.route)}
-              className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
-            >
-              <View className="flex-1">
-                <Text className="font-display text-heading text-fg">{item.label}</Text>
-                <Text className="font-body text-body-sm text-muted mt-0.5">{item.meta}</Text>
-              </View>
-              <Text className="font-mono text-[13px] text-muted">›</Text>
-            </Pressable>
-          ))}
-        </View>
 
         {/* Free-tier nudge */}
         {isFree && hasDocuments && (

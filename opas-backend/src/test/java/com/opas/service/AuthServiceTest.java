@@ -9,10 +9,12 @@ import com.opas.config.JwtUtil;
 import com.opas.domain.Document;
 import com.opas.domain.Subscription;
 import com.opas.domain.User;
+import com.opas.config.EmailNotVerifiedException;
 import com.opas.dto.AuthResponse;
 import com.opas.dto.LoginRequest;
 import com.opas.dto.RefreshRequest;
 import com.opas.dto.RegisterRequest;
+import com.opas.dto.RegisterResponse;
 import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.SubscriptionRepository;
@@ -45,6 +47,8 @@ class AuthServiceTest {
     @Mock
     private DocumentRepository documentRepository;
     @Mock
+    private com.opas.repository.FolderRepository folderRepository;
+    @Mock
     private StorageService storageService;
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -54,6 +58,8 @@ class AuthServiceTest {
     private RefreshTokenService refreshTokenService;
     @Mock
     private TokenBlacklistService tokenBlacklistService;
+    @Mock
+    private EmailVerificationService emailVerificationService;
     @Mock
     private Claims claims;
 
@@ -72,14 +78,15 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         service = new AuthService(userRepository, subscriptionRepository, decodeResultRepository,
-                documentRepository, storageService, passwordEncoder, jwtUtil, refreshTokenService,
-                tokenBlacklistService);
+                documentRepository, folderRepository, storageService, passwordEncoder, jwtUtil, refreshTokenService,
+                tokenBlacklistService, emailVerificationService);
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);
         user.setEmail("test@example.com");
         user.setPasswordHash("hashed-password");
         user.setName("Test User");
+        user.setEmailVerified(true);
         subscription = new Subscription();
         subscription.setUser(user);
         subscription.setTier("free");
@@ -89,7 +96,7 @@ class AuthServiceTest {
     // --- register ---
 
     @Test
-    void registerCreatesUserAndSubscription() {
+    void registerCreatesUnverifiedUserAndSendsCode() {
         when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("hashed-password");
         when(userRepository.save(any())).thenAnswer(invocation -> {
@@ -98,20 +105,20 @@ class AuthServiceTest {
             return u;
         });
         when(subscriptionRepository.save(any())).thenReturn(subscription);
-        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.of(subscription));
-        when(jwtUtil.createAccessToken(anyString(), anyString())).thenReturn("access-token");
-        when(jwtUtil.createRefreshToken(anyString())).thenReturn("refresh-token");
 
-        AuthResponse response = service.register(new RegisterRequest("new@example.com", "password123", "New User"));
+        RegisterResponse response = service.register(new RegisterRequest("new@example.com", "password123", "New User"));
 
         assertNotNull(response);
-        assertEquals("access-token", response.getAccessToken());
-        assertEquals("refresh-token", response.getRefreshToken());
-        assertEquals("free", response.getPlan());
+        assertTrue(response.verificationRequired());
+        assertEquals("new@example.com", response.email());
+        // No tokens are issued at registration — the user is not logged in.
+        verify(jwtUtil, never()).createAccessToken(anyString(), anyString());
         verify(userRepository).save(userCaptor.capture());
         assertEquals("New User", userCaptor.getValue().getName());
+        assertFalse(userCaptor.getValue().isEmailVerified());
         verify(subscriptionRepository).save(subscriptionCaptor.capture());
         assertEquals("free", subscriptionCaptor.getValue().getTier());
+        verify(emailVerificationService).generateAndSend(any(User.class));
     }
 
     @Test
@@ -122,24 +129,69 @@ class AuthServiceTest {
                 () -> service.register(new RegisterRequest("existing@example.com", "password123", "User")));
     }
 
+    // --- verify-email ---
+
     @Test
-    void registerGeneratesAuthResponse() {
-        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("hashed-password");
-        when(userRepository.save(any())).thenAnswer(invocation -> {
-            User u = invocation.getArgument(0);
-            u.setId(userId);
-            return u;
-        });
-        when(subscriptionRepository.save(any())).thenReturn(subscription);
+    void verifyEmailMarksVerifiedAndIssuesTokens() {
+        user.setEmailVerified(false);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(emailVerificationService.verify(user, "123456")).thenReturn(true);
         when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.of(subscription));
-        when(jwtUtil.createAccessToken(eq(userId.toString()), eq("new@example.com"))).thenReturn("access-token");
+        when(jwtUtil.createAccessToken(userId.toString(), "test@example.com")).thenReturn("access-token");
         when(jwtUtil.createRefreshToken(userId.toString())).thenReturn("refresh-token");
 
-        AuthResponse response = service.register(new RegisterRequest("new@example.com", "password123", "New User"));
+        AuthResponse response = service.verifyEmail("test@example.com", "123456");
 
-        assertEquals("Bearer", response.getTokenType());
-        verify(refreshTokenService).store(eq(userId.toString()), anyString());
+        assertEquals("access-token", response.getAccessToken());
+        assertTrue(user.isEmailVerified());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void verifyEmailThrowsOnWrongCode() {
+        user.setEmailVerified(false);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(emailVerificationService.verify(user, "000000")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> service.verifyEmail("test@example.com", "000000"));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void verifyEmailThrowsOnUnknownEmail() {
+        when(userRepository.findByEmail("nobody@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> service.verifyEmail("nobody@example.com", "123456"));
+    }
+
+    // --- resend-verification ---
+
+    @Test
+    void resendVerificationSendsForUnverifiedUser() {
+        user.setEmailVerified(false);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        service.resendVerification("test@example.com");
+
+        verify(emailVerificationService).generateAndSend(user);
+    }
+
+    @Test
+    void resendVerificationDoesNothingForVerifiedUser() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        service.resendVerification("test@example.com");
+
+        verify(emailVerificationService, never()).generateAndSend(any());
+    }
+
+    @Test
+    void resendVerificationDoesNothingForUnknownEmail() {
+        when(userRepository.findByEmail("nobody@example.com")).thenReturn(Optional.empty());
+
+        service.resendVerification("nobody@example.com");
+
+        verify(emailVerificationService, never()).generateAndSend(any());
     }
 
     // --- login ---
@@ -164,6 +216,17 @@ class AuthServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> service.login(new LoginRequest("unknown@example.com", "password123")));
+    }
+
+    @Test
+    void loginThrowsWhenEmailNotVerified() {
+        user.setEmailVerified(false);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("password123", "hashed-password")).thenReturn(true);
+
+        assertThrows(EmailNotVerifiedException.class,
+                () -> service.login(new LoginRequest("test@example.com", "password123")));
+        verify(jwtUtil, never()).createAccessToken(anyString(), anyString());
     }
 
     @Test
@@ -328,6 +391,7 @@ class AuthServiceTest {
         verify(decodeResultRepository).deleteByUser_Id(userId);
         verify(storageService).deleteObject("s3-key");
         verify(documentRepository).deleteByUser_Id(userId);
+        verify(folderRepository).deleteByUser_Id(userId);
         verify(subscriptionRepository).delete(subscription);
         verify(refreshTokenService).invalidateAll(userId.toString());
         verify(userRepository).deleteById(userId);

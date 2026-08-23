@@ -54,7 +54,8 @@ public class SecurityConfig {
                         // (scrape them over an internal network / management port instead).
                         .requestMatchers("/actuator/health/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
-                                "/api/v1/auth/refresh", "/api/v1/auth/forgot-password")
+                                "/api/v1/auth/refresh", "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/verify-email", "/api/v1/auth/resend-verification")
                         .permitAll().requestMatchers(HttpMethod.POST, "/api/v1/webhooks/stripe").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

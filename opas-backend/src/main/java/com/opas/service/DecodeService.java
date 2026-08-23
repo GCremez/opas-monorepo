@@ -106,6 +106,17 @@ public class DecodeService {
      */
     @Transactional
     public void processDecode(DecodeMessage message) {
+        // Idempotency guard: if a result already exists for this document, the decode
+        // already completed successfully. This suppresses duplicate processing when
+        // RabbitMQ redelivers after a lost ack (network blip post-commit). The
+        // transactional rollback on crash-before-commit means no result row exists in
+        // that case, so reprocessing is safe.
+        if (!decodeResultRepository.findByDocumentId(message.documentId()).isEmpty()) {
+            log.info("Decode already completed for document {}, skipping redelivery",
+                    message.documentId());
+            return;
+        }
+
         Document document = documentRepository.findById(message.documentId())
                 .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(message.userId())) {

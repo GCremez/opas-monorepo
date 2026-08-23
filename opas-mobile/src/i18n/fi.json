@@ -64,7 +64,18 @@
     "reset_sent_title": "Tarkista sähköpostisi.",
     "reset_sent_body": "Jos osoitteelle {{email}} löytyy tili, lähetimme linkin salasanan palauttamiseksi.",
     "back_to_sign_in": "Takaisin kirjautumiseen",
-    "enter_email": "Anna sähköpostiosoitteesi"
+    "enter_email": "Anna sähköpostiosoitteesi",
+    "verify_eyebrow": "Vahvista sähköposti",
+    "verify_title": "Tarkista postilaatikkosi.",
+    "verify_body": "Lähetimme 6-numeroisen koodin osoitteeseen {{email}}. Vahvista henkilöllisyytesi syöttämällä se alle.",
+    "verify_code_label": "Vahvistuskoodi",
+    "verify_cta": "Vahvista",
+    "verify_enter_code": "Syötä 6-numeroinen koodi",
+    "verify_invalid": "Koodi on virheellinen tai vanhentunut. Yritä uudelleen tai pyydä uusi koodi.",
+    "verify_no_code": "Etkö saanut sitä?",
+    "verify_resend": "Lähetä koodi uudelleen",
+    "verify_resend_in": "Lähetä uudelleen {{seconds}} s kuluttua",
+    "verify_resent": "Uusi koodi on matkalla, jos sähköposti on rekisteröity."
   },
   "tabs": {
     "home": "Koti",
@@ -81,6 +92,7 @@
     "eyebrow": "Opas · Tietosi",
     "needs_you": "Vaatii huomiotasi",
     "your_documents": "Asiakirjasi",
+    "needs_you": "Vaatii sinua",
     "see_all": "Näytä kaikki →",
     "all_clear": "Kaikki on kunnossa.",
     "one_thing": " Yksi asia vaatii huomiotasi tällä viikolla.",
@@ -289,6 +301,7 @@
     "auto_archive_desc": "Pidä asiakirjaluettelosi järjestyksessä",
     "subscription": "Tilaus",
     "subscription_value": "Pro · Hallinnoi ↗",
+    "subscription_value_free": "Päivitä ↗",
     "remaining_decodes": "{{remaining}}/{{limit}} asiakirjaa jäljellä",
     "decodes_used": "Asiakirjoja analysoitu tässä kuussa",
     "help": "Ohje & FAQ",
@@ -364,6 +377,7 @@
     "copied": "Kopioitu!",
     "error": "Luonnoksen luominen epäonnistui. Yritä uudelleen.",
     "generated_on": "Luotu",
+    "tone": "Sävy",
     "tone_formal": "Muodollinen",
     "tone_professional": "Ammattimainen",
     "include_details": "Sisällytä asiakirjan tiedot"

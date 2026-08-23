@@ -10,5 +10,7 @@ public interface DecodeResultRepository extends JpaRepository<DecodeResult, UUID
 
     long countByUserId(UUID userId);
 
+    void deleteByDocumentId(UUID documentId);
+
     void deleteByUser_Id(UUID userId);
 }

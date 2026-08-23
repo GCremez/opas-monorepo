@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../../src/components/ui/EmptyState';
+import { CountdownRing } from '../../src/components/motion';
 import { useDocumentStore } from '../../src/store/documentStore';
 import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
@@ -93,6 +94,13 @@ export default function AlertsScreen() {
 
         {isDemo && (
           <>
+            {/* Next deadline — The Countdown (12), the nearest due item at a glance. */}
+            <View className="items-center pb-8">
+              <CountdownRing days={9} total={30} label="days left" />
+              <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted mt-3">
+                Extend residence permit · MIGRI
+              </Text>
+            </View>
             <View className="px-6">
               <SectionHeader title={t('alerts.this_week')} tone="text-danger" />
               {demoThisWeek.map((d) => (

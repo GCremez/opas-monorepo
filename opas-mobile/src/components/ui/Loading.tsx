@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
-import { useThemeColors } from '../../store/themeStore';
+import { View } from 'react-native';
+import { OrbitLoader, Materialize } from '../motion';
 
 export function Skeleton({ className = '' }: { className?: string }) {
-  return (
-    <View className={`bg-surface-2 rounded-md overflow-hidden relative ${className}`} />
-  );
+  return <View className={`bg-surface-2 rounded-md overflow-hidden relative ${className}`} />;
 }
 
 export function SkeletonBlock({ className = '' }: { className?: string }) {
@@ -18,22 +16,21 @@ export function SkeletonLine({ className = '' }: { className?: string }) {
 
 export function SkeletonCard() {
   return (
-    <View className="bg-surface rounded-md p-4 gap-3">
+    <Materialize className="bg-surface rounded-md p-4 gap-3">
       <SkeletonLine className="w-1/3" />
       <SkeletonLine className="w-2/3" />
       <SkeletonLine className="w-1/2" />
       <SkeletonBlock />
-    </View>
+    </Materialize>
   );
 }
 
+// The Orbit — telekinetic full-page loader replacing the platform spinner.
 export function Spinner({ size = 'sm', label }: { size?: 'sm' | 'lg'; label?: string }) {
-  const c = useThemeColors();
-  const dim = size === 'lg' ? 32 : 20;
+  const dim = size === 'lg' ? 72 : 40;
   return (
-    <View className="flex-row items-center gap-3 py-4">
-      <ActivityIndicator size={dim} color={c.accent} />
-      {label && <Text className="font-body text-body-sm text-muted">{label}</Text>}
+    <View className="items-center py-4">
+      <OrbitLoader size={dim} label={label} />
     </View>
   );
 }

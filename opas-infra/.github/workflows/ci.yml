@@ -140,6 +140,7 @@ jobs:
               VpcId=${{ vars.INFRA_VPC_ID }} \
               PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
+              MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@opas.fi' }} \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset \
             --no-cli-pager
@@ -178,6 +179,7 @@ jobs:
               VpcId=${{ vars.INFRA_VPC_ID }} \
               PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
+              MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@opas.fi' }} \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset \
             --no-cli-pager

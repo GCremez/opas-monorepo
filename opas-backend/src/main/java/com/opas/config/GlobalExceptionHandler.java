@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ProblemDetail handleEmailNotVerified(EmailNotVerifiedException e) {
+        // 403 with a distinct title so the client can route to the verification screen.
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+        detail.setType(URI.create("about:blank"));
+        detail.setTitle("Email Not Verified");
+        detail.setProperty("code", "email_not_verified");
+        return detail;
+    }
+
     @ExceptionHandler(QuotaExceededException.class)
     public ProblemDetail handleQuotaExceeded(QuotaExceededException e) {
         // 402 so the client can distinguish "out of plan quota" from a validation
