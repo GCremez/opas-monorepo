@@ -12,16 +12,16 @@
 [![Demo video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://youtu.be/VIDEO_ID)
 -->
 
-### Screen designs
+### Screen designs — "Personal Record"
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="200" alt="Home" />
-  <img src="docs/screenshots/scan.png" width="200" alt="Scan a document" />
-  <img src="docs/screenshots/document.png" width="200" alt="Decoded document" />
-  <img src="docs/screenshots/folders.png" width="200" alt="Folders" />
+  <img src="docs/screenshots/home.png" width="190" alt="Home" />
+  <img src="docs/screenshots/scan.png" width="190" alt="Scan a letter" />
+  <img src="docs/screenshots/document.png" width="190" alt="Decoded letter" />
+  <img src="docs/screenshots/draft-reply.png" width="190" alt="Draft reply in Finnish" />
 </p>
 
-<p align="center"><em>Home · Scan · Decoded letter · Folders — more screens in <a href="docs/screenshots">docs/screenshots</a></em></p>
+<p align="center"><em>Home · Scan · Decoded letter · Draft reply — more screens (dark mode, search, folders, alerts) in <a href="docs/screenshots">docs/screenshots</a></em></p>
 
 ---
 
