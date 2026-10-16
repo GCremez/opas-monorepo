@@ -200,7 +200,10 @@ export default function ProfileScreen() {
           <Text className="font-display text-title text-fg mt-4" numberOfLines={1}>{user?.name ?? ''}</Text>
           <Text className="font-mono text-label tracking-[0.05em] uppercase text-muted mt-1.5">
             {tier === 'premium' ? t('profile.premium_plan') : t('profile.free_plan')}
-            {usage && tier !== 'premium' ? ` · ${usage.remaining}/${usage.limit}` : ''}
+            {/* Spell out "left": a bare "5/5" read as five of five already used. */}
+            {usage && tier !== 'premium'
+              ? ` · ${t('profile.remaining_short', { remaining: usage.remaining, limit: usage.limit })}`
+              : ''}
           </Text>
         </View>
 

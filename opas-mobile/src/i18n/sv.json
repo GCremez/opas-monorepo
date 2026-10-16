@@ -364,7 +364,8 @@
     "lang_sv_native": "Svenska",
     "deadline_reminders": "Påminnelser om tidsfrister",
     "on": "På",
-    "off": "Av"
+    "off": "Av",
+    "remaining_short": "{{remaining}} av {{limit}} kvar"
   },
   "document": {
     "title": "Dokument",

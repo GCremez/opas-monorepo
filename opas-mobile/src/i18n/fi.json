@@ -364,7 +364,8 @@
     "lang_sv_native": "Ruotsi",
     "deadline_reminders": "Määräaikamuistutukset",
     "on": "Päällä",
-    "off": "Pois"
+    "off": "Pois",
+    "remaining_short": "{{remaining}}/{{limit}} jäljellä"
   },
   "document": {
     "title": "Asiakirja",

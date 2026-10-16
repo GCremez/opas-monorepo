@@ -364,7 +364,8 @@
     "lang_sv_native": "Swedish",
     "deadline_reminders": "Deadline reminders",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "remaining_short": "{{remaining}} of {{limit}} left"
   },
   "document": {
     "title": "Document",
