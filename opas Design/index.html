@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Opas — Design System</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;
+  --surface:#1c1c1e;
+  --surface-2:#2c2c2e;
+  --fg:#f5f5f7;
+  --muted:#86868b;
+  --border:#38383a;
+  --accent:#92d9bb;
+  --accent-dim:#92d9bb22;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-xl:24px;
+  --font-display:'Lufga','Inter',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+}
+body{
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;padding:48px 24px 60px;
+}
+::selection{background:var(--accent);color:var(--bg)}
+h1{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:4px}
+h2{font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.02em;margin-bottom:var(--space-4)}
+.sub{color:var(--muted);font-size:14px;margin-bottom:var(--space-8)}
+.container{max-width:700px;width:100%}
+.hero{text-align:center;padding:var(--space-12) 0 var(--space-10);margin-bottom:var(--space-10);border-bottom:1px solid var(--border)}
+.hero .logo-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:var(--space-6)}
+.hero .logo-row svg{flex-shrink:0}
+.hero .tagline{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.7}
+.cards{display:flex;flex-direction:column;gap:var(--space-4);margin-bottom:var(--space-12)}
+.card{
+  display:flex;align-items:center;gap:var(--space-5);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:var(--space-6);
+  text-decoration:none;color:var(--fg);transition:all .15s;
+}
+.card:hover{border-color:var(--accent);background:var(--surface-2)}
+.card-icon{
+  width:56px;height:56px;border-radius:var(--radius-md);
+  background:var(--accent-dim);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.card-info{flex:1;min-width:0}
+.card-info .title{font-family:var(--font-display);font-size:17px;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
+.card-info .desc{font-size:13px;color:var(--muted);line-height:1.5}
+.card-meta{font-size:12px;color:var(--muted);white-space:nowrap}
+.footer{text-align:center;padding:var(--space-8) 0;font-size:12px;color:var(--muted)}
+.footer a{color:var(--accent)}
+.palette-row{display:flex;gap:8px;justify-content:center;margin-bottom:var(--space-8)}
+.palette-swatch{width:32px;height:32px;border-radius:8px;border:1px solid var(--border)}
+@media(max-width:500px){
+  .card{padding:var(--space-4);gap:var(--space-3)}
+  .card-icon{width:44px;height:44px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="logo-row">
+    <svg width="48" height="48" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="58" stroke="#38383a" stroke-width="1" fill="none"/>
+      <circle cx="70" cy="70" r="44" stroke="#3a3a3c" stroke-width="2.5" stroke-dasharray="12 10" stroke-dashoffset="0" stroke-linecap="round" fill="none"/>
+      <circle cx="70" cy="70" r="44" stroke="#92d9bb" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round" fill="none"/>
+      <circle cx="36" cy="50" r="12" fill="#3a3a3c"/>
+      <circle cx="36" cy="50" r="4.5" fill="#1c1c1e"/>
+      <circle cx="94" cy="42" r="12" fill="#92d9bb"/>
+      <circle cx="94" cy="42" r="4.5" fill="#000"/>
+      <circle cx="84" cy="98" r="12" fill="#92d9bb"/>
+      <circle cx="84" cy="98" r="4.5" fill="#000"/>
+      <path d="M92 102 L84 112 L77 102" stroke="#92d9bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <h1>Opas</h1>
+  </div>
+  <p class="tagline">Ring Path — Finnish for <em>Guide</em>. AI document assistant for expats in Finland.</p>
+</div>
+
+<div class="palette-row">
+  <div class="palette-swatch" style="background:#000000" title="#000000"></div>
+  <div class="palette-swatch" style="background:#1c1c1e" title="#1c1c1e"></div>
+  <div class="palette-swatch" style="background:#2c2c2e" title="#2c2c2e"></div>
+  <div class="palette-swatch" style="background:#92d9bb" title="#92d9bb accent"></div>
+  <div class="palette-swatch" style="background:#f5f5f7" title="#f5f5f7 fg"></div>
+</div>
+
+<div class="cards">
+
+  <a href="system/index.html" class="card">
+    <div class="card-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <line x1="9" y1="9" x2="15" y2="9"/>
+        <line x1="9" y1="13" x2="15" y2="13"/>
+        <line x1="9" y1="17" x2="12" y2="17"/>
+      </svg>
+    </div>
+    <div class="card-info">
+      <div class="title">Design System</div>
+      <div class="desc">Tokens, typography, spacing, components, interaction design, motion, platform specs, patterns, and accessibility — mobile-first.</div>
+    </div>
+    <span class="card-meta">1,695 lines</span>
+  </a>
+
+  <a href="icons/index.html" class="card">
+    <div class="card-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="3" x2="12" y2="5"/>
+        <line x1="12" y1="19" x2="12" y2="21"/>
+        <line x1="3" y1="12" x2="5" y2="12"/>
+        <line x1="19" y1="12" x2="21" y2="12"/>
+      </svg>
+    </div>
+    <div class="card-info">
+      <div class="title">Icon Set</div>
+      <div class="desc">36 hand-coded SVG icons across 6 categories — tab bar, document actions, content types, status, navigation, and scan-specific. Brand-colored. 24×24 viewBox, stroke-based.</div>
+    </div>
+    <span class="card-meta">407 lines</span>
+  </a>
+
+  <a href="logo/index.html" class="card">
+    <div class="card-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#92d9bb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" stroke-dasharray="3 2"/>
+        <circle cx="12" cy="12" r="10" stroke-dasharray="9 13" stroke-dashoffset="-4" stroke="#92d9bb"/>
+        <circle cx="7" cy="8" r="2.5" fill="#3a3a3c" stroke="none"/>
+        <circle cx="17" cy="7" r="2.5" fill="#92d9bb" stroke="none"/>
+        <circle cx="15" cy="18" r="2.5" fill="#92d9bb" stroke="none"/>
+        <path d="M16 19 L15 20.5 L14 19" stroke="#92d9bb" stroke-width="1.5" fill="none"/>
+      </svg>
+    </div>
+    <div class="card-info">
+      <div class="title">Logo Asset Pack</div>
+      <div class="desc">Final Ring Path logo — master SVG, sizes (120/80/40px), wordmark lockups, circle app icon + spotlight, light/dark/navy themes, usage guidelines, clear space diagram. Includes earlier explorations and refinements.</div>
+    </div>
+    <span class="card-meta">3 files</span>
+  </a>
+
+</div>
+
+<div class="palette-row" style="gap:4px">
+  <a href="logo/exploration.html" style="font-size:12px;color:var(--muted);padding:6px 12px;border:1px solid var(--border);border-radius:6px;text-decoration:none">Logo explorations</a>
+  <a href="logo/pathfinder.html" style="font-size:12px;color:var(--muted);padding:6px 12px;border:1px solid var(--border);border-radius:6px;text-decoration:none">Pathfinder variants</a>
+  <a href="logo/early.html" style="font-size:12px;color:var(--muted);padding:6px 12px;border:1px solid var(--border);border-radius:6px;text-decoration:none">Early concepts</a>
+</div>
+
+<div class="footer">
+  Built with <a href="#">designer-skills</a> &middot; Lufga + Inter &middot; Dark theme &middot; Finnish / Swedish / English ready
+</div>
+
+</div>
+</body>
+</html>

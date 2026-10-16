@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Opas — Icon Set</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;
+  --surface:#1c1c1e;
+  --surface-2:#2c2c2e;
+  --surface-3:#3a3a3c;
+  --fg:#f5f5f7;
+  --muted:#86868b;
+  --border:#38383a;
+  --accent:#92d9bb;
+  --accent-dim:#92d9bb22;
+  --accent-hover:#7eccac;
+  --danger:#ff453a;
+  --warning:#ff9f0a;
+  --success:#30d158;
+  --info:#5e5ce6;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;
+  --font-display:'Lufga','Inter',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+body{
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 80px;
+}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+::selection{background:var(--accent);color:var(--bg)}
+h1{
+  font-family:var(--font-display);font-size:32px;font-weight:700;
+  letter-spacing:-.03em;margin-bottom:4px;
+}
+.hero{
+  padding:var(--space-12) 0 var(--space-8);
+  border-bottom:1px solid var(--border);
+  margin-bottom:var(--space-8);
+}
+.hero .sub{color:var(--muted);font-size:14px;margin-bottom:var(--space-3)}
+.hero .meta{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-4)}
+.hero .meta span{
+  font-size:12px;color:var(--muted);font-weight:500;
+  padding:4px 10px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+}
+.badge{
+  display:inline-block;font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:2px 8px;border-radius:3px;
+  background:var(--accent-dim);color:var(--accent);margin-bottom:var(--space-2);
+}
+.spec-bar{
+  display:flex;gap:var(--space-6);padding:var(--space-4) var(--space-5);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);margin-bottom:var(--space-8);
+  flex-wrap:wrap;
+}
+.spec-bar .spec-item{display:flex;flex-direction:column;gap:2px}
+.spec-bar .spec-item .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.spec-bar .spec-item .val{font-family:var(--font-mono);font-size:13px;color:var(--accent)}
+.color-key{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-8);padding:var(--space-4);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md)}
+.color-swatch{display:flex;align-items:center;gap:var(--space-2);font-size:12px;color:var(--muted)}
+.color-swatch .dot{width:12px;height:12px;border-radius:50%;border:1px solid var(--border);flex-shrink:0}
+.category{
+  margin-bottom:var(--space-10);
+  padding-bottom:var(--space-8);
+  border-bottom:1px solid var(--border);
+}
+.category:last-child{border-bottom:none}
+.category h2{
+  font-family:var(--font-display);font-size:20px;font-weight:600;
+  letter-spacing:-.02em;margin-bottom:var(--space-6);
+  display:flex;align-items:center;gap:var(--space-3);
+}
+.category h2 .count{
+  font-size:13px;font-weight:500;color:var(--muted);
+  font-family:var(--font-mono);
+}
+.category-desc{color:var(--muted);font-size:14px;margin-bottom:var(--space-6);max-width:500px}
+.icon-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:var(--space-3);
+}
+.icon-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-5) var(--space-3);
+  display:flex;flex-direction:column;align-items:center;gap:var(--space-3);
+  cursor:pointer;transition:all .15s;
+  position:relative;
+}
+.icon-card:hover{border-color:var(--accent);background:var(--surface-2)}
+.icon-card .preview{
+  width:48px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+}
+.icon-card .name{
+  font-family:var(--font-mono);font-size:11px;color:var(--muted);
+  text-align:center;line-height:1.3;
+}
+.icon-card .preview-2x{
+  position:absolute;top:var(--space-2);right:var(--space-2);
+  opacity:0;transition:opacity .15s;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface-2);border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+}
+.icon-card:hover .preview-2x{opacity:1}
+.icon-card .preview-2x svg{opacity:.5}
+@media(max-width:500px){
+  .icon-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .icon-card{padding:var(--space-4) var(--space-2)}
+}
+.selected{
+  border-color:var(--accent) !important;
+  background:var(--accent-dim) !important;
+}
+.selected .name{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="hero">
+  <span class="badge">Opas Icon Set</span>
+  <h1>Custom icons</h1>
+  <p class="sub">36 stroke-based icons, 24×24 viewBox, 1.5px weight, rounded caps/joins — colored with the Opas brand palette. Click any icon to select it.</p>
+  <div class="meta">
+    <span>36 icons</span>
+    <span>24×24</span>
+    <span>1.5px stroke</span>
+    <span>round caps + joins</span>
+    <span>6 categories</span>
+  </div>
+</div>
+
+<div class="spec-bar">
+  <div class="spec-item"><span class="lbl">Canvas</span><span class="val">24×24</span></div>
+  <div class="spec-item"><span class="lbl">Stroke</span><span class="val">1.5px</span></div>
+  <div class="spec-item"><span class="lbl">Caps / Joins</span><span class="val">round</span></div>
+  <div class="spec-item"><span class="lbl">Palette</span><span class="val">brand + semantic</span></div>
+  <div class="spec-item"><span class="lbl">Style</span><span class="val">outline, colored</span></div>
+</div>
+
+<div class="color-key">
+  <span class="color-swatch"><span class="dot" style="background:#92d9bb"></span>accent green</span>
+  <span class="color-swatch"><span class="dot" style="background:#86868b"></span>muted grey</span>
+  <span class="color-swatch"><span class="dot" style="background:#f5f5f7"></span>white</span>
+  <span class="color-swatch"><span class="dot" style="background:#ff453a"></span>danger red</span>
+  <span class="color-swatch"><span class="dot" style="background:#ff9f0a"></span>warning amber</span>
+  <span class="color-swatch"><span class="dot" style="background:#30d158"></span>success green</span>
+  <span class="color-swatch"><span class="dot" style="background:#5e5ce6"></span>info blue</span>
+</div>
+
+<div class="category">
+  <h2>Tab Bar <span class="count">5</span></h2>
+  <p class="category-desc">Core app navigation. Accent green highlights the active tab, muted grey for inactive.</p>
+  <div class="icon-grid">
+
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10L12 3L21 10L21 21C21 21.5523 20.5523 22 20 22L16 22L16 14L8 14L8 22L4 22C3.44772 22 3 21.5523 3 21L3 10Z" stroke="#92d9bb"/></svg></div>
+      <span class="name">nav-home</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10L12 3L21 10L21 21C21 21.5523 20.5523 22 20 22L16 22L16 14L8 14L8 22L4 22C3.44772 22 3 21.5523 3 21L3 10Z" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="7" stroke="#86868b"/><path d="M16 16L21 21" stroke="#92d9bb"/></svg></div>
+      <span class="name">nav-search</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="7" stroke="#86868b"/><path d="M16 16L21 21" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')" style="position:relative">
+      <div class="preview"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="15" stroke="#3a3a3c" stroke-width="1.3" stroke-dasharray="3.5 3" fill="none"/><circle cx="18" cy="18" r="15" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="12 35" stroke-dashoffset="-8" stroke-linecap="round" fill="none"/><rect x="10" y="15" width="16" height="10" rx="2.5" stroke="#86868b" stroke-width="1.3" fill="none"/><path d="M20 15V13c0-.5 0-.5-.5-.5h-3c-.5 0-.5 0-.5.5v2" stroke="#86868b" stroke-width="1.3" fill="none"/><circle cx="18" cy="20" r="3.5" stroke="#92d9bb" stroke-width="1.3" fill="none"/><circle cx="18" cy="20" r="1.2" stroke="#3a3a3c" fill="none"/><circle cx="23.5" cy="17" r="1" fill="#92d9bb"/><circle cx="10.5" cy="11.5" r="3" fill="#3a3a3c"/><circle cx="10.5" cy="11.5" r="1.5" fill="#1c1c1e"/><circle cx="27.5" cy="22.5" r="3" fill="#92d9bb"/><circle cx="27.5" cy="22.5" r="1.5" fill="#000"/><path d="M28.5 26L29.5 28L26.5 26" stroke="#92d9bb" stroke-width="1.5" fill="none"/></svg></div>
+      <span class="name" style="margin-top:8px;font-weight:600;color:var(--accent)">nav-scan</span>
+      <span style="position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);background:var(--accent-dim);padding:1px 5px;border-radius:3px">CTA</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 36 36" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="15" stroke="#3a3a3c" stroke-width="1.3" stroke-dasharray="3.5 3" fill="none"/><circle cx="18" cy="18" r="15" stroke="#92d9bb" stroke-width="1.5" stroke-dasharray="12 35" stroke-dashoffset="-8" stroke-linecap="round" fill="none"/><rect x="10" y="15" width="16" height="10" rx="2.5" stroke="#86868b" stroke-width="1.3" fill="none"/><path d="M20 15V13c0-.5 0-.5-.5-.5h-3c-.5 0-.5 0-.5.5v2" stroke="#86868b" stroke-width="1.3" fill="none"/><circle cx="18" cy="20" r="3.5" stroke="#92d9bb" stroke-width="1.3" fill="none"/><circle cx="18" cy="20" r="1.2" stroke="#3a3a3c" fill="none"/><circle cx="23.5" cy="17" r="1" fill="#92d9bb"/><circle cx="10.5" cy="11.5" r="3" fill="#3a3a3c"/><circle cx="10.5" cy="11.5" r="1.5" fill="#1c1c1e"/><circle cx="27.5" cy="22.5" r="3" fill="#92d9bb"/><circle cx="27.5" cy="22.5" r="1.5" fill="#000"/><path d="M28.5 26L29.5 28L26.5 26" stroke="#92d9bb" stroke-width="1.5" fill="none"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4L12 4L15 7L19 7C19.5523 7 20 7.44772 20 8L20 19C20 19.5523 19.5523 20 19 20L5 20C4.44772 20 4 19.5523 4 19L4 5C4 4.44772 4.44772 4 5 4Z" stroke="#86868b"/><path d="M9 4L9 7L15 7" stroke="#92d9bb"/></svg></div>
+      <span class="name">nav-folders</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4L12 4L15 7L19 7C19.5523 7 20 7.44772 20 8L20 19C20 19.5523 19.5523 20 19 20L5 20C4.44772 20 4 19.5523 4 19L4 5C4 4.44772 4.44772 4 5 4Z" stroke="#86868b"/><path d="M9 4L9 7L15 7" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5" stroke="#92d9bb"/><path d="M5 20C5 16.134 8.13401 13 12 13C15.866 13 19 16.134 19 20" stroke="#86868b"/></svg></div>
+      <span class="name">nav-profile</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5" stroke="#92d9bb"/><path d="M5 20C5 16.134 8.13401 13 12 13C15.866 13 19 16.134 19 20" stroke="#86868b"/></svg></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="category">
+  <h2>Document Actions <span class="count">8</span></h2>
+  <p class="category-desc">Primary file operations. Accent green for primary actions, danger red for destructive.</p>
+  <div class="icon-grid">
+
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L13 2Z" stroke="#86868b"/><path d="M13 2L13 8L19 8" stroke="#86868b"/><path d="M9 15L12 12L15 15" stroke="#92d9bb"/><path d="M12 12L12 20" stroke="#92d9bb"/></svg></div>
+      <span class="name">doc-upload</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L13 2Z" stroke="#86868b"/><path d="M13 2L13 8L19 8" stroke="#86868b"/><path d="M9 15L12 12L15 15" stroke="#92d9bb"/><path d="M12 12L12 20" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L13 2Z" stroke="#86868b"/><path d="M13 2L13 8L19 8" stroke="#86868b"/><path d="M15 15L12 12L9 15" stroke="#92d9bb"/><path d="M12 12L12 20" stroke="#92d9bb"/></svg></div>
+      <span class="name">doc-download</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L13 2Z" stroke="#86868b"/><path d="M13 2L13 8L19 8" stroke="#86868b"/><path d="M15 15L12 12L9 15" stroke="#92d9bb"/><path d="M12 12L12 20" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="6" r="2.5" stroke="#86868b"/><circle cx="6" cy="12" r="2.5" stroke="#86868b"/><circle cx="18" cy="18" r="2.5" stroke="#92d9bb"/><path d="M15.5 7.5L8.5 10.5" stroke="#92d9bb"/><path d="M8.5 13.5L15.5 16.5" stroke="#92d9bb"/></svg></div>
+      <span class="name">doc-share</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="6" r="2.5" stroke="#86868b"/><circle cx="6" cy="12" r="2.5" stroke="#86868b"/><circle cx="18" cy="18" r="2.5" stroke="#92d9bb"/><path d="M15.5 7.5L8.5 10.5" stroke="#92d9bb"/><path d="M8.5 13.5L15.5 16.5" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7L20 7" stroke="#ff453a"/><path d="M10 11L10 17" stroke="#86868b"/><path d="M14 11L14 17" stroke="#86868b"/><path d="M5 7L6 19C6 19.5523 6.44772 20 7 20L17 20C17.5523 20 18 19.5523 18 19L19 7" stroke="#86868b"/><path d="M9 7L9 4L15 4L15 7" stroke="#86868b"/></svg></div>
+      <span class="name">doc-delete</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7L20 7" stroke="#ff453a"/><path d="M10 11L10 17" stroke="#86868b"/><path d="M14 11L14 17" stroke="#86868b"/><path d="M5 7L6 19C6 19.5523 6.44772 20 7 20L17 20C17.5523 20 18 19.5523 18 19L19 7" stroke="#86868b"/><path d="M9 7L9 4L15 4L15 7" stroke="#86868b"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4L15 4L20 9L20 20C20 20.5523 19.5523 21 19 21L5 21C4.44772 21 4 20.5523 4 20L4 4Z" stroke="#86868b"/><path d="M4 9L15 9L15 4" stroke="#92d9bb"/><path d="M8 14L12 14" stroke="#92d9bb"/><path d="M8 17L12 17" stroke="#92d9bb"/></svg></div>
+      <span class="name">doc-archive</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4L15 4L20 9L20 20C20 20.5523 19.5523 21 19 21L5 21C4.44772 21 4 20.5523 4 20L4 4Z" stroke="#86868b"/><path d="M4 9L15 9L15 4" stroke="#92d9bb"/><path d="M8 14L12 14" stroke="#92d9bb"/><path d="M8 17L12 17" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3C17.5523 3 18 3.44772 18 4L18 7" stroke="#92d9bb"/><path d="M14 3L14 7" stroke="#92d9bb"/><path d="M10 3L10 7" stroke="#86868b"/><path d="M6 3L6 4C6 4.55228 6.44772 5 7 5" stroke="#86868b"/><path d="M4 8L20 8" stroke="#86868b"/><path d="M6 10L6 20C6 20.5523 6.44772 21 7 21L17 21C17.5523 21 18 20.5523 18 20L18 10" stroke="#86868b"/></svg></div>
+      <span class="name">doc-edit</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3C17.5523 3 18 3.44772 18 4L18 7" stroke="#92d9bb"/><path d="M14 3L14 7" stroke="#92d9bb"/><path d="M10 3L10 7" stroke="#86868b"/><path d="M6 3L6 4C6 4.55228 6.44772 5 7 5" stroke="#86868b"/><path d="M4 8L20 8" stroke="#86868b"/><path d="M6 10L6 20C6 20.5523 6.44772 21 7 21L17 21C17.5523 21 18 20.5523 18 20L18 10" stroke="#86868b"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8L10 8" stroke="#86868b"/><path d="M14 8L20 8" stroke="#86868b"/><path d="M8 12L16 12" stroke="#92d9bb"/><path d="M6 16L10 16" stroke="#86868b"/><path d="M14 16L18 16" stroke="#86868b"/><path d="M12 4L12 20" stroke="#86868b"/><circle cx="12" cy="12" r="9" stroke="#86868b"/></svg></div>
+      <span class="name">doc-filter</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8L10 8" stroke="#86868b"/><path d="M14 8L20 8" stroke="#86868b"/><path d="M8 12L16 12" stroke="#92d9bb"/><path d="M6 16L10 16" stroke="#86868b"/><path d="M14 16L18 16" stroke="#86868b"/><path d="M12 4L12 20" stroke="#86868b"/><circle cx="12" cy="12" r="9" stroke="#86868b"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="5" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="#86868b" stroke="none"/></svg></div>
+      <span class="name">doc-more</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="5" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="#86868b" stroke="none"/></svg></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="category">
+  <h2>Content Types <span class="count">5</span></h2>
+  <p class="category-desc">Visual badges identifying file categories. Each type gets a distinct semantic color.</p>
+  <div class="icon-grid">
+
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L13 2Z" stroke="#92d9bb"/><path d="M13 2L13 8L19 8" stroke="#92d9bb"/><path d="M8 13L16 13" stroke="#92d9bb"/><path d="M8 17L16 17" stroke="#92d9bb"/><path d="M8 9L10 9" stroke="#92d9bb"/></svg></div>
+      <span class="name">type-document</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L13 2Z" stroke="#92d9bb"/><path d="M13 2L13 8L19 8" stroke="#92d9bb"/><path d="M8 13L16 13" stroke="#92d9bb"/><path d="M8 17L16 17" stroke="#92d9bb"/><path d="M8 9L10 9" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#5e5ce6"/><path d="M3 8L21 8" stroke="#5e5ce6"/><path d="M7 12L10 12" stroke="#5e5ce6"/><path d="M7 15L10 15" stroke="#5e5ce6"/><path d="M14 12L17 12" stroke="#5e5ce6"/><path d="M14 15L17 15" stroke="#5e5ce6"/></svg></div>
+      <span class="name">type-letter</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#5e5ce6"/><path d="M3 8L21 8" stroke="#5e5ce6"/><path d="M7 12L10 12" stroke="#5e5ce6"/><path d="M7 15L10 15" stroke="#5e5ce6"/><path d="M14 12L17 12" stroke="#5e5ce6"/><path d="M14 15L17 15" stroke="#5e5ce6"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L14 2Z" stroke="#ff9f0a"/><path d="M14 2L14 8L19 8" stroke="#ff9f0a"/><path d="M9 13L9 17" stroke="#ff9f0a"/><path d="M9 13L12 13" stroke="#ff9f0a"/><path d="M12 17L9 17" stroke="#ff9f0a"/><path d="M15 13L15 17" stroke="#ff9f0a"/><path d="M15 13L17 13" stroke="#ff9f0a"/><path d="M15 17L17 17" stroke="#ff9f0a"/></svg></div>
+      <span class="name">type-form</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2L6 2C5.44772 2 5 2.44772 5 3L5 21C5 21.5523 5.44772 22 6 22L18 22C18.5523 22 19 21.5523 19 21L19 8L14 2Z" stroke="#ff9f0a"/><path d="M14 2L14 8L19 8" stroke="#ff9f0a"/><path d="M9 13L9 17" stroke="#ff9f0a"/><path d="M9 13L12 13" stroke="#ff9f0a"/><path d="M12 17L9 17" stroke="#ff9f0a"/><path d="M15 13L15 17" stroke="#ff9f0a"/><path d="M15 13L17 13" stroke="#ff9f0a"/><path d="M15 17L17 17" stroke="#ff9f0a"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L4 7C4 5.89543 4.89543 5 6 5L18 5C19.1046 5 20 5.89543 20 7L20 20" stroke="#92d9bb"/><path d="M8 5L8 3L16 3L16 5" stroke="#92d9bb"/><path d="M8 10L16 10" stroke="#92d9bb"/><path d="M8 14L16 14" stroke="#92d9bb"/><path d="M8 18L13 18" stroke="#92d9bb"/></svg></div>
+      <span class="name">type-guide</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L4 7C4 5.89543 4.89543 5 6 5L18 5C19.1046 5 20 5.89543 20 7L20 20" stroke="#92d9bb"/><path d="M8 5L8 3L16 3L16 5" stroke="#92d9bb"/><path d="M8 10L16 10" stroke="#92d9bb"/><path d="M8 14L16 14" stroke="#92d9bb"/><path d="M8 18L13 18" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8C21 8 22 11 22 14C22 17 21 20 18 20" stroke="#ff453a"/><path d="M6 8C3 8 2 11 2 14C2 17 3 20 6 20" stroke="#ff453a"/><path d="M8 14C8 11.7909 9.79086 10 12 10C14.2091 10 16 11.7909 16 14" stroke="#ff453a"/><path d="M12 10L12 6" stroke="#ff453a"/><path d="M10 4L12 6L14 4" stroke="#ff453a"/></svg></div>
+      <span class="name">type-notification</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8C21 8 22 11 22 14C22 17 21 20 18 20" stroke="#ff453a"/><path d="M6 8C3 8 2 11 2 14C2 17 3 20 6 20" stroke="#ff453a"/><path d="M8 14C8 11.7909 9.79086 10 12 10C14.2091 10 16 11.7909 16 14" stroke="#ff453a"/><path d="M12 10L12 6" stroke="#ff453a"/><path d="M10 4L12 6L14 4" stroke="#ff453a"/></svg></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="category">
+  <h2>Status &amp; Feedback <span class="count">6</span></h2>
+  <p class="category-desc">System signals using semantic colors — green for success, amber for warning, red for error, blue for info.</p>
+  <div class="icon-grid">
+
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#30d158" stroke="none"/><path d="M9 12L11 14L15 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="name">status-check</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#30d158" stroke="none"/><path d="M9 12L11 14L15 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55047 18.6453 1.54522 18.9956C1.53997 19.346 1.62452 19.6917 1.78985 20.3085C1.95518 20.6135 2.19422 20.8972 2.73255 20.8972C3.27087 21.1809 3.644 21.2812 12 21.2812C20.356 21.2812 20.7291 21.1809 21.2674 20.8972C21.8058 20.6135 22.0448 20.3085 22.2101 20.3085C22.3755 19.6917 22.46 19.346 22.4548 18.9956C22.4495 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98584 12.3437 2.89725 12 2.89725C11.6563 2.89725 11.3183 2.98584 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" fill="#ff9f0a" stroke="none"/><path d="M12 9L12 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17L12 17.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="name">status-warning</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55047 18.6453 1.54522 18.9956C1.53997 19.346 1.62452 19.6917 1.78985 20.3085C1.95518 20.6135 2.19422 20.8972 2.73255 20.8972C3.27087 21.1809 3.644 21.2812 12 21.2812C20.356 21.2812 20.7291 21.1809 21.2674 20.8972C21.8058 20.6135 22.0448 20.3085 22.2101 20.3085C22.3755 19.6917 22.46 19.346 22.4548 18.9956C22.4495 18.6453 22.3546 18.3024 22.18 18L13.71 3.86" fill="#ff9f0a" stroke="none"/><path d="M12 9L12 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17L12 17.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#ff453a" stroke="none"/><path d="M15 9L9 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9L15 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="name">status-error</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#ff453a" stroke="none"/><path d="M15 9L9 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9L15 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#5e5ce6" stroke="none"/><path d="M12 8L12 12L15 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="name">status-info</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#5e5ce6" stroke="none"/><path d="M12 8L12 12L15 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C15.3019 21 18.1885 19.1098 19.7141 16.2859" stroke="#92d9bb"/><path d="M21 3L21 8L16 8" stroke="#92d9bb"/><path d="M17 12L19 14L21 12" stroke="#92d9bb"/></svg></div>
+      <span class="name">status-processing</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C15.3019 21 18.1885 19.1098 19.7141 16.2859" stroke="#92d9bb"/><path d="M21 3L21 8L16 8" stroke="#92d9bb"/><path d="M17 12L19 14L21 12" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#86868b"/><path d="M9 3L9 12L15 12L15 3" stroke="#86868b"/><path d="M9 12L15 21" stroke="#86868b"/><path d="M3 12L9 12" stroke="#86868b"/><path d="M15 12L21 12" stroke="#86868b"/></svg></div>
+      <span class="name">status-empty</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#86868b"/><path d="M9 3L9 12L15 12L15 3" stroke="#86868b"/><path d="M9 12L15 21" stroke="#86868b"/><path d="M3 12L9 12" stroke="#86868b"/><path d="M15 12L21 12" stroke="#86868b"/></svg></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="category">
+  <h2>Navigation &amp; Utility <span class="count">9</span></h2>
+  <p class="category-desc">App chrome. Muted grey defaults with green accents on interactive elements.</p>
+  <div class="icon-grid">
+
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4L7 12L15 20"/></svg></div>
+      <span class="name">nav-back</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4L7 12L15 20"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6L18 18"/></svg></div>
+      <span class="name">nav-close</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6L18 18"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6L20 6"/><path d="M4 12L20 12"/><path d="M4 18L20 18"/></svg></div>
+      <span class="name">nav-menu</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6L20 6"/><path d="M4 12L20 12"/><path d="M4 18L20 18"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="16" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="8" cy="12" r="1.5" fill="#86868b" stroke="none"/></svg></div>
+      <span class="name">nav-more</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="16" cy="12" r="1.5" fill="#86868b" stroke="none"/><circle cx="8" cy="12" r="1.5" fill="#86868b" stroke="none"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12L19 12" stroke="#86868b"/><path d="M5 5L19 5" stroke="#86868b"/><path d="M5 19L19 19" stroke="#86868b"/><polyline points="9 5 9 3 15 3 15 5" stroke="#86868b"/><polyline points="9 19 9 21 15 21 15 19" stroke="#86868b"/><path d="M12 8L12 12L15 15" stroke="#92d9bb"/></svg></div>
+      <span class="name">nav-checkmark</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12L19 12" stroke="#86868b"/><path d="M5 5L19 5" stroke="#86868b"/><path d="M5 19L19 19" stroke="#86868b"/><polyline points="9 5 9 3 15 3 15 5" stroke="#86868b"/><polyline points="9 19 9 21 15 21 15 19" stroke="#86868b"/><path d="M12 8L12 12L15 15" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4L12 2L9 4" stroke="#86868b"/><path d="M5 12C5 8.68629 7.68629 6 11 6L13 6C16.3137 6 19 8.68629 19 12L19 16C19 17.1046 18.1046 18 17 18L7 18C5.89543 18 5 17.1046 5 16L5 12Z" stroke="#86868b"/><circle cx="12" cy="11" r="2.5" fill="#92d9bb" stroke="none"/></svg></div>
+      <span class="name">ui-camera</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4L12 2L9 4" stroke="#86868b"/><path d="M5 12C5 8.68629 7.68629 6 11 6L13 6C16.3137 6 19 8.68629 19 12L19 16C19 17.1046 18.1046 18 17 18L7 18C5.89543 18 5 17.1046 5 16L5 12Z" stroke="#86868b"/><circle cx="12" cy="11" r="2.5" fill="#92d9bb" stroke="none"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#86868b"/><circle cx="9" cy="11" r="2" fill="#92d9bb" stroke="none"/><path d="M3 15L8 12" stroke="#86868b"/><path d="M21 15L16 12" stroke="#86868b"/><path d="M8 15L10 17L14 13L16 15" stroke="#92d9bb"/></svg></div>
+      <span class="name">ui-gallery</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#86868b"/><circle cx="9" cy="11" r="2" fill="#92d9bb" stroke="none"/><path d="M3 15L8 12" stroke="#86868b"/><path d="M21 15L16 12" stroke="#86868b"/><path d="M8 15L10 17L14 13L16 15" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke="#86868b"/><path d="M2 12L22 12" stroke="#86868b"/><path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22" stroke="#92d9bb"/><path d="M12 2C9.49872 4.73835 8.07725 8.29203 8 12C8.07725 15.708 9.49872 19.2616 12 22" stroke="#92d9bb"/></svg></div>
+      <span class="name">ui-language</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke="#86868b"/><path d="M2 12L22 12" stroke="#86868b"/><path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22" stroke="#92d9bb"/><path d="M12 2C9.49872 4.73835 8.07725 8.29203 8 12C8.07725 15.708 9.49872 19.2616 12 22" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#86868b"/><path d="M3 10L21 10" stroke="#86868b"/><path d="M8 2L8 6" stroke="#86868b"/><path d="M16 2L16 6" stroke="#86868b"/><circle cx="9" cy="15" r="1" fill="#92d9bb" stroke="none"/><circle cx="13" cy="15" r="1" fill="#92d9bb" stroke="none"/><circle cx="17" cy="15" r="1" fill="#92d9bb" stroke="none"/></svg></div>
+      <span class="name">ui-calendar</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#86868b"/><path d="M3 10L21 10" stroke="#86868b"/><path d="M8 2L8 6" stroke="#86868b"/><path d="M16 2L16 6" stroke="#86868b"/><circle cx="9" cy="15" r="1" fill="#92d9bb" stroke="none"/><circle cx="13" cy="15" r="1" fill="#92d9bb" stroke="none"/><circle cx="17" cy="15" r="1" fill="#92d9bb" stroke="none"/></svg></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="category">
+  <h2>Scan-specific <span class="count">3</span></h2>
+  <p class="category-desc">Camera flow controls. Flash uses warning amber, auto-frame and retake use accent green.</p>
+  <div class="icon-grid">
+
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 2C3.44772 2 3 2.44772 3 3L3 21C3 21.5523 3.44772 22 4 22L20 22C20.5523 22 21 21.5523 21 21L21 12" stroke="#86868b"/><path d="M21 2L21 8" stroke="#ff9f0a"/><path d="M21 2L15 2" stroke="#ff9f0a"/><path d="M21 2L13 10" stroke="#ff9f0a"/></svg></div>
+      <span class="name">scan-flash</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 2C3.44772 2 3 2.44772 3 3L3 21C3 21.5523 3.44772 22 4 22L20 22C20.5523 22 21 21.5523 21 21L21 12" stroke="#86868b"/><path d="M21 2L21 8" stroke="#ff9f0a"/><path d="M21 2L15 2" stroke="#ff9f0a"/><path d="M21 2L13 10" stroke="#ff9f0a"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1.5" stroke="#92d9bb"/><rect x="14" y="2" width="8" height="8" rx="1.5" stroke="#92d9bb"/><rect x="2" y="14" width="8" height="8" rx="1.5" stroke="#92d9bb"/><rect x="14" y="14" width="8" height="8" rx="1.5" stroke="#92d9bb"/><circle cx="18" cy="18" r="4" stroke="#86868b"/><path d="M16 18L20 18" stroke="#92d9bb"/><path d="M18 16L18 20" stroke="#92d9bb"/></svg></div>
+      <span class="name">scan-auto</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1.5" stroke="#92d9bb"/><rect x="14" y="2" width="8" height="8" rx="1.5" stroke="#92d9bb"/><rect x="2" y="14" width="8" height="8" rx="1.5" stroke="#92d9bb"/><rect x="14" y="14" width="8" height="8" rx="1.5" stroke="#92d9bb"/><circle cx="18" cy="18" r="4" stroke="#86868b"/><path d="M16 18L20 18" stroke="#92d9bb"/><path d="M18 16L18 20" stroke="#92d9bb"/></svg></div>
+    </div>
+    <div class="icon-card" onclick="this.classList.toggle('selected')">
+      <div class="preview"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12C3 7.02944 7.02944 3 12 3C16.2131 3 19.7165 5.89878 20.6813 9.81818" stroke="#92d9bb"/><path d="M21 3L21 9L15 9" stroke="#92d9bb"/><path d="M21 12C21 16.9706 16.9706 21 12 21C7.78688 21 4.2835 18.1012 3.31865 14.1818" stroke="#92d9bb"/><path d="M3 21L3 15L9 15" stroke="#92d9bb"/></svg></div>
+      <span class="name">scan-retake</span>
+      <div class="preview-2x"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12C3 7.02944 7.02944 3 12 3C16.2131 3 19.7165 5.89878 20.6813 9.81818" stroke="#92d9bb"/><path d="M21 3L21 9L15 9" stroke="#92d9bb"/><path d="M21 12C21 16.9706 16.9706 21 12 21C7.78688 21 4.2835 18.1012 3.31865 14.1818" stroke="#92d9bb"/><path d="M3 21L3 15L9 15" stroke="#92d9bb"/></svg></div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+</body>
+</html>

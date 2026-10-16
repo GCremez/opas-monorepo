@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Opas — Home</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+.welcome-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-5);margin-bottom:var(--space-5)}
+.welcome-card .greeting{font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:2px}
+.welcome-card .status-line{font-size:14px;color:var(--muted)}
+.welcome-card .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);margin-right:6px;vertical-align:middle}
+.deadline-alert{display:flex;align-items:center;gap:var(--space-3);background:rgba(255,159,10,.1);border:1px solid rgba(255,159,10,.2);border-radius:var(--radius-md);padding:var(--space-4) var(--space-4);margin-bottom:var(--space-5);cursor:pointer;transition:all .15s}
+.deadline-alert:active{opacity:.7}
+.deadline-alert .icon{width:36px;height:36px;border-radius:50%;background:rgba(255,159,10,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.deadline-alert .info{flex:1;min-width:0}
+.deadline-alert .info .primary{font-size:14px;font-weight:600}
+.deadline-alert .info .secondary{font-size:12px;color:var(--muted)}
+.deadline-alert .days{flex-shrink:0;font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--warning);text-align:right}
+.deadline-alert .days-label{font-size:10px;color:var(--muted);text-align:right}
+</style>
+</head>
+<body>
+<div id="03-home" class="screen">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1.5" stroke="#86868b" stroke-width="1"/><path d="M14 3v6" stroke="#86868b" stroke-width="1.2" stroke-linecap="round"/><path d="M15.5 4.5v3" stroke="#86868b" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="content">
+    <div class="header" style="padding-top:0">
+      <h1>Home</h1>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showScreen('05-search')" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+        </button>
+        <button class="icon-btn" onclick="showScreen('10-profile')" aria-label="Profile">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-8 8-8s8 4 8 8"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="welcome-card">
+      <div class="greeting">Good morning, Elena</div>
+      <div class="status-line"><span class="status-dot"></span>All systems up to date — 1 action needed</div>
+    </div>
+
+    <div class="deadline-alert" onclick="showScreen('08-document')">
+      <div class="icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="info">
+        <div class="primary">Residence Permit Extension</div>
+        <div class="secondary">Response due — KELA, 2 attachments needed</div>
+      </div>
+      <div><div class="days">7</div><div class="days-label">days left</div></div>
+    </div>
+
+    <div class="section-header">
+      <h3>Recent Documents</h3>
+      <span class="see-all" onclick="showScreen('04-documents')">See all</span>
+    </div>
+    <div class="recents-list" style="margin-bottom:var(--space-6)">
+      <div class="doc-row" onclick="showScreen('08-document')">
+        <div class="doc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92d9bb" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="doc-info"><div class="doc-name">KELA — Housing Benefit</div><div class="doc-meta">Scanned 2h ago • 3 pages</div></div>
+        <span class="badge badge-accent">New</span>
+      </div>
+      <div class="doc-row" onclick="showScreen('08-document')">
+        <div class="doc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="doc-info"><div class="doc-name">Tax Card 2025</div><div class="doc-meta">Scanned yesterday • 1 page</div></div>
+        <span class="badge badge-success">Translated</span>
+      </div>
+      <div class="doc-row" onclick="showScreen('08-document')">
+        <div class="doc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="doc-info"><div class="doc-name">Residence Permit Extension</div><div class="doc-meta">Scanned 3d ago • 5 pages</div></div>
+        <span class="badge badge-warning">Deadline Jun 30</span>
+      </div>
+    </div>
+
+    <div class="section-header"><h3>Quick Actions</h3></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:24px">
+      <div class="card card-interactive" onclick="showScreen('04-documents')" style="padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        <span style="font-size:14px;font-weight:500">Documents</span>
+      </div>
+      <div class="card card-interactive" onclick="showScreen('06-scan')" style="padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h4a2 2 0 012 2v4M9 21H5a2 2 0 01-2-2v-4M21 15v4a2 2 0 01-2 2h-4M9 3H5a2 2 0 00-2 2v4"/></svg>
+        <span style="font-size:14px;font-weight:500">Scan</span>
+      </div>
+      <div class="card card-interactive" onclick="showScreen('09-folders')" style="padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2h-7l-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span style="font-size:14px;font-weight:500">Folders</span>
+      </div>
+      <div class="card card-interactive" onclick="showScreen('10-profile')" style="padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-8 8-8s8 4 8 8"/></svg>
+        <span style="font-size:14px;font-weight:500">Profile</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="glass-nav">
+    <button class="tab active" data-screen="03-home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="tab" data-screen="05-search">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+      <span>Search</span>
+    </button>
+    <button class="tab-scan" onclick="showScreen('06-scan')" aria-label="Scan document">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 012 2v4M9 21H5a2 2 0 01-2-2v-4M21 15v4a2 2 0 01-2 2h-4M9 3H5a2 2 0 00-2 2v4"/></svg>
+    </button>
+    <button class="tab" data-screen="04-documents">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      <span>Docs</span>
+    </button>
+    <button class="tab" data-screen="09-folders">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2h-7l-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span>Folders</span>
+    </button>
+  </nav>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

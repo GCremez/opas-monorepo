@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Opas Logo Asset Pack — Ring Path",
+  "entry": "opas-logo-assets.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-05-16T13:23:05.933Z",
+  "updatedAt": "2026-05-16T13:23:05.949Z",
+  "sourceSkillId": "agent-browser",
+  "metadata": {
+    "identifier": "opas-logo-assets",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

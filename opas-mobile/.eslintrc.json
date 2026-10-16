@@ -1,0 +1,6 @@
+{
+  "extends": "expo",
+  "rules": {
+    "react-native/no-inline-styles": "off"
+  }
+}

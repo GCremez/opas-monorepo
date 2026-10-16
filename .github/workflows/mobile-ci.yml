@@ -1,0 +1,82 @@
+name: Mobile CI
+
+# Checks run automatically on every push and pull request.
+# EAS builds and store submission only run when started by hand (Actions tab → Run workflow).
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'opas-mobile/**'
+      - '.github/workflows/mobile-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'opas-mobile/**'
+      - '.github/workflows/mobile-ci.yml'
+  workflow_dispatch:
+    inputs:
+      build:
+        description: 'EAS build to run'
+        type: choice
+        options: [none, preview, production]
+        default: none
+      submit:
+        description: 'Submit the production build to the App Store / Play Store'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: opas-mobile
+
+jobs:
+  lint-and-test:
+    name: Typecheck, Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: opas-mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test:ci
+
+  eas-build:
+    name: EAS Build (${{ inputs.build }})
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.build != 'none'
+    environment: ${{ inputs.build == 'production' && 'production' || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: opas-mobile/package-lock.json
+      - run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Build
+        run: eas build --platform all --profile ${{ inputs.build }} --non-interactive
+      - name: Submit to stores
+        if: inputs.build == 'production' && inputs.submit
+        run: eas submit --platform all --non-interactive

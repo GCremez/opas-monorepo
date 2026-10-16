@@ -1,0 +1,63 @@
+package com.opas.controller;
+
+import com.opas.service.IdempotencyService;
+import com.opas.service.StripeWebhookService;
+import com.stripe.model.Event;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.time.Duration;
+import java.util.stream.Collectors;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/webhooks")
+public class WebhookController {
+
+    private final StripeWebhookService stripeWebhookService;
+    private final IdempotencyService idempotencyService;
+
+    public WebhookController(StripeWebhookService stripeWebhookService, IdempotencyService idempotencyService) {
+        this.stripeWebhookService = stripeWebhookService;
+        this.idempotencyService = idempotencyService;
+    }
+
+    @SuppressWarnings("null")
+    @PostMapping("/stripe")
+    public ResponseEntity<Void> handleStripeWebhook(HttpServletRequest request) {
+        String payload;
+        try (BufferedReader reader = request.getReader()) {
+            payload = reader.lines().collect(Collectors.joining());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String sigHeader = request.getHeader("Stripe-Signature");
+        if (sigHeader == null || sigHeader.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        @SuppressWarnings("null")
+        Event event = stripeWebhookService.verifySignature(payload, sigHeader);
+
+        // Claim the event atomically BEFORE handling it. Stripe delivers at-least-once
+        // and retries overlap, so a check-then-handle-then-mark sequence lets two
+        // concurrent copies of one event both pass the check and both apply the side
+        // effect. setIfAbsent returns true only for the copy that wins the claim.
+        if (!idempotencyService.markProcessed(event.getId(), Duration.ofHours(24))) {
+            return ResponseEntity.ok().build();
+        }
+
+        try {
+            stripeWebhookService.handleEvent(event);
+        } catch (RuntimeException e) {
+            // Handling failed after we claimed the key. Release it so Stripe's retry
+            // can re-deliver and be processed, instead of being swallowed as "done".
+            idempotencyService.release(event.getId());
+            throw e;
+        }
+        return ResponseEntity.ok().build();
+    }
+}

@@ -1,0 +1,1695 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Opas Design System — Mobile</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000000;
+  --surface:#1c1c1e;
+  --surface-2:#2c2c2e;
+  --surface-3:#3a3a3c;
+  --fg:#f5f5f7;
+  --muted:#86868b;
+  --border:#38383a;
+  --accent:#92d9bb;
+  --accent-hover:#7eccac;
+  --accent-dim:#92d9bb22;
+  --danger:#ff453a;
+  --warning:#ff9f0a;
+  --success:#30d158;
+  --info:#5e5ce6;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-xl:20px;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;
+  --space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--space-20:80px;
+  --font-display:'Lufga','Inter',system-ui,-apple-system,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --dur-fast:150ms;--dur-normal:250ms;--dur-slow:400ms;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --nav-height:56px;
+  --tab-height:96px;
+  --touch-min:44px;
+}
+[data-theme="light"]{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#e8e8ed;--surface-3:#d1d1d6;
+  --fg:#1c1c1e;--muted:#8e8e93;--border:#c6c6c8;
+  --accent:#1a8a7a;--accent-hover:#147a6b;--accent-dim:#1a8a7a18;
+  --danger:#d32f2f;--warning:#e68a00;--success:#2e7d32;--info:#5e5ce6;
+}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-height) + var(--space-4))}
+body{
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  padding-top:var(--nav-height);padding-bottom:calc(var(--tab-height) + var(--safe-bottom));
+}
+::selection{background:var(--accent);color:var(--bg)}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--accent-hover)}
+
+/* ═══ Top nav ═══ */
+.top-nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:var(--nav-height);padding-top:var(--safe-top);
+  background:rgba(0,0,0,.85);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding-left:var(--safe-top);
+}
+.top-nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:1200px;margin:0 auto;
+  padding:0 var(--space-4);height:100%;
+}
+.top-nav .logo{font-family:var(--font-display);font-size:16px;font-weight:600;letter-spacing:-.02em}
+.top-nav .logo span{color:var(--accent)}
+.top-nav .version{font-size:11px;color:var(--muted);font-weight:500;padding:2px var(--space-2);border-radius:4px;background:var(--surface-2);margin-left:var(--space-2)}
+.nav-links{display:none;gap:var(--space-1)}
+.nav-links a{
+  font-size:13px;font-weight:500;color:var(--muted);
+  padding:var(--space-1) var(--space-3);border-radius:var(--radius-sm);
+  transition:all .15s;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--fg);background:var(--surface-2)}
+.menu-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:var(--touch-min);height:var(--touch-min);border:none;background:none;
+  color:var(--fg);font-size:20px;cursor:pointer;border-radius:var(--radius-sm);
+}
+.menu-btn:hover{background:var(--surface-2)}
+.theme-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--surface-2);border:1px solid var(--border);
+  color:var(--fg);cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
+}
+.theme-btn:hover{background:var(--surface-3);border-color:var(--accent)}
+.top-nav-actions{display:flex;align-items:center;gap:var(--space-2)}
+
+/* ═══ Drawer (mobile nav) ═══ */
+.drawer-overlay{
+  position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:300px;max-width:80vw;
+  z-index:310;background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:calc(var(--safe-top) + var(--space-6)) var(--space-4) var(--space-6);
+  overflow-y:auto;
+  transform:translateX(-100%);transition:transform .3s var(--ease-out);
+}
+.drawer.open{transform:translateX(0)}
+.drawer-header{
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-display);font-size:18px;font-weight:600;
+  padding:0 var(--space-2) var(--space-6);
+}
+.drawer-header span{color:var(--accent)}
+.drawer-close{
+  width:var(--touch-min);height:var(--touch-min);
+  border:none;background:none;color:var(--muted);cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+}
+.drawer nav{display:flex;flex-direction:column;gap:1px}
+.drawer .section-label{
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);padding:var(--space-4) var(--space-3) var(--space-1);
+}
+.drawer a{
+  font-size:14px;font-weight:500;color:var(--muted);
+  padding:var(--space-3) var(--space-3);border-radius:var(--radius-sm);
+  transition:all .15s;
+}
+.drawer a:hover{color:var(--fg);background:var(--surface-2)}
+.theme-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:var(--space-4) var(--space-3);margin-top:var(--space-4);
+  border-top:1px solid var(--border);
+  font-size:13px;color:var(--muted);
+}
+
+/* ═══ Bottom tab bar — glassmorphism floating ═══ */
+.bottom-tab-bar{
+  position:fixed;bottom:var(--space-6);left:50%;transform:translateX(-50%);
+  z-index:200;
+  display:flex;align-items:center;gap:var(--space-1);
+  padding:var(--space-2) var(--space-4);
+  padding-bottom:max(var(--space-2),var(--safe-bottom));
+  background:rgba(28,28,30,.78);
+  -webkit-backdrop-filter:blur(30px) saturate(1.6);
+  backdrop-filter:blur(30px) saturate(1.6);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:34px;
+  width:auto;min-width:320px;max-width:calc(100% - 48px);
+  box-shadow:0 4px 24px rgba(0,0,0,.55),0 8px 48px rgba(0,0,0,.25);
+}
+[data-theme="light"] .bottom-tab-bar{
+  background:rgba(245,245,247,.82);
+  border-color:rgba(0,0,0,.08);
+  box-shadow:0 4px 24px rgba(0,0,0,.08);
+}
+.tab-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;border:none;background:none;cursor:pointer;
+  font-size:10px;color:var(--muted);font-family:var(--font-body);
+  padding:var(--space-1) var(--space-3);min-height:var(--touch-min);
+  min-width:var(--touch-min);border-radius:var(--radius-md);
+  transition:all .15s;position:relative;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab-btn .tab-icon{
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+}
+.tab-btn .tab-icon svg{width:22px;height:22px}
+.tab-btn .tab-label{font-size:9px;font-weight:500;letter-spacing:.01em}
+.tab-btn.active{color:var(--accent)}
+.tab-btn.active .tab-icon svg{stroke-width:2.5}
+.tab-btn:hover{background:rgba(255,255,255,.05)}
+[data-theme="light"] .tab-btn:hover{background:rgba(0,0,0,.05)}
+.tab-btn.scan-btn{
+  margin-top:-24px;
+}
+.tab-btn.scan-btn .scan-ring{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--accent);color:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(146,217,187,.5),0 8px 32px rgba(146,217,187,.2);
+  transition:transform .2s cubic-bezier(0.34,1.56,0.64,1),box-shadow .2s;
+  position:relative;
+}
+.tab-btn.scan-btn .scan-ring svg{width:26px;height:26px}
+.tab-btn.scan-btn:active .scan-ring{transform:scale(.88);box-shadow:0 2px 8px rgba(146,217,187,.3)}
+.tab-btn.scan-btn .tab-label{margin-top:7px;display:block}
+
+/* ═══ Main content ═══ */
+.main{max-width:1200px;margin:0 auto;padding:var(--space-6) var(--space-5) var(--space-12)}
+
+/* ═══ Hero (mobile-compact) ═══ */
+.hero{
+  margin-bottom:var(--space-10);
+  padding-bottom:var(--space-8);
+  border-bottom:1px solid var(--border);
+}
+.hero .badge{
+  display:inline-block;font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:var(--space-1) var(--space-2);border-radius:4px;
+  background:var(--accent-dim);color:var(--accent);margin-bottom:var(--space-3);
+}
+.hero h1{
+  font-family:var(--font-display);font-size:clamp(26px,5vw,42px);font-weight:700;
+  letter-spacing:-.03em;line-height:1.1;margin-bottom:var(--space-3);
+}
+.hero p{font-size:14px;color:var(--muted);line-height:1.7;max-width:600px}
+.hero .skill-badges{
+  display:flex;flex-wrap:wrap;gap:var(--space-1);margin-top:var(--space-4);
+}
+.hero .skill-badges span{
+  font-size:10px;font-weight:500;padding:2px var(--space-2);
+  border-radius:4px;background:var(--surface-2);color:var(--muted);
+}
+
+/* ═══ Section ═══ */
+.section{margin-bottom:var(--space-12)}.section:last-child{margin-bottom:0}
+.section h2{
+  font-family:var(--font-display);font-size:clamp(20px,3.5vw,28px);font-weight:600;
+  letter-spacing:-.02em;margin-bottom:var(--space-1);
+}
+.section>.desc{color:var(--muted);font-size:13px;margin-bottom:var(--space-6);max-width:560px;line-height:1.7}
+.section h3{
+  font-size:15px;font-weight:600;margin-bottom:var(--space-3);
+  padding-top:var(--space-6);color:var(--fg);
+}
+.section h3:first-of-type{padding-top:0}
+.section h4{font-size:14px;font-weight:500;color:var(--muted);margin-bottom:var(--space-2);padding-top:var(--space-4)}
+.section p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:var(--space-3)}
+.section ul{color:var(--muted);font-size:13px;line-height:1.8;padding-left:var(--space-5);margin-bottom:var(--space-4)}
+.section ul li{margin-bottom:var(--space-1)}
+.section strong{color:var(--fg)}
+.section code{font-family:var(--font-mono);font-size:12px;background:var(--surface-2);padding:1px var(--space-1);border-radius:3px}
+
+/* ═══ Principles ═══ */
+.principles{display:grid;grid-template-columns:1fr;gap:var(--space-3);margin-bottom:var(--space-6)}
+.principle-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-4);
+  transition:border-color .15s;
+}
+.principle-card:hover{border-color:var(--accent)}
+.principle-card .num{
+  font-family:var(--font-mono);font-size:12px;color:var(--accent);margin-bottom:var(--space-1);
+}
+.principle-card h4{font-size:14px;font-weight:600;margin-bottom:var(--space-1)}
+.principle-card p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ═══ Tables ═══ */
+.table-wrap{overflow-x:auto;margin-bottom:var(--space-5);-webkit-overflow-scrolling:touch}
+.table-wrap table{width:100%;border-collapse:collapse;font-size:13px;min-width:480px}
+.table-wrap th,.table-wrap td{
+  text-align:left;padding:var(--space-2) var(--space-3);
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+.table-wrap th{
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);padding-bottom:var(--space-2);
+}
+.table-wrap td:first-child{font-family:var(--font-mono);font-size:12px}
+.table-wrap tr:hover td{background:var(--surface)}
+.swatch-dot{
+  display:inline-block;width:14px;height:14px;border-radius:50%;
+  vertical-align:middle;margin-right:var(--space-1);border:1px solid var(--border);
+}
+
+/* ═══ Token tiers ═══ */
+.token-tier{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-4);
+  margin-bottom:var(--space-3);
+}
+.token-tier h4{font-size:13px;font-weight:600;margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap}
+.token-tier .tier-label{
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+  padding:1px var(--space-2);border-radius:3px;
+}
+.token-tier .tier-label.l1{background:var(--accent-dim);color:var(--accent)}
+.token-tier .tier-label.l2{background:#ff9f0a22;color:var(--warning)}
+.token-tier .tier-label.l3{background:#5e5ce622;color:var(--info)}
+.token-tier p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:var(--space-2)}
+.token-tier code{font-size:12px}
+.token-tier:last-child{margin-bottom:0}
+
+/* ═══ Font showcase ═══ */
+.font-showcase{display:grid;grid-template-columns:1fr;gap:var(--space-3);margin-bottom:var(--space-5)}
+.font-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-4);
+}
+.font-card h4{font-size:12px;color:var(--muted);margin-bottom:var(--space-2);font-weight:500}
+.font-card .sample{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:2px}
+.font-card .sample-sub{font-size:13px;line-height:1.6;max-width:400px}
+.font-card .stack{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:var(--space-2)}
+
+/* ═══ Type samples ═══ */
+.type-sample{margin-bottom:var(--space-5)}
+.type-sample .label{font-size:11px;color:var(--muted);margin-bottom:var(--space-1);font-weight:500}
+.type-sample .display-1{font-family:var(--font-display);font-size:clamp(32px,6vw,56px);font-weight:700;letter-spacing:-.03em;line-height:1.05}
+.type-sample .heading-xl{font-family:var(--font-display);font-size:clamp(24px,4.5vw,40px);font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.type-sample .heading-l{font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-.01em}
+.type-sample .heading-m{font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-.005em}
+.type-sample .body{font-size:15px;line-height:1.7;max-width:520px}
+.type-sample .body-small{font-size:13px;line-height:1.6;color:var(--muted)}
+.type-sample .caption{font-size:12px;color:var(--muted)}
+.type-sample .mono{font-family:var(--font-mono);font-size:13px;font-variant-numeric:tabular-nums}
+
+/* ═══ Spacing scale ═══ */
+.spacing-scale{display:flex;align-items:flex-end;gap:var(--space-2);margin-bottom:var(--space-5);flex-wrap:wrap;overflow-x:auto;padding-bottom:var(--space-2)}
+.spacing-unit{display:flex;flex-direction:column;align-items:center}
+.spacing-unit .bar{background:var(--accent);border-radius:3px 3px 0 0;min-width:28px;transition:background .15s}
+.spacing-unit:hover .bar{background:var(--accent-hover)}
+.spacing-unit .val{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:var(--space-1)}
+
+/* ═══ Component previews ═══ */
+.comp-section{margin-bottom:var(--space-6)}
+.comp-section h4{
+  font-size:13px;font-weight:600;margin-bottom:var(--space-3);
+  color:var(--muted);display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;
+}
+.comp-section h4 .spec-label{
+  font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+  padding:1px var(--space-2);border-radius:3px;background:var(--surface-2);color:var(--muted);
+}
+.comp-row{display:flex;flex-wrap:wrap;gap:var(--space-2);align-items:center;margin-bottom:var(--space-3)}
+.comp-label{font-size:11px;color:var(--muted);width:100%}
+
+/* ═══ Spec grid ═══ */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-4)}
+.spec-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:var(--space-3);
+}
+.spec-card h5{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:var(--space-1)}
+.spec-card .spec-val{font-size:13px;color:var(--fg)}
+.spec-card .spec-val code{font-size:11px;font-family:var(--font-mono)}
+.spec-card p{font-size:11px;color:var(--muted);line-height:1.5;margin-top:var(--space-1)}
+
+/* ═══ Component: Buttons ═══ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);
+  font-family:var(--font-body);font-size:14px;font-weight:500;
+  padding:var(--space-3) var(--space-5);border-radius:var(--radius-md);
+  border:1px solid transparent;cursor:pointer;transition:all var(--dur-fast) var(--ease-out);
+  text-decoration:none;white-space:nowrap;line-height:1;
+  min-height:var(--touch-min);
+}
+.btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:var(--surface-2);color:var(--fg);border-color:var(--border)}
+.btn-secondary:hover{background:var(--surface-3)}
+.btn-outline{background:transparent;color:var(--fg);border-color:var(--border)}
+.btn-outline:hover{background:var(--surface);border-color:var(--accent);color:var(--accent)}
+.btn-ghost{background:transparent;color:var(--muted);border-color:transparent}
+.btn-ghost:hover{background:var(--surface);color:var(--fg)}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-danger:hover{opacity:.9}
+.btn-sm{min-height:32px;padding:var(--space-1) var(--space-3);font-size:13px;border-radius:var(--radius-sm)}
+.btn-lg{min-height:52px;padding:var(--space-4) var(--space-6);font-size:16px;border-radius:var(--radius-lg)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.btn-block{width:100%}
+
+/* ═══ Component: Inputs ═══ */
+.input-group{display:flex;flex-direction:column;gap:var(--space-2);width:100%;margin-bottom:var(--space-4)}
+.input-label{font-size:13px;font-weight:500;color:var(--fg)}
+.input-hint{font-size:12px;color:var(--muted)}
+.input{
+  font-family:var(--font-body);font-size:16px;color:var(--fg);
+  background:var(--surface);border:1px solid var(--border);
+  padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);
+  outline:none;transition:all .15s;width:100%;
+  min-height:var(--touch-min);-webkit-appearance:none;appearance:none;
+}
+.input:hover{border-color:var(--muted)}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.input.error{border-color:var(--danger)}
+.input.error:focus{box-shadow:0 0 0 3px rgba(255,69,58,.2)}
+.input:disabled{opacity:.4;pointer-events:none}
+textarea.input{resize:vertical;min-height:80px;line-height:1.6}
+select.input{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%2386868b'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+
+/* ═══ Component: Cards ═══ */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-4);
+  transition:all .15s;
+}
+.card.interactive{cursor:pointer}
+.card.interactive:hover{border-color:var(--accent);background:var(--surface-2)}
+.card .card-badge{
+  display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.06em;padding:1px var(--space-2);border-radius:3px;
+  background:var(--accent-dim);color:var(--accent);margin-bottom:var(--space-2);
+}
+.card .card-title{font-size:15px;font-weight:600;margin-bottom:var(--space-1)}
+.card .card-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:var(--space-2)}
+.card .card-meta{font-size:12px;color:var(--muted)}
+.doc-card{
+  display:flex;gap:var(--space-3);align-items:flex-start;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-3);
+  cursor:pointer;transition:all .15s;
+}
+.doc-card:hover{border-color:var(--accent)}
+.doc-card .icon{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  background:var(--accent-dim);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:16px;
+}
+.doc-card .info{flex:1;min-width:0}
+.doc-card .info .title{font-size:13px;font-weight:600;margin-bottom:2px}
+.doc-card .info .sub{font-size:11px;color:var(--muted)}
+.doc-card .deadline{font-size:11px;font-weight:500;color:var(--warning);white-space:nowrap;flex-shrink:0}
+.doc-card .badge-result{flex-shrink:0}
+
+/* ═══ Component: Badges & Pills ═══ */
+.badge{
+  display:inline-flex;align-items:center;gap:var(--space-1);
+  font-size:10px;font-weight:600;padding:1px var(--space-2);border-radius:3px;letter-spacing:.02em;
+}
+.badge-accent{background:var(--accent-dim);color:var(--accent)}
+.badge-success{background:#30d15822;color:var(--success)}
+.badge-warning{background:#ff9f0a22;color:var(--warning)}
+.badge-danger{background:#ff453a22;color:var(--danger)}
+.badge-info{background:#5e5ce622;color:var(--info)}
+.badge-neutral{background:var(--surface-2);color:var(--muted)}
+.pill{
+  display:inline-flex;align-items:center;gap:var(--space-1);
+  font-size:11px;font-weight:500;padding:var(--space-1) var(--space-3);
+  border-radius:100px;border:1px solid var(--border);
+  min-height:28px;
+}
+
+/* ═══ Component: Alerts ═══ */
+.alert{
+  display:flex;gap:var(--space-2);align-items:flex-start;
+  padding:var(--space-3);border-radius:var(--radius-md);
+  font-size:13px;line-height:1.6;margin-bottom:var(--space-2);
+}
+.alert-accent{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent)}
+.alert-success{background:#30d15818;border:1px solid var(--success);color:var(--success)}
+.alert-warning{background:#ff9f0a18;border:1px solid var(--warning);color:var(--warning)}
+.alert-danger{background:#ff453a18;border:1px solid var(--danger);color:var(--danger)}
+.alert-info{background:#5e5ce618;border:1px solid var(--info);color:var(--info)}
+.alert .alert-icon{font-size:14px;line-height:1.5;flex-shrink:0}
+
+/* ═══ Component: Bottom Sheet (demo) ═══ */
+.sheet-demo{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:var(--space-4);
+  max-width:400px;
+}
+.sheet-demo .sheet-handle{
+  width:32px;height:4px;border-radius:2px;background:var(--surface-3);
+  margin:0 auto var(--space-4);
+}
+.sheet-demo .sheet-title{font-size:17px;font-weight:600;margin-bottom:var(--space-4)}
+.sheet-row{
+  display:flex;align-items:center;gap:var(--space-3);
+  padding:var(--space-2) 0;cursor:pointer;
+  min-height:var(--touch-min);
+}
+.sheet-row:hover{opacity:.8}
+.sheet-row .s-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sheet-row .s-label{font-size:15px;flex:1}
+.sheet-row .s-desc{font-size:12px;color:var(--muted);text-align:right}
+
+/* ═══ Component: Toast ═══ */
+.toast-demo{
+  background:var(--surface-3);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);
+  display:flex;align-items:center;gap:var(--space-3);
+  max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+.toast-demo .t-icon{flex-shrink:0;font-size:16px}
+.toast-demo .t-msg{font-size:13px;flex:1;line-height:1.4}
+.toast-demo .t-action{font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;border:none;background:none;font-family:var(--font-body);padding:0;flex-shrink:0;min-height:var(--touch-min);display:flex;align-items:center}
+
+/* ═══ Component: Loading states ═══ */
+.skeleton-demo{display:flex;flex-direction:column;gap:var(--space-3);max-width:360px}
+.skeleton-line{
+  height:12px;border-radius:4px;background:var(--surface-2);
+  position:relative;overflow:hidden;
+}
+.skeleton-line::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,var(--surface-3),transparent);
+  animation:skeleton-shimmer 1.5s infinite;
+}
+@keyframes skeleton-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.skeleton-line.h{height:16px;width:60%}
+.skeleton-line.w{width:80%}
+.skeleton-line.s{width:40%}
+.skeleton-block{
+  height:80px;border-radius:var(--radius-md);background:var(--surface-2);
+  position:relative;overflow:hidden;
+}
+.skeleton-block::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,var(--surface-3),transparent);
+  animation:skeleton-shimmer 1.5s infinite;
+}
+.spinner-demo{
+  display:flex;align-items:center;gap:var(--space-3);
+  padding:var(--space-4);
+}
+.spinner{
+  width:20px;height:20px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .6s linear infinite;
+  flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-lg{width:32px;height:32px;border-width:3px}
+
+/* ═══ Component: Empty/Error state ═══ */
+.empty-state{
+  text-align:center;padding:var(--space-10) var(--space-5);max-width:360px;margin:0 auto;
+}
+.empty-state .e-icon{font-size:40px;margin-bottom:var(--space-4);opacity:.3}
+.empty-state h4{font-size:17px;font-weight:600;color:var(--fg);margin-bottom:var(--space-2)}
+.empty-state p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:var(--space-5)}
+
+/* ═══ Component: Navigation (Tab bar) ═══ */
+.tab-bar{
+  display:flex;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:var(--space-2);gap:2px;
+  max-width:400px;
+}
+.tab-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:var(--space-2);border-radius:var(--radius-md);
+  font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s;
+  border:none;background:none;font-family:var(--font-body);
+  min-height:var(--touch-min);
+}
+.tab-item:hover,.tab-item.active{color:var(--accent);background:var(--accent-dim)}
+.tab-item .tab-icon{font-size:18px;line-height:1}
+
+/* ═══ Component: Switch ═══ */
+.switch{
+  width:44px;height:28px;border-radius:14px;border:1px solid var(--border);
+  background:var(--surface-2);cursor:pointer;position:relative;
+  transition:all .2s;flex-shrink:0;
+}
+.switch.on{background:var(--accent);border-color:var(--accent)}
+.switch::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:22px;height:22px;border-radius:50%;background:#fff;
+  transition:transform .2s var(--ease-spring);
+}
+.switch.on::after{transform:translateX(16px)}
+
+/* ═══ Component: Slider ═══ */
+.slider-demo{
+  width:100%;max-width:360px;
+}
+.slider-track{
+  width:100%;height:4px;border-radius:2px;background:var(--surface-2);
+  position:relative;margin:var(--space-2) 0;
+}
+.slider-track .fill{
+  position:absolute;left:0;top:0;height:100%;border-radius:2px;
+  background:var(--accent);width:65%;
+}
+.slider-track .thumb{
+  position:absolute;left:65%;top:50%;transform:translate(-50%,-50%);
+  width:24px;height:24px;border-radius:50%;background:#fff;
+  border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+
+/* ═══ Scaffold Viewer ═══ */
+.phone-frame{
+  width:100%;max-width:375px;margin:0 auto;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:40px;padding:12px;position:relative;
+  overflow:hidden;
+}
+.phone-frame .notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:120px;height:28px;background:var(--bg);
+  border-radius:0 0 16px 16px;z-index:10;
+}
+.phone-frame .status-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:var(--space-2) var(--space-6) var(--space-2);
+  font-size:11px;font-weight:600;color:var(--fg);
+  font-family:var(--font-display);
+}
+.phone-frame .screen-content{
+  background:var(--surface);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  min-height:500px;padding:var(--space-4);
+}
+.phone-frame .home-indicator{
+  height:5px;width:120px;border-radius:3px;background:var(--surface-3);
+  margin:var(--space-2) auto var(--space-1);
+}
+
+/* ═══ Code block ═══ */
+.code-block{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:var(--space-3);
+  font-family:var(--font-mono);font-size:12px;line-height:1.7;
+  overflow-x:auto;margin-bottom:var(--space-4);color:var(--muted);
+  -webkit-overflow-scrolling:touch;
+}
+.code-block .hl{color:var(--accent)}
+.code-block .cm{color:var(--muted)}
+.code-block .kw{color:var(--info)}
+.code-block .str{color:var(--warning)}
+
+/* ═══ Footer ═══ */
+.footer{
+  margin-top:var(--space-12);padding-top:var(--space-6);
+  border-top:1px solid var(--border);
+  font-size:12px;color:var(--muted);
+  display:flex;flex-direction:column;gap:var(--space-2);
+  text-align:center;
+}
+.footer a{color:var(--muted)}
+.footer a:hover{color:var(--accent)}
+
+/* ═══ Responsive: tablet+ ═══ */
+@media(min-width:600px){
+  .principles{grid-template-columns:1fr 1fr}
+  .font-showcase{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:clamp(32px,4vw,48px)}
+  .main{padding:var(--space-8) var(--space-6) var(--space-12)}
+  .spec-grid{grid-template-columns:repeat(3,1fr)}
+  .nav-links{display:flex}
+  .menu-btn{display:none}
+  .bottom-tab-bar{display:none}
+  body{padding-bottom:var(--safe-bottom)}
+}
+@media(min-width:768px){
+  .main{padding:var(--space-10) var(--space-8) var(--space-16)}
+  .hero{padding-bottom:var(--space-10)}
+  .section h2{font-size:clamp(24px,3vw,32px)}
+}
+@media(min-width:1024px){
+  .main{max-width:960px}
+}
+@media(min-width:1280px){
+  .main{max-width:1040px}
+}
+</style>
+</head>
+<body>
+
+<!-- Top nav -->
+<header class="top-nav">
+<div class="top-nav-inner">
+<div class="logo">
+<svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:middle;margin-right:6px">
+<circle cx="11" cy="11" r="6.5" stroke="#3a3a3c" stroke-width="1" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>
+<circle cx="11" cy="11" r="6.5" stroke="var(--accent,#92d9bb)" stroke-width="1" stroke-dasharray="7 12" stroke-dashoffset="-3" stroke-linecap="round" fill="none"/>
+<circle cx="6.5" cy="8" r="2.5" fill="#3a3a3c"/>
+<circle cx="15" cy="8" r="2.5" fill="var(--accent,#92d9bb)"/>
+<circle cx="13.5" cy="15.5" r="2.5" fill="var(--accent,#92d9bb)"/>
+</svg>
+<span>Opas</span> <span class="version">DS</span>
+</div>
+<nav class="nav-links">
+<a href="#principles">Principles</a>
+<a href="#tokens">Tokens</a>
+<a href="#color">Color</a>
+<a href="#typography">Type</a>
+<a href="#spacing">Spacing</a>
+<a href="#motion">Motion</a>
+<a href="#components">Components</a>
+<a href="#patterns">Patterns</a>
+<a href="#platform">Platform</a>
+</nav>
+<div class="top-nav-actions">
+<button class="theme-btn" id="themeBtn" aria-label="Toggle theme">🌙</button>
+<button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+</div>
+</div>
+</header>
+
+<!-- Drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer">
+<div class="drawer-header">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="vertical-align:middle;margin-right:4px">
+<circle cx="10" cy="10" r="6.5" stroke="#3a3a3c" stroke-width="1" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>
+<circle cx="10" cy="10" r="6.5" stroke="var(--accent,#92d9bb)" stroke-width="1" stroke-dasharray="7 12" stroke-dashoffset="-3" stroke-linecap="round" fill="none"/>
+<circle cx="6" cy="7" r="2" fill="#3a3a3c"/>
+<circle cx="14" cy="7" r="2" fill="var(--accent,#92d9bb)"/>
+<circle cx="12.5" cy="14.5" r="2" fill="var(--accent,#92d9bb)"/>
+</svg>
+<span>Opas</span> DS <button class="drawer-close" id="drawerClose">✕</button>
+</div>
+<nav>
+<span class="section-label">Foundation</span>
+<a href="#principles" class="drawer-link">Principles &amp; Voice</a>
+<a href="#tokens" class="drawer-link">Token Architecture</a>
+<a href="#naming" class="drawer-link">Naming Conventions</a>
+<a href="#color" class="drawer-link">Color System</a>
+<a href="#typography" class="drawer-link">Typography</a>
+<a href="#spacing" class="drawer-link">Spacing &amp; Grid</a>
+<a href="#motion" class="drawer-link">Motion</a>
+<a href="#interaction" class="drawer-link">Interaction Design</a>
+<span class="section-label">Components</span>
+<a href="#components" class="drawer-link">Mobile Component Library</a>
+<a href="#nav-component" class="drawer-link">Navigation</a>
+<a href="#buttons" class="drawer-link">Buttons</a>
+<a href="#inputs" class="drawer-link">Inputs</a>
+<a href="#cards" class="drawer-link">Cards</a>
+<a href="#badges" class="drawer-link">Badges &amp; Alerts</a>
+<span class="section-label">Design</span>
+<a href="#patterns" class="drawer-link">Patterns &amp; Flows</a>
+<a href="#platform" class="drawer-link">Platform &amp; Accessibility</a>
+</nav>
+<div class="theme-row">
+<span>Appearance</span>
+<button class="theme-btn" id="drawerThemeBtn" aria-label="Toggle theme">🌙</button>
+</div>
+</aside>
+
+<!-- Bottom tab bar — glassmorphism floating (Opas app nav) -->
+<nav class="bottom-tab-bar" aria-label="Main navigation">
+<button class="tab-btn active" data-section="home" onclick="scrollToSection('principles')" aria-label="Home">
+<span class="tab-icon">
+<svg viewBox="0 0 24 24" fill="none">
+<circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>
+<circle cx="12" cy="12" r="7.5" stroke="var(--accent,#92d9bb)" stroke-width="1.2" stroke-dasharray="8 14" stroke-dashoffset="-4" stroke-linecap="round" fill="none"/>
+<circle cx="7" cy="9" r="2.5" fill="#3a3a3c"/>
+<circle cx="17" cy="9" r="2.5" fill="var(--accent,#92d9bb)"/>
+<circle cx="15" cy="17" r="2.5" fill="var(--accent,#92d9bb)"/>
+</svg>
+</span>
+<span class="tab-label">Home</span>
+</button>
+<button class="tab-btn" data-section="search" onclick="scrollToSection('patterns')" aria-label="Search documents">
+<span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5 21 21"></path></svg></span>
+<span class="tab-label">Search</span>
+</button>
+<button class="tab-btn scan-btn" data-section="scan" onclick="scrollToSection('components')" aria-label="Scan new document">
+<span class="scan-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span>
+<span class="tab-label">Scan</span>
+</button>
+<button class="tab-btn" data-section="folders" onclick="scrollToSection('spacing')" aria-label="Document folders">
+<span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"></path></svg></span>
+<span class="tab-label">Folders</span>
+</button>
+<button class="tab-btn" data-section="profile" onclick="scrollToSection('platform')" aria-label="Profile settings">
+<span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>
+<span class="tab-label">Profile</span>
+</button>
+</nav>
+
+<main class="main">
+
+<!-- ═══ Hero ═══ -->
+<section class="hero">
+<span class="badge">v2.0 — May 2026 · Mobile-first</span>
+<h1>
+<svg width="36" height="36" viewBox="0 0 36 36" fill="none" style="vertical-align:middle;margin-right:10px">
+<circle cx="18" cy="18" r="11" stroke="#3a3a3c" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>
+<circle cx="18" cy="18" r="11" stroke="var(--accent,#92d9bb)" stroke-width="1.5" stroke-dasharray="11.5 21" stroke-dashoffset="-5.5" stroke-linecap="round" fill="none"/>
+<circle cx="10" cy="13" r="3" fill="#3a3a3c"/>
+<circle cx="24" cy="11" r="3" fill="var(--accent,#92d9bb)"/>
+<circle cx="21.5" cy="25" r="3" fill="var(--accent,#92d9bb)"/>
+</svg>
+Opas Design System</h1>
+<p>A calm, trustworthy visual language for the AI-powered document assistant that helps expats navigate Finnish bureaucracy. Dark-mode first, built for mobile, engineered for clarity.</p>
+<p style="margin-top:12px;font-size:13px;color:var(--muted)">Logo: <a href="opas-logo-assets.html" style="color:var(--accent)">Ring Path → full asset pack</a> &middot; Circle app icon &middot; Light/dark variants &middot; SVG exports</p>
+<div class="skill-badges">
+<span>91 designer skills</span><span>9 plugins</span><span>mobile-first</span><span>WCAG AA+</span><span>interaction-ready</span>
+</div>
+</section>
+
+<!-- ═══ 1. Principles & Voice ═══ -->
+<section class="section" id="principles">
+<h2>Design Principles &amp; Voice</h2>
+<p class="desc">Five product principles grounded in the <em>design-principles</em> skill, <em>visual-critique composite</em>, and <em>content-strategy</em> skill. Every screen is tested against these before shipping.</p>
+
+<div class="principles">
+<div class="principle-card">
+<div class="num">01</div>
+<h4>Clarity over cleverness</h4>
+<p>Every screen must be usable by someone with intermediate English and zero knowledge of Finnish administrative systems. No jargon, no assumptions. <strong>Miller's Law:</strong> keep 7±2 items per screen, no more.</p>
+</div>
+<div class="principle-card">
+<div class="num">02</div>
+<h4>Action-first hierarchy</h4>
+<p>The most important thing is what to do next — always the most prominent element. Follows the <em>visual-hierarchy</em> and <em>von Restorff effect</em> skills: the primary action should be visually unique.</p>
+</div>
+<div class="principle-card">
+<div class="num">03</div>
+<h4>One thumb, one tap</h4>
+<p>Every core action is reachable with the thumb on a 6.1" screen. The scan button is permanently in the bottom nav. Follows <strong>Fitts's Law</strong>: bigger targets closer to the thumb = faster interaction.</p>
+</div>
+<div class="principle-card">
+<div class="num">04</div>
+<h4>Calm &amp; trustworthy</h4>
+<p>Users arrive stressed. The interface must feel solid, predictable, reassuring — never flashy. <strong>Hick's Law:</strong> fewer choices per screen reduces decision time and anxiety.</p>
+</div>
+<div class="principle-card">
+<div class="num">05</div>
+<h4>Respect the data</h4>
+<p>Government correspondence is sensitive. Design communicates security through restraint: clear visual boundaries around personal content, transparent loading states, no unnecessary data exposure.</p>
+</div>
+</div>
+
+<h3>Voice &amp; Tone</h3>
+<p>Write in plain, direct English. Short sentences. Lead with the action or deadline. Never use bureaucratic language to explain bureaucratic language. Labels are concise nouns. Follows <em>ux-writing</em> skill: every word earns its place.</p>
+
+<h3>Information Architecture</h3>
+<p>Five core sections: <strong>Home</strong> (dashboard + deadlines), <strong>Documents</strong> (scan history), <strong>Scan</strong> (camera), <strong>Guides</strong> (walkthroughs), <strong>Account</strong> (settings). Follows <em>information-architecture</em> skill: card-sorted navigation, 5 ± 2 top-level items. <em>Navigation-patterns</em> skill: bottom tab bar with a visually distinguished primary action.</p>
+</section>
+
+<!-- ═══ 2. Token Architecture ═══ -->
+<section class="section" id="tokens">
+<h2>Token Architecture</h2>
+<p class="desc">Three-tier token system from the <em>design-token</em> skill. Components never reference raw values. Themes override Layer 2 only.</p>
+
+<div class="token-tier">
+<h4><span class="tier-label l1">Layer 1</span> Global primitives</h4>
+<p>Raw atomic values — palette hexes, font stacks, unit, breakpoints. These are theme-agnostic and never change.</p>
+<div class="code-block" style="margin-top:var(--space-2);margin-bottom:0">
+<span class="cm">/* Primitives */</span>
+--color-black: #000000;
+--color-charcoal: #3c3c3c;
+--color-white: #f5f5f7;
+--color-mint: #92d9bb;
+
+<span class="cm">/* Font stacks */</span>
+--font-lufga: 'Lufga', 'Inter', system-ui, sans-serif;
+--font-inter: 'Inter', system-ui, sans-serif;
+--font-jetbrains: 'JetBrains Mono', ui-monospace, monospace;
+
+<span class="cm">/* Unit */</span>
+--unit: 4px;
+
+<span class="cm">/* Safe areas (mobile) */</span>
+--safe-top: env(safe-area-inset-top, 0px);
+--safe-bottom: env(safe-area-inset-bottom, 0px);
+</div>
+</div>
+
+<div class="token-tier">
+<h4><span class="tier-label l2">Layer 2</span> Semantic aliases</h4>
+<p>Purpose-driven — what themes override. Mapped from primitives to functional roles.</p>
+<div class="code-block" style="margin-top:var(--space-2);margin-bottom:0">
+<span class="cm">/* Surface tokens */</span>
+--bg: var(--color-black);
+--surface: var(--color-charcoal);
+--fg: var(--color-white);
+--accent: var(--color-mint);
+
+<span class="cm">/* Spacing */</span>
+--space-inset: 16px;
+--space-stack: 16px;
+--space-inline: 12px;
+
+<span class="cm">/* Safe areas */</span>
+--safe-top: env(safe-area-inset-top, 0px);
+</div>
+</div>
+
+<div class="token-tier">
+<h4><span class="tier-label l3">Layer 3</span> Component-scoped</h4>
+<p>Bound per component. Reference semantic tokens only.</p>
+<div class="code-block" style="margin-top:var(--space-2);margin-bottom:0">
+<span class="cm">/* Button */</span>
+--btn-min-height: 44px;
+--btn-radius: var(--radius-10);
+--btn-primary-bg: var(--accent);
+
+<span class="cm">/* Bottom sheet */</span>
+--sheet-radius: var(--radius-16);
+--sheet-handle-width: 32px;
+</div>
+</div>
+</section>
+
+<!-- ═══ 3. Naming ═══ -->
+<section class="section" id="naming">
+<h2>Naming Conventions</h2>
+<p class="desc">Predictable naming per <em>naming-convention</em> skill. Pattern: <code>{category}-{property}-{concept}-{variant}-{state}</code>.</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Category</th><th>Pattern</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Color</td><td><code>color-{hue}-{weight}</code></td><td><code>color-mint-500</code></td></tr>
+<tr><td>Surface</td><td><code>{role}-{variant}</code></td><td><code>surface-2</code>, <code>surface-3</code></td></tr>
+<tr><td>Spacing</td><td><code>space-{n}</code></td><td><code>space-4</code>, <code>space-inset</code></td></tr>
+<tr><td>Typography</td><td><code>font-{role}</code></td><td><code>font-display</code>, <code>font-mono</code></td></tr>
+<tr><td>Motion</td><td><code>dur-{tempo}</code> / <code>ease-{style}</code></td><td><code>dur-fast</code>, <code>ease-spring</code></td></tr>
+<tr><td>Component</td><td><code>{component}-{property}-{variant}-{state}</code></td><td><code>btn-primary-bg</code></td></tr>
+<tr><td>Touch target</td><td><code>touch-{n}</code></td><td><code>touch-min: 44px</code></td></tr>
+<tr><td>Safe area</td><td><code>safe-{edge}</code></td><td><code>safe-top</code>, <code>safe-bottom</code></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ═══ 4. Color System ═══ -->
+<section class="section" id="color">
+<h2>Color System</h2>
+<p class="desc">Dark-mode-first, built around black + charcoal + mint-teal accent. Follows <em>color-system</em> skill with <em>accesslint</em> WCAG AA+ compliance and <em>dark-mode-design</em> best practices.</p>
+
+<h3>Brand palette</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Token</th><th>Dark</th><th>Light</th><th>Usage</th><th>Contrast</th></tr></thead>
+<tbody>
+<tr><td>--bg</td><td><span class="swatch-dot" style="background:#000"></span>#000</td><td><span class="swatch-dot" style="background:#f5f5f7"></span>#f5f5f7</td><td>Canvas</td><td>—</td></tr>
+<tr><td>--surface</td><td><span class="swatch-dot" style="background:#1c1c1e"></span>#1c1c1e</td><td><span class="swatch-dot" style="background:#fff"></span>#fff</td><td>Cards, sheets</td><td>AA</td></tr>
+<tr><td>--surface-2</td><td><span class="swatch-dot" style="background:#2c2c2e"></span>#2c2c2e</td><td><span class="swatch-dot" style="background:#e8e8ed"></span>#e8e8ed</td><td>Input bg, hover</td><td>AA</td></tr>
+<tr><td>--fg</td><td><span class="swatch-dot" style="background:#f5f5f7"></span>#f5f5f7</td><td><span class="swatch-dot" style="background:#1c1c1e"></span>#1c1c1e</td><td>Primary text</td><td>AAA</td></tr>
+<tr><td>--muted</td><td><span class="swatch-dot" style="background:#86868b"></span>#86868b</td><td><span class="swatch-dot" style="background:#8e8e93"></span>#8e8e93</td><td>Secondary text</td><td>AA</td></tr>
+<tr><td>--border</td><td><span class="swatch-dot" style="background:#38383a"></span>#38383a</td><td><span class="swatch-dot" style="background:#c6c6c8"></span>#c6c6c8</td><td>Borders</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Accent &amp; semantic</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Token</th><th>Dark</th><th>Light</th><th>Usage</th></tr></thead>
+<tbody>
+<tr><td>--accent</td><td><span class="swatch-dot" style="background:#92d9bb"></span>#92d9bb</td><td><span class="swatch-dot" style="background:#1a8a7a"></span>#1a8a7a</td><td>Primary actions, links, active nav</td></tr>
+<tr><td>--accent-hover</td><td><span class="swatch-dot" style="background:#7eccac"></span>#7eccac</td><td><span class="swatch-dot" style="background:#147a6b"></span>#147a6b</td><td>Button press</td></tr>
+<tr><td>--accent-dim</td><td><span class="swatch-dot" style="background:#92d9bb22"></span>15%</td><td><span class="swatch-dot" style="background:#1a8a7a18"></span>10%</td><td>Subtle backgrounds</td></tr>
+<tr><td>--danger</td><td><span class="swatch-dot" style="background:#ff453a"></span>#ff453a</td><td><span class="swatch-dot" style="background:#d32f2f"></span>#d32f2f</td><td>Errors, destructive</td></tr>
+<tr><td>--warning</td><td><span class="swatch-dot" style="background:#ff9f0a"></span>#ff9f0a</td><td><span class="swatch-dot" style="background:#e68a00"></span>#e68a00</td><td>Deadlines, warnings</td></tr>
+<tr><td>--success</td><td><span class="swatch-dot" style="background:#30d158"></span>#30d158</td><td><span class="swatch-dot" style="background:#2e7d32"></span>#2e7d32</td><td>Complete, confirmed</td></tr>
+<tr><td>--info</td><td><span class="swatch-dot" style="background:#5e5ce6"></span>#5e5ce6</td><td><span class="swatch-dot" style="background:#5e5ce6"></span>#5e5ce6</td><td>Info, tips</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Accessibility audit</h3>
+<ul>
+<li><strong>--fg on --bg:</strong> 15:1 → AAA ✓</li>
+<li><strong>--muted on --bg:</strong> 5.3:1 → AA ✓</li>
+<li><strong>--accent on --bg:</strong> 5.7:1 → AA ✓ (do not use for small text)</li>
+<li><strong>Non-color signals:</strong> every status also uses an icon or label — never color alone (accesslint rule)</li>
+<li><strong>Touch targets:</strong> min 44px × 44px per Fitts's Law — verified on every interactive element</li>
+</ul>
+
+<h3>Guidelines</h3>
+<ul>
+<li>One accent per screen, used 1–2 times max. The accent is a precision tool, not a decorative wash</li>
+<li>Status colors as badges or inline indicators — never full backgrounds</li>
+<li>Squint test: blur your eyes — hierarchy should still be clear (<em>visual-hierarchy</em> skill)</li>
+<li>Follow <em>aesthetic-usability effect</em>: visually pleasing designs are perceived as more usable — but never at the cost of accessibility</li>
+</ul>
+</section>
+
+<!-- ═══ 5. Typography ═══ -->
+<section class="section" id="typography">
+<h2>Typography</h2>
+<p class="desc">Lufga (display) + Inter (body) + JetBrains Mono (code). 1.25 major-third ratio. Follows <em>typography-scale</em> skill and <em>critique-typography</em> skill. Never <strong>Inter as display</strong> — all headlines use Lufga per <em>anthropic-frontend-design</em> rules.</p>
+
+<div class="font-showcase">
+<div class="font-card">
+<h4>Display — Lufga</h4>
+<div class="sample" style="font-family:'Lufga','Inter',system-ui,sans-serif">Lufga</div>
+<div class="sample-sub" style="font-family:'Lufga','Inter',system-ui,sans-serif">The quick brown fox jumps over the lazy dog. Helsingissä on kaunis ilma.</div>
+<div class="stack">'Lufga', 'Inter', system-ui, sans-serif</div>
+</div>
+<div class="font-card">
+<h4>Body — Inter</h4>
+<div class="sample" style="font-family:'Inter',system-ui,sans-serif">Inter</div>
+<div class="sample-sub" style="font-family:'Inter',system-ui,sans-serif">The quick brown fox jumps over the lazy dog. Helsingissä on kaunis ilma.</div>
+<div class="stack">'Inter', system-ui, sans-serif</div>
+</div>
+</div>
+
+<h3>Type scale (1.25)</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Style</th><th>Size</th><th>Weight</th><th>Line height</th><th>Tracking</th><th>Font</th><th>Mobile usage</th></tr></thead>
+<tbody>
+<tr><td>Display</td><td>clamp(32,6vw,56)</td><td>700</td><td>1.05</td><td>-0.03em</td><td>Lufga</td><td>Splash, hero screens</td></tr>
+<tr><td>Heading XL</td><td>clamp(24,4.5vw,40)</td><td>600</td><td>1.1</td><td>-0.02em</td><td>Lufga</td><td>Screen titles</td></tr>
+<tr><td>Heading L</td><td>20px</td><td>600</td><td>1.25</td><td>-0.01em</td><td>Lufga</td><td>Section headers</td></tr>
+<tr><td>Heading M</td><td>17px</td><td>600</td><td>1.3</td><td>-0.005em</td><td>Lufga</td><td>Card titles</td></tr>
+<tr><td>Body</td><td>15px</td><td>400</td><td>1.7</td><td>0</td><td>Inter</td><td>Paragraphs</td></tr>
+<tr><td>Body small</td><td>13px</td><td>400</td><td>1.6</td><td>0</td><td>Inter</td><td>Metadata, deadlines</td></tr>
+<tr><td>Caption</td><td>12px</td><td>500</td><td>1.5</td><td>0.02em</td><td>Inter</td><td>Timestamps, IDs</td></tr>
+<tr><td>Monospace</td><td>13px</td><td>400</td><td>1.7</td><td>0</td><td>JetBrains Mono</td><td>Code, job IDs</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Mobile-specific rules</h3>
+<ul>
+<li>Body text min 15px — 13px only for metadata (accesslint: never below 12px at 100% zoom)</li>
+<li>Optimal line length for mobile: 35–65 characters (<em>readable-measure</em> skill)</li>
+<li>Input fields: <strong>16px</strong> minimum to prevent iOS zoom on focus (accesslint &amp; form-design)</li>
+<li><code>font-variant-numeric: tabular-nums</code> for dates, amounts, and deadlines</li>
+<li>Dynamic type support via <code>clamp()</code> — respects iOS font size changes</li>
+</ul>
+
+<h3>Samples</h3>
+<div class="type-sample"><div class="label">Display</div><div class="display-1">Opas guides you</div></div>
+<div class="type-sample"><div class="label">Heading XL</div><div class="heading-xl">Your documents, decoded</div></div>
+<div class="type-sample"><div class="label">Heading L</div><div class="heading-l">Recent documents</div></div>
+<div class="type-sample"><div class="label">Body · 45–65 chars</div><div class="body">This letter from Kela confirms your student financial aid. Your monthly benefit is €536.86, paid on the first banking day.</div></div>
+<div class="type-sample"><div class="label">Body small · metadata</div><div class="body-small">Deadline: submit income report by 31 July 2026</div></div>
+<div class="type-sample"><div class="label">Mono · tabular-nums</div><div class="mono">job_id: d4e7f8a1-2b3c-4d5e-6f7a-8b9c0d1e2f3a</div></div>
+</section>
+
+<!-- ═══ 6. Spacing & Grid ═══ -->
+<section class="section" id="spacing">
+<h2>Spacing &amp; Grid</h2>
+<p class="desc">4px base unit powering a consistent scale with three spacing types. Follows <em>spacing-system</em> skill and <em>layout-grid</em> skill. Mobile-first breakpoints from 360px to 1920px.</p>
+
+<div class="spacing-scale">
+<div class="spacing-unit"><div class="bar" style="height:4px"></div><span class="val">4px</span></div>
+<div class="spacing-unit"><div class="bar" style="height:8px"></div><span class="val">8px</span></div>
+<div class="spacing-unit"><div class="bar" style="height:12px"></div><span class="val">12px</span></div>
+<div class="spacing-unit"><div class="bar" style="height:16px"></div><span class="val">16px</span></div>
+<div class="spacing-unit"><div class="bar" style="height:24px;width:40px"></div><span class="val">24px</span></div>
+<div class="spacing-unit"><div class="bar" style="height:32px;width:40px"></div><span class="val">32px</span></div>
+<div class="spacing-unit"><div class="bar" style="height:48px;width:48px"></div><span class="val">48px</span></div>
+<div class="spacing-unit"><div class="bar" style="height:64px;width:48px"></div><span class="val">64px</span></div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Token</th><th>Value</th><th>Token</th><th>Value</th><th>Mobile usage</th></tr></thead>
+<tbody>
+<tr><td>--space-1</td><td>4px</td><td>--space-2</td><td>8px</td><td>Icon gaps</td></tr>
+<tr><td>--space-3</td><td>12px</td><td>--space-4</td><td>16px</td><td>Card padding, stack</td></tr>
+<tr><td>--space-5</td><td>20px</td><td>--space-6</td><td>24px</td><td>Page margins (mobile)</td></tr>
+<tr><td>--space-8</td><td>32px</td><td>--space-10</td><td>40px</td><td>Section gaps</td></tr>
+<tr><td>--space-12</td><td>48px</td><td>--space-16</td><td>64px</td><td>Major regions</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Spacing types</h3>
+<ul>
+<li><strong>Inset:</strong> internal container padding. Mobile: 16px inset for cards, 20px for page margins</li>
+<li><strong>Stack:</strong> vertical space between elements. Related: 12–16px. Sections: 32–48px</li>
+<li><strong>Inline:</strong> horizontal gap between inline elements (buttons, pills). Default: 8–12px</li>
+<li><strong>Touch cushion:</strong> extra padding inside interactive areas to meet 44px min target</li>
+</ul>
+
+<h3>Mobile-first breakpoints</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Breakpoint</th><th>Width</th><th>Columns</th><th>Gutter</th><th>Margin</th><th>Target</th></tr></thead>
+<tbody>
+<tr><td>Mobile compact</td><td>360px</td><td>4</td><td>12px</td><td>16px</td><td>Small iPhones</td></tr>
+<tr><td>Mobile standard</td><td>390–430px</td><td>4</td><td>16px</td><td>20px</td><td>iPhone 14–16, Pixel</td></tr>
+<tr><td>Foldable</td><td>600–744px</td><td>8</td><td>16px</td><td>24px</td><td>Galaxy Fold, iPad Mini</td></tr>
+<tr><td>Tablet portrait</td><td>768–834px</td><td>8</td><td>20px</td><td>32px</td><td>iPad, Tab S</td></tr>
+<tr><td>Laptop</td><td>1280+</td><td>12</td><td>24px</td><td>40px</td><td>Desktop web</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Mobile layout rules</h3>
+<ul>
+<li>Content never exceeds 45–75 chars per line (80px readable-measure max on mobile)</li>
+<li>Page margins: 16px compact → 20px standard → 24px foldable</li>
+<li>Bottom tab bar is 64px + safe-area-bottom</li>
+<li>Top nav is 56px + safe-area-top</li>
+<li>Interactive elements inside scroll containers must stay above the bottom tab bar</li>
+<li>Use <code>env(safe-area-inset-*)</code> for notch and home indicator</li>
+</ul>
+</section>
+
+<!-- ═══ 7. Motion ═══ -->
+<section class="section" id="motion">
+<h2>Motion</h2>
+<p class="desc">Follows <em>animation-principles</em>, <em>motion-system</em>, and <em>doherty-threshold</em> skills. Every animation should complete within 400ms (the Doherty Threshold) and communicate hierarchy.</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+<tbody>
+<tr><td>--dur-fast</td><td>150ms</td><td>Hover, press, toggle, micro-interactions</td></tr>
+<tr><td>--dur-normal</td><td>250ms</td><td>Transitions, sheet open/close, tab switches</td></tr>
+<tr><td>--dur-slow</td><td>400ms</td><td>Page transitions, onboarding, hero reveals</td></tr>
+<tr><td>--ease-out</td><td>cubic-bezier(0.16,1,0.3,1)</td><td>Standard entrance (material-inspired deceleration)</td></tr>
+<tr><td>--ease-spring</td><td>cubic-bezier(0.34,1.56,0.64,1)</td><td>Button press, toggle switch, liking animations</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Mobile micro-interaction spec</h3>
+<ul>
+<li><strong>Button press:</strong> scale(0.97) + 150ms ease-out — tactile response</li>
+<li><strong>Tab switch:</strong> 250ms fade + slide — content layer beneath nav stays static</li>
+<li><strong>Bottom sheet:</strong> 300ms spring entrance — slides up from edge with handle indicator</li>
+<li><strong>Toast:</strong> 250ms slide-in from top, auto-dismiss after 4s (or explicit close)</li>
+<li><strong>Pull to refresh:</strong> 400ms spring — spinner appears, content resists then releases</li>
+<li><strong>Page transitions:</strong> 350ms slide — push new screen from right (iOS) or fade (Android)</li>
+<li><strong>Haptic feedback:</strong> light impact for button press, medium warning for alerts, success notification for completion</li>
+</ul>
+
+<h3>Doherty Threshold compliance</h3>
+<p>Every user-initiated action provides feedback within 400ms. Loading states &gt;400ms show a skeleton or spinner. Transitions &gt;500ms show a progress indicator with a cancel option when possible (<em>loading-states</em> skill, <em>doherty-threshold</em> skill).</p>
+
+<h3>Gesture patterns</h3>
+<ul>
+<li><strong>Swipe left on document card:</strong> reveals "Archive" and "Delete" actions (iOS-style)</li>
+<li><strong>Swipe right on document card:</strong> marks as "Done" / changes status</li>
+<li><strong>Pull down:</strong> refresh document list (with haptic on release)</li>
+<li><strong>Long press on document:</strong> context menu (select, share, export)</li>
+<li><strong>Tap scan button:</strong> opens camera immediately — no second tap</li>
+</ul>
+</section>
+
+<!-- ═══ 8. Interaction Design ═══ -->
+<section class="section" id="interaction">
+<h2>Interaction Design</h2>
+<p class="desc">Grounded in 15 interaction design skills from the Owl-Listener framework. Every touch point is engineered, not placed.</p>
+
+<h3>Fitts's Law — touch target calculator</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Element</th><th>Min size</th><th>Distance from thumb</th><th>Priority</th></tr></thead>
+<tbody>
+<tr><td>Bottom tab items</td><td>44×44px ✓</td><td>0 (fixed)</td><td>Critical</td></tr>
+<tr><td>Primary action button</td><td>52px height</td><td>Bottom-center</td><td>Critical</td></tr>
+<tr><td>Document list items</td><td>44×100%</td><td>Scrollable</td><td>High</td></tr>
+<tr><td>Back button (top left)</td><td>44×44px</td><td>Far (hardest)</td><td>High</td></tr>
+<tr><td>Inline links</td><td>11px text</td><td>Anywhere</td><td>Low → pad to 44px</td></tr>
+<tr><td>Scan FAB</td><td>56×56px</td><td>Thumb zone</td><td>Critical</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Hick's Law — choices per screen</h3>
+<ul>
+<li>Bottom nav: 5 items ← 5 ± 2 (Miller's Law)</li>
+<li>Document list actions: 3 max (view, deadline, archive)</li>
+<li>Filter chips: 5 max per category</li>
+<li>Settings sections: grouped into 7±2 clusters</li>
+<li>Onboarding: 3–5 steps, one decision each</li>
+</ul>
+
+<h3>Loading states (Doherty Threshold)</h3>
+<ul>
+<li><strong>0–200ms:</strong> no feedback needed. Feels instant.</li>
+<li><strong>200–400ms:</strong> subtle spinner or inline loading indicator (e.g. while decoding a document)</li>
+<li><strong>400–2000ms:</strong> skeleton screen matching content layout — maintain user orientation</li>
+<li><strong>2000ms+:</strong> progress bar with estimated time + graceful degrade messaging</li>
+<li><strong>Failure:</strong> inline error message with retry action. Never a blank screen.</li>
+</ul>
+
+<h3>State machine — every component has states</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Component</th><th>States</th></tr></thead>
+<tbody>
+<tr><td>Button</td><td>enabled → hover → active/pressed → disabled → loading</td></tr>
+<tr><td>Input</td><td>empty → typing → focused → error → filled → disabled</td></tr>
+<tr><td>Document card</td><td>default → hover → swiped-left → swiped-right → loading</td></tr>
+<tr><td>Scan button</td><td>ready → scanning → processing → success → error → disabled</td></tr>
+<tr><td>Sheet</td><td>closed → dragging → open (snapped) → open (full) → dismissing</td></tr>
+<tr><td>Toast</td><td>entering → visible → exiting → gone</td></tr>
+<tr><td>Bottom nav</td><td>idle → tab-pressed → screen-transition → new-badge</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Error handling</h3>
+<ul>
+<li><strong>Document scan fails:</strong> show inline error with specific reason ("Too dark", "Blurry", "Not a document") + retry button</li>
+<li><strong>Network error:</strong> bottom toast with offline indicator, cached content shown, action queue stored locally</li>
+<li><strong>Decoding error:</strong> text-level explanation ("We couldn't read this format"), alternative options (manual entry, try again, email to support)</li>
+<li><strong>Empty state:</strong> clear what to do next ("No documents yet — tap Scan to start") — follows <em>empty-state</em> pattern</li>
+</ul>
+</section>
+
+<!-- ═══ 9. Mobile Component Library ═══ -->
+<section class="section" id="components">
+<h2>Mobile Component Library</h2>
+<p class="desc">Every component follows the 8-part <em>component-spec</em> skill: anatomy, variants, states, accessibility, content rules, responsive behavior, motion, usage guidelines. All touch targets ≥ 44px (Fitts's Law).</p>
+</section>
+
+<!-- ═══ 9a. Nav ═══ -->
+<section class="section" id="nav-component">
+<h3>Bottom Tab Navigation</h3>
+<p>The primary navigation for the mobile app. Five tabs with a visually distinguished scan button center. Follows <em>navigation-patterns</em> skill.</p>
+
+<div class="spec-grid">
+<div class="spec-card"><h5>Anatomy</h5><div class="spec-val">SVG icon + label per tab · center: scan FAB</div><p>5 tabs: Home, Search, Scan, Folders, Profile</p></div>
+<div class="spec-card"><h5>States</h5><div class="spec-val">inactive (muted) · active (accent, stroke 2.5) · scan (always accent)</div></div>
+<div class="spec-card"><h5>Touch</h5><div class="spec-val">44×44px min · scan FAB: 56px raised</div></div>
+<div class="spec-card"><h5>Motion</h5><div class="spec-val">FAB spring press (scale .88) · active icon weight shift</div></div>
+</div>
+
+<div class="comp-section">
+<h4>Demo <span class="spec-label">glassmorphism floating</span></h4>
+<div style="display:flex;align-items:center;justify-content:center;padding:var(--space-4);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg)">
+<div class="bottom-tab-bar" style="position:relative;bottom:auto;left:auto;transform:none;margin:0">
+<button class="tab-btn active" onclick="void(0)" aria-label="Home">
+<span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a1 1 0 0 1 .3-.7l8-8a1 1 0 0 1 1.4 0l8 8a1 1 0 0 1 .3.7v8a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path></svg></span>
+<span class="tab-label">Home</span>
+</button>
+<button class="tab-btn" onclick="void(0)" aria-label="Search">
+<span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5 21 21"></path></svg></span>
+<span class="tab-label">Search</span>
+</button>
+<button class="tab-btn scan-btn" onclick="void(0)" aria-label="Scan">
+<span class="scan-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span>
+<span class="tab-label">Scan</span>
+</button>
+<button class="tab-btn" onclick="void(0)" aria-label="Folders">
+<span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"></path></svg></span>
+<span class="tab-label">Folders</span>
+</button>
+<button class="tab-btn" onclick="void(0)" aria-label="Profile">
+<span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>
+<span class="tab-label">Profile</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 9b. Buttons ═══ -->
+<section class="section" id="buttons">
+<h3>Buttons</h3>
+<p>Five variants across three sizes. Every button has a minimum touch target of 44px. Primary and secondary for most actions; ghost for tertiary; danger for destructive.</p>
+
+<div class="spec-grid">
+<div class="spec-card"><h5>Anatomy</h5><div class="spec-val">Icon (opt) + label + right slot (opt)</div></div>
+<div class="spec-card"><h5>Variants</h5><div class="spec-val">primary · secondary · outline · ghost · danger</div></div>
+<div class="spec-card"><h5>Sizes</h5><div class="spec-val">sm (32px) · md (44px) · lg (52px)</div></div>
+<div class="spec-card"><h5>States</h5><div class="spec-val">default · hover · active · focus · disabled · loading</div></div>
+</div>
+
+<div class="comp-section">
+<h4>Variants <span class="spec-label">spec v1</span></h4>
+<div class="comp-row">
+<button class="btn btn-primary">Scan document</button>
+<button class="btn btn-secondary">Cancel</button>
+<button class="btn btn-outline">Outline</button>
+<button class="btn btn-ghost">Ghost</button>
+<button class="btn btn-danger">Delete</button>
+</div>
+<h4>Sizes</h4>
+<div class="comp-row">
+<button class="btn btn-primary btn-sm">Small</button>
+<button class="btn btn-primary">Default</button>
+<button class="btn btn-primary btn-lg">Large</button>
+<button class="btn btn-primary" disabled="">Disabled</button>
+</div>
+<h4>Block (mobile full-width)</h4>
+<button class="btn btn-primary btn-block" style="max-width:400px">Continue</button>
+</div>
+</section>
+
+<!-- ═══ 9c. Inputs ═══ -->
+<section class="section" id="inputs">
+<h3>Inputs</h3>
+<p>Mobile-optimized inputs with 16px font to prevent iOS zoom, keyboard-aware labels, and clear error states. Follows <em>form-design</em> skill.</p>
+
+<div class="spec-grid">
+<div class="spec-card"><h5>Anatomy</h5><div class="spec-val">Label + field + hint/error</div></div>
+<div class="spec-card"><h5>Font size</h5><div class="spec-val"><strong>16px minimum</strong> to prevent iOS zoom on focus</div></div>
+<div class="spec-card"><h5>States</h5><div class="spec-val">empty · typing · filled · error · disabled</div></div>
+<div class="spec-card"><h5>Keyboard</h5><div class="spec-val">Set <code>inputmode</code> per type: numeric, email, url</div></div>
+</div>
+
+<div class="comp-section">
+<h4>Demo <span class="spec-label">mobile inputs</span></h4>
+<div class="input-group" style="max-width:400px">
+<label class="input-label">Finnish HETU</label>
+<input class="input" type="text" inputmode="numeric" placeholder="DDMMYY-XXXX" value="010190-1234">
+<span class="input-hint">Personal identity code from your Finnish ID card</span>
+</div>
+<div class="input-group" style="max-width:400px">
+<label class="input-label">Email</label>
+<input class="input" type="email" inputmode="email" placeholder="you@example.com" value="priya@helsinki.fi">
+</div>
+<div class="input-group" style="max-width:400px">
+<label class="input-label">Document ID</label>
+<input class="input error" type="text" value="invalid-id-xxx">
+<span class="input-hint" style="color:var(--danger)">Enter a 10-character document ID</span>
+</div>
+<div class="input-group" style="max-width:400px">
+<label class="input-label">Notes</label>
+<textarea class="input" placeholder="Add context..." style="min-height:72px">Kela benefit notice — check income deadline</textarea>
+</div>
+</div>
+</section>
+
+<!-- ═══ 9d. Cards ═══ -->
+<section class="section" id="cards">
+<h3>Cards</h3>
+<p>Document cards and content cards — the primary content containers in the app. Document cards have swipe actions per <em>gesture-patterns</em> skill.</p>
+
+<div class="spec-grid">
+<div class="spec-card"><h5>Anatomy</h5><div class="spec-val">Badge + title + desc + deadline/meta</div></div>
+<div class="spec-card"><h5>Variants</h5><div class="spec-val">content card · doc card · interactive</div></div>
+<div class="spec-card"><h5>Swipe</h5><div class="spec-val">Swipe left: actions · Swipe right: complete</div></div>
+<div class="spec-card"><h5>Touch</h5><div class="spec-val">Min height 68px · tap targets ≥44px</div></div>
+</div>
+
+<div class="comp-section">
+<h4>Demo <span class="spec-label">spec v1</span></h4>
+<div class="card" style="max-width:400px;margin-bottom:var(--space-3)">
+<div class="card-badge">Kela — Benefit notice</div>
+<div class="card-title">Student financial aid confirmation</div>
+<div class="card-desc">Monthly benefit: €536.86. Income report deadline: 31 July 2026.</div>
+<div class="card-meta">Confidence 94% · Decoded 14 May 2026</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:400px">
+<div class="doc-card">
+<div class="icon">📄</div>
+<div class="info">
+<div class="title">Kela — Student benefit notice</div>
+<div class="sub">Decoded 14 May · 3 actions required</div>
+</div>
+<div class="deadline">Due 31 Jul</div>
+</div>
+<div class="doc-card">
+<div class="icon">📋</div>
+<div class="info">
+<div class="title">Vero — Tax decision 2025</div>
+<div class="sub">Decoded 10 May · Appeal deadline</div>
+</div>
+<div class="deadline" style="color:var(--danger)">Due 9 Jun</div>
+</div>
+<div class="doc-card">
+<div class="icon">📎</div>
+<div class="info">
+<div class="title">Migri — Residence permit renewal</div>
+<div class="sub">Decoded 2 May · No action needed</div>
+</div>
+<span class="badge badge-success">Complete</span>
+</div>
+</div>
+</div>
+
+<h4>Interactive cards</h4>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);max-width:400px">
+<div class="card interactive" onclick="void(0)">
+<div class="card-title">Scan a document</div>
+<div class="card-desc">Photograph any official letter from Kela, Vero, or Migri.</div>
+<span style="font-size:12px;color:var(--accent);font-weight:500">Start scan →</span>
+</div>
+<div class="card interactive" onclick="void(0)">
+<div class="card-title">Browse guides</div>
+<div class="card-desc">Step-by-step walkthroughs for residence permits and more.</div>
+<span style="font-size:12px;color:var(--accent);font-weight:500">View guides →</span>
+</div>
+</div>
+</section>
+
+<!-- ═══ 9e. Badges & Alerts ═══ -->
+<section class="section" id="badges">
+<h3>Badges, Pills &amp; Alerts</h3>
+<p>Compact status indicators. Badges are filled (tinted bg); pills are bordered (chip-style); alerts provide contextual feedback.</p>
+
+<div class="comp-section">
+<h4>Badges <span class="spec-label">spec v1</span></h4>
+<div class="comp-row">
+<span class="badge badge-accent">Processing</span>
+<span class="badge badge-success">Complete</span>
+<span class="badge badge-warning">Action needed</span>
+<span class="badge badge-danger">Expired</span>
+<span class="badge badge-info">New</span>
+<span class="badge badge-neutral">Draft</span>
+</div>
+<h4>Pills (category chips)</h4>
+<div class="comp-row">
+<span class="pill">Kela</span>
+<span class="pill">Vero</span>
+<span class="pill">Migri</span>
+<span class="pill">Suomi.fi</span>
+</div>
+<h4>Mobile alerts <span class="spec-label">spec v1</span></h4>
+<div style="max-width:400px">
+<div class="alert alert-success"><span class="alert-icon">✓</span><span>Document decoded. 3 actions extracted.</span></div>
+<div class="alert alert-warning"><span class="alert-icon">⚠</span><span><strong>Deadline:</strong> Income report due 31 July 2026.</span></div>
+<div class="alert alert-danger"><span class="alert-icon">✕</span><span>Couldn't read this. Try a clearer photo.</span></div>
+<div class="alert alert-info"><span class="alert-icon">ℹ</span><span>Premium: draft appeal letters, export PDF, sync deadlines.</span></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 9f. Bottom Sheet ═══ -->
+<section class="section">
+<h3>Bottom Sheet</h3>
+<p>Commonly used for action selection, document context menus, and filter choices. Follows <em>feedback-patterns</em> skill with drag handle, title, and action rows.</p>
+
+<div class="spec-grid">
+<div class="spec-card"><h5>Anatomy</h5><div class="spec-val">Handle + title (opt) + rows + close</div></div>
+<div class="spec-card"><h5>States</h5><div class="spec-val">closed → dragging → snapped → full</div></div>
+<div class="spec-card"><h5>Motion</h5><div class="spec-val">300ms spring entrance · drag to dismiss</div></div>
+<div class="spec-card"><h5>Touch</h5><div class="spec-val">Rows min 44px · drag handle min 32px</div></div>
+</div>
+
+<div class="comp-section">
+<h4>Demo <span class="spec-label">mobile sheet</span></h4>
+<div class="sheet-demo">
+<div class="sheet-handle"></div>
+<div class="sheet-title">Actions for Kela notice</div>
+<div class="sheet-row"><span class="s-icon" style="background:var(--accent-dim);color:var(--accent)">👁</span><span class="s-label">View decoded text</span><span class="s-desc">Full transcript</span></div>
+<div class="sheet-row"><span class="s-icon" style="background:#30d15822;color:var(--success)">📅</span><span class="s-label">Add deadline to calendar</span><span class="s-desc">31 Jul 2026</span></div>
+<div class="sheet-row"><span class="s-icon" style="background:#ff9f0a22;color:var(--warning)">📎</span><span class="s-label">Appeal this decision</span><span class="s-desc">Draft letter</span></div>
+<div class="sheet-row"><span class="s-icon" style="background:#5e5ce622;color:var(--info)">📤</span><span class="s-label">Share</span><span class="s-desc">PDF or link</span></div>
+<div class="sheet-row" style="border-top:1px solid var(--border);margin-top:var(--space-2);padding-top:var(--space-3);color:var(--danger)"><span class="s-icon" style="background:#ff453a22;color:var(--danger)">🗑</span><span class="s-label">Delete document</span></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 9g. Toast / Snackbar ═══ -->
+<section class="section">
+<h3>Toast</h3>
+<p>Transient notifications for confirmation, offline mode, and errors. Auto-dismisses after 4s. Follows <em>feedback-patterns</em> and <em>doherty-threshold</em> skills.</p>
+
+<div class="comp-section">
+<h4>Demo <span class="spec-label">spec v1</span></h4>
+<div class="toast-demo">
+<span class="t-icon">✓</span>
+<span class="t-msg">Document decoded successfully</span>
+<button class="t-action">View</button>
+</div>
+</div>
+
+<h4>Toast variants</h4>
+<ul>
+<li><strong>Success:</strong> green accent, auto-dismiss 3s</li>
+<li><strong>Error:</strong> red accent, manual dismiss or 6s auto-dismiss</li>
+<li><strong>Offline:</strong> warning accent, persists until reconnection</li>
+<li><strong>Info:</strong> neutral accent, 4s auto-dismiss</li>
+</ul>
+</section>
+
+<!-- ═══ 9h. Loading States ═══ -->
+<section class="section">
+<h3>Loading States</h3>
+<p>Skeleton screens and spinners following <em>loading-states</em> skill. Skeletons match content layout to maintain spatial orientation. Spinners for brief waits (200–400ms Doherty threshold).</p>
+
+<div class="comp-section">
+<h4>Skeleton <span class="spec-label">spec v1</span></h4>
+<div class="skeleton-demo">
+<div class="skeleton-line h"></div>
+<div class="skeleton-line w"></div>
+<div class="skeleton-line s"></div>
+<div class="skeleton-block"></div>
+<div class="skeleton-line w"></div>
+<div class="skeleton-line s"></div>
+</div>
+</div>
+
+<div class="comp-section">
+<h4>Spinner <span class="spec-label">spec v1</span></h4>
+<div class="spinner-demo">
+<div class="spinner"></div>
+<span style="font-size:14px;color:var(--muted)">Decoding document…</span>
+</div>
+<div class="spinner-demo">
+<div class="spinner spinner-lg"></div>
+<span style="font-size:15px;color:var(--muted)">Processing your document…</span>
+</div>
+</div>
+</section>
+
+<!-- ═══ 9i. Empty & Error States ═══ -->
+<section class="section">
+<h3>Empty &amp; Error States</h3>
+<p>Every list, search result, and screen has designed empty and error states per <em>state-machine</em> and <em>error-handling-ux</em> skills. Never a blank screen.</p>
+
+<div class="comp-section">
+<h4>Empty state <span class="spec-label">spec v1</span></h4>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);max-width:400px;min-height:280px;display:flex;align-items:center;justify-content:center">
+<div class="empty-state">
+<div class="e-icon">📄</div>
+<h4>No documents yet</h4>
+<p>Tap the scan button below to photograph your first official letter. Opas will decode it and show you what to do next.</p>
+<button class="btn btn-primary" style="display:inline-flex">Scan a document</button>
+</div>
+</div>
+</div>
+
+<div class="comp-section" style="text-align: center;">
+<h4>Error state <span class="spec-label">spec v1</span></h4>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);max-width:400px;min-height:280px;display:flex;align-items:center;justify-content:center">
+<div class="empty-state">
+<div class="e-icon" style="color:var(--danger);opacity:.5">⚠</div>
+<h4>Connection lost</h4>
+<p>Your documents are saved locally. We'll sync them automatically when your connection returns.</p>
+<button class="btn btn-secondary" style="display:inline-flex">Try again</button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 10. Patterns & Flows ═══ -->
+<section class="section" id="patterns">
+<h2>Patterns &amp; Flows</h2>
+<p class="desc">Key user flows woven from the component library. Each follows <em>navigation-patterns</em>, <em>form-design</em>, <em>onboarding-design</em>, and <em>information-architecture</em> skills.</p>
+
+<h3>Scanning flow</h3>
+<div class="spec-grid">
+<div class="spec-card"><h5>Step 1</h5><div class="spec-val">Tap Scan (bottom nav)</div><p>Camera opens immediately — no splash screen</p></div>
+<div class="spec-card"><h5>Step 2</h5><div class="spec-val">Align document in frame</div><p>Auto-capture when stable. 1.5s max manual tap</p></div>
+<div class="spec-card"><h5>Step 3</h5><div class="spec-val">Processing → skeleton</div><p>Skeleton screen with "Decoding document…" spinner</p></div>
+<div class="spec-card"><h5>Step 4</h5><div class="spec-val">Result → document card</div><p>New card in list with extracted actions + deadline badge</p></div>
+</div>
+
+<h3>Document review flow</h3>
+<div class="spec-grid">
+<div class="spec-card"><h5>Entry</h5><div class="spec-val">Tap doc card in list</div><p>Fade transition to detail view</p></div>
+<div class="spec-card"><h5>Content</h5><div class="spec-val">Original text + AI summary</div><p>Tab switcher: Original | Summary | Actions</p></div>
+<div class="spec-card"><h5>Actions</h5><div class="spec-val">Bottom sheet on "Do this"</div><p>Each extracted deadline has a "Add to calendar" action</p></div>
+<div class="spec-card"><h5>Complete</h5><div class="spec-val">Mark as done → badge changes</div><p>Swipe right or tap checkmark</p></div>
+</div>
+
+<h3>Onboarding flow</h3>
+<div class="spec-grid">
+<div class="spec-card"><h5>Step 1</h5><div class="spec-val">Welcome + Permissions</div><p>Camera permission request with explanation. Follows <em>onboarding-design</em> skill</p></div>
+<div class="spec-card"><h5>Step 2</h5><div class="spec-val">Scan your first doc</div><p>Guided scan with overlay frame — no blank tutorial screens</p></div>
+<div class="spec-card"><h5>Step 3</h5><div class="spec-val">See the result</div><p>Animated reveal of decoded document with extracted deadline</p></div>
+</div>
+
+<h3>Search UX</h3>
+<ul>
+<li>Search accessible from Home screen (top search bar) and Documents tab</li>
+<li>Results filtered by: document name, issuing authority (Kela, Vero, Migri), date range, status</li>
+<li>No results: empty state with "Try a different term" + suggestion chips</li>
+<li>Follows <em>search-ux</em> skill: search-as-you-type with 300ms debounce</li>
+</ul>
+</section>
+
+<!-- ═══ 11. Platform & Accessibility ═══ -->
+<section class="section" id="platform">
+<h2>Platform &amp; Accessibility</h2>
+<p class="desc">Cross-platform engineering and WCAG compliance. Follows <em>accessibility-audit</em>, <em>accesslint</em>, <em>responsive-design</em>, and <em>localization-design</em> skills.</p>
+
+<h3>Mobile platform specs</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Property</th><th>iOS</th><th>Android</th></tr></thead>
+<tbody>
+<tr><td>Status bar height</td><td>44–54px (Dynamic Island)</td><td>24–40px (varies)</td></tr>
+<tr><td>Nav bar height</td><td>44px (standard)</td><td>48–56px (Material)</td></tr>
+<tr><td>Bottom safe area</td><td>34px (home indicator)</td><td>16–24px (nav bar)</td></tr>
+<tr><td>Touch target</td><td>≥44×44pt</td><td>≥48×48dp</td></tr>
+<tr><td>Font scaling</td><td>Dynamic Type (UIFontMetrics)</td><td>sp units (auto-scale)</td></tr>
+<tr><td>Keyboard avoidance</td><td>Auto via inputAccessoryView</td><td>adjustResize window soft input mode</td></tr>
+<tr><td>Haptic feedback</td><td>UIImpactFeedbackGenerator</td><td>HapticFeedback.performConstantPressure</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Safe areas</h3>
+<ul>
+<li>Use <code>env(safe-area-inset-top)</code> and <code>env(safe-area-inset-bottom)</code> in CSS</li>
+<li>Content must not render under the notch or home indicator</li>
+<li>Bottom tab bar includes safe area padding</li>
+<li>Top nav includes safe area padding for Dynamic Island</li>
+<li>Full-screen camera view: content behind safe areas (camera preview)</li>
+</ul>
+
+<h3>Touch &amp; interaction</h3>
+<ul>
+<li><strong>Minimum 44×44px</strong> for all touch targets — verified in Fitts's Law calculator above</li>
+<li>Active/pressed states on every interactive element</li>
+<li>No hover-dependent interactions on mobile (hover → press)</li>
+<li>400ms response guarantee (Doherty Threshold) — skeleton or spinner for any wait</li>
+<li>Error messages are specific, actionable, and placed inline near the relevant element</li>
+</ul>
+
+<h3>WCAG compliance (accesslint)</h3>
+<ul>
+<li>Text contrast: min AA (4.5:1) for body, AAA (7:1) preferred for primary text</li>
+<li>Non-text contrast: 3:1 for icons, borders, and focus indicators</li>
+<li>Touch target minimum: 44×44px (exceeds WCAG 2.2 24×24px AA target)</li>
+<li>Focus indicators: visible keyboard focus for all interactive elements</li>
+<li>No information conveyed by color alone — every status also uses icon + label</li>
+<li>Semantic HTML: <code>&lt;button&gt;</code> for actions, <code>&lt;nav&gt;</code> for navigation, ARIA labels where needed</li>
+<li>Respects <code>prefers-reduced-motion</code> for vestibular sensitivity</li>
+</ul>
+
+<h3>Internationalization (i18n)</h3>
+<ul>
+<li>Design accommodates Finnish, Swedish, and English text</li>
+<li>All labels and copy stored as tokenized strings — never hardcoded in components</li>
+<li>Layout handles text expansion (Finnish compound words can be 2–3× English length)</li>
+<li>RTL not a current requirement but should not break layouts</li>
+</ul>
+</section>
+
+<!-- ═══ Footer ═══ -->
+<footer class="footer">
+<span>Opas Design System v2.0 — Mobile-first · Powered by <a href="https://github.com/Owl-Listener/designer-skills">Owl-Listener/designer-skills</a> (91 skills, 9 plugins)</span>
+<span><a href="#principles">↑ Back to top</a> · <span id="themeLabel">Dark</span> theme</span>
+</footer>
+
+</main>
+
+<script>
+(function(){
+  // Theme
+  const html = document.documentElement;
+  const themeBtns = document.querySelectorAll('.theme-btn');
+  const themeLabel = document.getElementById('themeLabel');
+  const setTheme = t => {
+    html.setAttribute('data-theme', t);
+    themeBtns.forEach(b => { b.textContent = t === 'light' ? '☀️' : '🌙' });
+    if (themeLabel) themeLabel.textContent = t === 'light' ? 'Light' : 'Dark';
+    try { localStorage.setItem('opas-theme', t) } catch(e) {}
+  };
+  const saved = (() => { try { return localStorage.getItem('opas-theme') } catch(e) { return null } })();
+  if (saved === 'light') setTheme('light');
+  else setTheme('dark');
+  if (!saved && window.matchMedia('(prefers-color-scheme: light)').matches) setTheme('light');
+  themeBtns.forEach(b => b.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  }));
+
+  // Drawer
+  const menuBtn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  const closeBtn = document.getElementById('drawerClose');
+  const openDrawer = () => { drawer.classList.add('open'); overlay.classList.add('open') };
+  const closeDrawer = () => { drawer.classList.remove('open'); overlay.classList.remove('open') };
+  if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  if (overlay) overlay.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.drawer-link').forEach(a => a.addEventListener('click', closeDrawer));
+
+  // Bottom tab bar active tracking + scroll
+  window.scrollToSection = function(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Intersection Observer for glassmorphism tab bar
+  const sections = ['principles','spacing','components','patterns','platform'];
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const observer = new IntersectionObserver(entries => {
+    let visible = 'principles';
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        if (sections.includes(id)) visible = id;
+      }
+    });
+    const mapping = { 'principles':'home', 'tokens':'home', 'naming':'home', 'color':'home',
+      'typography':'home', 'spacing':'folders', 'motion':'home', 'interaction':'home',
+      'components':'scan', 'nav-component':'scan', 'buttons':'scan', 'inputs':'scan',
+      'cards':'scan', 'badges':'scan',
+      'patterns':'search', 'platform':'profile' };
+    const tab = mapping[visible] || 'home';
+    tabBtns.forEach(b => {
+      b.classList.toggle('active', b.dataset.section === tab);
+    });
+  }, { rootMargin: '-40% 0px -40% 0px' });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+  // Also observe sub-sections
+  ['nav-component','buttons','inputs','cards','badges','color','typography',
+   'tokens','naming','motion','interaction'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  // Respect reduced motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('*').forEach(el => {
+      el.style.animationDuration = '0.01ms !important';
+      el.style.transitionDuration = '0.01ms !important';
+    });
+  }
+})();
+</script>
+
+
+</body></html>
