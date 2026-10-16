@@ -42,7 +42,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String jti = claims.getId();
                 String subject = claims.getSubject();
-                if (jti != null && subject != null && !tokenBlacklistService.isBlacklisted(jti)) {
+                // Only access tokens authenticate requests — a refresh token must never work as a bearer.
+                if (jti != null && subject != null && JwtUtil.isAccessToken(claims)
+                        && !tokenBlacklistService.isBlacklisted(jti)) {
                     var auth = new UsernamePasswordAuthenticationToken(subject, null, Collections.emptyList());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);

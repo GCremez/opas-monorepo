@@ -67,6 +67,8 @@ class JwtUtilTest {
         assertEquals("user-123", claims.getSubject());
         assertEquals("opas", claims.getIssuer());
         assertEquals("test@example.com", claims.get("email"));
+        assertTrue(JwtUtil.isAccessToken(claims));
+        assertFalse(JwtUtil.isRefreshToken(claims));
         assertNotNull(claims.getId());
         assertNotNull(claims.getExpiration());
         assertNotNull(claims.getIssuedAt());
@@ -79,6 +81,8 @@ class JwtUtilTest {
         assertNotNull(token);
         Claims claims = jwtUtil.parseToken(token);
         assertEquals("user-123", claims.getSubject());
+        assertTrue(JwtUtil.isRefreshToken(claims));
+        assertFalse(JwtUtil.isAccessToken(claims));
         assertEquals("opas", claims.getIssuer());
         assertNotNull(claims.getId());
         assertNotNull(claims.getExpiration());

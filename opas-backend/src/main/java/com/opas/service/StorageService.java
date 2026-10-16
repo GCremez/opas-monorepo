@@ -1,6 +1,8 @@
 package com.opas.service;
 
 import java.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 @Service
 public class StorageService {
+
+    private static final Logger log = LoggerFactory.getLogger(StorageService.class);
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
@@ -90,8 +94,20 @@ public class StorageService {
         }
     }
 
+    /**
+     * Best-effort removal of a stored object. Deletion of the owning DB rows (a
+     * document or a whole account) must not be held hostage to object storage: a
+     * transient S3 error or an already-missing key would otherwise roll back the
+     * caller's transaction and leave the user unable to delete their data at all.
+     * A leftover object is reclaimable by a bucket lifecycle rule; a blocked
+     * account deletion is a GDPR problem. So we log and swallow storage failures.
+     */
     public void deleteObject(String key) {
-        s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
+        try {
+            s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
+        } catch (RuntimeException e) {
+            log.warn("Failed to delete S3 object {} (continuing anyway): {}", key, e.toString());
+        }
     }
 
     public String getBucketName() {

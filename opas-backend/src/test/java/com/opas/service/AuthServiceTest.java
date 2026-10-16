@@ -61,6 +61,8 @@ class AuthServiceTest {
     @Mock
     private EmailVerificationService emailVerificationService;
     @Mock
+    private PasswordResetService passwordResetService;
+    @Mock
     private Claims claims;
 
     @Captor
@@ -69,6 +71,9 @@ class AuthServiceTest {
     private ArgumentCaptor<Subscription> subscriptionCaptor;
     @Captor
     private ArgumentCaptor<String> stringCaptor;
+
+    @Mock
+    private SubscriptionService subscriptionService;
 
     private AuthService service;
     private UUID userId;
@@ -79,7 +84,7 @@ class AuthServiceTest {
     void setUp() {
         service = new AuthService(userRepository, subscriptionRepository, decodeResultRepository,
                 documentRepository, folderRepository, storageService, passwordEncoder, jwtUtil, refreshTokenService,
-                tokenBlacklistService, emailVerificationService);
+                tokenBlacklistService, emailVerificationService, passwordResetService, subscriptionService);
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);
@@ -164,6 +169,18 @@ class AuthServiceTest {
         assertThrows(IllegalArgumentException.class, () -> service.verifyEmail("nobody@example.com", "123456"));
     }
 
+    @Test
+    void verifyEmailNeverIssuesTokensForAlreadyVerifiedAccount() {
+        // Regression: this path used to log the caller straight in without checking the
+        // code, which let anyone take over a verified account knowing only its email.
+        user.setEmailVerified(true);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        assertThrows(IllegalArgumentException.class, () -> service.verifyEmail("test@example.com", "anything"));
+        verify(jwtUtil, never()).createAccessToken(any(), any());
+        verify(jwtUtil, never()).createRefreshToken(any());
+    }
+
     // --- resend-verification ---
 
     @Test
@@ -192,6 +209,72 @@ class AuthServiceTest {
         service.resendVerification("nobody@example.com");
 
         verify(emailVerificationService, never()).generateAndSend(any());
+    }
+
+    // --- password reset ---
+
+    @Test
+    void requestPasswordResetSendsCodeForExistingUser() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        service.requestPasswordReset("test@example.com");
+
+        verify(passwordResetService).generateAndSend(user);
+    }
+
+    @Test
+    void requestPasswordResetHidesMailFailures() {
+        // A 500 here (only possible for real accounts) would reveal which emails exist.
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        doThrow(new IllegalStateException("SES down")).when(passwordResetService).generateAndSend(user);
+
+        assertDoesNotThrow(() -> service.requestPasswordReset("test@example.com"));
+    }
+
+    @Test
+    void requestPasswordResetDoesNothingForUnknownEmail() {
+        when(userRepository.findByEmail("nobody@example.com")).thenReturn(Optional.empty());
+
+        service.requestPasswordReset("nobody@example.com");
+
+        verify(passwordResetService, never()).generateAndSend(any());
+    }
+
+    @Test
+    void resetPasswordSetsNewPasswordVerifiesEmailAndRevokesSessions() {
+        user.setEmailVerified(false);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordResetService.verifyAndConsume(user, "123456")).thenReturn(true);
+        when(passwordEncoder.encode("new-password")).thenReturn("new-hash");
+
+        service.resetPassword("test@example.com", "123456", "new-password");
+
+        assertEquals("new-hash", user.getPasswordHash());
+        assertTrue(user.isEmailVerified());
+        verify(userRepository).save(user);
+        verify(refreshTokenService).invalidateAll(userId.toString());
+    }
+
+    @Test
+    void resetPasswordThrowsOnWrongCodeAndLeavesPasswordUnchanged() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordResetService.verifyAndConsume(user, "000000")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.resetPassword("test@example.com", "000000", "new-password"));
+
+        assertEquals("hashed-password", user.getPasswordHash());
+        verify(userRepository, never()).save(any());
+        verify(refreshTokenService, never()).invalidateAll(any());
+    }
+
+    @Test
+    void resetPasswordThrowsOnUnknownEmail() {
+        when(userRepository.findByEmail("nobody@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.resetPassword("nobody@example.com", "123456", "new-password"));
+        verify(passwordResetService, never()).verifyAndConsume(any(), any());
     }
 
     // --- login ---
@@ -250,10 +333,22 @@ class AuthServiceTest {
         when(jwtUtil.createAccessToken(userId.toString(), "test@example.com")).thenReturn("new-access-token");
         when(jwtUtil.createRefreshToken(userId.toString())).thenReturn("new-refresh-token");
 
-        AuthResponse response = service.refresh(new RefreshRequest("valid-refresh-token"));
+        AuthResponse response = service.refresh(new RefreshRequest("valid-refresh-token"), null);
 
         assertEquals("new-access-token", response.getAccessToken());
         verify(refreshTokenService).consume(userId.toString(), sha256Hex("valid-refresh-token"));
+    }
+
+    @Test
+    void refreshRejectsAccessToken() {
+        when(jwtUtil.parseToken("access-token")).thenReturn(claims);
+        when(claims.getSubject()).thenReturn(userId.toString());
+        when(claims.get(com.opas.config.JwtUtil.CLAIM_TYPE, String.class))
+                .thenReturn(com.opas.config.JwtUtil.TYPE_ACCESS);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.refresh(new RefreshRequest("access-token"), null));
+        verify(refreshTokenService, never()).consume(anyString(), anyString());
     }
 
     @Test
@@ -261,7 +356,7 @@ class AuthServiceTest {
         when(jwtUtil.parseToken("bad-token")).thenThrow(new RuntimeException("Bad token"));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.refresh(new RefreshRequest("bad-token")));
+                () -> service.refresh(new RefreshRequest("bad-token"), null));
     }
 
     @Test
@@ -270,7 +365,7 @@ class AuthServiceTest {
         when(claims.getSubject()).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.refresh(new RefreshRequest("no-subject-token")));
+                () -> service.refresh(new RefreshRequest("no-subject-token"), null));
     }
 
     @Test
@@ -280,7 +375,7 @@ class AuthServiceTest {
         when(refreshTokenService.consume(anyString(), anyString())).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.refresh(new RefreshRequest("unused-token")));
+                () -> service.refresh(new RefreshRequest("unused-token"), null));
     }
 
     @Test
@@ -291,14 +386,17 @@ class AuthServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
-                () -> service.refresh(new RefreshRequest("valid-token")));
+                () -> service.refresh(new RefreshRequest("valid-token"), null));
     }
 
     // --- logout ---
 
     @Test
     void logoutBlacklistsAccessTokenAndDeletesRefreshToken() {
+        // The account for refresh-token revocation is derived from the refresh
+        // token itself, not the access token.
         when(jwtUtil.parseToken("valid-access-token")).thenReturn(claims);
+        when(jwtUtil.parseToken("refresh-token-value")).thenReturn(claims);
         when(claims.getId()).thenReturn("token-jti");
         when(claims.getExpiration()).thenReturn(Date.from(Instant.now().plusSeconds(3600)));
         when(claims.getSubject()).thenReturn(userId.toString());
@@ -333,6 +431,7 @@ class AuthServiceTest {
     @Test
     void logoutSkipsRefreshDeletionWhenSubjectNull() {
         when(jwtUtil.parseToken("valid-token")).thenReturn(claims);
+        when(jwtUtil.parseToken("refresh-token")).thenReturn(claims);
         when(claims.getId()).thenReturn("token-jti");
         when(claims.getExpiration()).thenReturn(Date.from(Instant.now().plusSeconds(3600)));
         when(claims.getSubject()).thenReturn(null);
@@ -343,23 +442,39 @@ class AuthServiceTest {
     }
 
     @Test
-    void logoutThrowsWhenAuthHeaderMissing() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.logout(null, "refresh-token"));
+    void logoutWithoutAccessTokenStillRevokesRefreshToken() {
+        // An expired/absent access token must not block refresh-token revocation.
+        when(jwtUtil.parseToken("refresh-token")).thenReturn(claims);
+        when(claims.getSubject()).thenReturn(userId.toString());
+
+        service.logout(null, "refresh-token");
+
+        verify(tokenBlacklistService, never()).blacklist(anyString(), any());
+        verify(refreshTokenService).delete(userId.toString(), sha256Hex("refresh-token"));
     }
 
     @Test
-    void logoutThrowsWhenAuthHeaderMalformed() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.logout("Basic token", "refresh-token"));
+    void logoutIgnoresMalformedAuthHeader() {
+        when(jwtUtil.parseToken("refresh-token")).thenReturn(claims);
+        when(claims.getSubject()).thenReturn(userId.toString());
+
+        // "Basic ..." is not a Bearer token — no blacklist, but refresh still revoked.
+        service.logout("Basic token", "refresh-token");
+
+        verify(tokenBlacklistService, never()).blacklist(anyString(), any());
+        verify(refreshTokenService).delete(userId.toString(), sha256Hex("refresh-token"));
     }
 
     @Test
-    void logoutThrowsWhenTokenInvalid() {
+    void logoutIgnoresInvalidAccessTokenButStillRevokesRefresh() {
         when(jwtUtil.parseToken("bad-token")).thenThrow(new RuntimeException("Bad token"));
+        when(jwtUtil.parseToken("refresh-token")).thenReturn(claims);
+        when(claims.getSubject()).thenReturn(userId.toString());
 
-        assertThrows(IllegalArgumentException.class,
-                () -> service.logout("Bearer bad-token", "refresh-token"));
+        service.logout("Bearer bad-token", "refresh-token");
+
+        verify(tokenBlacklistService, never()).blacklist(anyString(), any());
+        verify(refreshTokenService).delete(userId.toString(), sha256Hex("refresh-token"));
     }
 
     @Test
@@ -395,6 +510,19 @@ class AuthServiceTest {
         verify(subscriptionRepository).delete(subscription);
         verify(refreshTokenService).invalidateAll(userId.toString());
         verify(userRepository).deleteById(userId);
+    }
+
+    @Test
+    void deleteAccountCancelsBillingBeforeDeletingAnything() {
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(subscriptionRepository.findByUserId(userId)).thenReturn(Optional.of(subscription));
+        doThrow(new IllegalStateException("Stripe down")).when(subscriptionService).deleteBillingCustomer(subscription);
+
+        assertThrows(IllegalStateException.class, () -> service.deleteAccount(userId));
+
+        verify(documentRepository, never()).deleteByUser_Id(any());
+        verify(storageService, never()).deleteObject(any());
+        verify(userRepository, never()).deleteById(any());
     }
 
     @Test
