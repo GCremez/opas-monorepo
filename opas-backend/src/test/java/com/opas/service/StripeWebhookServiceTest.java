@@ -30,7 +30,9 @@ class StripeWebhookServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new StripeWebhookService(subscriptionRepository, "whsec_test");
+        service = new StripeWebhookService(subscriptionRepository,
+                new io.micrometer.core.instrument.simple.SimpleMeterRegistry(), "whsec_test",
+                "price_premium_monthly, price_premium_yearly");
     }
 
     @Test
@@ -219,5 +221,70 @@ class StripeWebhookServiceTest {
 
         service.handleEvent(event);
         verify(subscriptionRepository, never()).save(any());
+    }
+
+    // --- tier mapping ---
+
+    private static com.stripe.model.Subscription stripeSubWithPrice(String status, String priceId) {
+        com.stripe.model.Subscription stripeSub = mock(com.stripe.model.Subscription.class);
+        lenient().when(stripeSub.getId()).thenReturn("sub_1");
+        when(stripeSub.getStatus()).thenReturn(status);
+        var price = mock(com.stripe.model.Price.class);
+        lenient().when(price.getId()).thenReturn(priceId);
+        // Opaque product id, as Stripe issues them: it must not drive the tier.
+        lenient().when(price.getProduct()).thenReturn("prod_Qx81mZa3");
+        var item = mock(com.stripe.model.SubscriptionItem.class);
+        lenient().when(item.getPrice()).thenReturn(price);
+        var items = mock(com.stripe.model.SubscriptionItemCollection.class);
+        lenient().when(items.getData()).thenReturn(java.util.List.of(item));
+        lenient().when(stripeSub.getItems()).thenReturn(items);
+        return stripeSub;
+    }
+
+    @Test
+    void allowlistedPriceMapsToPremiumEvenWithOpaqueProductId() {
+        assertEquals("premium", service.extractTier(stripeSubWithPrice("active", "price_premium_yearly")));
+    }
+
+    @Test
+    void pastDueKeepsPremiumDuringStripeRetries() {
+        assertEquals("premium", service.extractTier(stripeSubWithPrice("past_due", "price_premium_monthly")));
+    }
+
+    @Test
+    void unknownPriceMapsToFree() {
+        assertEquals("free", service.extractTier(stripeSubWithPrice("active", "price_something_else")));
+    }
+
+    @Test
+    void endedSubscriptionMapsToFree() {
+        assertEquals("free", service.extractTier(stripeSubWithPrice("unpaid", "price_premium_monthly")));
+        assertEquals("free", service.extractTier(stripeSubWithPrice("canceled", "price_premium_monthly")));
+    }
+
+    @Test
+    void missingAllowlistLeavesTierUnchanged() {
+        var unconfigured = new StripeWebhookService(subscriptionRepository,
+                new io.micrometer.core.instrument.simple.SimpleMeterRegistry(), "whsec_test", "");
+        assertNull(unconfigured.extractTier(stripeSubWithPrice("active", "price_premium_monthly")));
+    }
+
+    @Test
+    void renewalUpdateKeepsPremiumUserPremium() {
+        // Regression: the old product-id check downgraded every premium user on the
+        // customer.subscription.updated event Stripe sends after checkout and each renewal.
+        var stripeSub = stripeSubWithPrice("active", "price_premium_monthly");
+        Event event = mock(Event.class);
+        when(event.getType()).thenReturn("customer.subscription.updated");
+        EventDataObjectDeserializer deserializer = mock(EventDataObjectDeserializer.class);
+        when(deserializer.getObject()).thenReturn(Optional.of(stripeSub));
+        when(event.getDataObjectDeserializer()).thenReturn(deserializer);
+        Subscription sub = new Subscription();
+        sub.setTier("premium");
+        when(subscriptionRepository.findByStripeSubscriptionId("sub_1")).thenReturn(Optional.of(sub));
+
+        service.handleEvent(event);
+
+        assertEquals("premium", sub.getTier());
     }
 }

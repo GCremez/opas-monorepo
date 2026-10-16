@@ -2,6 +2,8 @@ package com.opas.service;
 
 import com.opas.repository.SubscriptionRepository;
 import com.stripe.exception.SignatureVerificationException;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.Price;
@@ -10,6 +12,9 @@ import com.stripe.model.Invoice;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import java.time.Instant;
+import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,13 +27,32 @@ public class StripeWebhookService {
 
     private static final Logger log = LoggerFactory.getLogger(StripeWebhookService.class);
 
+    /** Stripe statuses after which the customer no longer has a paid plan. */
+    private static final Set<String> ENDED_STATUSES = Set.of("canceled", "unpaid", "incomplete_expired");
+
     private final SubscriptionRepository subscriptionRepository;
     private final String webhookSecret;
+    private final Set<String> premiumPriceIds;
+    private final Counter upgradedCounter;
+    private final Counter downgradedCounter;
+    private final Counter cancelledCounter;
 
     public StripeWebhookService(SubscriptionRepository subscriptionRepository,
-            @Value("${opas.stripe.webhook-secret}") String webhookSecret) {
+            MeterRegistry registry,
+            @Value("${opas.stripe.webhook-secret}") String webhookSecret,
+            @Value("${opas.stripe.premium-price-ids:}") String premiumPriceIds) {
         this.subscriptionRepository = subscriptionRepository;
         this.webhookSecret = webhookSecret;
+        // Same allowlist checkout is restricted to (SubscriptionService), so the tier a
+        // subscription maps to always matches what the customer was allowed to buy.
+        this.premiumPriceIds = Arrays.stream(premiumPriceIds.split(",")).map(String::trim)
+                .filter(id -> !id.isEmpty()).collect(Collectors.toUnmodifiableSet());
+        this.upgradedCounter = Counter.builder("opas.subscription.upgraded")
+                .description("Subscriptions upgraded to premium").register(registry);
+        this.downgradedCounter = Counter.builder("opas.subscription.downgraded")
+                .description("Subscriptions downgraded to free").register(registry);
+        this.cancelledCounter = Counter.builder("opas.subscription.cancelled")
+                .description("Subscriptions cancelled").register(registry);
     }
 
     public Event verifySignature(String payload, String sigHeader) {
@@ -97,9 +121,13 @@ public class StripeWebhookService {
                 .ifPresentOrElse(sub -> {
                     sub.setStripeCustomerId(customerId);
                     sub.setStripeSubscriptionId(subscriptionId);
+                    boolean wasPremium = "premium".equals(sub.getTier());
                     sub.setTier("premium");
                     sub.setStatus("active");
                     subscriptionRepository.save(sub);
+                    if (!wasPremium) {
+                        upgradedCounter.increment();
+                    }
                 }, () -> log.warn("No subscription found for checkout session {}", session.getId()));
     }
 
@@ -118,7 +146,15 @@ public class StripeWebhookService {
             }
             String tier = extractTier(stripeSub);
             if (tier != null) {
+                String prevTier = sub.getTier();
                 sub.setTier(tier);
+                if (!tier.equals(prevTier)) {
+                    if ("premium".equals(tier)) {
+                        upgradedCounter.increment();
+                    } else if ("free".equals(tier)) {
+                        downgradedCounter.increment();
+                    }
+                }
             }
             subscriptionRepository.save(sub);
         });
@@ -133,6 +169,7 @@ public class StripeWebhookService {
             sub.setStatus("canceled");
             sub.setTier("free");
             subscriptionRepository.save(sub);
+            cancelledCounter.increment();
         });
     }
 
@@ -156,15 +193,30 @@ public class StripeWebhookService {
         });
     }
 
+    /**
+     * The plan a Stripe subscription entitles the customer to, or null to leave the stored
+     * tier unchanged. An ended subscription is always free; otherwise the tier follows the
+     * subscribed price. Stripe product ids are opaque ({@code prod_…}), so they can't be
+     * used to tell plans apart.
+     */
     @Nullable
-    private static String extractTier(com.stripe.model.Subscription stripeSub) {
-        var items = stripeSub.getItems().getData();
+    String extractTier(com.stripe.model.Subscription stripeSub) {
+        if (ENDED_STATUSES.contains(stripeSub.getStatus())) {
+            return "free";
+        }
+        var items = stripeSub.getItems() != null ? stripeSub.getItems().getData() : null;
         if (items == null || items.isEmpty())
             return null;
         Price price = items.get(0).getPrice();
-        if (price == null || price.getProduct() == null)
+        if (price == null || price.getId() == null)
             return null;
-        String productId = price.getProduct();
-        return productId != null && productId.contains("premium") ? "premium" : "free";
+        if (premiumPriceIds.isEmpty()) {
+            // Without an allowlist every renewal would look like a downgrade. Leave the
+            // tier alone and make the misconfiguration loud instead.
+            log.warn("opas.stripe.premium-price-ids is not configured; not changing tier for {}",
+                    stripeSub.getId());
+            return null;
+        }
+        return premiumPriceIds.contains(price.getId()) ? "premium" : "free";
     }
 }
