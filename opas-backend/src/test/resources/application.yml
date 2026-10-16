@@ -89,6 +89,7 @@ opas:
     endpoint: http://localhost:4566
     upload-ttl-minutes: 15
   stripe:
+    enabled: false
     secret-key: sk_test_placeholder
     webhook-secret: whsec_placeholder
   free-tier:
