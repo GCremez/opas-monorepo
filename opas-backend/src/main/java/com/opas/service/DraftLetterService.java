@@ -13,8 +13,6 @@ import com.opas.repository.SubscriptionRepository;
 import com.opas.repository.UserRepository;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,18 +24,18 @@ public class DraftLetterService {
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final StorageService storageService;
-    private final ChatModel chatModel;
+    private final ClaudeClient claudeClient;
 
     public DraftLetterService(DocumentRepository documentRepository,
             DraftLetterRepository draftLetterRepository, UserRepository userRepository,
             SubscriptionRepository subscriptionRepository, StorageService storageService,
-            ChatModel chatModel) {
+            ClaudeClient claudeClient) {
         this.documentRepository = documentRepository;
         this.draftLetterRepository = draftLetterRepository;
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.storageService = storageService;
-        this.chatModel = chatModel;
+        this.claudeClient = claudeClient;
     }
 
     @Transactional(readOnly = true)
@@ -71,10 +69,7 @@ public class DraftLetterService {
         String content = new String(fileBytes, java.nio.charset.StandardCharsets.UTF_8);
 
         String prompt = buildPrompt(document.getFilename(), content, request.tone(), request.includeOriginal());
-        var chatResponse = chatModel.call(new Prompt(prompt));
-        String generatedText = chatResponse.getResult() != null
-                ? chatResponse.getResult().getOutput().getText()
-                : "";
+        String generatedText = claudeClient.complete(prompt).text();
 
         DraftLetter draft = new DraftLetter();
         draft.setDocument(document);

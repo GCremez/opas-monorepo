@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +41,11 @@ public class DecodeService {
     private final TextExtractionService textExtractionService;
     private final EmbeddingService embeddingService;
     private final UsageTracker usageTracker;
-    private final ChatModel chatModel;
+    private final ClaudeClient claudeClient;
     private final ObjectMapper objectMapper;
     private final int freeTierLimit;
-    private final String modelName;
+    private final double inputPricePerMTok;
+    private final double outputPricePerMTok;
 
     // Business metrics scraped via /actuator/prometheus. Registered once in the
     // constructor so they carry a stable identity across the app's lifetime.
@@ -63,10 +62,11 @@ public class DecodeService {
             DecodeResultRepository decodeResultRepository, SubscriptionRepository subscriptionRepository,
             StorageService storageService, PresidioService presidioService,
             TextExtractionService textExtractionService, EmbeddingService embeddingService,
-            UsageTracker usageTracker, ChatModel chatModel, ObjectMapper objectMapper,
+            UsageTracker usageTracker, ClaudeClient claudeClient, ObjectMapper objectMapper,
             MeterRegistry registry,
             @Value("${opas.free-tier.monthly-decode-limit}") int freeTierLimit,
-            @Value("${spring.ai.anthropic.chat.options.model}") String modelName) {
+            @Value("${opas.ai.input-price-per-mtok}") double inputPricePerMTok,
+            @Value("${opas.ai.output-price-per-mtok}") double outputPricePerMTok) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.decodeResultRepository = decodeResultRepository;
@@ -76,10 +76,11 @@ public class DecodeService {
         this.textExtractionService = textExtractionService;
         this.embeddingService = embeddingService;
         this.usageTracker = usageTracker;
-        this.chatModel = chatModel;
+        this.claudeClient = claudeClient;
         this.objectMapper = objectMapper;
         this.freeTierLimit = freeTierLimit;
-        this.modelName = modelName;
+        this.inputPricePerMTok = inputPricePerMTok;
+        this.outputPricePerMTok = outputPricePerMTok;
         this.decodeCounter = Counter.builder("opas.decode.completed")
                 .description("Successful document decodes").register(registry);
         this.decodeFailureCounter = Counter.builder("opas.decode.failed")
@@ -166,16 +167,13 @@ public class DecodeService {
         }
 
         Instant startedAt = Instant.now();
-        Prompt prompt = new Prompt(buildDecodePrompt(document.getFilename(), content,
+        ClaudeClient.Reply reply = claudeClient.complete(buildDecodePrompt(document.getFilename(), content,
                 document.getUser().getLanguage()));
-        var chatResponse = chatModel.call(prompt);
         Instant completedAt = Instant.now();
 
-        String rawText = chatResponse.getResult() != null ? chatResponse.getResult().getOutput().getText() : "";
-        var metadata = chatResponse.getMetadata();
-        var usage = metadata != null ? metadata.getUsage() : null;
-        Integer tokensIn = usage != null ? usage.getPromptTokens() : null;
-        Integer tokensOut = usage != null ? usage.getCompletionTokens() : null;
+        String rawText = reply.text();
+        int tokensIn = Math.toIntExact(reply.inputTokens());
+        int tokensOut = Math.toIntExact(reply.outputTokens());
 
         DecodeResult result = new DecodeResult();
         result.setDocument(document);
@@ -186,7 +184,7 @@ public class DecodeService {
         // to the raw dump. Invalid JSON just leaves structuredData null.
         result.setStructuredData(extractJsonObject(rawText));
         result.setPiiScrubbed(message.scrubPii());
-        result.setModel(modelName);
+        result.setModel(reply.model());
         result.setTokensIn(tokensIn);
         result.setTokensOut(tokensOut);
         result.setStartedAt(startedAt);
@@ -200,8 +198,8 @@ public class DecodeService {
         // call itself (startedAt..completedAt), matching the p50/p95/p99 dashboard.
         decodeCounter.increment();
         decodeTimer.record(Duration.between(startedAt, completedAt));
-        if (tokensIn != null) claudeTokensIn.increment(tokensIn);
-        if (tokensOut != null) claudeTokensOut.increment(tokensOut);
+        claudeTokensIn.increment(tokensIn);
+        claudeTokensOut.increment(tokensOut);
 
         // Populate the document's embedding so semantic search can find it. Best-effort:
         // an embedding failure must not fail an otherwise-successful decode.
@@ -211,15 +209,13 @@ public class DecodeService {
             log.warn("Failed to store embedding for document {}: {}", document.getId(), e.getMessage());
         }
 
-        if (tokensIn != null && tokensOut != null) {
-            double costInput = tokensIn * 3.00 / 1_000_000;
-            double costOutput = tokensOut * 15.00 / 1_000_000;
-            double totalCost = costInput + costOutput;
-            decodeCostUsd.increment(totalCost);
-            log.info("Decode cost: userId={}, documentId={}, tokensIn={}, tokensOut={}, model={}, cost=${}",
-                    message.userId(), message.documentId(), tokensIn, tokensOut, modelName,
-                    String.format("%.4f", totalCost));
-        }
+        // Priced at the configured model's rates; a refusal fallback answered by another model
+        // is rare enough not to warrant per-model pricing here.
+        double totalCost = tokensIn * inputPricePerMTok / 1_000_000 + tokensOut * outputPricePerMTok / 1_000_000;
+        decodeCostUsd.increment(totalCost);
+        log.info("Decode cost: userId={}, documentId={}, tokensIn={}, tokensOut={}, model={}, cost=${}",
+                message.userId(), message.documentId(), tokensIn, tokensOut, reply.model(),
+                String.format("%.4f", totalCost));
     }
 
     /**
