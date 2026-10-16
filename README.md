@@ -12,14 +12,16 @@
 [![Demo video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://youtu.be/VIDEO_ID)
 -->
 
-<!-- Add 3–4 app screenshots (save them in docs/screenshots/):
+### Screen designs
+
 <p align="center">
-  <img src="docs/screenshots/home.png" width="220" />
-  <img src="docs/screenshots/scan.png" width="220" />
-  <img src="docs/screenshots/decode-result.png" width="220" />
-  <img src="docs/screenshots/draft-letter.png" width="220" />
+  <img src="docs/screenshots/home.png" width="200" alt="Home" />
+  <img src="docs/screenshots/scan.png" width="200" alt="Scan a document" />
+  <img src="docs/screenshots/document.png" width="200" alt="Decoded document" />
+  <img src="docs/screenshots/folders.png" width="200" alt="Folders" />
 </p>
--->
+
+<p align="center"><em>Home · Scan · Decoded letter · Folders — more screens in <a href="docs/screenshots">docs/screenshots</a></em></p>
 
 ---
 
