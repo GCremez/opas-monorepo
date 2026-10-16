@@ -8,15 +8,16 @@
 // - App Transport Security: allow cleartext http to localhost and private LAN
 //   addresses for development. Arbitrary public cleartext stays blocked, and production
 //   talks https via EXPO_PUBLIC_API_BASE_URL.
-const base = require('./app.json').expo;
 
-const apiBaseUrl =
-  process.env.EXPO_PUBLIC_API_BASE_URL ||
-  process.env.EXPO_PUBLIC_API_URL ||
-  (base.extra && base.extra.apiBaseUrl) ||
-  'http://localhost:8080/api/v1';
+// Expo passes app.json's contents in as `config`; extend it rather than re-reading the file.
+module.exports = ({ config: base }) => {
+  const apiBaseUrl =
+    process.env.EXPO_PUBLIC_API_BASE_URL ||
+    process.env.EXPO_PUBLIC_API_URL ||
+    (base.extra && base.extra.apiBaseUrl) ||
+    'http://localhost:8080/api/v1';
 
-module.exports = () => ({
+  return {
   ...base,
   extra: {
     ...(base.extra || {}),
@@ -33,4 +34,5 @@ module.exports = () => ({
       },
     },
   },
-});
+};
+};
