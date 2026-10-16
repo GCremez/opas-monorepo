@@ -97,6 +97,14 @@ opas:
     secret-key: ${AWS_SECRET_ACCESS_KEY:}
     endpoint: ${AWS_ENDPOINT_URL:}
     upload-ttl-minutes: 15
+  textract:
+    # OCR for photographed letters. Textract has no eu-north-1 endpoint, so it runs in
+    # Frankfurt by default. Keys/endpoint are only for local dev (S3 on LocalStack, OCR on
+    # real AWS); deployed tasks use the ECS task role.
+    region: ${TEXTRACT_REGION:eu-central-1}
+    access-key: ${TEXTRACT_ACCESS_KEY:}
+    secret-key: ${TEXTRACT_SECRET_KEY:}
+    endpoint: ${TEXTRACT_ENDPOINT_URL:}
   ses:
     # Dedicated SES client config. Unset in deployments — falls back to the S3 region
     # and the default credential chain (ECS task role). Set locally to send real

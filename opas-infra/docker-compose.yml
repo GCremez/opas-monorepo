@@ -67,7 +67,8 @@ services:
     image: localstack/localstack:3
     container_name: opas-localstack
     environment:
-      SERVICES: s3,textract
+      # Textract is a LocalStack Pro feature; local OCR calls real AWS (see .env.example).
+      SERVICES: s3
       DEFAULT_REGION: eu-north-1
       AWS_DEFAULT_REGION: eu-north-1
     ports:

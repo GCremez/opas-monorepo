@@ -54,14 +54,35 @@ public class S3Config {
         return builder.build();
     }
 
+    // Textract isn't offered in eu-north-1 (where everything else runs), so it gets its own
+    // region, defaulting to Frankfurt to keep documents in the EU. Like SES it never
+    // inherits the S3 endpoint override: LocalStack's free tier has no Textract, so local
+    // dev calls real AWS with dedicated credentials while S3 stays on LocalStack.
+    @Value("${opas.textract.region:eu-central-1}")
+    private String textractRegion;
+
+    @Value("${opas.textract.access-key:}")
+    private String textractAccessKey;
+
+    @Value("${opas.textract.secret-key:}")
+    private String textractSecretKey;
+
+    @Value("${opas.textract.endpoint:}")
+    private String textractEndpoint;
+
     @Bean(destroyMethod = "close")
     public software.amazon.awssdk.services.textract.TextractClient textractClient(
             AwsCredentialsProvider credentialsProvider) {
-        var builder = software.amazon.awssdk.services.textract.TextractClient.builder().region(Region.of(region));
-        if (!endpoint.isBlank()) {
-            builder.endpointOverride(URI.create(endpoint));
+        var builder = software.amazon.awssdk.services.textract.TextractClient.builder()
+                .region(Region.of(textractRegion));
+        if (!textractEndpoint.isBlank()) {
+            builder.endpointOverride(URI.create(textractEndpoint));
         }
-        builder.credentialsProvider(credentialsProvider);
+        if (!textractAccessKey.isBlank() && !textractSecretKey.isBlank()) {
+            builder.credentialsProvider(() -> AwsBasicCredentials.create(textractAccessKey, textractSecretKey));
+        } else {
+            builder.credentialsProvider(credentialsProvider);
+        }
         return builder.build();
     }
 
