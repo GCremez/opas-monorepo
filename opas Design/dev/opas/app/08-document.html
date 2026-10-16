@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Opas — Document</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+.doc-tabs{display:flex;gap:0;margin-bottom:var(--space-5);border-bottom:1px solid var(--border);flex-shrink:0}
+.doc-tab{padding:var(--space-3) var(--space-5);font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-body)}
+.doc-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.doc-pane{display:none;flex:1;overflow-y:auto;padding-bottom:var(--space-8)}
+.doc-pane.active{display:block}
+.doc-pane::-webkit-scrollbar{width:0}
+.original-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-6);margin-bottom:var(--space-5);min-height:300px;display:flex;flex-direction:column}
+.original-preview .page-number{text-align:center;font-size:12px;color:var(--muted);margin-top:var(--space-4)}
+.original-text{font-size:13px;color:var(--muted);line-height:2;font-family:var(--font-mono)}
+.action-bar{display:flex;gap:var(--space-2);padding:var(--space-3) 0;border-top:1px solid var(--border);margin-top:var(--space-4);flex-shrink:0}
+.action-btn{display:flex;flex-direction:column;align-items:center;gap:var(--space-1);padding:var(--space-2) var(--space-4);cursor:pointer;border-radius:var(--radius-md);transition:all .15s;color:var(--muted);background:none;border:none;font-family:var(--font-body);font-size:11px;font-weight:500}
+.action-btn:active{background:var(--surface)}
+.action-btn svg{width:20px;height:20px}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="status-bar"><span>9:41</span><svg width="68" height="12" viewBox="0 0 68 12" fill="none"><rect x="42" y="1" width="22" height="10" rx="3" stroke="#f5f5f7" stroke-width=".8" fill="none"/><rect x="44" y="3" width="14" height="6" rx="1.5" fill="#f5f5f7" opacity=".35"/><rect x="60" y="5" width="2" height="2" rx="1" fill="#f5f5f7"/><circle cx="9" cy="6" r="5" fill="#f5f5f7" opacity=".9"/></svg></div>
+  <div class="doc-detail-header" style="padding:var(--space-3) var(--space-5);flex-shrink:0">
+    <button class="back-btn" onclick="window.history.back()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h2>KELA Housing Benefit 2026</h2>
+    <button class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    </button>
+  </div>
+
+  <!-- Status bar under header -->
+  <div style="padding:0 var(--space-5) var(--space-3);flex-shrink:0;display:flex;align-items:center;gap:var(--space-3)">
+    <span class="badge badge-success">Translated</span>
+    <span style="font-size:12px;color:var(--muted)">2 pages · Finnish → English</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="doc-tabs" style="padding:0 var(--space-5)">
+    <button class="doc-tab active" data-target="pane-summary">Summary</button>
+    <button class="doc-tab" data-target="pane-original">Original</button>
+    <button class="doc-tab" data-target="pane-dates">Dates &amp; Actions</button>
+  </div>
+
+  <!-- Content area -->
+  <div class="content" style="padding-top:0">
+
+    <!-- Tab: Summary -->
+    <div class="doc-pane active" id="pane-summary">
+      <div class="section-block">
+        <h4>What this document is</h4>
+        <p class="body-text">
+          A decision letter from KELA (Social Insurance Institution of Finland) regarding your housing benefit application. The letter confirms that your application has been approved and specifies the monthly benefit amount, payment dates, and the conditions you must continue to meet.
+        </p>
+      </div>
+      <div class="section-block">
+        <h4>Key points</h4>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)">
+          <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:14px;color:var(--muted)">Approved amount</span>
+            <span style="font-size:14px;font-weight:600;color:var(--accent)">€387.20/month</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:14px;color:var(--muted)">Valid from</span>
+            <span style="font-size:14px;font-weight:500">1 April 2026</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:14px;color:var(--muted)">Payment date</span>
+            <span style="font-size:14px;font-weight:500;color:var(--warning)">15th of each month</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0">
+            <span style="font-size:14px;color:var(--muted)">Next review</span>
+            <span style="font-size:14px;font-weight:500">31 December 2026</span>
+          </div>
+        </div>
+      </div>
+      <div class="section-block">
+        <h4>What you need to do</h4>
+        <div style="display:flex;gap:var(--space-3);align-items:flex-start;background:var(--accent-dim);border:1px solid rgba(146,217,187,.2);border-radius:var(--radius-md);padding:var(--space-4)">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+            <span style="color:#000;font-size:13px;font-weight:700">1</span>
+          </div>
+          <div>
+            <p style="font-size:14px;font-weight:600;margin-bottom:var(--space-1)">Report income changes</p>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6">Notify KELA within 14 days if your employment status or income changes. Failure to report may result in overpayment recovery.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Original -->
+    <div class="doc-pane" id="pane-original">
+      <div class="original-preview">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)">
+          <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">KELA — Päätös asumistuesta</span>
+          <span style="font-size:12px;color:var(--muted)">Page 1/2</span>
+        </div>
+        <div class="original-text">
+<span style="color:var(--fg)">KELAN PÄÄTÖS</span>
+
+<span style="color:var(--fg);font-weight:500">ASUMISTUEN MÄÄRÄÄMINEN</span>
+
+Päivämäärä: 15.03.2026
+Diaarinumero: 12345/2026
+
+<span style="color:var(--fg)">PÄÄTÖS</span>
+
+Kela on päättänyt, että sinulla on oikeus
+asumistukeen 1.4.2026 alkaen.
+
+Asumistuen määrä on 387,20 €/kk.
+
+Tukea maksetaan 15. päivänä joka kuukausi
+jälkikäteen.
+
+<span style="color:var(--fg)">EDELLYTYKSET</span>
+
+Asumistuen saamisen edellytyksenä on, että
+asut vakituisesti vuokra-asunnossa
+Suomessa.
+        </div>
+        <div class="page-number">1 / 2</div>
+      </div>
+    </div>
+
+    <!-- Tab: Dates & Actions -->
+    <div class="doc-pane" id="pane-dates">
+      <div class="section-block">
+        <h4>Extracted Dates</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Document date</div>
+            <div class="info-value" style="color:var(--fg)">15 March 2026</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Valid from</div>
+            <div class="info-value" style="color:var(--success)">1 April 2026</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Payment</div>
+            <div class="info-value" style="color:var(--warning)">15th each month</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Next review</div>
+            <div class="info-value">31 December 2026</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Report changes within</div>
+            <div class="info-value" style="color:var(--danger)">14 days</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Reference</div>
+            <div class="info-value" style="font-family:var(--font-mono);font-size:12px">12345/2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-block">
+        <h4>Required actions</h4>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4);margin-bottom:var(--space-3)">
+          <div style="display:flex;align-items:flex-start;gap:var(--space-3)">
+            <div class="checkbox" style="margin-top:2px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div><div style="font-size:14px;font-weight:500;margin-bottom:2px">Report income changes</div><div style="font-size:12px;color:var(--muted)">Due within 14 days of change</div></div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)">
+          <div style="display:flex;align-items:flex-start;gap:var(--space-3)">
+            <div class="checkbox" style="margin-top:2px"></div>
+            <div><div style="font-size:14px;font-weight:500;margin-bottom:2px">Submit annual income declaration</div><div style="font-size:12px;color:var(--muted)">Due 31 December 2026</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action bar -->
+  <div class="action-bar" style="padding:var(--space-3) var(--space-5)">
+    <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Share</span></button>
+    <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Export</span></button>
+    <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Archive</span></button>
+    <button class="action-btn" style="color:var(--danger)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Delete</span></button>
+    <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>Email</span></button>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script>initDocTabs()</script>
+</body>
+</html>

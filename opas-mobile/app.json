@@ -5,34 +5,68 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "description": "OPAS helps you manage official letters from Finnish authorities — Kela, Vero, Migri, and more. Scan, decode, and organize documents with AI-powered analysis.",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#1B7F79"
+      "backgroundColor": "#000000"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.opas.app",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        },
+        "NSCalendarsUsageDescription": "Opas uses your calendar to add deadline reminders for your documents.",
+        "NSCalendarsFullAccessUsageDescription": "Opas uses your calendar to add deadline reminders for your documents.",
+        "NSRemindersUsageDescription": "Opas uses reminders to notify you of upcoming document deadlines.",
+        "NSPhotoLibraryUsageDescription": "Opas needs access to your photos to import documents.",
+        "NSCameraUsageDescription": "Opas needs camera access to scan your documents."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1B7F79"
+        "backgroundColor": "#000000"
       },
       "package": "com.opas.app",
       "versionCode": 1,
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "POST_NOTIFICATIONS",
+        "SCHEDULE_EXACT_ALARM",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
     },
+    "scheme": "opas",
     "plugins": [
       "expo-router",
       "expo-secure-store",
       [
+        "expo-calendar",
+        {
+          "calendarPermission": "Opas needs calendar access to add deadline reminders for your documents."
+        }
+      ],
+      [
         "expo-camera",
         {
-          "cameraPermission": "Opas needs camera access to scan your documents."
+          "cameraPermission": "Opas needs camera access to scan your documents.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Opas needs access to your photos to import documents."
         }
       ],
       [
@@ -41,14 +75,12 @@
           "icon": "./assets/notification-icon.png",
           "color": "#1B7F79"
         }
-      ]
+      ],
+      "expo-localization",
+      "expo-font"
     ],
-    "scheme": "opas",
     "extra": {
-      "apiBaseUrl": "https://api.opas.fi/api/v1",
-      "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
-      }
+      "apiBaseUrl": "http://192.168.0.14:8080/api/v1"
     }
   }
 }

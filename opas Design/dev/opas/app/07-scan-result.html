@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Opas — Scan Result</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+#scan-result-screen{display:flex;flex-direction:column;height:100%}
+.result-content{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5) 0}
+.progress-block{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-16) var(--space-5);text-align:center;min-height:380px}
+.progress-block .status-label{font-size:17px;font-weight:600;margin-bottom:var(--space-5)}
+.progress-block .bar-wrap{width:240px;margin:0 auto}
+.preview-section{display:none;animation:fadeInUp .4s ease-out}
+.preview-section.ready{display:block}
+.doc-preview-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-8);margin-bottom:var(--space-5);display:flex;align-items:center;justify-content:center;min-height:200px;position:relative}
+.doc-preview-card svg{width:80px;height:80px;opacity:.3}
+.doc-preview-card .pg-count{position:absolute;bottom:var(--space-3);right:var(--space-3);font-size:12px;color:var(--muted)}
+.confirm-section{display:none;animation:fadeInUp .5s .2s both;padding-bottom:var(--space-6)}
+.confirm-section.visible{display:block}
+.form-group{margin-bottom:var(--space-4)}
+.form-group label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:var(--space-2)}
+.form-input{font-family:var(--font-body);font-size:15px;color:var(--fg);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;width:100%;outline:none;transition:all .15s}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.form-select{font-family:var(--font-body);font-size:15px;color:var(--fg);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 40px 14px 16px;width:100%;outline:none;transition:all .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2386868b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px}
+.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.result-actions{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);padding-bottom:var(--space-6)}
+.result-actions .btn{padding:var(--space-4) var(--space-5);font-size:15px;justify-content:center}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div id="scan-result-screen">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1.5" stroke="#86868b" stroke-width="1"/><path d="M14 3v6" stroke="#86868b" stroke-width="1.2" stroke-linecap="round"/><path d="M15.5 4.5v3" stroke="#86868b" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+  </div>
+
+  <div class="result-content">
+    <div class="progress-block" id="progressBlock">
+      <div class="status-label" id="scanStatusText">Processing document…</div>
+      <div class="bar-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="scanProgress" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="preview-section" id="previewSection">
+      <div class="header" style="padding-top:0">
+        <h1 style="font-size:18px">Scan Complete</h1>
+        <div class="header-actions">
+          <span class="badge badge-accent">3 pages</span>
+        </div>
+      </div>
+
+      <div class="doc-preview-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+        <span class="pg-count">3 pages</span>
+      </div>
+
+      <div class="confirm-section" id="confirmSection">
+        <div class="form-group">
+          <label>Document name</label>
+          <input class="form-input" type="text" value="KELA — Housing Benefit" placeholder="Enter document name">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-select"><option>KELA & Social Benefits</option><option>Tax & Finance</option><option>Residence & Immigration</option><option>Healthcare</option><option>Education</option><option>Employment</option><option>Housing</option><option>Other</option></select>
+        </div>
+        <div class="form-group">
+          <label>Language</label>
+          <select class="form-select"><option>Finnish (suomi)</option><option>Swedish (svenska)</option><option>English</option><option>Other</option></select>
+        </div>
+        <div class="result-actions">
+          <button class="btn btn-secondary" onclick="showScreen('06-scan')">Retake</button>
+          <button class="btn btn-primary" onclick="showToast('Document saved!');setTimeout(()=>showScreen('08-document'),500)">Save & Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script>
+(function(){
+  let pct=0;
+  const fill=document.getElementById('scanProgress');
+  const statusEl=document.getElementById('scanStatusText');
+  const preview=document.getElementById('previewSection');
+  const confirm=document.getElementById('confirmSection');
+  const iv=setInterval(()=>{
+    pct+=Math.random()*15+5;
+    if(pct>100)pct=100;
+    if(fill)fill.style.width=pct+'%';
+    if(pct<40&&statusEl)statusEl.textContent='Analyzing document…';
+    else if(pct<70&&statusEl)statusEl.textContent='Extracting text…';
+    else if(pct<90&&statusEl)statusEl.textContent='Detecting fields…';
+    else if(pct===100){
+      if(statusEl)statusEl.textContent='Ready!';
+      clearInterval(iv);
+      document.getElementById('progressBlock').style.display='none';
+      preview.classList.add('ready');
+      setTimeout(()=>confirm.classList.add('visible'),300);
+    }
+  },200);
+})();
+function showToast(msg){
+  const existing=document.querySelector('.toast');
+  if(existing)existing.remove();
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'+msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+</script>
+</body>
+</html>

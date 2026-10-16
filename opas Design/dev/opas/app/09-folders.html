@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Opas — Folders</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+#folders-screen{height:100%;display:flex;flex-direction:column}
+.folders-content{flex:1;overflow-y:auto;padding:var(--space-4) var(--space-5) 0}
+.deadline-section{margin-bottom:var(--space-6)}
+.deadline-section .section-label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-2)}
+.deadline-section .section-label svg{width:16px;height:16px}
+.deadline-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-3);transition:border-color .15s;cursor:pointer}
+.deadline-card:active{background:var(--surface-2)}
+.deadline-card .priority-dot{width:4px;height:40px;border-radius:2px;flex-shrink:0}
+.deadline-card .priority-dot.warning{background:var(--warning)}
+.deadline-card .priority-dot.danger{background:var(--danger)}
+.deadline-card .body{flex:1;min-width:0}
+.deadline-card .body .name{font-size:14px;font-weight:600;margin-bottom:2px}
+.deadline-card .body .sub{font-size:12px;color:var(--muted)}
+.deadline-card .right{text-align:right;flex-shrink:0}
+.deadline-card .right .date{font-size:13px;font-weight:600;color:var(--warning)}
+.deadline-card .right .date.danger{color:var(--danger)}
+.deadline-card .right .label{font-size:11px;color:var(--muted)}
+.folder-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);padding-bottom:var(--space-8)}
+.folder-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-4);cursor:pointer;transition:all .15s;min-height:88px;display:flex;flex-direction:column}
+.folder-card:active{background:var(--surface-2)}
+.folder-card .icon{width:36px;height:36px;border-radius:var(--radius-sm);background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-2)}
+.folder-card .icon svg{width:18px;height:18px}
+.folder-card .name{font-size:13px;font-weight:600;margin-bottom:1px}
+.folder-card .count{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="folders-screen">
+  <div class="status-bar"><span>9:41</span><svg width="68" height="12" viewBox="0 0 68 12" fill="none"><rect x="42" y="1" width="22" height="10" rx="3" stroke="#f5f5f7" stroke-width=".8" fill="none"/><rect x="44" y="3" width="14" height="6" rx="1.5" fill="#f5f5f7" opacity=".35"/><rect x="60" y="5" width="2" height="2" rx="1" fill="#f5f5f7"/><circle cx="9" cy="6" r="5" fill="#f5f5f7" opacity=".9"/></svg></div>
+  <div class="folders-content">
+    <div class="header" style="padding:0 0 var(--space-4)">
+      <h1>Folders</h1>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showScreen('05-search')" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="deadline-section">
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Upcoming deadlines
+      </div>
+      <div class="deadline-card" onclick="showScreen('08-document')">
+        <div class="priority-dot warning"></div>
+        <div class="body">
+          <div class="name">Residence Permit Extension</div>
+          <div class="sub">KELA & Benefits • 2 attachments needed</div>
+        </div>
+        <div class="right">
+          <div class="date">Jun 30</div>
+          <div class="label">7 days left</div>
+        </div>
+      </div>
+      <div class="deadline-card" onclick="showScreen('08-document')">
+        <div class="priority-dot danger"></div>
+        <div class="body">
+          <div class="name">Tax Return 2025</div>
+          <div class="sub">Tax & Finance • Final review</div>
+        </div>
+        <div class="right">
+          <div class="date danger">Jun 15</div>
+          <div class="label">2 days left</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:var(--space-3)">All folders</div>
+    <div class="folder-grid">
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">Tax</div>
+        <div class="count">3 documents</div>
+      </div>
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">Residence & Immigration</div>
+        <div class="count">2 documents</div>
+      </div>
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">KELA & Benefits</div>
+        <div class="count">4 documents</div>
+      </div>
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">Healthcare</div>
+        <div class="count">1 document</div>
+      </div>
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">Employment</div>
+        <div class="count">2 documents</div>
+      </div>
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">Education</div>
+        <div class="count">1 document</div>
+      </div>
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">Housing</div>
+        <div class="count">2 documents</div>
+      </div>
+      <div class="folder-card" onclick="showScreen('04-documents')">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        <div class="name">Finance</div>
+        <div class="count">1 document</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="glass-nav">
+    <button class="tab" data-screen="03-home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg><span>Home</span></button>
+    <button class="tab" data-screen="05-search"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg><span>Search</span></button>
+    <button class="tab-scan" onclick="showScreen('06-scan')" aria-label="Scan document"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 012 2v4M9 21H5a2 2 0 01-2-2v-4M21 15v4a2 2 0 01-2 2h-4M9 3H5a2 2 0 00-2 2v4"/></svg></button>
+    <button class="tab" data-screen="04-documents"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span>Docs</span></button>
+    <button class="tab active" data-screen="09-folders"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2h-7l-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span>Folders</span></button>
+    <button class="tab" data-screen="10-profile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></button>
+  </nav>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

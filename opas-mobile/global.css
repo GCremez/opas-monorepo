@@ -1,0 +1,41 @@
+/* global.css — Opas v2 theme variables for NativeWind.
+   :root is the Paper (light) theme; .dark is the Ink theme.
+   Toggle by adding/removing the `dark` class on the root view
+   (e.g. via useColorScheme() + nativewind's colorScheme API). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:        #f2ede2;
+  --surface:   #eae3d3;
+  --surface-2: #e3dbc8;
+  --fg:        #211e16;
+  --fg-soft:   #4c473c;
+  --muted:     #8a8272;
+  --hairline:  rgba(33,30,22,0.12);
+  --rule:      rgba(33,30,22,0.22);
+  --accent:    #35503f;
+  --on-accent: #f2ede2;
+  --warning:   #916219;
+  --danger:    #9c3a2c;
+  --info:      #42606f;
+  --node:      #cdbfa6;
+}
+
+.dark:root {
+  --bg:        #16150e;
+  --surface:   #201e16;
+  --surface-2: #2a2820;
+  --fg:        #ece6d8;
+  --fg-soft:   #b6ae9e;
+  --muted:     #857e6f;
+  --hairline:  rgba(236,230,216,0.13);
+  --rule:      rgba(236,230,216,0.24);
+  --accent:    #8fbb9f;
+  --on-accent: #16150e;
+  --warning:   #d8a552;
+  --danger:    #d5745f;
+  --info:      #7fa0b3;
+  --node:      #6f6a5c;
+}

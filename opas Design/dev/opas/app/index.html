@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Opas — App Screens</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=lufga@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000;--surface:#1c1c1e;--surface-2:#2c2c2e;--fg:#f5f5f7;--muted:#86868b;--border:#38383a;--accent:#92d9bb;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:16px;
+  --font-display:'Lufga','Inter',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+}
+body{
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;padding:40px 24px;
+}
+::selection{background:var(--accent);color:#000}
+h1{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:4px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:8px}
+.badge{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:3px;background:var(--accent);color:#000;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:32px}
+.screen-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:border-color .15s;cursor:pointer;text-decoration:none;color:var(--fg);
+  display:flex;flex-direction:column;
+}
+.screen-card:hover{border-color:var(--accent)}
+.screen-preview{
+  aspect-ratio:390/844;max-height:520px;overflow:hidden;
+  background:var(--bg);position:relative;
+}
+.screen-preview iframe{width:100%;height:100%;border:none;transform:scale(.45);transform-origin:0 0;pointer-events:none}
+.screen-info{padding:var(--space-4)}
+.screen-info h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.screen-info p{font-size:12px;color:var(--muted);line-height:1.5}
+.screen-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.screen-tags span{font-size:10px;padding:2px 6px;border-radius:3px;background:var(--surface-2);color:var(--muted)}
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:32px;padding:20px;background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border)}
+.flow span{font-size:12px;color:var(--muted)}
+.flow .arrow{color:var(--accent);font-size:16px}
+.flow .step{padding:6px 14px;border-radius:var(--radius-full);background:var(--surface-2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.flow .step:hover{background:var(--accent-dim);color:var(--accent)}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<span class="badge">Opas App</span>
+<h1>Screen library</h1>
+<p class="sub">12 mobile screens · Ring Path brand · Dark theme · 390px base</p>
+
+<div class="flow">
+  <span>User flow →</span>
+  <span class="step" onclick="location='01-launch.html'">01 Launch</span>
+  <span class="arrow">→</span>
+  <span class="step" onclick="location='02-onboarding.html'">02 Onboarding</span>
+  <span class="arrow">→</span>
+  <span class="step" onclick="location='03-home.html'">03 Home</span>
+  <span class="arrow">→</span>
+  <span class="step" onclick="location='06-scan.html'">04 Scan</span>
+  <span class="arrow">→</span>
+  <span class="step" onclick="location='07-scan-result.html'">05 Result</span>
+  <span class="arrow">→</span>
+  <span class="step" onclick="location='08-document.html'">06 Detail</span>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap">
+  <a href="../system/index.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);text-decoration:none;color:var(--fg);font-size:14px;font-weight:500">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Design System
+  </a>
+  <a href="../icons/index.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);text-decoration:none;color:var(--fg);font-size:14px;font-weight:500">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+    Icons
+  </a>
+  <a href="../logo/index.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);text-decoration:none;color:var(--fg);font-size:14px;font-weight:500">
+    <svg width="18" height="18" viewBox="0 0 140 140" fill="none"><circle cx="70" cy="70" r="44" stroke="#92d9bb" stroke-width="2.5" stroke-dasharray="46 86" stroke-dashoffset="-22" stroke-linecap="round" fill="none"/><circle cx="36" cy="50" r="8" fill="#3a3a3c"/><circle cx="94" cy="42" r="8" fill="#92d9bb"/><path d="M92 102 L84 112 L77 102" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    Logo
+  </a>
+</div>
+
+<div class="grid">
+  <a class="screen-card" href="01-launch.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center">
+      <svg width="80" height="80" viewBox="0 0 140 140" fill="none"><circle cx="70" cy="70" r="50" stroke="#3a3a3c" stroke-width="2" stroke-dasharray="10 8" stroke-linecap="round" fill="none"/><circle cx="70" cy="70" r="50" stroke="#92d9bb" stroke-width="2" stroke-dasharray="32 84" stroke-dashoffset="-16" stroke-linecap="round" fill="none"/><circle cx="40" cy="52" r="10" fill="#3a3a3c"/><circle cx="96" cy="47" r="10" fill="#92d9bb"/><circle cx="86" cy="96" r="10" fill="#92d9bb"/><path d="M94 99 L86 108 L79 99" stroke="#92d9bb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+    <div class="screen-info">
+      <h3>01 — Launch</h3>
+      <p>Splash screen with Ring Path logo, auto-transitions to onboarding</p>
+      <div class="screen-tags"><span>Splash</span><span>Animation</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="02-onboarding.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:40px">
+      <div style="width:60px;height:60px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:Lufga;font-size:24px;font-weight:700;color:var(--accent)">O</div>
+      <div style="width:80px;height:4px;background:var(--accent);border-radius:2px;margin-top:8px"></div>
+      <div style="width:40px;height:4px;background:var(--surface-3);border-radius:2px"></div>
+    </div>
+    <div class="screen-info">
+      <h3>02 — Onboarding</h3>
+      <p>3-step carousel: Welcome → How it works → Language selection</p>
+      <div class="screen-tags"><span>Onboarding</span><span>Carousel</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="03-home.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center">
+      <div style="width:80%;display:flex;flex-direction:column;gap:6px">
+        <div style="height:10px;width:40%;background:var(--accent);border-radius:3px"></div>
+        <div style="height:40px;width:100%;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted)">Scan CTA</div>
+        <div style="height:8px;width:60%;background:var(--surface-3);border-radius:2px"></div>
+        <div style="height:8px;width:50%;background:var(--surface-3);border-radius:2px"></div>
+        <div style="height:8px;width:45%;background:var(--surface-3);border-radius:2px"></div>
+      </div>
+    </div>
+    <div class="screen-info">
+      <h3>03 — Home</h3>
+      <p>Feed with KPI row, scan CTA, recent document list, glass tab bar</p>
+      <div class="screen-tags"><span>Home</span><span>Feed</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="04-documents.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center">
+      <div style="width:80%;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;gap:3px;margin-bottom:4px">
+          <span style="padding:2px 6px;font-size:8px;border-radius:4px;background:var(--accent-dim);color:var(--accent)">All</span>
+          <span style="padding:2px 6px;font-size:8px;border-radius:4px;background:var(--surface-2);color:var(--muted)">Pending</span>
+          <span style="padding:2px 6px;font-size:8px;border-radius:4px;background:var(--surface-2);color:var(--muted)">Done</span>
+        </div>
+        <div style="height:8px;width:100%;background:var(--surface-3);border-radius:2px"></div>
+        <div style="height:8px;width:90%;background:var(--surface-3);border-radius:2px"></div>
+        <div style="height:8px;width:85%;background:var(--surface-3);border-radius:2px"></div>
+        <div style="height:8px;width:95%;background:var(--surface-3);border-radius:2px"></div>
+      </div>
+    </div>
+    <div class="screen-info">
+      <h3>04 — Documents</h3>
+      <p>Filterable list with status badges, categories, search access</p>
+      <div class="screen-tags"><span>List</span><span>Filter</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="05-search.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <div class="screen-info">
+      <h3>05 — Search</h3>
+      <p>Full-screen search with recent queries and real-time results</p>
+      <div class="screen-tags"><span>Search</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="06-scan.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center;background:#0a0a0a">
+      <div style="width:60%;height:50%;border:1.5px solid rgba(255,255,255,.15);border-radius:8px;position:relative">
+        <span style="position:absolute;top:-1.5px;left:-1.5px;width:12px;height:12px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);border-radius:3px 0 0 0"></span>
+        <span style="position:absolute;top:-1.5px;right:-1.5px;width:12px;height:12px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);border-radius:0 3px 0 0"></span>
+      </div>
+    </div>
+    <div class="screen-info">
+      <h3>06 — Scan</h3>
+      <p>Camera viewfinder with auto-frame, flash, gallery import, capture</p>
+      <div class="screen-tags"><span>Camera</span><span>Scan</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="07-scan-result.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center">
+      <div style="width:60%;height:40%;background:var(--surface);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+    </div>
+    <div class="screen-info">
+      <h3>07 — Scan Result</h3>
+      <p>Detected document preview, category picker, confirm or retake</p>
+      <div class="screen-tags"><span>Result</span><span>Confirm</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="08-document.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center">
+      <div style="width:75%;display:flex;flex-direction:column;gap:3px">
+        <div style="display:flex;gap:6px;margin-bottom:4px">
+          <span style="padding:2px 6px;font-size:8px;border-radius:4px;background:rgba(48,209,88,.12);color:var(--success)">Summary</span>
+          <span style="padding:2px 6px;font-size:8px;border-radius:4px;background:var(--surface-2);color:var(--muted)">Original</span>
+        </div>
+        <div style="height:6px;width:100%;background:var(--accent);border-radius:2px;opacity:.5"></div>
+        <div style="height:6px;width:80%;background:var(--surface-3);border-radius:2px"></div>
+        <div style="height:6px;width:60%;background:var(--surface-3);border-radius:2px"></div>
+      </div>
+    </div>
+    <div class="screen-info">
+      <h3>08 — Document Detail</h3>
+      <p>Summary / Original / Dates tabs, AI translation, extracted deadlines, action bar</p>
+      <div class="screen-tags"><span>Detail</span><span>Translation</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="09-folders.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center">
+      <div style="width:75%;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <div style="height:28px;background:var(--surface-2);border-radius:4px"></div>
+        <div style="height:28px;background:var(--surface-2);border-radius:4px"></div>
+        <div style="height:28px;background:var(--surface-2);border-radius:4px"></div>
+        <div style="height:28px;background:var(--surface-2);border-radius:4px"></div>
+      </div>
+    </div>
+    <div class="screen-info">
+      <h3>09 — Folders</h3>
+      <p>Categorized grid: Tax, Residence, KELA, Healthcare, Employment, etc.</p>
+      <div class="screen-tags"><span>Grid</span><span>Categories</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="10-profile.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px">
+      <div style="width:32px;height:32px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div style="width:50px;height:6px;background:var(--surface-3);border-radius:2px"></div>
+    </div>
+    <div class="screen-info">
+      <h3>10 — Profile</h3>
+      <p>Avatar, language toggle (FI/SV/EN), notifications, biometric lock, subscription</p>
+      <div class="screen-tags"><span>Profile</span><span>Settings</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="11-empty.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.2"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <div style="width:50px;height:6px;background:var(--surface-3);border-radius:2px"></div>
+    </div>
+    <div class="screen-info">
+      <h3>11 — Empty State</h3>
+      <p>"No documents yet" with Ring Path illustration and scan CTA</p>
+      <div class="screen-tags"><span>Empty</span><span>Onboarding</span></div>
+    </div>
+  </a>
+
+  <a class="screen-card" href="12-error.html">
+    <div class="screen-preview" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div style="width:60px;height:6px;background:var(--surface-3);border-radius:2px"></div>
+    </div>
+    <div class="screen-info">
+      <h3>12 — Error State</h3>
+      <p>"Connection lost" with retry button, Ring Path error treatment</p>
+      <div class="screen-tags"><span>Error</span><span>Offline</span></div>
+    </div>
+  </a>
+</div>
+
+<div style="margin-top:32px;padding:16px;background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border)">
+  <div style="font-size:13px;color:var(--muted);margin-bottom:4px">app/css/app.css</div>
+  <div style="font-size:13px;color:var(--muted);">app/js/app.js</div>
+  <div style="font-size:11px;color:var(--muted);margin-top:8px">Shared CSS/JS across all 12 screens · 390px mobile base · Dark theme</div>
+</div>
+</body>
+</html>
