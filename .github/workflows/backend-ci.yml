@@ -1,10 +1,27 @@
-name: Backend CI/CD
+name: Backend CI
 
+# Tests run automatically on every push and pull request.
+# Deploys to AWS only run when started by hand (Actions tab → Run workflow).
 on:
   push:
     branches: [main, develop]
+    paths:
+      - 'opas-backend/**'
+      - '.github/workflows/backend-ci.yml'
   pull_request:
     branches: [main]
+    paths:
+      - 'opas-backend/**'
+      - '.github/workflows/backend-ci.yml'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Build image and deploy to staging and production'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
 
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/opas-backend
@@ -13,26 +30,9 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_DB: opas_test
-          POSTGRES_USER: opas
-          POSTGRES_PASSWORD: opas
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      redis:
-        image: redis:7-alpine
-        options: --health-cmd "redis-cli ping" --health-interval 10s
-        ports:
-          - 6379:6379
-
+    defaults:
+      run:
+        working-directory: opas-backend
     steps:
       - uses: actions/checkout@v4
 
@@ -41,35 +41,20 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-
+      # Integration tests start their own PostgreSQL and Redis with Testcontainers.
       - name: Run tests
         run: mvn verify --no-transfer-progress
-        env:
-          DATABASE_URL: jdbc:postgresql://localhost:5432/opas_test
-          DATABASE_USER: opas
-          DATABASE_PASSWORD: opas
-          REDIS_URL: redis://localhost:6379
-          JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY_TEST }}
-          JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY_TEST }}
-          ANTHROPIC_API_KEY: test-key-not-used-in-tests
-          STRIPE_SECRET_KEY: sk_test_placeholder
-          STRIPE_WEBHOOK_SECRET: whsec_placeholder
-          PRESIDIO_SIDECAR_URL: http://localhost:5001
-          S3_BUCKET_NAME: opas-test
 
   build:
     name: Build & Push Image
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -83,7 +68,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: opas-backend
           push: true
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
@@ -93,8 +78,9 @@ jobs:
     name: Security Scan
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -115,17 +101,18 @@ jobs:
     name: Deploy to Staging
     needs: security-scan
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     environment: staging
+    permissions:
+      contents: read
+      id-token: write
     env:
       ECS_CLUSTER: opas-staging
       ECS_SERVICE: opas-backend
       TASK_DEF_FILE: opas-infra/cloudformation/task-definition-staging.json
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-north-1
@@ -158,17 +145,18 @@ jobs:
     name: Deploy to Production
     needs: deploy-staging
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     environment: production
+    permissions:
+      contents: read
+      id-token: write
     env:
       ECS_CLUSTER: opas-prod
       ECS_SERVICE: opas-backend
       TASK_DEF_FILE: opas-infra/cloudformation/task-definition-production.json
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-north-1

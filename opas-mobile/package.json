@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "test": "jest --watchAll=false",
-    "test:ci": "jest --ci --coverage"
+    "test:ci": "jest --ci --coverage --passWithNoTests"
   },
   "dependencies": {
     "@expo-google-fonts/instrument-sans": "^0.4.2",

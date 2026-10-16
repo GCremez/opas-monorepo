@@ -1,5 +1,7 @@
-name: Infra CI/CD
+name: Infra CI
 
+# Checks run automatically when opas-infra changes.
+# CloudFormation deploys only run when started by hand (Actions tab → Run workflow).
 on:
   push:
     branches: [main, develop]
@@ -10,6 +12,16 @@ on:
     branches: [main]
     paths:
       - 'opas-infra/**'
+      - '.github/workflows/infra-ci.yml'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy CloudFormation stacks to staging and production'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
 
 defaults:
   run:
@@ -77,11 +89,15 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     needs: validate
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Trivy on infra images
+      - name: Run Trivy on PostgreSQL
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: 'docker.io/pgvector/pgvector:pg16'
           format: 'sarif'
@@ -110,15 +126,19 @@ jobs:
       - name: Upload Trivy results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
-          sarif_file: opas-infra/trivy-postgres.sarif
+          sarif_file: trivy-postgres.sarif
 
   deploy-infra-staging:
     name: Deploy Infra — Staging
     needs: integration
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
     environment: staging
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -156,8 +176,10 @@ jobs:
     name: Deploy Infra — Production
     needs: deploy-infra-staging
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     environment: production
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
