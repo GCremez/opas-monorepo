@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DecodeResultRepository extends JpaRepository<DecodeResult, UUID> {
     List<DecodeResult> findByDocumentId(UUID documentId);
 
+    List<DecodeResult> findByUserIdOrderByCreatedAtDesc(UUID userId);
+
     long countByUserId(UUID userId);
 
     void deleteByDocumentId(UUID documentId);

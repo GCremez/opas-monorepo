@@ -49,6 +49,15 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    @ExceptionHandler(DecodeFailedException.class)
+    public ProblemDetail handleDecodeFailed(DecodeFailedException e) {
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
+        detail.setType(URI.create("about:blank"));
+        detail.setTitle("Decode Failed");
+        detail.setProperty("code", "decode_failed");
+        return detail;
+    }
+
     @ExceptionHandler(QuotaExceededException.class)
     public ProblemDetail handleQuotaExceeded(QuotaExceededException e) {
         // 402 so the client can distinguish "out of plan quota" from a validation

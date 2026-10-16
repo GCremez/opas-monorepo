@@ -1,5 +1,6 @@
 package com.opas.config;
 
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -93,6 +94,9 @@ public class RabbitMQConfig {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
         container.setQueueNames(QUEUE_DECODE);
         container.setMessageListener(decodeMessageListener);
+        // The listener acks/nacks itself. Under the default AUTO mode the container would
+        // ack the same delivery tag again, and the broker closes the channel on that.
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         container.setPrefetchCount(5);
         container.setConcurrentConsumers(3);
         container.setMaxConcurrentConsumers(10);
@@ -106,6 +110,7 @@ public class RabbitMQConfig {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
         container.setQueueNames(QUEUE_DECODE_DLQ);
         container.setMessageListener(decodeDlqListener);
+        container.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         container.setConcurrentConsumers(1);
         container.setDefaultRequeueRejected(false);
         return container;

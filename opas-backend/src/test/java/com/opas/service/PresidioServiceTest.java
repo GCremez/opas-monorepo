@@ -129,4 +129,16 @@ class PresidioServiceTest {
 
         assertThrows(PresidioUnavailableException.class, () -> service.scrubPii("John Doe"));
     }
+
+    @Test
+    void anonymizeRequestUsesPresidioSnakeCaseKeys() throws Exception {
+        var request = new PresidioService.AnonymizeRequest("Call 040 123 4567",
+                java.util.List.of(new PresidioService.AnalysisResult("PHONE_NUMBER", 5, 17, 0.9)));
+
+        String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(request);
+
+        assertTrue(json.contains("\"analyzer_results\""), json);
+        assertTrue(json.contains("\"entity_type\":\"PHONE_NUMBER\""), json);
+        assertFalse(json.contains("analyzerResults"), json);
+    }
 }

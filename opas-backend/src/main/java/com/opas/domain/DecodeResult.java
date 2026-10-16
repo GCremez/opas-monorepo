@@ -1,6 +1,7 @@
 package com.opas.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.lang.Nullable;
@@ -21,10 +22,14 @@ public class DecodeResult {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "raw_response", columnDefinition = "jsonb")
+    // The model's verbatim reply — prose, not guaranteed JSON, so it lives in a text column.
+    @Column(name = "raw_response", columnDefinition = "text")
     private String rawResponse;
 
+    // Already-validated JSON text (see DecodeService#extractJsonObject). Hibernate binds a
+    // String as varchar, which Postgres refuses to put in a jsonb column without a cast.
     @Column(name = "structured_data", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     private String structuredData;
 
     @Column(name = "pii_scrubbed", nullable = false)
