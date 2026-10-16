@@ -109,7 +109,12 @@ public class S3Config {
         var builder = S3Presigner.builder().region(Region.of(region));
 
         if (!endpoint.isBlank()) {
-            builder.endpointOverride(URI.create(endpoint));
+            // Path-style like the S3Client above. Without it presigned links point at
+            // <bucket>.localhost:4566, which LocalStack reads as a bucket named after the
+            // key's first segment, so every upload from the app failed with NoSuchBucket.
+            builder.endpointOverride(URI.create(endpoint))
+                    .serviceConfiguration(software.amazon.awssdk.services.s3.S3Configuration.builder()
+                            .pathStyleAccessEnabled(true).build());
         }
 
         builder.credentialsProvider(credentialsProvider);

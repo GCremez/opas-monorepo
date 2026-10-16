@@ -82,6 +82,7 @@ opas:
     output-price-per-mtok: 10.00
   presidio:
     url: http://localhost:5001
+    anonymizer-url: http://localhost:5002
   s3:
     bucket: opas-test
     region: eu-north-1

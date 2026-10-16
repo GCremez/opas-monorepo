@@ -23,23 +23,29 @@ public class PresidioService {
      * prefer availability over privacy when the sidecar is down.
      */
     private final boolean failOpen;
-    private final RestClient restClient;
+    // Presidio's analyzer and anonymizer are separate services; /anonymize doesn't exist
+    // on the analyzer, so sending both calls to one URL failed every scrub with a 404.
+    private final RestClient analyzer;
+    private final RestClient anonymizer;
     private final String language;
 
     private static final int MAX_RETRIES = 3;
     private static final long INITIAL_BACKOFF_MS = 500;
 
-    public PresidioService(RestClient.Builder restClientBuilder, @Value("${opas.presidio.url}") String presidioUrl,
+    public PresidioService(RestClient.Builder restClientBuilder, @Value("${opas.presidio.url}") String analyzerUrl,
+            @Value("${opas.presidio.anonymizer-url}") String anonymizerUrl,
             @Value("${opas.presidio.language:en}") String language,
             @Value("${opas.presidio.fail-open:false}") boolean failOpen) {
-        this.restClient = restClientBuilder.baseUrl(presidioUrl).build();
+        // build() snapshots the builder, so the same builder can produce both clients.
+        this.analyzer = restClientBuilder.baseUrl(analyzerUrl).build();
+        this.anonymizer = restClientBuilder.baseUrl(anonymizerUrl).build();
         this.language = language;
         this.failOpen = failOpen;
     }
 
     public List<AnalysisResult> analyze(String text) {
         return executeWithRetry(() -> {
-            List<AnalysisResult> results = restClient.post().uri("/analyze").body(new AnalyzeRequest(text, language))
+            List<AnalysisResult> results = analyzer.post().uri("/analyze").body(new AnalyzeRequest(text, language, List.of(finnishPersonalId(language))))
                     .retrieve().body(new ParameterizedTypeReference<>() {
                     });
             return results != null ? results : Collections.emptyList();
@@ -64,7 +70,7 @@ public class PresidioService {
             return text;
         }
         try {
-            var response = executeWithRetry(() -> restClient.post().uri("/anonymize")
+            var response = executeWithRetry(() -> anonymizer.post().uri("/anonymize")
                     .body(new AnonymizeRequest(text, results)).retrieve()
                     .body(AnonymizeResponse.class), "anonymize");
             if (response == null) {
@@ -106,7 +112,24 @@ public class PresidioService {
                 "Presidio " + operationName + " failed after " + MAX_RETRIES + " attempts", lastException);
     }
 
-    record AnalyzeRequest(String text, String language) {
+    // Presidio has no recognizer for the Finnish personal identity code (henkilötunnus),
+    // the most sensitive field on these letters. Without this, the built-in models matched
+    // only part of it and its last four characters went to the AI unredacted. The format
+    // is strict (DDMMYY, century sign, 3 digits, check character), so a regex is reliable.
+    static AdHocRecognizer finnishPersonalId(String language) {
+        return new AdHocRecognizer("Finnish personal identity code", language, "FI_PERSONAL_ID",
+                List.of(new Pattern("henkilotunnus", "\\b\\d{6}[-+A-FU-Y]\\d{3}[0-9A-FHJ-NPR-Y]\\b", 0.95)));
+    }
+
+    record AnalyzeRequest(String text, String language,
+            @JsonProperty("ad_hoc_recognizers") List<AdHocRecognizer> adHocRecognizers) {
+    }
+
+    record AdHocRecognizer(String name, @JsonProperty("supported_language") String supportedLanguage,
+            @JsonProperty("supported_entity") String supportedEntity, List<Pattern> patterns) {
+    }
+
+    record Pattern(String name, String regex, double score) {
     }
 
     // Presidio's anonymizer API is snake_case; a camelCase "analyzerResults" key is

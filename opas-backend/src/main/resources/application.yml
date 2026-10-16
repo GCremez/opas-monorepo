@@ -80,6 +80,8 @@ opas:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
   presidio:
     url: ${PRESIDIO_SIDECAR_URL:http://localhost:5001}
+    # The anonymizer is a separate Presidio service from the analyzer above.
+    anonymizer-url: ${PRESIDIO_ANONYMIZER_URL:http://localhost:5002}
     # Language the PII analyzer runs in. Opas documents are Finnish/Swedish, so set
     # this to the document language and load the matching model in the Presidio
     # container; defaulting to English under-detects Finnish PII (e.g. henkilotunnus).

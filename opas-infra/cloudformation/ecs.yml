@@ -359,6 +359,8 @@ Resources:
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/rabbitmq-url
             - Name: PRESIDIO_SIDECAR_URL
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/presidio-url
+            - Name: PRESIDIO_ANONYMIZER_URL
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/presidio-anonymizer-url
             - Name: JWT_PRIVATE_KEY
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/jwt-private-key
             - Name: JWT_PUBLIC_KEY
