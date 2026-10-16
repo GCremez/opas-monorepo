@@ -152,7 +152,7 @@ export function LaunchScreen() {
       </View>
 
       <View className="items-center" style={{ paddingBottom: insets.bottom + 40 }}>
-        <Text className="font-mono text-[11px] text-muted tracking-[0.08em]">v1.0.0</Text>
+        <Text className="font-mono text-meta text-muted tracking-[0.08em]">v1.0.0</Text>
       </View>
     </View>
   );

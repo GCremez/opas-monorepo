@@ -1,0 +1,9 @@
+target/
+bin/
+.idea/
+.vscode/
+*.iml
+.env*
+!.env.example
+*.pem
+*.log

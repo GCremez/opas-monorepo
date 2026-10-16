@@ -50,9 +50,9 @@ export default function GuideScreen() {
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="px-6 pt-3 pb-4">
-          <Text className="font-semibold text-[10px] tracking-[0.16em] uppercase text-muted">{GUIDE.authority}</Text>
+          <Text className="font-semibold text-label tracking-[0.16em] uppercase text-muted">{GUIDE.authority}</Text>
           <Text className="font-display text-[28px] leading-[31px] tracking-[-0.01em] text-fg mt-2">{GUIDE.title}</Text>
-          <Text className="font-mono text-[10px] tracking-[0.05em] text-muted mt-2.5">{GUIDE.meta}</Text>
+          <Text className="font-mono text-meta tracking-[0.05em] text-muted mt-2.5">{GUIDE.meta}</Text>
         </View>
 
         <View className="px-6">
@@ -69,7 +69,7 @@ export default function GuideScreen() {
                 className="flex-row gap-3.5 py-3.5 border-b border-hairline"
               >
                 <View className={`w-6 h-6 rounded-full border items-center justify-center ${isDone ? 'bg-accent border-accent' : 'border-rule'}`}>
-                  <Text className={`text-[11px] font-semibold ${isDone ? 'text-on-accent' : 'text-fg-soft'}`}>{isDone ? '✓' : i + 1}</Text>
+                  <Text className={`text-meta font-semibold ${isDone ? 'text-on-accent' : 'text-fg-soft'}`}>{isDone ? '✓' : i + 1}</Text>
                 </View>
                 <View className="flex-1">
                   <Text className={`font-display text-[16px] ${isDone ? 'text-muted line-through' : 'text-fg'}`}>{s.title}</Text>

@@ -5,14 +5,10 @@ name: Backend CI
 on:
   push:
     branches: [main, develop]
-    paths:
-      - 'opas-backend/**'
-      - '.github/workflows/backend-ci.yml'
+    paths: ['opas-backend/**', '.github/workflows/backend-ci.yml']
   pull_request:
     branches: [main]
-    paths:
-      - 'opas-backend/**'
-      - '.github/workflows/backend-ci.yml'
+    paths: ['opas-backend/**', '.github/workflows/backend-ci.yml']
   workflow_dispatch:
     inputs:
       deploy:
@@ -23,164 +19,170 @@ on:
 permissions:
   contents: read
 
-env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/opas-backend
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    working-directory: opas-backend
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: opas-backend
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: opas_test
+          POSTGRES_USER: opas
+          POSTGRES_PASSWORD: opas
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: --health-cmd "redis-cli ping" --health-interval 10s
+        ports:
+          - 6379:6379
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution: temurin
           cache: maven
-
-      # Integration tests start their own PostgreSQL and Redis with Testcontainers.
+          cache-dependency-path: opas-backend/pom.xml
+      # Test keys and placeholder credentials come from src/test/resources/application.yml.
       - name: Run tests
-        run: mvn verify --no-transfer-progress
+        run: mvn -B --no-transfer-progress verify
 
   build:
-    name: Build & Push Image
+    name: Build & push image
     needs: test
-    runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Registry paths must be lowercase; the GitHub owner here is "GCremez".
+      - id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/opas-backend" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: opas-backend
           push: true
           tags: |
-            ${{ env.IMAGE }}:${{ github.sha }}
-            ${{ env.IMAGE }}:latest
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
+            ${{ steps.image.outputs.name }}:${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   security-scan:
-    name: Security Scan
+    name: Image scan
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: read
       security-events: write
     steps:
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+      - name: Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          # New GHCR packages are private by default.
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         with:
-          image-ref: ${{ env.IMAGE }}:${{ github.sha }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
+          image-ref: ${{ needs.build.outputs.image }}:${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
           exit-code: '1'
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload scan results
         if: always()
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: trivy-results.sarif
 
+  # Before the first deploy, the backing services (RDS, Redis, RabbitMQ, S3, Presidio)
+  # and the opas/<env>/* secrets must exist; opas-infra doesn't provision them yet.
+  #
+  # Deploying = updating the CloudFormation stack's ImageTag. The task definition lives
+  # only in opas-infra/cloudformation/ecs.yml, so there is one source of truth; other
+  # stack parameters keep their current values.
   deploy-staging:
-    name: Deploy to Staging
+    name: Deploy — staging
     needs: security-scan
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: staging
     permissions:
       contents: read
       id-token: write
-    env:
-      ECS_CLUSTER: opas-staging
-      ECS_SERVICE: opas-backend
-      TASK_DEF_FILE: opas-infra/cloudformation/task-definition-staging.json
+    defaults:
+      run:
+        working-directory: .
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           aws-region: eu-north-1
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: opas-backend-deploy
-
-      - name: Render task definition
+      - name: Roll out image
         run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          sed -e "s/ACCOUNT_ID_PLACEHOLDER/${ACCOUNT_ID}/g" \
-              "${TASK_DEF_FILE}" > /tmp/task-definition.json
-
-      - name: Deploy to ECS
-        run: |
-          aws ecs deploy \
-            --cluster "${ECS_CLUSTER}" \
-            --service "${ECS_SERVICE}" \
-            --task-definition /tmp/task-definition.json \
-            --image-overrides "backend=${{ env.IMAGE }}:${{ github.sha }}" \
-            --codepipeline false \
+          aws cloudformation deploy \
+            --template-file opas-infra/cloudformation/ecs.yml \
+            --stack-name opas-infra-staging \
+            --parameter-overrides Environment=staging ImageTag=${{ github.sha }} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset \
             --no-cli-pager
-
-      - name: Verify deployment
-        run: |
-          aws ecs wait services-stable \
-            --cluster "${ECS_CLUSTER}" \
-            --services "${ECS_SERVICE}"
+          aws ecs wait services-stable --cluster opas-staging --services opas-backend
 
   deploy-production:
-    name: Deploy to Production
+    name: Deploy — production
     needs: deploy-staging
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     permissions:
       contents: read
       id-token: write
-    env:
-      ECS_CLUSTER: opas-prod
-      ECS_SERVICE: opas-backend
-      TASK_DEF_FILE: opas-infra/cloudformation/task-definition-production.json
+    defaults:
+      run:
+        working-directory: .
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           aws-region: eu-north-1
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: opas-backend-prod-deploy
-
-      - name: Render task definition
+      - name: Roll out image
         run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          sed -e "s/ACCOUNT_ID_PLACEHOLDER/${ACCOUNT_ID}/g" \
-              "${TASK_DEF_FILE}" > /tmp/task-definition.json
-
-      - name: Deploy to ECS
-        run: |
-          aws ecs deploy \
-            --cluster "${ECS_CLUSTER}" \
-            --service "${ECS_SERVICE}" \
-            --task-definition /tmp/task-definition.json \
-            --image-overrides "backend=${{ env.IMAGE }}:${{ github.sha }}" \
-            --codepipeline false \
+          aws cloudformation deploy \
+            --template-file opas-infra/cloudformation/ecs.yml \
+            --stack-name opas-infra-production \
+            --parameter-overrides Environment=production ImageTag=${{ github.sha }} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset \
             --no-cli-pager
-
-      - name: Verify deployment
-        run: |
-          aws ecs wait services-stable \
-            --cluster "${ECS_CLUSTER}" \
-            --services "${ECS_SERVICE}"
+          aws ecs wait services-stable --cluster opas-production --services opas-backend

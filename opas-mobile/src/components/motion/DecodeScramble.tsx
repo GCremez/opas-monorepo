@@ -84,7 +84,7 @@ export function DecodeScramble({ pairs = DEFAULT_PAIRS, label = 'Translating' }:
 
   return (
     <View className="items-center gap-4">
-      <Text className="font-body font-semibold text-[9px] tracking-[0.24em] uppercase text-muted">{label}</Text>
+      <Text className="font-body font-semibold text-label tracking-[0.24em] uppercase text-muted">{label}</Text>
       <Text className="font-mono text-[26px] tracking-[0.04em]" style={{ color: c.warning }}>
         {fi}
       </Text>

@@ -31,10 +31,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 public class AuthService {
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
@@ -47,6 +48,8 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final TokenBlacklistService tokenBlacklistService;
     private final EmailVerificationService emailVerificationService;
+    private final PasswordResetService passwordResetService;
+    private final SubscriptionService subscriptionService;
 
     /**
      * A valid bcrypt hash computed once at startup. On login for a non-existent email
@@ -60,7 +63,8 @@ public class AuthService {
             FolderRepository folderRepository,
             StorageService storageService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
             RefreshTokenService refreshTokenService, TokenBlacklistService tokenBlacklistService,
-            EmailVerificationService emailVerificationService) {
+            EmailVerificationService emailVerificationService, PasswordResetService passwordResetService,
+            SubscriptionService subscriptionService) {
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.decodeResultRepository = decodeResultRepository;
@@ -72,6 +76,8 @@ public class AuthService {
         this.refreshTokenService = refreshTokenService;
         this.tokenBlacklistService = tokenBlacklistService;
         this.emailVerificationService = emailVerificationService;
+        this.passwordResetService = passwordResetService;
+        this.subscriptionService = subscriptionService;
         this.dummyPasswordHash = passwordEncoder.encode("opas-constant-time-login-placeholder");
     }
 
@@ -135,8 +141,9 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid or expired verification code"));
         if (user.isEmailVerified()) {
-            // Already verified — treat as success and log the user in (idempotent).
-            return generateAuthResponse(user);
+            // Never issue tokens here without a valid code: an already-verified account
+            // must log in with its password. Same generic error as every other failure.
+            throw new IllegalArgumentException("Invalid or expired verification code");
         }
         if (!emailVerificationService.verify(user, code)) {
             throw new IllegalArgumentException("Invalid or expired verification code");
@@ -157,7 +164,10 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse refresh(RefreshRequest request) {
+    public AuthResponse refresh(RefreshRequest request, @Nullable String authHeader) {
+        // Revoke the caller's current access token as part of rotation so a
+        // stolen-but-still-valid access token can't outlive the refresh.
+        blacklistAccessToken(extractBearerToken(authHeader));
         Claims claims;
         try {
             claims = jwtUtil.parseToken(request.refreshToken());
@@ -165,7 +175,7 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid refresh token");
         }
         String userId = claims.getSubject();
-        if (userId == null) {
+        if (userId == null || !JwtUtil.isRefreshToken(claims)) {
             throw new IllegalArgumentException("Invalid refresh token");
         }
         String hash = sha256Hex(request.refreshToken());
@@ -182,31 +192,49 @@ public class AuthService {
     }
 
     public void logout(String authHeader, String refreshToken) {
-        String accessToken = extractBearerToken(authHeader);
+        // Best-effort blacklist of the access token. It may be absent or already
+        // expired (an expired token is already unusable), so its state must not
+        // block the real goal of logout: revoking the refresh token.
+        blacklistAccessToken(extractBearerToken(authHeader));
+
+        // Derive the account from the refresh token itself rather than the access
+        // token, so logout still revokes the session when the access token is gone.
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return;
+        }
+        try {
+            Claims refreshClaims = jwtUtil.parseToken(refreshToken);
+            String subject = refreshClaims.getSubject();
+            if (subject != null && JwtUtil.isRefreshToken(refreshClaims)) {
+                refreshTokenService.delete(subject, sha256Hex(refreshToken));
+            }
+        } catch (Exception ignored) {
+            // Malformed/expired refresh token — nothing to revoke.
+        }
+    }
+
+    /**
+     * Adds a valid, unexpired access token's jti to the blacklist for its remaining
+     * lifetime. No-op when the token is null, blank, malformed, or already expired.
+     */
+    private void blacklistAccessToken(@Nullable String accessToken) {
         if (accessToken == null || accessToken.isBlank()) {
-            throw new IllegalArgumentException("Missing or invalid Authorization header");
+            return;
         }
         Claims claims;
         try {
             claims = jwtUtil.parseToken(accessToken);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid access token");
+            return;
         }
         String jti = claims.getId();
         var expiration = claims.getExpiration();
         if (jti == null || jti.isBlank() || expiration == null) {
             return;
         }
-        Instant exp = expiration.toInstant();
-        Duration remaining = Duration.between(Instant.now(), exp);
+        Duration remaining = Duration.between(Instant.now(), expiration.toInstant());
         if (remaining.isPositive()) {
             tokenBlacklistService.blacklist(jti, remaining);
-        }
-        if (refreshToken != null && !refreshToken.isBlank()) {
-            String subject = claims.getSubject();
-            if (subject != null) {
-                refreshTokenService.delete(subject, sha256Hex(refreshToken));
-            }
         }
     }
 
@@ -218,30 +246,78 @@ public class AuthService {
         if (!userRepository.existsById(userId)) {
             return;
         }
-        List<Document> documents = documentRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        // Stop billing first. If Stripe fails this throws and nothing is deleted, so the user
+        // can retry — never a deleted account that keeps getting charged.
+        Optional<Subscription> subscription = subscriptionRepository.findByUserId(userId);
+        subscription.ifPresent(subscriptionService::deleteBillingCustomer);
+
+        List<String> s3Keys = documentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(Document::getS3Key).toList();
         decodeResultRepository.deleteByUser_Id(userId);
-        for (Document document : documents) {
-            storageService.deleteObject(document.getS3Key());
-        }
         documentRepository.deleteByUser_Id(userId);
         // folders.user_id has no ON DELETE cascade, so folders must be removed
         // explicitly or the final user delete fails the FK check.
         folderRepository.deleteByUser_Id(userId);
-        subscriptionRepository.findByUserId(userId).ifPresent(subscriptionRepository::delete);
+        subscription.ifPresent(subscriptionRepository::delete);
         refreshTokenService.invalidateAll(userId.toString());
         userRepository.deleteById(userId);
+        // Remove the files only once the rows are really gone: deleting them mid-transaction
+        // would leave an intact account with missing files if the commit then failed.
+        runAfterCommit(() -> s3Keys.forEach(storageService::deleteObject));
+    }
+
+    private static void runAfterCommit(Runnable action) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    action.run();
+                }
+            });
+        } else {
+            action.run();
+        }
     }
 
     /**
      * Begin a password reset. Behaves identically whether or not the email is
-     * registered, so the endpoint can't be used to enumerate accounts. When the email
-     * belongs to a real account we would mint a one-time reset token and email a link;
-     * email delivery is a separate infrastructure concern (no provider is wired yet),
-     * so for now the request is accepted and recorded.
+     * registered, so the endpoint can't be used to enumerate accounts: when the email
+     * belongs to a real account a one-time 6-digit code is generated and emailed;
+     * otherwise nothing happens and the caller still sees the same generic success.
      */
     public void requestPasswordReset(String email) {
-        userRepository.findByEmail(email).ifPresent(user ->
-                log.info("Password reset requested for an existing account (email delivery not yet configured)"));
+        try {
+            userRepository.findByEmail(email).ifPresent(passwordResetService::generateAndSend);
+        } catch (IllegalStateException e) {
+            // A mail failure only ever happens for a registered email, so surfacing it
+            // (500 vs 204) would reveal which addresses have accounts. The failure is
+            // already logged by EmailService; the user can simply request another code.
+        }
+    }
+
+    /**
+     * Completes a password reset. Consumes the one-time code, sets the new password, and
+     * revokes every existing session (refresh tokens) so any attacker holding a live
+     * session is kicked out. A correct code additionally verifies the email — reaching a
+     * private inbox proves ownership just as the verification flow does. Uses a generic
+     * error on every failure path so it can't be used to probe which emails are
+     * registered or which codes are close.
+     */
+    @Transactional
+    public void resetPassword(String email, String code, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired reset code"));
+        if (!passwordResetService.verifyAndConsume(user, code)) {
+            throw new IllegalArgumentException("Invalid or expired reset code");
+        }
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        // A successful reset proves the user controls the inbox, so treat the address as
+        // verified — otherwise a user who reset before verifying could still never log in.
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        // Revoke all existing refresh tokens: a reset is exactly the "I may be compromised"
+        // moment, so no session opened before it may survive.
+        refreshTokenService.invalidateAll(user.getId().toString());
     }
 
     @Transactional
@@ -274,7 +350,6 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken, plan, UserResponse.from(user, plan));
     }
 
-    @Nullable
     private static String extractBearerToken(String authHeader) {
         if (authHeader == null || !authHeader.regionMatches(true, 0, "Bearer ", 0, 7)) {
             return null;

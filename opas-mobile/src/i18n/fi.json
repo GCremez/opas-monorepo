@@ -15,7 +15,10 @@
     "show": "Näytä",
     "hide": "Piilota",
     "see_all": "Näytä kaikki",
-    "close": "Sulje"
+    "close": "Sulje",
+    "camera_access_needed": "Kameran käyttö tarvitaan",
+    "grant_permission": "Myöntä lupa",
+    "open_original": "Avaa alkuperäinen asiakirja"
   },
   "onboarding": {
     "skip": "Ohita",
@@ -23,7 +26,6 @@
     "eyebrow_1": "Tervetuloa Opasiin",
     "eyebrow_2": "Älä koskaan missaa määräaikaa",
     "eyebrow_3": "Kaikki yhdessä paikassa",
-    "illo_caption": "skannaa → selkokielinen opas",
     "next": "Seuraava",
     "get_started": "Aloita",
     "slide_1_title": "Ymmärrä jokainen virallinen kirje.",
@@ -31,7 +33,17 @@
     "slide_2_title": "Tiedä, mitä tehdä — ja mihin mennessä.",
     "slide_2_desc": "Opas poimii kirjeistäsi jokaisen päivämäärän ja toimenpiteen ja muistuttaa ennen määräaikaa.",
     "slide_3_title": "Kaikki tallessa ja järjestyksessä.",
-    "slide_3_desc": "Asiakirjasi on lajiteltu viranomaisen mukaan ja aina haettavissa — mikään ei katoa laatikon pohjalle."
+    "slide_3_desc": "Asiakirjasi on lajiteltu viranomaisen mukaan ja aina haettavissa — mikään ei katoa laatikon pohjalle.",
+    "mini_1_row_1_label": "Ilmoita tulomuutos",
+    "mini_1_row_1_value": "9 päivää",
+    "mini_1_row_2_label": "Jatka lupaa",
+    "mini_1_row_2_value": "3 viikkoa",
+    "mini_2_row_1_label": "KELA",
+    "mini_2_row_1_value": "5 asiakirjaa",
+    "mini_2_row_2_label": "Verohallinto",
+    "mini_2_row_2_value": "3 asiakirjaa",
+    "mini_2_row_3_label": "Migri",
+    "mini_2_row_3_value": "2 · 1 eräpäivä"
   },
   "auth": {
     "welcome_back": "Tervetuloa takaisin.",
@@ -59,10 +71,10 @@
     "registration_failed": "Tilin luonti epäonnistui. Yritä uudelleen.",
     "reset_eyebrow": "Palauta salasana",
     "reset_title": "Ei hätää.",
-    "reset_body": "Anna sähköpostiosoitteesi, niin lähetämme linkin uuden salasanan asettamiseen.",
-    "reset_send": "Lähetä palautuslinkki",
+    "reset_body": "Anna sähköpostiosoitteesi, niin lähetämme koodin uuden salasanan asettamiseksi.",
+    "reset_send": "Lähetä koodi",
     "reset_sent_title": "Tarkista sähköpostisi.",
-    "reset_sent_body": "Jos osoitteelle {{email}} löytyy tili, lähetimme linkin salasanan palauttamiseksi.",
+    "reset_sent_body": "Jos tilillä {{email}} on tili, lähetimme 6-numeroisen koodin salasanan nollaamiseksi.",
     "back_to_sign_in": "Takaisin kirjautumiseen",
     "enter_email": "Anna sähköpostiosoitteesi",
     "verify_eyebrow": "Vahvista sähköposti",
@@ -75,7 +87,16 @@
     "verify_no_code": "Etkö saanut sitä?",
     "verify_resend": "Lähetä koodi uudelleen",
     "verify_resend_in": "Lähetä uudelleen {{seconds}} s kuluttua",
-    "verify_resent": "Uusi koodi on matkalla, jos sähköposti on rekisteröity."
+    "verify_resent": "Uusi koodi on matkalla, jos sähköposti on rekisteröity.",
+    "reset_code_label": "Nollauskoodi",
+    "reset_new_password_label": "Uusi salasana",
+    "reset_new_password_placeholder": "Vähintään 8 merkkiä",
+    "reset_cta": "Aseta uusi salasana",
+    "reset_enter_code": "Anna 6-numeroinen koodi",
+    "reset_password_min": "Uuden salasanan on oltava vähintään 8 merkkiä",
+    "reset_invalid": "Koodi on virheellinen tai vanhentunut. Pyydä uusi.",
+    "reset_done_title": "Salasana päivitetty.",
+    "reset_done_body": "Kirjaudu sisään uudella salasanallasi."
   },
   "tabs": {
     "home": "Koti",
@@ -84,15 +105,14 @@
     "scan": "Skannaa",
     "docs": "Asiakirjat",
     "files": "Tiedostot",
-    "alerts": "Muistutukset",
+    "alerts": "Määräajat",
     "profile": "Profiili",
     "you": "Sinä"
   },
   "record": {
     "eyebrow": "Opas · Tietosi",
-    "needs_you": "Vaatii huomiotasi",
-    "your_documents": "Asiakirjasi",
     "needs_you": "Vaatii sinua",
+    "your_documents": "Asiakirjasi",
     "see_all": "Näytä kaikki →",
     "all_clear": "Kaikki on kunnossa.",
     "one_thing": " Yksi asia vaatii huomiotasi tällä viikolla.",
@@ -110,18 +130,22 @@
     "empty_desc": "Skannaa ensimmäinen kirjeesi — Kelasta, verottajalta, mistä tahansa — ja Opas alkaa pitää sitä järjestyksessä.",
     "scan_first": "Skannaa ensimmäinen asiakirjasi",
     "see_how": "Katso miten Opas toimii",
-    "welcome": "Tervetuloa"
+    "welcome": "Tervetuloa",
+    "needs_count": " {{count}} määräaika lähestyy.",
+    "needs_count_plural": " {{count}} määräaikaa lähestyy.",
+    "load_error_desc": "Tarkista yhteys ja vedä alas yrittääksesi uudelleen."
   },
   "alerts": {
     "eyebrow": "Opas · Muistutukset",
     "title": "Määräajat ja\nmuistutukset.",
     "this_week": "Tällä viikolla",
-    "later": "Myöhemmin tässä kuussa",
+    "later": "Myöhemmin",
     "done": "Valmis",
     "no_alerts": "Ei määräaikoja",
     "no_alerts_desc": "Kun asiakirjalla on määräaika, se näkyy täällä.",
     "days_left": "{{count}} pv",
-    "day_left": "{{count}} pv"
+    "day_left": "{{count}} pv",
+    "passed": "Menneet"
   },
   "home": {
     "title": "Koti",
@@ -214,7 +238,8 @@
     "step_extracting": "Etsitään päivämääriä ja toimia",
     "reading": "Luetaan kirjettäsi…",
     "please_wait": "Odota hetki",
-    "privacy_note": "Asiakirjasi pysyy hallinnassasi. Henkilötiedot piilotetaan ennen kuin mitään luetaan."
+    "privacy_note": "Asiakirjasi pysyy hallinnassasi. Henkilötiedot piilotetaan ennen kuin mitään luetaan.",
+    "grant_permission_desc": "Myöntä kameran käyttöasetuksista, jotta voit skannata asiakirjoja."
   },
   "documents": {
     "title": "Asiakirjat",
@@ -367,7 +392,21 @@
     "email": "Sähköposti",
     "not_decoded": "Tätä asiakirjaa ei ole vielä analysoitu.",
     "uploaded_on": "Ladattu",
-    "draft_letter": "Vastausluonnos"
+    "draft_letter": "Vastausluonnos",
+    "analyze": "Analysoi",
+    "decode_failed": "Asiakirjan analysointi epäonnistui.",
+    "decode_failed_hint": "Varmista, että koko sivu näkyy ja teksti on terävää, ja yritä uudelleen. Tätä yritystä ei laskettu käyttökertoihin.",
+    "issued": "Päivätty {{date}}",
+    "no_summary": "Yhteenvetoa ei ole saatavilla.",
+    "key_details": "Keskeiset tiedot",
+    "preview_unavailable": "Tälle tiedostotyypille ei ole esikatselua. Avaa alkuperäinen nähdäksesi sen.",
+    "days_to_deadline": "päivää määräaikaan",
+    "date_passed": "Mennyt",
+    "due_today": "Erääntyy tänään",
+    "days_left": "{{count}} päivä jäljellä",
+    "days_left_plural": "{{count}} päivää jäljellä",
+    "no_dates": "Asiakirjassa ei mainita päivämääriä tai määräaikoja.",
+    "more": "Lisää toimintoja"
   },
   "draftLetter": {
     "title": "Kirjeluonnos",
@@ -398,8 +437,7 @@
     "feature_ai": "Tekoäly poimii määräajat ja ohjeet selkokielellä",
     "feature_organize": "Järjestyy automaattisesti kansioihin määräaikamuistutusten kanssa",
     "premium": "Premium",
-    "upgrade_note": "Päivitä profiilistasi, kun olet valmis",
-    "demo": "Jatka vieraana"
+    "upgrade_note": "Päivitä profiilistasi, kun olet valmis"
   },
   "subscription": {
     "title": "Kaikki\nhoidettu.",
@@ -421,5 +459,13 @@
     "save_yearly": "Säästä 20% vuodessa",
     "free_trial": "Aloita 7 päivän ilmainen kokeilu",
     "trial_note": "Sitten 4,99 €/kk. Peru milloin tahansa."
+  },
+  "status": {
+    "pending": "Ladataan",
+    "uploaded": "Analysoimatta",
+    "processing": "Analysoidaan",
+    "ready": "Luettu",
+    "failed": "Epäonnistui",
+    "archived": "Arkistoitu"
   }
 }

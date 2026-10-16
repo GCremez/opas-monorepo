@@ -1,6 +1,7 @@
 package com.opas.service;
 
 import com.opas.config.ResourceNotFoundException;
+import com.opas.domain.DecodeResult;
 import com.opas.domain.Document;
 import com.opas.domain.User;
 import com.opas.dto.ConfirmUploadRequest;
@@ -11,7 +12,10 @@ import com.opas.repository.DocumentRepository;
 import com.opas.repository.FolderRepository;
 import com.opas.repository.UserRepository;
 import java.time.Duration;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
@@ -26,17 +30,19 @@ public class DocumentService {
     private final FolderRepository folderRepository;
     private final DecodeResultRepository decodeResultRepository;
     private final StorageService storageService;
+    private final DocumentInsights documentInsights;
     private final Duration uploadTtl;
 
     public DocumentService(DocumentRepository documentRepository, UserRepository userRepository,
             FolderRepository folderRepository, DecodeResultRepository decodeResultRepository,
-            StorageService storageService,
+            StorageService storageService, DocumentInsights documentInsights,
             @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.folderRepository = folderRepository;
         this.decodeResultRepository = decodeResultRepository;
         this.storageService = storageService;
+        this.documentInsights = documentInsights;
         this.uploadTtl = Duration.ofMinutes(uploadTtlMinutes);
     }
 
@@ -58,7 +64,7 @@ public class DocumentService {
         }
         document.setFolderId(folderId);
         document = documentRepository.save(document);
-        return toResponse(document, null, generateDownloadUrl(document));
+        return toResponse(document, null, generateDownloadUrl(document), insightsFor(document.getId()));
     }
 
     @Transactional
@@ -77,7 +83,7 @@ public class DocumentService {
 
         String uploadUrl = storageService.generatePresignedUploadUrl(s3Key, request.contentType(),
                 request.fileSize(), uploadTtl);
-        return toResponse(document, uploadUrl, null);
+        return toResponse(document, uploadUrl, null, DocumentInsights.Insights.EMPTY);
     }
 
     @Transactional
@@ -118,8 +124,15 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public List<DocumentResponse> listDocuments(UUID userId) {
+        // One query for all of the user's decodes (newest first), not one per document.
+        Map<UUID, String> latestDecode = new HashMap<>();
+        for (DecodeResult result : decodeResultRepository.findByUserIdOrderByCreatedAtDesc(userId)) {
+            latestDecode.putIfAbsent(result.getDocument().getId(), result.getStructuredData());
+        }
         return documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(userId, "archived").stream()
-                .map(doc -> toResponse(doc, null, generateDownloadUrl(doc))).toList();
+                .map(doc -> toResponse(doc, null, generateDownloadUrl(doc),
+                        documentInsights.from(latestDecode.get(doc.getId()))))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -129,7 +142,7 @@ public class DocumentService {
         if (!document.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
         }
-        return toResponse(document, null, generateDownloadUrl(document));
+        return toResponse(document, null, generateDownloadUrl(document), insightsFor(documentId));
     }
 
     @Transactional
@@ -169,8 +182,17 @@ public class DocumentService {
         return storageService.generatePresignedDownloadUrl(document.getS3Key(), Duration.ofHours(1));
     }
 
-    private static DocumentResponse toResponse(Document doc, String uploadUrl, String downloadUrl) {
+    private DocumentInsights.Insights insightsFor(UUID documentId) {
+        return decodeResultRepository.findByDocumentId(documentId).stream()
+                .max(Comparator.comparing(DecodeResult::getCreatedAt))
+                .map(result -> documentInsights.from(result.getStructuredData()))
+                .orElse(DocumentInsights.Insights.EMPTY);
+    }
+
+    private static DocumentResponse toResponse(Document doc, String uploadUrl, String downloadUrl,
+            DocumentInsights.Insights insights) {
         return new DocumentResponse(doc.getId(), doc.getFilename(), doc.getContentType(), doc.getFileSize(),
-                doc.getStatus(), doc.getFolderId(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl);
+                doc.getStatus(), doc.getFolderId(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl,
+                insights.title(), insights.authority(), insights.deadlines());
     }
 }

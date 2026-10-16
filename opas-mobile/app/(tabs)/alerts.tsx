@@ -5,14 +5,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../../src/components/ui/EmptyState';
-import { CountdownRing } from '../../src/components/motion';
 import { useDocumentStore } from '../../src/store/documentStore';
-import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
+import { collectDeadlines, documentName, formatDate, type DeadlineItem } from '../../src/lib/decodeView';
+
+// Passed deadlines stay visible for a month, then drop off the list.
+const PASSED_WINDOW_DAYS = 30;
 
 function SectionHeader({ title, tone }: { title: string; tone: string }) {
   return (
-    <Text className={`font-semibold text-[10px] tracking-[0.16em] uppercase pb-2 ${tone}`}>
+    <Text className={`font-semibold text-label tracking-[0.16em] uppercase pb-2 ${tone}`}>
       {title}
     </Text>
   );
@@ -32,39 +34,44 @@ function DeadlineRow({
     >
       <View className="flex-1">
         <Text className="font-display text-[16px] leading-[19px] text-fg">{title}</Text>
-        <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted mt-1">{meta}</Text>
+        <Text className="font-mono text-label tracking-[0.05em] uppercase text-muted mt-1">{meta}</Text>
       </View>
       <View className="items-end">
         <Text className={`font-mono-medium text-data ${tone}`}>{date}</Text>
-        <Text className={`font-semibold text-[9px] tracking-[0.11em] uppercase mt-1 ${tone}`}>{note}</Text>
+        <Text className={`font-semibold text-label tracking-[0.11em] uppercase mt-1 ${tone}`}>{note}</Text>
       </View>
     </Pressable>
   );
 }
 
-const demoThisWeek = [
-  { title: 'Extend residence permit', meta: 'MIGRI', date: '30 JUN', note: '9 days', tone: 'text-danger', id: 'sample-3' },
-];
-const demoLater = [
-  { title: 'Report income change', meta: 'KELA', date: '14 JUL', note: '23 days', tone: 'text-warning', id: 'sample-1' },
-];
-const demoDone = [
-  { title: 'Submit tax card', meta: 'VERO', date: '✓ 12 MAY', id: 'sample-2' },
-];
-
 export default function AlertsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { documents, loading, fetchDocuments } = useDocumentStore();
-  const { isDemo } = useAuthStore();
 
   useEffect(() => {
     fetchDocuments();
   }, []);
 
   const onRefresh = useCallback(() => fetchDocuments(), [fetchDocuments]);
-  const hasContent = isDemo || documents.length > 0;
+  const deadlines = collectDeadlines(documents);
+  const thisWeek = deadlines.filter((i) => i.days >= 0 && i.days <= 7);
+  const later = deadlines.filter((i) => i.days > 7);
+  const passed = deadlines.filter((i) => i.days < 0 && i.days >= -PASSED_WINDOW_DAYS).reverse();
+  const hasContent = thisWeek.length + later.length + passed.length > 0;
+
+  const renderRow = ({ document, deadline, days }: DeadlineItem, tone: string) => (
+    <DeadlineRow
+      key={`${document.id}-${deadline.date}-${deadline.description}`}
+      title={deadline.description || documentName(document)}
+      meta={document.authority ?? documentName(document)}
+      date={formatDate(deadline.date, i18n.language)}
+      note={days < 0 ? t('alerts.passed') : days === 0 ? t('document.due_today') : t('document.days_left', { count: days })}
+      tone={tone}
+      onPress={() => router.push(`/document/${document.id}`)}
+    />
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
@@ -75,7 +82,7 @@ export default function AlertsScreen() {
         refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
       >
         <View className="px-6 pt-3 pb-6">
-          <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">
+          <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">
             {t('alerts.eyebrow')}
           </Text>
           <Text className="font-display text-[30px] leading-[32px] tracking-[-0.01em] text-fg mt-2.5">
@@ -92,58 +99,23 @@ export default function AlertsScreen() {
           />
         )}
 
-        {isDemo && (
-          <>
-            {/* Next deadline — The Countdown (12), the nearest due item at a glance. */}
-            <View className="items-center pb-8">
-              <CountdownRing days={9} total={30} label="days left" />
-              <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted mt-3">
-                Extend residence permit · MIGRI
-              </Text>
-            </View>
-            <View className="px-6">
-              <SectionHeader title={t('alerts.this_week')} tone="text-danger" />
-              {demoThisWeek.map((d) => (
-                <DeadlineRow key={d.title} {...d} onPress={() => router.push('/application/12345')} />
-              ))}
-            </View>
-            <View className="px-6 mt-6">
-              <SectionHeader title={t('alerts.later')} tone="text-warning" />
-              {demoLater.map((d) => (
-                <DeadlineRow key={d.title} {...d} onPress={() => router.push(`/document/${d.id}`)} />
-              ))}
-            </View>
-            <View className="px-6 mt-6">
-              <SectionHeader title={t('alerts.done')} tone="text-muted" />
-              {demoDone.map((d) => (
-                <Pressable
-                  key={d.title}
-                  onPress={() => router.push(`/document/${d.id}`)}
-                  className="flex-row items-center justify-between gap-3.5 py-4 border-b border-hairline"
-                >
-                  <Text className="font-display text-[16px] text-muted line-through">{d.title}</Text>
-                  <Text className="font-mono text-[11px] text-accent">{d.date}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </>
-        )}
-
-        {/* Real data: list ready documents as tracked items (no deadline model yet). */}
-        {!isDemo && documents.length > 0 && (
-          <View className="px-6">
+        {/* Deadlines stated in the user's own documents. */}
+        {thisWeek.length > 0 && (
+          <View className="px-6 mb-8">
             <SectionHeader title={t('alerts.this_week')} tone="text-warning" />
-            {documents.map((d) => (
-              <DeadlineRow
-                key={d.id}
-                title={d.filename}
-                meta={d.status.toUpperCase()}
-                date={new Date(d.updatedAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short' }).toUpperCase()}
-                note=""
-                tone="text-muted"
-                onPress={() => router.push(`/document/${d.id}`)}
-              />
-            ))}
+            {thisWeek.map((item) => renderRow(item, item.days <= 3 ? 'text-danger' : 'text-warning'))}
+          </View>
+        )}
+        {later.length > 0 && (
+          <View className="px-6 mb-8">
+            <SectionHeader title={t('alerts.later')} tone="text-fg" />
+            {later.map((item) => renderRow(item, 'text-fg-soft'))}
+          </View>
+        )}
+        {passed.length > 0 && (
+          <View className="px-6 mb-8">
+            <SectionHeader title={t('alerts.passed')} tone="text-muted" />
+            {passed.map((item) => renderRow(item, 'text-muted'))}
           </View>
         )}
       </ScrollView>

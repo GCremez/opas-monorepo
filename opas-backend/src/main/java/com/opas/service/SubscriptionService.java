@@ -140,4 +140,28 @@ public class SubscriptionService {
             throw new RuntimeException("Failed to open manage subscription", e);
         }
     }
+
+    /**
+     * Ends all billing for an account that is being deleted, by deleting its Stripe
+     * customer: Stripe cancels the customer's subscriptions immediately (no further
+     * charges) and removes their stored details. Throws if Stripe can't be reached, so the
+     * caller aborts the deletion rather than leaving a deleted user still being billed.
+     */
+    public void deleteBillingCustomer(Subscription subscription) {
+        String customerId = subscription.getStripeCustomerId();
+        if (!stripeEnabled || customerId == null || customerId.isBlank()) {
+            return;
+        }
+        try {
+            com.stripe.model.Customer.retrieve(customerId).delete();
+            log.info("Deleted Stripe customer {} for account deletion", customerId);
+        } catch (com.stripe.exception.InvalidRequestException e) {
+            if ("resource_missing".equals(e.getCode())) {
+                return; // Already gone — nothing left to bill.
+            }
+            throw new IllegalStateException("Could not cancel billing; account not deleted", e);
+        } catch (StripeException e) {
+            throw new IllegalStateException("Could not cancel billing; account not deleted", e);
+        }
+    }
 }

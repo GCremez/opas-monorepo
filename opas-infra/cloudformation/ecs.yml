@@ -22,8 +22,24 @@ Parameters:
 
   GitHubOwner:
     Type: String
-    Default: GCremez
-    Description: GitHub owner/organization for the container registry
+    Default: gcremez
+    AllowedPattern: '[a-z0-9-]+'
+    Description: GitHub owner for the container registry, lowercase (image references must be lowercase)
+
+  ImageTag:
+    Type: String
+    Default: latest
+    Description: Backend image tag to run. CI sets this to the commit SHA on every deploy.
+
+  CorsAllowedOrigins:
+    Type: String
+    Default: ''
+    Description: Comma-separated browser origins allowed by CORS (the mobile app needs none)
+
+  StripePremiumPriceIds:
+    Type: String
+    Default: ''
+    Description: Comma-separated Stripe price IDs that grant premium (checkout allowlist and webhook tier mapping)
 
   MailFromAddress:
     Type: String
@@ -32,7 +48,6 @@ Parameters:
 
 Conditions:
   HasCertificate: !Not [!Equals [!Ref CertificateArn, '']]
-  IsProduction: !Equals [!Ref Environment, production]
 
 Mappings:
   EnvironmentConfig:
@@ -61,7 +76,7 @@ Resources:
           Base: 1
         - CapacityProvider: FARGATE_SPOT
           Weight: !FindInMap [EnvironmentConfig, !Ref Environment, FargateSpotWeight]
-      Settings:
+      ClusterSettings:
         - Name: containerInsights
           Value: enabled
 
@@ -83,6 +98,23 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      # The execution role (not the task role) resolves container `Secrets` at startup,
+      # and the managed policy above doesn't include Secrets Manager.
+      Policies:
+        - PolicyName: opas-exec-secrets
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/*
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Condition:
+                  StringLike:
+                    kms:ViaService: !Sub secretsmanager.${AWS::Region}.amazonaws.com
 
   TaskRole:
     Type: AWS::IAM::Role
@@ -235,13 +267,13 @@ Resources:
 
   ECSService:
     Type: AWS::ECS::Service
-    DependsOn: [HTTPListener, TargetGroup]
+    DependsOn: [HTTPListener]
     Properties:
       Cluster: !Ref ECSCluster
       ServiceName: opas-backend
       TaskDefinition: !Ref TaskDefinition
       DesiredCount: !FindInMap [EnvironmentConfig, !Ref Environment, DesiredCount]
-      LaunchType: FARGATE
+      # No LaunchType: it would override the cluster's FARGATE/FARGATE_SPOT strategy.
       DeploymentConfiguration:
         DeploymentCircuitBreaker:
           Enable: true
@@ -270,7 +302,7 @@ Resources:
       TaskRoleArn: !GetAtt TaskRole.Arn
       ContainerDefinitions:
         - Name: backend
-          Image: !Sub ghcr.io/${GitHubOwner}/opas-backend:latest
+          Image: !Sub ghcr.io/${GitHubOwner}/opas-backend:${ImageTag}
           Essential: true
           PortMappings:
             - ContainerPort: 8080
@@ -281,39 +313,43 @@ Resources:
               awslogs-group: !Ref LogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: backend
+          # Plain configuration only. Anything sensitive goes under Secrets: values put
+          # here (including {{resolve:secretsmanager}} references) are stored in plaintext
+          # in the task definition and readable via ecs:DescribeTaskDefinition.
           Environment:
             - Name: SPRING_PROFILES_ACTIVE
               Value: !Ref Environment
-            - Name: DATABASE_URL
-              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/database-url}}'
-            - Name: DATABASE_USER
-              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/database-user}}'
-            - Name: REDIS_URL
-              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/redis-url}}'
-            - Name: RABBITMQ_URL
-              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/rabbitmq-url}}'
-            - Name: PRESIDIO_SIDECAR_URL
-              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/presidio-url}}'
             - Name: S3_BUCKET_NAME
               Value: !Sub opas-app-bucket-${Environment}
             - Name: CORS_ALLOWED_ORIGINS
-              Value: !If
-                - IsProduction
-                - https://app.opas.fi
-                - !Sub https://staging.${ALB.DNSName}
+              Value: !Ref CorsAllowedOrigins
             - Name: AWS_REGION
               Value: !Ref AWS::Region
             - Name: MAIL_ENABLED
               Value: 'true'
             - Name: MAIL_FROM
               Value: !Ref MailFromAddress
-            - Name: JWT_PRIVATE_KEY
-              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/jwt-private-key}}'
-            - Name: JWT_PUBLIC_KEY
-              Value: !Sub '{{resolve:secretsmanager:opas/${Environment}/jwt-public-key}}'
+            - Name: STRIPE_ENABLED
+              Value: 'true'
+            - Name: STRIPE_PREMIUM_PRICE_IDS
+              Value: !Ref StripePremiumPriceIds
           Secrets:
+            - Name: DATABASE_URL
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/database-url
+            - Name: DATABASE_USER
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/database-user
             - Name: DATABASE_PASSWORD
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/database-password
+            - Name: REDIS_URL
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/redis-url
+            - Name: RABBITMQ_URL
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/rabbitmq-url
+            - Name: PRESIDIO_SIDECAR_URL
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/presidio-url
+            - Name: JWT_PRIVATE_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/jwt-private-key
+            - Name: JWT_PUBLIC_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/jwt-public-key
             - Name: ANTHROPIC_API_KEY
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:opas/${Environment}/anthropic-api-key
             - Name: STRIPE_SECRET_KEY
@@ -323,7 +359,7 @@ Resources:
           HealthCheck:
             Command:
               - CMD-SHELL
-              - curl -sf http://localhost:8080/actuator/health || exit 1
+              - wget -qO- http://localhost:8080/actuator/health || exit 1
             Interval: 30
             Retries: 3
             Timeout: 5

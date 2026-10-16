@@ -22,7 +22,7 @@ function Section({ n, title, dark, children }: { n: string; title: string; dark?
     <View
       className="rounded-2xl border p-6 mb-4"
       style={{
-        backgroundColor: dark ? '#16150e' : '#f2ede2',
+        backgroundColor: dark ? '#16150e' : '#f2ede2', // TODO: Use theme tokens
         borderColor: dark ? 'rgba(236,230,216,0.1)' : 'rgba(33,30,22,0.13)',
       }}
     >

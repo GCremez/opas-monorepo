@@ -47,7 +47,7 @@ export default function AskOpasScreen() {
           <Pressable onPress={() => router.back()} hitSlop={8}>
             <ChevronLeftIcon size={22} color={c['fg-soft']} />
           </Pressable>
-          <Text className="font-semibold text-[9.5px] tracking-[0.16em] uppercase text-muted">Ask Opas</Text>
+          <Text className="font-semibold text-label tracking-[0.16em] uppercase text-muted">Ask Opas</Text>
           <View className="w-6" />
         </View>
 
@@ -71,12 +71,12 @@ export default function AskOpasScreen() {
               </View>
             ) : (
               <View key={i} className="mb-5">
-                <Text className="font-semibold text-[9px] tracking-[0.16em] uppercase text-accent mb-2">Opas</Text>
+                <Text className="font-semibold text-label tracking-[0.16em] uppercase text-accent mb-2">Opas</Text>
                 <Text className="font-serif text-[16px] leading-[26px] text-fg">{m.text}</Text>
                 {m.source && (
                   <View className="flex-row items-center gap-2 self-start mt-3 bg-surface rounded-pill px-3 py-1.5">
-                    <Text className="font-mono text-[9px] text-accent">◆</Text>
-                    <Text className="font-mono text-[10px] tracking-[0.04em] text-fg-soft">{m.source}</Text>
+                    <Text className="font-mono text-meta text-accent">◆</Text>
+                    <Text className="font-mono text-meta tracking-[0.04em] text-fg-soft">{m.source}</Text>
                   </View>
                 )}
               </View>

@@ -1,22 +1,17 @@
 name: Infra CI
 
-# Checks run automatically when opas-infra changes.
-# CloudFormation deploys only run when started by hand (Actions tab → Run workflow).
+# Validation runs automatically; deploys only run when started by hand.
 on:
   push:
     branches: [main, develop]
-    paths:
-      - 'opas-infra/**'
-      - '.github/workflows/infra-ci.yml'
+    paths: ['opas-infra/**', '.github/workflows/infra-ci.yml']
   pull_request:
     branches: [main]
-    paths:
-      - 'opas-infra/**'
-      - '.github/workflows/infra-ci.yml'
+    paths: ['opas-infra/**', '.github/workflows/infra-ci.yml']
   workflow_dispatch:
     inputs:
       deploy:
-        description: 'Deploy CloudFormation stacks to staging and production'
+        description: 'Deploy the CloudFormation stack to staging and production'
         type: boolean
         default: false
 
@@ -29,128 +24,99 @@ defaults:
 
 jobs:
   validate:
-    name: Validate Docker Compose
+    name: Validate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate compose file syntax
-        run: docker compose config
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Compose file syntax
+        run: docker compose config --quiet
+      - name: Lint CloudFormation
+        run: |
+          pipx run cfn-lint cloudformation/ecs.yml
 
   integration:
-    name: Integration Test
+    name: Local stack smoke test
     runs-on: ubuntu-latest
     needs: validate
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Start all services
-        run: docker compose up -d --wait --wait-timeout 120
-
-      - name: List running containers
-        run: docker compose ps
-
-      - name: Verify PostgreSQL health
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start services
+        run: docker compose up -d --wait --wait-timeout 180
+      - run: docker compose ps
+      - name: PostgreSQL
         run: |
           docker exec opas-postgres pg_isready -U opas
-          docker exec opas-postgres psql -U opas -d opas -c "CREATE EXTENSION IF NOT EXISTS vector;"
           docker exec opas-postgres psql -U opas -d opas -c "SELECT extname FROM pg_extension;"
-
-      - name: Verify Redis health
+      - name: Redis
         run: docker exec opas-redis redis-cli ping
-
-      - name: Verify RabbitMQ health
+      - name: RabbitMQ
+        run: docker exec opas-rabbitmq rabbitmq-diagnostics check_running
+      - name: LocalStack
         run: |
-          docker exec opas-rabbitmq rabbitmq-diagnostics ping
-          docker exec opas-rabbitmq rabbitmq-diagnostics check_running
-
-      - name: Verify LocalStack health
-        run: |
-          curl -s http://localhost:4566/_localstack/health | jq .
+          curl -sf http://localhost:4566/_localstack/health | jq .
           docker exec opas-localstack awslocal s3 ls
-
-      - name: Verify Prometheus health
-        run: curl -s http://localhost:9090/-/healthy
-
-      - name: Verify Grafana health
-        run: curl -s http://localhost:3001/api/health
-
-      - name: Verify Presidio Analyzer health
-        run: curl -s http://localhost:5001/health
-
-      - name: Verify Presidio Anonymizer health
-        run: curl -s http://localhost:5002/health
-
+      - name: Prometheus
+        run: curl -sf http://localhost:9090/-/healthy
+      - name: Grafana
+        run: curl -sf http://localhost:3001/api/health
+      - name: Presidio
+        run: |
+          curl -sf http://localhost:5001/health
+          curl -sf http://localhost:5002/health
       - name: Tear down
         if: always()
         run: docker compose down -v
 
   security-scan:
-    name: Security Scan
+    name: Image scan
     runs-on: ubuntu-latest
     needs: validate
     permissions:
       contents: read
       security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ['pgvector/pgvector:pg16', 'redis:7-alpine', 'rabbitmq:3-management-alpine']
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Run Trivy on PostgreSQL
-        uses: aquasecurity/trivy-action@master
-        continue-on-error: true
+      - id: name
+        run: echo "slug=$(echo '${{ matrix.image }}' | tr '/:' '--')" >> "$GITHUB_OUTPUT"
+        working-directory: .
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          image-ref: 'docker.io/pgvector/pgvector:pg16'
-          format: 'sarif'
-          output: 'trivy-postgres.sarif'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '1'
-
-      - name: Run Trivy on Redis
-        uses: aquasecurity/trivy-action@master
-        continue-on-error: true
+          image-ref: docker.io/${{ matrix.image }}
+          format: sarif
+          # Actions run from the workspace root; defaults.run.working-directory only
+          # applies to `run` steps.
+          output: trivy-${{ steps.name.outputs.slug }}.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+      - if: always()
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
-          image-ref: 'docker.io/redis:7-alpine'
-          format: 'sarif'
-          output: 'trivy-redis.sarif'
-          severity: 'CRITICAL,HIGH'
+          sarif_file: trivy-${{ steps.name.outputs.slug }}.sarif
+          category: trivy-${{ steps.name.outputs.slug }}
 
-      - name: Run Trivy on RabbitMQ
-        uses: aquasecurity/trivy-action@master
-        continue-on-error: true
-        with:
-          image-ref: 'docker.io/rabbitmq:3-management-alpine'
-          format: 'sarif'
-          output: 'trivy-rabbitmq.sarif'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Upload Trivy results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        continue-on-error: true
-        with:
-          sarif_file: trivy-postgres.sarif
-
-  deploy-infra-staging:
-    name: Deploy Infra — Staging
+  # Needs the backing services and the opas/<env>/* secrets to exist in AWS first.
+  # ImageTag isn't passed, so the stack keeps the image
+  # the backend pipeline last deployed.
+  deploy-staging:
+    name: Deploy — staging
     needs: integration
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && inputs.deploy
     environment: staging
     permissions:
       contents: read
       id-token: write
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           aws-region: eu-north-1
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: opas-infra-deploy
-
-      - name: Deploy CloudFormation stack (staging)
+      - name: Deploy stack
         run: |
           aws cloudformation deploy \
             --template-file cloudformation/ecs.yml \
@@ -161,37 +127,28 @@ jobs:
               PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
               MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@opas.fi' }} \
-            --capabilities CAPABILITY_IAM \
+              StripePremiumPriceIds=${{ vars.STRIPE_PREMIUM_PRICE_IDS }} \
+            --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset \
             --no-cli-pager
 
-      - name: Verify stack
-        run: |
-          aws cloudformation describe-stacks \
-            --stack-name opas-infra-staging \
-            --query 'Stacks[0].StackStatus' \
-            --no-cli-pager
-
-  deploy-infra-production:
-    name: Deploy Infra — Production
-    needs: deploy-infra-staging
+  deploy-production:
+    name: Deploy — production
+    needs: deploy-staging
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     permissions:
       contents: read
       id-token: write
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           aws-region: eu-north-1
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: opas-infra-prod-deploy
-
-      - name: Deploy CloudFormation stack (production)
+      - name: Deploy stack
         run: |
           aws cloudformation deploy \
             --template-file cloudformation/ecs.yml \
@@ -202,13 +159,8 @@ jobs:
               PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
               MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@opas.fi' }} \
-            --capabilities CAPABILITY_IAM \
+              StripePremiumPriceIds=${{ vars.STRIPE_PREMIUM_PRICE_IDS }} \
+              CorsAllowedOrigins=https://app.opas.fi \
+            --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset \
-            --no-cli-pager
-
-      - name: Verify stack
-        run: |
-          aws cloudformation describe-stacks \
-            --stack-name opas-infra-production \
-            --query 'Stacks[0].StackStatus' \
             --no-cli-pager

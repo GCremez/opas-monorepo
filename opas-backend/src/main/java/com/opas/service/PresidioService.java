@@ -109,7 +109,9 @@ public class PresidioService {
     record AnalyzeRequest(String text, String language) {
     }
 
-    record AnonymizeRequest(String text, List<AnalysisResult> analyzerResults) {
+    // Presidio's anonymizer API is snake_case; a camelCase "analyzerResults" key is
+    // ignored and the request is rejected for missing analyzer results.
+    record AnonymizeRequest(String text, @JsonProperty("analyzer_results") List<AnalysisResult> analyzerResults) {
     }
 
     record AnonymizeResponse(String text) {

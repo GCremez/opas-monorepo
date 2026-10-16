@@ -46,7 +46,8 @@ class DocumentServiceTest {
     @BeforeEach
     void setUp() {
         service = new DocumentService(documentRepository, userRepository, folderRepository,
-                decodeResultRepository, storageService, 15);
+                decodeResultRepository, storageService,
+                new DocumentInsights(new com.fasterxml.jackson.databind.ObjectMapper()), 15);
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);
@@ -162,6 +163,29 @@ class DocumentServiceTest {
         assertEquals(1, responses.size());
         assertEquals("test.pdf", responses.getFirst().filename());
         assertNotNull(responses.getFirst().downloadUrl());
+    }
+
+    @Test
+    void listDocumentsIncludesLatestDecodeInsights() {
+        document.setStatus("ready");
+        when(documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(userId, "archived"))
+                .thenReturn(List.of(document));
+        var newer = new com.opas.domain.DecodeResult();
+        newer.setDocument(document);
+        newer.setStructuredData("""
+                {"title": "Tax decision", "authority": "Vero",
+                 "deadlines": [{"date": "2026-06-30", "description": "Pay remaining tax"}]}""");
+        var older = new com.opas.domain.DecodeResult();
+        older.setDocument(document);
+        older.setStructuredData("{\"title\": \"Old title\"}");
+        // Repository returns newest first; the newest decode must win.
+        when(decodeResultRepository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(newer, older));
+
+        DocumentResponse response = service.listDocuments(userId).getFirst();
+
+        assertEquals("Tax decision", response.title());
+        assertEquals("Vero", response.authority());
+        assertEquals("2026-06-30", response.deadlines().getFirst().date());
     }
 
     @Test

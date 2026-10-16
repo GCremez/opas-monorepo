@@ -45,6 +45,7 @@ class JwtAuthenticationFilterTest {
         when(jwtUtil.parseToken("valid-token")).thenReturn(claims);
         when(claims.getId()).thenReturn("jti-123");
         when(claims.getSubject()).thenReturn("user-123");
+        when(claims.get(JwtUtil.CLAIM_TYPE, String.class)).thenReturn(JwtUtil.TYPE_ACCESS);
         when(tokenBlacklistService.isBlacklisted("jti-123")).thenReturn(false);
 
         filter.doFilterInternal(request, response, chain);
@@ -53,6 +54,32 @@ class JwtAuthenticationFilterTest {
         assertEquals("user-123",
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         verify(chain).doFilter(request, response);
+    }
+
+    @Test
+    void rejectsRefreshTokenUsedAsBearer() throws Exception {
+        when(request.getHeader("Authorization")).thenReturn("Bearer refresh-token");
+        when(jwtUtil.parseToken("refresh-token")).thenReturn(claims);
+        when(claims.getId()).thenReturn("jti-refresh");
+        when(claims.getSubject()).thenReturn("user-123");
+        when(claims.get(JwtUtil.CLAIM_TYPE, String.class)).thenReturn(JwtUtil.TYPE_REFRESH);
+
+        filter.doFilterInternal(request, response, chain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(chain).doFilter(request, response);
+    }
+
+    @Test
+    void rejectsUntypedTokenAsBearer() throws Exception {
+        when(request.getHeader("Authorization")).thenReturn("Bearer legacy-token");
+        when(jwtUtil.parseToken("legacy-token")).thenReturn(claims);
+        when(claims.getId()).thenReturn("jti-legacy");
+        when(claims.getSubject()).thenReturn("user-123");
+
+        filter.doFilterInternal(request, response, chain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test
@@ -80,6 +107,7 @@ class JwtAuthenticationFilterTest {
         when(jwtUtil.parseToken("blacklisted-token")).thenReturn(claims);
         when(claims.getId()).thenReturn("jti-blacklisted");
         when(claims.getSubject()).thenReturn("user-123");
+        when(claims.get(JwtUtil.CLAIM_TYPE, String.class)).thenReturn(JwtUtil.TYPE_ACCESS);
         when(tokenBlacklistService.isBlacklisted("jti-blacklisted")).thenReturn(true);
 
         filter.doFilterInternal(request, response, chain);

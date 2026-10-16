@@ -36,7 +36,7 @@ export default function JourneyScreen() {
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         <View className="px-6 pt-3 pb-7">
-          <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">Opas · Journey</Text>
+          <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">Opas · Journey</Text>
           <Text className="font-display text-[30px] leading-[32px] tracking-[-0.01em] text-fg mt-2.5">
             Your life in{'\n'}Finland, so far.
           </Text>
@@ -71,7 +71,7 @@ export default function JourneyScreen() {
                   <Text className={`font-mono-medium text-[13px] ${yearTone}`}>{m.year}</Text>
                   <Text className={`font-serif text-[16px] leading-[22px] mt-1 ${titleTone}`}>{m.title}</Text>
                   {m.note && (
-                    <Text className="font-semibold text-[9px] tracking-[0.11em] uppercase text-warning mt-1">{m.note}</Text>
+                    <Text className="font-semibold text-label tracking-[0.11em] uppercase text-warning mt-1">{m.note}</Text>
                   )}
                 </View>
               </View>

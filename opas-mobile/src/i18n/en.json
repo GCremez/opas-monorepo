@@ -15,7 +15,10 @@
     "back": "Back",
     "show": "Show",
     "hide": "Hide",
-    "see_all": "See all"
+    "see_all": "See all",
+    "camera_access_needed": "Camera access needed",
+    "grant_permission": "Grant permission",
+    "open_original": "Open original document"
   },
   "onboarding": {
     "skip": "Skip",
@@ -23,7 +26,6 @@
     "eyebrow_1": "Welcome to Opas",
     "eyebrow_2": "Never miss a deadline",
     "eyebrow_3": "All in one place",
-    "illo_caption": "scan → plain-language guide",
     "next": "Next",
     "get_started": "Get Started",
     "slide_1_title": "Understand every official letter.",
@@ -31,7 +33,17 @@
     "slide_2_title": "Know what to do — and by when.",
     "slide_2_desc": "Opas pulls every date and required action out of your letters, then reminds you before anything is due.",
     "slide_3_title": "Everything, kept in order.",
-    "slide_3_desc": "Your documents are filed by authority and always searchable — so nothing gets lost in a drawer again."
+    "slide_3_desc": "Your documents are filed by authority and always searchable — so nothing gets lost in a drawer again.",
+    "mini_1_row_1_label": "Report income change",
+    "mini_1_row_1_value": "9 days",
+    "mini_1_row_2_label": "Extend permit",
+    "mini_1_row_2_value": "3 weeks",
+    "mini_2_row_1_label": "KELA",
+    "mini_2_row_1_value": "5 docs",
+    "mini_2_row_2_label": "Verohallinto",
+    "mini_2_row_2_value": "3 docs",
+    "mini_2_row_3_label": "Migri",
+    "mini_2_row_3_value": "2 · 1 due"
   },
   "auth": {
     "welcome_back": "Welcome back.",
@@ -59,10 +71,10 @@
     "registration_failed": "Could not create account. Please try again.",
     "reset_eyebrow": "Reset password",
     "reset_title": "No trouble.",
-    "reset_body": "Enter your email and we'll send you a link to set a new password.",
-    "reset_send": "Send reset link",
+    "reset_body": "Enter your email and we'll send you a code to set a new password.",
+    "reset_send": "Send reset code",
     "reset_sent_title": "Check your email.",
-    "reset_sent_body": "If an account exists for {{email}}, we've sent a link to reset your password.",
+    "reset_sent_body": "If an account exists for {{email}}, we've sent a 6-digit code to reset your password.",
     "back_to_sign_in": "Back to sign in",
     "enter_email": "Please enter your email",
     "verify_eyebrow": "Verify email",
@@ -75,7 +87,16 @@
     "verify_no_code": "Didn't get it?",
     "verify_resend": "Resend code",
     "verify_resend_in": "Resend in {{seconds}}s",
-    "verify_resent": "A new code is on its way if the email is registered."
+    "verify_resent": "A new code is on its way if the email is registered.",
+    "reset_code_label": "Reset code",
+    "reset_new_password_label": "New password",
+    "reset_new_password_placeholder": "At least 8 characters",
+    "reset_cta": "Set new password",
+    "reset_enter_code": "Enter the 6-digit code",
+    "reset_password_min": "New password must be at least 8 characters",
+    "reset_invalid": "That code is invalid or expired. Request a new one.",
+    "reset_done_title": "Password updated.",
+    "reset_done_body": "Sign in with your new password."
   },
   "tabs": {
     "home": "Home",
@@ -92,7 +113,6 @@
     "eyebrow": "Opas · Your record",
     "needs_you": "Needs you",
     "your_documents": "Your documents",
-    "needs_you": "Needs you",
     "see_all": "See all →",
     "all_clear": "Everything's in order.",
     "one_thing": " One thing needs you this week.",
@@ -110,18 +130,22 @@
     "empty_desc": "Scan your first letter — from Kela, the tax office, anywhere — and Opas will start keeping it in order for you.",
     "scan_first": "Scan your first document",
     "see_how": "See how Opas works",
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "needs_count": " {{count}} deadline is coming up.",
+    "needs_count_plural": " {{count}} deadlines are coming up.",
+    "load_error_desc": "Check your connection, then pull down to try again."
   },
   "alerts": {
     "eyebrow": "Opas · Alerts",
     "title": "Deadlines &\nreminders.",
     "this_week": "This week",
-    "later": "Later this month",
+    "later": "Later",
     "done": "Done",
     "no_alerts": "No deadlines",
     "no_alerts_desc": "When a document has a deadline, it shows up here.",
     "days_left": "{{count}} days",
-    "day_left": "{{count}} day"
+    "day_left": "{{count}} day",
+    "passed": "Passed"
   },
   "home": {
     "title": "Home",
@@ -214,7 +238,8 @@
     "step_extracting": "Finding dates & actions",
     "reading": "Reading your letter…",
     "please_wait": "Please wait",
-    "privacy_note": "Your document never leaves your control. Personal details are hidden before anything is read."
+    "privacy_note": "Your document never leaves your control. Personal details are hidden before anything is read.",
+    "grant_permission_desc": "Grant camera access in Settings to scan documents."
   },
   "documents": {
     "title": "Documents",
@@ -367,7 +392,21 @@
     "email": "Email",
     "not_decoded": "This document hasn't been analyzed yet.",
     "uploaded_on": "Uploaded",
-    "draft_letter": "Draft reply letter"
+    "draft_letter": "Draft reply letter",
+    "analyze": "Analyze",
+    "decode_failed": "We couldn't analyze this document.",
+    "decode_failed_hint": "Make sure the whole page is visible and the text is sharp, then try again. You weren't charged for this attempt.",
+    "issued": "Issued {{date}}",
+    "no_summary": "No summary available.",
+    "key_details": "Key details",
+    "preview_unavailable": "There's no preview for this file type. Open the original to view it.",
+    "days_to_deadline": "days to deadline",
+    "date_passed": "Passed",
+    "due_today": "Due today",
+    "days_left": "{{count}} day left",
+    "days_left_plural": "{{count}} days left",
+    "no_dates": "This document doesn't state any dates or deadlines.",
+    "more": "More options"
   },
   "draftLetter": {
     "title": "Draft Letter",
@@ -398,8 +437,7 @@
     "feature_ai": "AI extracts deadlines and instructions in plain language",
     "feature_organize": "Auto-organized into folders with deadline reminders",
     "premium": "Premium",
-    "upgrade_note": "Upgrade from your profile whenever you're ready",
-    "demo": "Continue as Guest"
+    "upgrade_note": "Upgrade from your profile whenever you're ready"
   },
   "subscription": {
     "title": "Everything,\nhandled.",
@@ -421,5 +459,13 @@
     "save_yearly": "Save 20% yearly",
     "free_trial": "Start 7-day free trial",
     "trial_note": "Then €4.99/month. Cancel anytime."
+  },
+  "status": {
+    "pending": "Uploading",
+    "uploaded": "Not analyzed",
+    "processing": "Analyzing",
+    "ready": "Read",
+    "failed": "Failed",
+    "archived": "Archived"
   }
 }

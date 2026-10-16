@@ -12,12 +12,12 @@ export const themes = {
     'surface-2':'#e3dbc8',
     fg:        '#211e16', // primary text
     'fg-soft': '#4c473c', // body / secondary
-    muted:     '#8a8272', // metadata, labels
+    muted:     '#666054', // metadata, labels — ≥4.5:1 on bg/surface/surface-2 (WCAG AA)
     hairline:  'rgba(33,30,22,0.12)', // row divider
     rule:      'rgba(33,30,22,0.22)', // section header underline
     accent:    '#35503f', // pine — primary / positive
     'on-accent':'#f2ede2',
-    warning:   '#916219', // ochre — deadlines
+    warning:   '#835817', // ochre — deadlines — ≥4.5:1 on every paper surface
     danger:    '#9c3a2c', // brick — urgent / destructive
     info:      '#42606f', // slate — neutral emphasis
     node:      '#cdbfa6', // logo start-waypoint / disabled dot
@@ -28,7 +28,7 @@ export const themes = {
     'surface-2':'#2a2820',
     fg:        '#ece6d8',
     'fg-soft': '#b6ae9e',
-    muted:     '#857e6f',
+    muted:     '#948e81', // ≥4.5:1 on ink surfaces
     hairline:  'rgba(236,230,216,0.13)',
     rule:      'rgba(236,230,216,0.24)',
     accent:    '#8fbb9f',

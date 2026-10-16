@@ -54,7 +54,7 @@ public class EmailVerificationService {
         entity.setCreatedAt(Instant.now());
         codeRepository.save(entity);
 
-        emailService.sendVerificationCode(user.getEmail(), code);
+        emailService.sendVerificationCode(user.getEmail(), code, user.getLanguage());
     }
 
     /**

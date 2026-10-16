@@ -16,6 +16,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
+    /**
+     * Token-type claim. Access and refresh tokens share a signing key, so without it a
+     * 30-day refresh token would be accepted anywhere an access token is.
+     */
+    public static final String CLAIM_TYPE = "typ";
+    public static final String TYPE_ACCESS = "access";
+    public static final String TYPE_REFRESH = "refresh";
+
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
     private final long accessTokenTtlMs;
@@ -33,17 +41,30 @@ public class JwtUtil {
     public String createAccessToken(String userId, String email) {
         return Jwts.builder().subject(userId).issuer("opas").issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessTokenTtlMs)).id(UUID.randomUUID().toString())
-                .claim("email", email).signWith(privateKey, Jwts.SIG.RS256).compact();
+                .claim("email", email).claim(CLAIM_TYPE, TYPE_ACCESS).signWith(privateKey, Jwts.SIG.RS256).compact();
     }
 
     public String createRefreshToken(String userId) {
         return Jwts.builder().subject(userId).issuer("opas").issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshTokenTtlMs)).id(UUID.randomUUID().toString())
-                .signWith(privateKey, Jwts.SIG.RS256).compact();
+                .claim(CLAIM_TYPE, TYPE_REFRESH).signWith(privateKey, Jwts.SIG.RS256).compact();
     }
 
     public Claims parseToken(String token) {
         return Jwts.parser().verifyWith(publicKey).requireIssuer("opas").build().parseSignedClaims(token).getPayload();
+    }
+
+    public static boolean isAccessToken(Claims claims) {
+        return TYPE_ACCESS.equals(claims.get(CLAIM_TYPE, String.class));
+    }
+
+    /**
+     * Anything not explicitly typed as an access token. Refresh tokens issued before the
+     * typ claim existed carry no type and stay usable until they expire; the refresh store
+     * lookup is still the real gate on those.
+     */
+    public static boolean isRefreshToken(Claims claims) {
+        return !isAccessToken(claims);
     }
 
     public boolean validateToken(String token) {

@@ -1,104 +1,89 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Pressable, Linking, Share, Alert } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Pressable, Linking, Share, Alert, Image } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../src/components/ui/Button';
-import { Pill } from '../../src/components/ui/Badge';
 import { Spinner } from '../../src/components/ui/Loading';
-import { DecodeScramble, StreamingText, CountdownRing } from '../../src/components/motion';
+import { DecodeScramble, CountdownRing } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { getDocument } from '../../src/api/documents';
-import { decodeDocument } from '../../src/api/decode';
+import { decodeDocument, getDecodeResult, pollDecodeResult } from '../../src/api/decode';
 import { useDocumentStore } from '../../src/store/documentStore';
-import { useAuthStore } from '../../src/store/authStore';
 import { ChevronLeftIcon, DotsIcon } from '../../src/components/icons';
 import { useThemeColors } from '../../src/store/themeStore';
 import type { Document, DecodeResult } from '../../src/types';
 import { usePremium } from '../../src/hooks/usePremium';
 import { addToCalendar } from '../../src/utils/calendar';
+import { daysUntil, formatDate, nextDeadline, parseIsoDate, toDecodeView } from '../../src/lib/decodeView';
 
 type TabView = 'summary' | 'original' | 'dates' | 'actions';
-
-const mockSummary =
-  "KELA has approved your housing benefit. The amount is based on the income and housing costs you reported. It's paid on the 15th of each month.";
-
-const mockKeyPoints = [
-  { label: 'Approved amount', value: '€387.20/mo', tone: 'text-accent' },
-  { label: 'Valid from', value: '1 APR 2026', tone: 'text-fg' },
-  { label: 'Paid on', value: '15TH MONTHLY', tone: 'text-fg' },
-  { label: 'Next review', value: '31 DEC 2026', tone: 'text-warning' },
-];
-
-const mockSteps = [
-  { title: 'Read the decision', desc: '', note: '', done: true },
-  { title: 'Report any income change', desc: 'Tell KELA within 14 days if your job or pay changes.', note: 'DUE WITHIN 14 DAYS', done: false },
-];
-
-const mockDates = [
-  { label: 'Document date', value: '15 MAR 2026', urgent: false },
-  { label: 'Valid from', value: '1 APR 2026', urgent: false },
-  { label: 'Payment', value: '15TH MONTHLY', urgent: true },
-  { label: 'Next review', value: '31 DEC 2026', urgent: false },
-  { label: 'Report changes within', value: '14 DAYS', urgent: true },
-  { label: 'Reference', value: '12345/2026', urgent: false },
-];
-
-const mockActions = [
-  { title: 'Report income changes', desc: 'Due within 14 days of any change' },
-  { title: 'Submit annual income declaration', desc: 'Due by 31 December 2026' },
-];
+type DecodeState = 'idle' | 'running' | 'failed';
 
 export default function DocumentDetailScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useThemeColors();
   const { deleteDocument, archiveDocument } = useDocumentStore();
   const { isPremium } = usePremium();
-  const { isDemo } = useAuthStore();
   const [doc, setDoc] = useState<Document | null>(null);
   const [decode, setDecode] = useState<DecodeResult | null>(null);
   const [loading, setLoading] = useState(true);
-  const [decoding, setDecoding] = useState(false);
+  const [decodeState, setDecodeState] = useState<DecodeState>('idle');
   const [activeTab, setActiveTab] = useState<TabView>('summary');
   const [sheetVisible, setSheetVisible] = useState(false);
-  const [checkedActions, setCheckedActions] = useState([true, false]);
+
+  const view = toDecodeView(decode);
+  const upcoming = nextDeadline(view);
+  const locale = i18n.language;
+
+  // Runs a decode step and maps its outcome onto the screen state. Every path ends the
+  // spinner: a failure must never leave the screen stuck on "decoding".
+  const runDecode = useCallback(async (step: () => Promise<DecodeResult>) => {
+    setDecodeState('running');
+    try {
+      setDecode(await step());
+      setDecodeState('idle');
+    } catch {
+      // DecodeFailedError (backend gave up), a timeout, or a network error: all retryable.
+      setDecodeState('failed');
+    }
+  }, []);
 
   useEffect(() => {
     if (!id) return;
-    if (isDemo) {
-      // Brief hold so the Orbit loader (The Orbit) actually plays on open.
+    let cancelled = false;
+    (async () => {
       setLoading(true);
-      const timer = setTimeout(() => {
-        setDoc({
-          id,
-          filename: 'KELA Housing Benefit Decision',
-          status: 'ready',
-          folderId: null,
-          contentType: 'application/pdf',
-          fileSize: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          uploadUrl: null,
-          downloadUrl: null,
-        });
-        setLoading(false);
-      }, 900);
-      return () => clearTimeout(timer);
-    }
-    setLoading(true);
-    getDocument(id).then(setDoc).finally(() => setLoading(false));
-  }, [id, isDemo]);
+      try {
+        const loaded = await getDocument(id);
+        if (cancelled) return;
+        setDoc(loaded);
+        // Show what already exists instead of re-running the decode.
+        if (loaded.status === 'ready') {
+          const existing = await getDecodeResult(id).catch(() => null);
+          if (!cancelled) setDecode(existing);
+        } else if (loaded.status === 'failed') {
+          setDecodeState('failed');
+        } else if (loaded.status === 'processing') {
+          runDecode(() => pollDecodeResult(id));
+        }
+      } catch {
+        // Leaves doc null → error state below.
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, runDecode]);
 
-  const handleDecode = async () => {
-    if (!id) return;
-    setDecoding(true);
-    const result = await decodeDocument(id);
-    setDecode(result);
-    setDecoding(false);
+  const handleDecode = () => {
+    if (id) runDecode(() => decodeDocument(id));
   };
 
   const handleDelete = async () => {
@@ -108,38 +93,43 @@ export default function DocumentDetailScreen() {
     router.back();
   };
 
-  const handleOpenOriginal = async () => {
-    if (isDemo) return;
+  const handleOpenOriginal = () => {
     if (doc?.downloadUrl) Linking.openURL(doc.downloadUrl);
   };
 
-  const handleShare = async () => {
+  // Share the explanation, not a link: a presigned URL gives anyone holding it full
+  // access to the original letter.
+  const handleShare = () => {
     if (!doc) return;
-    if (isDemo) { Share.share({ message: 'KELA Housing Benefit Decision - Shared from Opas' }); return; }
-    Share.share(doc.downloadUrl ? { message: doc.downloadUrl, title: doc.filename } : { message: doc.filename, title: doc.filename });
+    const title = view?.title ?? doc.filename;
+    const message = [title, view?.summary, upcoming && `${formatDate(upcoming.date, locale)} — ${upcoming.description}`]
+      .filter(Boolean)
+      .join('\n\n');
+    Share.share({ message, title });
   };
 
-  const handleExport = async () => {
-    if (!doc) return;
-    if (isDemo) { Share.share({ message: 'KELA Housing Benefit Decision - Exported from Opas' }); return; }
-    if (doc.downloadUrl) Share.share({ url: doc.downloadUrl, title: doc.filename }); else handleShare();
+  const handleExport = () => {
+    if (doc?.downloadUrl) Share.share({ url: doc.downloadUrl, title: doc.filename });
   };
 
   const handleDraftLetter = () => {
-    if (!isPremium) { router.push('/subscription'); return; }
+    if (!isPremium) {
+      router.push('/subscription');
+      return;
+    }
     router.push(`/draft/${id}?filename=${encodeURIComponent(doc?.filename ?? '')}`);
   };
 
+  // Only offered when the document itself states an upcoming date — never an invented one.
   const handleAddToCalendar = async () => {
-    if (!doc) return;
-    if (isDemo) { setSheetVisible(false); return; }
-    const deadlineDate = new Date();
-    deadlineDate.setDate(deadlineDate.getDate() + 7);
+    const date = upcoming && parseIsoDate(upcoming.date);
+    if (!doc || !upcoming || !date) return;
+    date.setHours(9, 0, 0, 0);
     const added = await addToCalendar({
-      title: t('calendar.event_title', { name: doc.filename }),
-      notes: t('calendar.event_notes', { filename: doc.filename }),
-      startDate: deadlineDate,
-      endDate: new Date(deadlineDate.getTime() + 3600000),
+      title: t('calendar.event_title', { name: upcoming.description || view?.title || doc.filename }),
+      notes: t('calendar.event_notes', { filename: view?.title ?? doc.filename }),
+      startDate: date,
+      endDate: new Date(date.getTime() + 3600000),
     });
     setSheetVisible(false);
     if (added) Alert.alert(t('calendar.added'));
@@ -147,7 +137,6 @@ export default function DocumentDetailScreen() {
 
   const handleArchive = async () => {
     if (!id) return;
-    if (isDemo) { setSheetVisible(false); return; }
     await archiveDocument(id);
     setSheetVisible(false);
     router.back();
@@ -159,9 +148,6 @@ export default function DocumentDetailScreen() {
       { text: t('document.delete_document'), style: 'destructive', onPress: handleDelete },
     ]);
   };
-
-  const toggleChecked = (index: number) =>
-    setCheckedActions((prev) => prev.map((v, i) => (i === index ? !v : v)));
 
   if (loading) {
     return (
@@ -178,7 +164,7 @@ export default function DocumentDetailScreen() {
       <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
         <View className="flex-1 items-center justify-center px-5">
           <Text className="font-serif text-prose text-fg-soft text-center">{t('common.error')}</Text>
-          <Button variant="ghost" onPress={() => router.back()} className="mt-4">{t('common.cancel')}</Button>
+          <Button variant="ghost" onPress={() => router.back()} className="mt-4">{t('common.back')}</Button>
         </View>
       </SafeAreaView>
     );
@@ -191,49 +177,81 @@ export default function DocumentDetailScreen() {
     { key: 'actions', label: t('document.actions') },
   ];
 
-  const showDecodeGate = doc.status === 'uploaded' && !decode;
+  const decoding = decodeState === 'running';
+  const canDecode = !decode && !decoding && (doc.status === 'uploaded' || doc.status === 'failed');
+  const isImage = (doc.contentType ?? '').startsWith('image/');
+  const docLanguage = view?.language?.toLowerCase();
+  const translated = !!docLanguage && docLanguage !== locale.split('-')[0];
+  const mastheadMeta = [
+    translated ? `${docLanguage!.toUpperCase()} → ${locale.split('-')[0].toUpperCase()}` : null,
+    view?.issuedDate
+      ? t('document.issued', { date: formatDate(view.issuedDate, locale) })
+      : `${t('document.uploaded_on')} ${formatDate(doc.createdAt.slice(0, 10), locale)}`,
+  ].filter(Boolean).join(' · ');
+  const footerAction = 'min-h-[44px] justify-center px-1';
+  const footerLabel = 'font-semibold text-label uppercase';
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
       <View className="flex-1">
         {/* Nav row */}
         <View className="flex-row items-center justify-between px-6 pt-2 pb-1">
-          <TouchableOpacity onPress={() => router.back()} hitSlop={8} accessibilityLabel={t('common.back')}>
+          <TouchableOpacity onPress={() => router.back()} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('common.back')}>
             <ChevronLeftIcon size={22} color={c['fg-soft']} />
           </TouchableOpacity>
-          <Text className="font-semibold text-[9.5px] tracking-[0.16em] uppercase text-muted">KELA</Text>
-          <TouchableOpacity onPress={() => setSheetVisible(true)} hitSlop={8} accessibilityLabel="More">
+          <Text className="font-semibold text-label uppercase text-muted" numberOfLines={1}>
+            {view?.authority ?? ''}
+          </Text>
+          <TouchableOpacity onPress={() => setSheetVisible(true)} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('document.more')}>
             <DotsIcon size={20} color={c['fg-soft']} />
           </TouchableOpacity>
         </View>
 
-        {/* Masthead */}
+        {/* Masthead — from this document's decode, falling back to its filename */}
         <View className="px-6 pt-3 pb-4">
-          <Text className="font-semibold text-[10px] tracking-[0.16em] uppercase text-muted">Päätös asumistuesta</Text>
-          <Text className="font-display text-[27px] leading-[30px] tracking-[-0.01em] text-fg mt-2">Housing benefit,{'\n'}approved.</Text>
-          <Text className="font-mono text-[10px] tracking-[0.05em] text-muted mt-2.5">TRANSLATED · FI → EN · 2 PAGES · 15 MAR 2026</Text>
+          {view?.documentType && (
+            <Text className="font-semibold text-label uppercase text-muted">{view.documentType}</Text>
+          )}
+          <Text className="font-display text-[27px] leading-[31px] tracking-[-0.01em] text-fg mt-2" accessibilityRole="header">
+            {view?.title ?? doc.filename}
+          </Text>
+          <Text className="font-mono text-meta text-muted mt-2.5">{mastheadMeta}</Text>
         </View>
 
-        {/* Tab underline row */}
-        <View className="flex-row gap-5 mx-6 border-b border-hairline">
-          {tabs.map((tab) => {
-            const active = activeTab === tab.key;
-            return (
-              <Pressable key={tab.key} onPress={() => setActiveTab(tab.key)} className="pb-3">
-                <Text className={`font-semibold text-[10.5px] tracking-[0.12em] uppercase ${active ? 'text-fg' : 'text-muted'}`}>
-                  {tab.label}
-                </Text>
-                {active && <View className="absolute left-0 right-0 -bottom-px h-0.5 bg-accent" />}
-              </Pressable>
-            );
-          })}
+        {/* Tab underline row — scrolls sideways when translated labels don't fit. */}
+        <View className="mx-6 border-b border-hairline">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }} accessibilityRole="tablist">
+            {tabs.map((tab) => {
+              const active = activeTab === tab.key;
+              return (
+                <Pressable
+                  key={tab.key}
+                  onPress={() => setActiveTab(tab.key)}
+                  className="pb-3 pt-2"
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: active }}
+                >
+                  <Text className={`font-semibold text-label uppercase ${active ? 'text-fg' : 'text-muted'}`}>{tab.label}</Text>
+                  {active && <View className="absolute left-0 right-0 bottom-0 h-0.5 bg-accent" />}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </View>
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
-          {showDecodeGate && !decoding && (
+          {canDecode && decodeState !== 'failed' && (
             <View className="flex-row items-center gap-3 mx-6 mt-5 bg-surface rounded-md px-4 py-3">
               <Text className="flex-1 font-serif text-prose text-fg-soft">{t('document.not_decoded')}</Text>
-              <Button variant="primary" size="sm" loading={decoding} onPress={handleDecode}>{t('document.summary')}</Button>
+              <Button variant="primary" size="sm" onPress={handleDecode}>{t('document.analyze')}</Button>
+            </View>
+          )}
+
+          {decodeState === 'failed' && !decoding && (
+            <View className="mx-6 mt-5 bg-surface rounded-md px-4 py-4" accessibilityRole="alert">
+              <Text className="font-serif text-prose text-fg">{t('document.decode_failed')}</Text>
+              <Text className="font-body text-body-sm text-fg-soft mt-1.5">{t('document.decode_failed_hint')}</Text>
+              <Button variant="primary" size="sm" className="mt-3 self-start" onPress={handleDecode}>{t('common.retry')}</Button>
             </View>
           )}
 
@@ -241,140 +259,93 @@ export default function DocumentDetailScreen() {
             <View className="pt-12 items-center"><DecodeScramble label={t('scan.decoding')} /></View>
           )}
 
-          {/* SUMMARY — demo */}
-          {!decoding && activeTab === 'summary' && isDemo && (
+          {/* SUMMARY */}
+          {!decoding && activeTab === 'summary' && decode && (
             <View className="px-6 pt-5">
-              <View className="flex-row items-end justify-between gap-3">
-                <Text className="font-display text-[34px] leading-[34px] text-fg">
-                  €387.20<Text className="font-serif text-[15px] text-muted"> / month</Text>
-                </Text>
-                <Pill variant="accent">Approved</Pill>
-              </View>
-              <View className="mt-4">
-                <StreamingText text={mockSummary} className="text-prose text-fg-soft" />
-              </View>
-
-              <Text className="font-semibold text-label uppercase text-fg mt-6 pb-2.5 border-b border-rule">{t('document.key_points')}</Text>
-              {mockKeyPoints.map((p) => (
-                <View key={p.label} className="flex-row items-baseline justify-between py-3">
-                  <Text className="font-body text-body text-fg-soft">{p.label}</Text>
-                  <Text className={`font-mono-medium text-data ${p.tone}`}>{p.value}</Text>
-                </View>
-              ))}
-
-              <Text className="font-semibold text-label uppercase text-fg mt-6 pb-2.5 border-b border-rule">{t('document.what_to_do')}</Text>
-              {mockSteps.map((s) => (
-                <View key={s.title} className="flex-row gap-3 py-3.5 border-b border-hairline">
-                  <View className={`w-[19px] h-[19px] rounded-sm border items-center justify-center mt-0.5 ${s.done ? 'bg-accent border-accent' : 'border-rule'}`}>
-                    {s.done && <Text className="text-on-accent text-[11px] font-semibold">✓</Text>}
-                  </View>
-                  <View className="flex-1">
-                    <Text className={`font-display text-[16px] leading-[20px] ${s.done ? 'text-muted line-through' : 'text-fg'}`}>{s.title}</Text>
-                    {!!s.desc && <Text className="font-body text-body-sm text-fg-soft mt-1">{s.desc}</Text>}
-                    {!!s.note && <Text className="font-mono text-[10px] tracking-[0.05em] text-warning mt-1.5">{s.note}</Text>}
-                  </View>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* SUMMARY — real */}
-          {!decoding && activeTab === 'summary' && !isDemo && decode && (
-            <View className="px-6 pt-5">
-              {decode.structuredData ? (
-                Object.entries(decode.structuredData as Record<string, unknown>).map(([key, value]) => (
-                  <View key={key} className="mb-5">
-                    <Text className="font-semibold text-label uppercase text-muted mb-1.5">
-                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}
-                    </Text>
-                    <Text className="font-serif text-prose text-fg">
-                      {typeof value === 'object' && value !== null ? JSON.stringify(value, null, 2) : String(value)}
-                    </Text>
-                  </View>
-                ))
+              {view?.summary ? (
+                <Text className="font-serif text-prose text-fg">{view.summary}</Text>
               ) : decode.rawResponse ? (
-                <Text className="font-mono text-body-sm text-fg-soft leading-[1.8]">
-                  {typeof decode.rawResponse === 'object' ? JSON.stringify(decode.rawResponse, null, 2) : String(decode.rawResponse)}
-                </Text>
+                // Older results (or a reply that wasn't valid JSON) only have the raw text.
+                <Text className="font-serif text-prose text-fg-soft">{decode.rawResponse}</Text>
               ) : (
-                <View className="items-center py-8"><Text className="font-body text-body-sm text-muted">No structured data available.</Text></View>
+                <Text className="font-body text-body-sm text-muted">{t('document.no_summary')}</Text>
+              )}
+              {!!view?.keyFields.length && (
+                <View className="mt-7">
+                  <Text className="font-semibold text-label uppercase text-muted mb-2">{t('document.key_details')}</Text>
+                  {view.keyFields.map(([label, value]) => (
+                    <View key={label} className="flex-row justify-between gap-4 py-3 border-b border-hairline">
+                      <Text className="font-body text-body-sm text-fg-soft flex-1">{label}</Text>
+                      <Text className="font-mono text-data text-fg text-right flex-1">{value}</Text>
+                    </View>
+                  ))}
+                </View>
               )}
             </View>
           )}
 
-          {/* ORIGINAL */}
+          {/* ORIGINAL — the user's own file */}
           {!decoding && activeTab === 'original' && (
             <View className="px-6 pt-5">
-              <TouchableOpacity onPress={handleOpenOriginal} activeOpacity={0.7} className="items-center rounded-md border border-rule py-3.5 mb-5">
-                <Text className="font-semibold text-[12px] tracking-[0.04em] text-fg">Open original document ↗</Text>
-              </TouchableOpacity>
-              <View className="bg-surface rounded-md p-4">
-                <Text className="font-semibold text-[10px] tracking-[0.14em] uppercase text-muted mb-2">KELA — Päätös asumistuesta</Text>
-                <Text className="font-mono text-[11px] text-muted mb-4">PAGE 1/2</Text>
-                <Text className="font-display text-[16px] text-fg mb-2">Asumistuen määrääminen</Text>
-                <Text className="font-serif text-prose text-fg-soft">
-                  Kela on päättänyt, että sinulla on oikeus asumistukeen 1.4.2026 alkaen.{'\n\n'}
-                  Asumistuen määrä on 387,20 €/kk.{'\n\n'}
-                  Tukea maksetaan 15. päivänä joka kuukausi jälkikäteen.
-                </Text>
-              </View>
+              {isImage && doc.downloadUrl ? (
+                <Image
+                  source={{ uri: doc.downloadUrl }}
+                  className="w-full rounded-md bg-surface mb-5"
+                  style={{ aspectRatio: 3 / 4 }}
+                  resizeMode="contain"
+                  accessibilityLabel={doc.filename}
+                />
+              ) : (
+                <Text className="font-body text-body-sm text-muted mb-5">{t('document.preview_unavailable')}</Text>
+              )}
+              {doc.downloadUrl && (
+                <Button variant="outline" block onPress={handleOpenOriginal}>{`${t('common.open_original')} ↗`}</Button>
+              )}
             </View>
           )}
 
-          {/* DATES */}
+          {/* DATES — only dates stated in the document */}
           {!decoding && activeTab === 'dates' && (
             <View className="px-6 pt-5">
-              <Text className="font-display text-title text-fg mb-4">{t('document.extracted_dates')}</Text>
-              {isDemo && (
+              {upcoming && (
                 <View className="items-center mb-6">
-                  <CountdownRing days={7} total={30} />
+                  <CountdownRing days={Math.max(daysUntil(upcoming.date) ?? 0, 0)} label={t('document.days_to_deadline')} />
                 </View>
               )}
-              {(isDemo ? mockDates : []).map((item) => (
-                <View key={item.label} className="flex-row items-baseline justify-between py-3.5 border-b border-hairline">
-                  <Text className="font-body text-body text-fg-soft">{item.label}</Text>
-                  <View className="flex-row items-baseline gap-2.5">
-                    <Text className={`font-mono-medium text-data ${item.urgent ? 'text-warning' : 'text-fg'}`}>{item.value}</Text>
-                    {item.urgent && <Text className="font-semibold text-[8.5px] tracking-[0.11em] uppercase text-warning">Due</Text>}
-                  </View>
-                </View>
-              ))}
-              {!isDemo && decode?.structuredData &&
-                Object.entries(decode.structuredData as Record<string, unknown>).map(([key, value]) => (
-                  <View key={key} className="mb-4">
-                    <Text className="font-semibold text-label uppercase text-muted mb-1.5">{key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}</Text>
-                    <Text className="font-mono text-data text-fg">{typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}</Text>
-                  </View>
-                ))}
+              {view?.deadlines.length ? (
+                view.deadlines.map((d) => {
+                  const days = daysUntil(d.date) ?? 0;
+                  const status = days < 0 ? t('document.date_passed') : days === 0 ? t('document.due_today') : t('document.days_left', { count: days });
+                  return (
+                    <View key={`${d.date}-${d.description}`} className="py-3 border-b border-hairline">
+                      <View className="flex-row justify-between">
+                        <Text className="font-mono text-data text-fg">{formatDate(d.date, locale)}</Text>
+                        <Text className={`font-body text-body-sm ${days < 0 ? 'text-muted' : 'text-warning'}`}>{status}</Text>
+                      </View>
+                      {!!d.description && <Text className="font-body text-body text-fg-soft mt-1">{d.description}</Text>}
+                    </View>
+                  );
+                })
+              ) : (
+                <Text className="font-body text-body-sm text-muted">{decode ? t('document.no_dates') : t('document.not_decoded')}</Text>
+              )}
             </View>
           )}
 
           {/* ACTIONS */}
           {!decoding && activeTab === 'actions' && (
             <View className="px-6 pt-5">
-              <View className="flex-row items-baseline justify-between mb-2 pb-2.5">
-                <Text className="font-semibold text-label uppercase text-fg">{t('document.required_actions')}</Text>
-                {isDemo && <Text className="font-mono text-[11px] text-muted">{checkedActions.filter(Boolean).length}/{mockActions.length}</Text>}
-              </View>
-              {(isDemo ? mockActions : []).map((action, i) => (
-                <TouchableOpacity key={action.title} onPress={() => toggleChecked(i)} activeOpacity={0.6} className="flex-row gap-3 py-3.5 border-b border-hairline">
-                  <View className={`w-[20px] h-[20px] rounded-sm border items-center justify-center mt-0.5 ${checkedActions[i] ? 'bg-accent border-accent' : 'border-rule'}`}>
-                    {checkedActions[i] && <Text className="text-on-accent text-[11px] font-semibold">✓</Text>}
+              <Text className="font-semibold text-label uppercase text-fg mb-2">{t('document.required_actions')}</Text>
+              {view?.actions.length ? (
+                view.actions.map((action, i) => (
+                  <View key={i} className="flex-row gap-3 py-3 border-b border-hairline">
+                    <Text className="font-mono text-data text-muted">{String(i + 1).padStart(2, '0')}</Text>
+                    <Text className="font-body text-body text-fg flex-1">{action}</Text>
                   </View>
-                  <View className="flex-1">
-                    <Text className={`font-display text-[16px] ${checkedActions[i] ? 'text-muted line-through' : 'text-fg'}`}>{action.title}</Text>
-                    <Text className="font-body text-body-sm text-fg-soft mt-0.5">{action.desc}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-              {!isDemo && decode?.structuredData &&
-                Object.entries(decode.structuredData as Record<string, unknown>).map(([key, value]) => (
-                  <View key={key} className="mb-4">
-                    <Text className="font-semibold text-label uppercase text-muted mb-1.5">{key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}</Text>
-                    <Text className="font-body text-body text-fg">{typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}</Text>
-                  </View>
-                ))}
-              {/* Prominent draft-reply CTA on the Actions tab, per the design (4a). */}
+                ))
+              ) : (
+                <Text className="font-body text-body-sm text-muted">{decode ? t('document.no_actions') : t('document.not_decoded')}</Text>
+              )}
               <Button variant="primary" block size="lg" className="mt-7" onPress={handleDraftLetter}>
                 {t('document.draft_letter')}
               </Button>
@@ -382,28 +353,32 @@ export default function DocumentDetailScreen() {
           )}
         </ScrollView>
 
-        {/* Footer actions — tracked caps */}
-        {(!showDecodeGate || decode) && (
-          <View
-            className="flex-row items-center justify-between px-8"
-            style={{ paddingBottom: insets.bottom + 12, paddingTop: 14 }}
-          >
-            <Pressable onPress={handleShare}><Text className="font-semibold text-[9.5px] tracking-[0.13em] uppercase text-fg-soft">{t('document.share')}</Text></Pressable>
-            <Pressable onPress={isPremium ? handleExport : () => router.push('/subscription')}><Text className="font-semibold text-[9.5px] tracking-[0.13em] uppercase text-fg-soft">{t('document.export')}</Text></Pressable>
-            <Pressable onPress={isPremium ? handleArchive : () => router.push('/subscription')}><Text className="font-semibold text-[9.5px] tracking-[0.13em] uppercase text-fg-soft">{t('document.archive')}</Text></Pressable>
-            <Pressable onPress={confirmDelete}><Text className="font-semibold text-[9.5px] tracking-[0.13em] uppercase text-danger">{t('document.delete_document')}</Text></Pressable>
+        {/* Footer actions */}
+        {!!decode && (
+          <View className="flex-row items-center justify-between px-6" style={{ paddingBottom: insets.bottom + 4, paddingTop: 6 }}>
+            <Pressable onPress={handleShare} className={footerAction} accessibilityRole="button">
+              <Text className={`${footerLabel} text-fg-soft`}>{t('document.share')}</Text>
+            </Pressable>
+            <Pressable onPress={isPremium ? handleExport : () => router.push('/subscription')} className={footerAction} accessibilityRole="button">
+              <Text className={`${footerLabel} text-fg-soft`}>{t('document.export')}</Text>
+            </Pressable>
+            <Pressable onPress={isPremium ? handleArchive : () => router.push('/subscription')} className={footerAction} accessibilityRole="button">
+              <Text className={`${footerLabel} text-fg-soft`}>{t('document.archive')}</Text>
+            </Pressable>
+            <Pressable onPress={confirmDelete} className={footerAction} accessibilityRole="button">
+              <Text className={`${footerLabel} text-danger`}>{t('common.delete')}</Text>
+            </Pressable>
           </View>
         )}
       </View>
 
       <BottomSheet
         visible={sheetVisible}
-        title={doc.filename}
+        title={view?.title ?? doc.filename}
         actions={[
           { label: t('document.share'), onPress: () => { setSheetVisible(false); handleShare(); } },
           { label: t('document.draft_letter'), onPress: () => { setSheetVisible(false); handleDraftLetter(); } },
-          { label: t('document.add_to_calendar'), onPress: () => { setSheetVisible(false); handleAddToCalendar(); } },
-          { label: t('document.mark_done'), onPress: () => setSheetVisible(false) },
+          ...(upcoming ? [{ label: t('document.add_to_calendar'), onPress: handleAddToCalendar }] : []),
           { label: t('document.delete_document'), onPress: confirmDelete, destructive: true },
         ]}
         onClose={() => setSheetVisible(false)}

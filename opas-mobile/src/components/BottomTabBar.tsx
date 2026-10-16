@@ -45,7 +45,7 @@ function TabItem({
         accessibilityRole="button"
         accessibilityLabel={t(tab.labelKey)}
       >
-        <Text className="font-semibold text-on-accent text-[9.5px] uppercase tracking-[0.15em]">
+        <Text className="font-semibold text-on-accent text-label uppercase tracking-[0.15em]">
           {t(tab.labelKey)}
         </Text>
       </Pressable>
@@ -55,13 +55,18 @@ function TabItem({
   return (
     <Pressable
       onPress={onPress}
-      className="min-h-touch px-2 items-center justify-center"
+      className="flex-1 min-h-touch px-1 items-center justify-center"
       accessibilityRole="button"
       accessibilityState={{ selected: isActive }}
       accessibilityLabel={t(tab.labelKey)}
     >
+      {/* Long translations (fi "Muistutukset") shrink to fit their slot instead of
+          pushing the bar off-screen. */}
       <Text
-        className={`font-semibold text-[9.5px] uppercase tracking-[0.13em] ${
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+        className={`font-semibold text-label uppercase tracking-[0.1em] ${
           isActive ? 'text-fg' : 'text-muted'
         }`}
       >
@@ -75,7 +80,7 @@ export function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="flex-row items-center justify-between bg-bg px-6 pt-4"
+      className="flex-row items-center gap-1 bg-bg px-4 pt-4"
       style={{ paddingBottom: Math.max(insets.bottom, 16) }}
     >
       {tabs.map((tab) => (

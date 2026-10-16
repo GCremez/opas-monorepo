@@ -64,8 +64,10 @@ public class AuthController {
 
     @RateLimit(key = "auth-refresh", limit = 30, windowSeconds = 300)
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
-        return ResponseEntity.ok(authService.refresh(request));
+    public ResponseEntity<AuthResponse> refresh(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @Valid @RequestBody RefreshRequest request) {
+        return ResponseEntity.ok(authService.refresh(request, authorization));
     }
 
     @RateLimit(key = "auth-forgot-password", limit = 5, windowSeconds = 3600)
@@ -76,9 +78,21 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @RateLimit(key = "auth-reset-password", limit = 10, windowSeconds = 300)
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody com.opas.dto.ResetPasswordRequest request) {
+        authService.resetPassword(request.email(), request.code(), request.newPassword());
+        // 204: the reset succeeded. On any bad/expired code the service throws a generic
+        // 400, so this never reveals whether the email or code was the problem.
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization,
+    public ResponseEntity<Void> logout(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
             @Valid @RequestBody RefreshRequest request) {
+        // Authorization is optional: a client whose access token has already
+        // expired must still be able to revoke its refresh token.
         authService.logout(authorization, request.refreshToken());
         return ResponseEntity.noContent().build();
     }

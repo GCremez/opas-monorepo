@@ -55,7 +55,11 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
                                 "/api/v1/auth/refresh", "/api/v1/auth/forgot-password",
-                                "/api/v1/auth/verify-email", "/api/v1/auth/resend-verification")
+                                "/api/v1/auth/reset-password",
+                                "/api/v1/auth/verify-email", "/api/v1/auth/resend-verification",
+                                // Logout self-authenticates via the refresh token in the body, so it
+                                // must stay reachable even after the access token expires.
+                                "/api/v1/auth/logout")
                         .permitAll().requestMatchers(HttpMethod.POST, "/api/v1/webhooks/stripe").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

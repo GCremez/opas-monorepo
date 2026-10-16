@@ -1,0 +1,15 @@
+apiVersion: 1
+
+providers:
+  - name: 'opas'
+    orgId: 1
+    folder: 'Opas'
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      # This dir is bind-mounted from ./docker/grafana/provisioning; the .json
+      # dashboards below live here alongside this provider config.
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

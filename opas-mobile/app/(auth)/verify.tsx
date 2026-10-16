@@ -77,7 +77,7 @@ export default function VerifyScreen() {
           <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/login'))} hitSlop={8} accessibilityLabel={t('common.back')}>
             <ChevronLeftIcon size={22} color={c['fg-soft']} />
           </Pressable>
-          <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">{t('auth.verify_eyebrow')}</Text>
+          <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">{t('auth.verify_eyebrow')}</Text>
         </View>
 
         <ScrollView contentContainerClassName="flex-grow px-6 pt-8" keyboardShouldPersistTaps="handled">
@@ -97,7 +97,7 @@ export default function VerifyScreen() {
             </View>
           ) : null}
 
-          <Text className="font-semibold text-[9.5px] tracking-[0.14em] uppercase text-muted mb-2">{t('auth.verify_code_label')}</Text>
+          <Text className="font-semibold text-label tracking-[0.14em] uppercase text-muted mb-2">{t('auth.verify_code_label')}</Text>
           <View className="border-b border-rule pb-2 mb-8">
             <TextInput
               ref={inputRef}

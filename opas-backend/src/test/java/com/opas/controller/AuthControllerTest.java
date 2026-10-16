@@ -86,9 +86,10 @@ class AuthControllerTest {
     @Test
     void refreshReturns200() {
         var request = new RefreshRequest("refresh-token");
-        when(authService.refresh(request)).thenReturn(new AuthResponse("new-at", "new-rt", "premium", null));
+        when(authService.refresh(request, "Bearer old-at"))
+                .thenReturn(new AuthResponse("new-at", "new-rt", "premium", null));
 
-        var response = controller.refresh(request);
+        var response = controller.refresh("Bearer old-at", request);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals("premium", response.getBody().getPlan());

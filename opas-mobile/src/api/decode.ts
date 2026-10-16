@@ -14,23 +14,46 @@ export async function startDecode(
   return data;
 }
 
+/** The backend gave up on this decode (OCR, PII scrub or AI step failed). Retryable. */
+export class DecodeFailedError extends Error {
+  constructor() {
+    super('DECODE_FAILED');
+    this.name = 'DecodeFailedError';
+  }
+}
+
 /**
- * Fetch the finished decode result. Resolves to null while the worker is still
- * running (backend answers 404); resolves to the result once it is ready.
+ * Fetch the finished decode result. Resolves to null while the worker is still running
+ * (backend answers 404) and throws DecodeFailedError once the decode has failed (422),
+ * so callers stop polling instead of waiting for a timeout.
  */
 export async function getDecodeResult(documentId: string): Promise<DecodeResult | null> {
   try {
     const { data } = await apiClient.get(`/documents/${documentId}/decode`);
     return data;
   } catch (e: unknown) {
-    if ((e as { response?: { status?: number } })?.response?.status === 404) {
-      return null;
-    }
+    const status = (e as { response?: { status?: number } })?.response?.status;
+    if (status === 404) return null;
+    if (status === 422) throw new DecodeFailedError();
     throw e;
   }
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Poll until a decode that is already running finishes (or fails / times out). */
+export async function pollDecodeResult(
+  documentId: string,
+  { intervalMs = 2000, timeoutMs = 180000 }: { intervalMs?: number; timeoutMs?: number } = {}
+): Promise<DecodeResult> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    await sleep(intervalMs);
+    const result = await getDecodeResult(documentId);
+    if (result) return result;
+  }
+  throw new Error('Decode timed out');
+}
 
 /**
  * Start a decode and poll until the result is ready. The decode itself runs in the
@@ -39,14 +62,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export async function decodeDocument(
   documentId: string,
   scrubPii = true,
-  { intervalMs = 2000, timeoutMs = 120000 }: { intervalMs?: number; timeoutMs?: number } = {}
+  options?: { intervalMs?: number; timeoutMs?: number }
 ): Promise<DecodeResult> {
   await startDecode(documentId, scrubPii);
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    await sleep(intervalMs);
-    const result = await getDecodeResult(documentId);
-    if (result) return result;
-  }
-  throw new Error('Decode timed out');
+  return pollDecodeResult(documentId, options);
 }

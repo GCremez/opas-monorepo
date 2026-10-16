@@ -15,7 +15,10 @@
     "show": "Visa",
     "hide": "Dölj",
     "see_all": "Visa alla",
-    "close": "Stäng"
+    "close": "Stäng",
+    "camera_access_needed": "Kamerans åtkomst behövs",
+    "grant_permission": "Bevilja behörighet",
+    "open_original": "Öppna originaldokumentet"
   },
   "onboarding": {
     "skip": "Hoppa över",
@@ -23,7 +26,6 @@
     "eyebrow_1": "Välkommen till Opas",
     "eyebrow_2": "Missa aldrig en tidsfrist",
     "eyebrow_3": "Allt på ett ställe",
-    "illo_caption": "skanna → guide i klarspråk",
     "next": "Nästa",
     "get_started": "Kom igång",
     "slide_1_title": "Förstå varje officiellt brev.",
@@ -31,7 +33,17 @@
     "slide_2_title": "Vet vad du ska göra — och när.",
     "slide_2_desc": "Opas hämtar varje datum och åtgärd ur dina brev och påminner dig innan något förfaller.",
     "slide_3_title": "Allt, prydligt ordnat.",
-    "slide_3_desc": "Dina dokument arkiveras per myndighet och är alltid sökbara — inget försvinner i en byrålåda igen."
+    "slide_3_desc": "Dina dokument arkiveras per myndighet och är alltid sökbara — inget försvinner i en byrålåda igen.",
+    "mini_1_row_1_label": "Rapportera inkomstförändring",
+    "mini_1_row_1_value": "9 dagar",
+    "mini_1_row_2_label": "Förlängt tillstånd",
+    "mini_1_row_2_value": "3 veckor",
+    "mini_2_row_1_label": "KELA",
+    "mini_2_row_1_value": "5 dokument",
+    "mini_2_row_2_label": "Verohallinto",
+    "mini_2_row_2_value": "3 dokument",
+    "mini_2_row_3_label": "Migri",
+    "mini_2_row_3_value": "2 · 1 förfaller"
   },
   "auth": {
     "welcome_back": "Välkommen tillbaka.",
@@ -59,10 +71,10 @@
     "registration_failed": "Kunde inte skapa konto. Försök igen.",
     "reset_eyebrow": "Återställ lösenord",
     "reset_title": "Inga problem.",
-    "reset_body": "Ange din e-postadress så skickar vi en länk för att ange ett nytt lösenord.",
-    "reset_send": "Skicka återställningslänk",
+    "reset_body": "Ange din e-postadress så skickar vi en kod för att ange ett nytt lösenord.",
+    "reset_send": "Skicka kod",
     "reset_sent_title": "Kolla din e-post.",
-    "reset_sent_body": "Om det finns ett konto för {{email}} har vi skickat en länk för att återställa lösenordet.",
+    "reset_sent_body": "Om det finns ett konto för {{email}} har vi skickat en 6-siffrig kod för att återställa lösenordet.",
     "back_to_sign_in": "Tillbaka till inloggning",
     "enter_email": "Ange din e-postadress",
     "verify_eyebrow": "Verifiera e-post",
@@ -75,7 +87,16 @@
     "verify_no_code": "Fick du den inte?",
     "verify_resend": "Skicka koden igen",
     "verify_resend_in": "Skicka igen om {{seconds}} s",
-    "verify_resent": "En ny kod är på väg om e-postadressen är registrerad."
+    "verify_resent": "En ny kod är på väg om e-postadressen är registrerad.",
+    "reset_code_label": "Återställningskod",
+    "reset_new_password_label": "Nytt lösenord",
+    "reset_new_password_placeholder": "Minst 8 tecken",
+    "reset_cta": "Ange nytt lösenord",
+    "reset_enter_code": "Ange den 6-siffriga koden",
+    "reset_password_min": "Det nya lösenordet måste vara minst 8 tecken",
+    "reset_invalid": "Koden är ogiltig eller har gått ut. Begär en ny.",
+    "reset_done_title": "Lösenordet uppdaterat.",
+    "reset_done_body": "Logga in med ditt nya lösenord."
   },
   "tabs": {
     "home": "Hem",
@@ -92,7 +113,6 @@
     "eyebrow": "Opas · Ditt register",
     "needs_you": "Kräver dig",
     "your_documents": "Dina dokument",
-    "needs_you": "Kräver dig",
     "see_all": "Visa alla →",
     "all_clear": "Allt är i ordning.",
     "one_thing": " En sak kräver dig den här veckan.",
@@ -110,18 +130,22 @@
     "empty_desc": "Skanna ditt första brev — från Kela, skatteverket, var som helst — så börjar Opas hålla ordning på det.",
     "scan_first": "Skanna ditt första dokument",
     "see_how": "Se hur Opas fungerar",
-    "welcome": "Välkommen"
+    "welcome": "Välkommen",
+    "needs_count": " {{count}} tidsfrist närmar sig.",
+    "needs_count_plural": " {{count}} tidsfrister närmar sig.",
+    "load_error_desc": "Kontrollera anslutningen och dra nedåt för att försöka igen."
   },
   "alerts": {
     "eyebrow": "Opas · Påminnelser",
     "title": "Tidsfrister &\npåminnelser.",
     "this_week": "Denna vecka",
-    "later": "Senare denna månad",
+    "later": "Senare",
     "done": "Klart",
     "no_alerts": "Inga tidsfrister",
     "no_alerts_desc": "När ett dokument har en tidsfrist visas det här.",
     "days_left": "{{count}} dgr",
-    "day_left": "{{count}} dg"
+    "day_left": "{{count}} dg",
+    "passed": "Passerade"
   },
   "home": {
     "title": "Hem",
@@ -214,7 +238,8 @@
     "step_extracting": "Hittar datum och åtgärder",
     "reading": "Läser ditt brev…",
     "please_wait": "Vänta",
-    "privacy_note": "Ditt dokument lämnar aldrig din kontroll. Personuppgifter döljs innan något läses."
+    "privacy_note": "Ditt dokument lämnar aldrig din kontroll. Personuppgifter döljs innan något läses.",
+    "grant_permission_desc": "Bevilja kamerans åtkomst i inställningarna för att kunna skanna dokument."
   },
   "documents": {
     "title": "Dokument",
@@ -367,7 +392,21 @@
     "email": "E-post",
     "not_decoded": "Detta dokument har inte analyserats ännu.",
     "uploaded_on": "Uppladdad",
-    "draft_letter": "Utkast till svar"
+    "draft_letter": "Utkast till svar",
+    "analyze": "Analysera",
+    "decode_failed": "Vi kunde inte analysera dokumentet.",
+    "decode_failed_hint": "Se till att hela sidan syns och att texten är skarp, och försök igen. Det här försöket räknades inte.",
+    "issued": "Daterat {{date}}",
+    "no_summary": "Ingen sammanfattning tillgänglig.",
+    "key_details": "Viktiga uppgifter",
+    "preview_unavailable": "Den här filtypen kan inte förhandsgranskas. Öppna originalet för att se det.",
+    "days_to_deadline": "dagar till sista dag",
+    "date_passed": "Passerat",
+    "due_today": "Förfaller i dag",
+    "days_left": "{{count}} dag kvar",
+    "days_left_plural": "{{count}} dagar kvar",
+    "no_dates": "Dokumentet anger inga datum eller tidsfrister.",
+    "more": "Fler alternativ"
   },
   "draftLetter": {
     "title": "Utkast till brev",
@@ -398,8 +437,7 @@
     "feature_ai": "AI extraherar deadlines och instruktioner på klarspråk",
     "feature_organize": "Auto-sorterat i mappar med deadline-påminnelser",
     "premium": "Premium",
-    "upgrade_note": "Uppgradera från din profil när du är redo",
-    "demo": "Fortsätt som gäst"
+    "upgrade_note": "Uppgradera från din profil när du är redo"
   },
   "subscription": {
     "title": "Allt,\nfixat.",
@@ -421,5 +459,13 @@
     "save_yearly": "Spara 20% per år",
     "free_trial": "Starta 7 dagars gratis provperiod",
     "trial_note": "Sedan 4,99 €/månad. Avsluta när som helst."
+  },
+  "status": {
+    "pending": "Laddas upp",
+    "uploaded": "Inte analyserat",
+    "processing": "Analyseras",
+    "ready": "Läst",
+    "failed": "Misslyckades",
+    "archived": "Arkiverat"
   }
 }

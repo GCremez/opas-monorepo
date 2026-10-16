@@ -2,6 +2,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { apiClient } from '../api/client';
+import { track } from '../lib/analytics';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -27,6 +28,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
   }
 
   if (finalStatus !== 'granted') {
+    track('push_denied', { platform: Platform.OS });
     return null;
   }
 
@@ -50,6 +52,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
 
   try {
     await apiClient.post('/push/register', { token, platform: Platform.OS });
+    track('push_registered', { platform: Platform.OS });
   } catch {
     // Token will be retried on next app launch
   }

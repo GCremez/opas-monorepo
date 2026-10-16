@@ -3,12 +3,11 @@ package com.opas.controller;
 import com.opas.service.IdempotencyService;
 import com.opas.service.StripeWebhookService;
 import com.stripe.model.Event;
-import jakarta.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
 import java.time.Duration;
-import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,22 +23,16 @@ public class WebhookController {
         this.idempotencyService = idempotencyService;
     }
 
-    @SuppressWarnings("null")
     @PostMapping("/stripe")
-    public ResponseEntity<Void> handleStripeWebhook(HttpServletRequest request) {
-        String payload;
-        try (BufferedReader reader = request.getReader()) {
-            payload = reader.lines().collect(Collectors.joining());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        String sigHeader = request.getHeader("Stripe-Signature");
+    public ResponseEntity<Void> handleStripeWebhook(
+            // The exact bytes Stripe signed. Re-assembling the body line by line drops the
+            // newlines of Stripe's pretty-printed JSON and every signature check fails.
+            @RequestBody String payload,
+            @RequestHeader(value = "Stripe-Signature", required = false) String sigHeader) {
         if (sigHeader == null || sigHeader.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
 
-        @SuppressWarnings("null")
         Event event = stripeWebhookService.verifySignature(payload, sigHeader);
 
         // Claim the event atomically BEFORE handling it. Stripe delivers at-least-once

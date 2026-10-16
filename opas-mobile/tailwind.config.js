@@ -42,9 +42,11 @@ module.exports = {
         prose:    ['16px', { lineHeight: '26px' }],
         body:     ['15px', { lineHeight: '22px' }],
         'body-sm':['13px', { lineHeight: '19px' }],
-        label:    ['10.5px', { lineHeight: '14px', letterSpacing: '0.18em' }],
+        // Floor for UI text is 11.5px (tracked caps) / 12px — smaller is unreadable for many
+        // users and ignores the accessibility text-size settings people rely on.
+        label:    ['11.5px', { lineHeight: '15px', letterSpacing: '0.14em' }],
         data:     ['13px', { lineHeight: '18px' }],
-        meta:     ['11px', { lineHeight: '15px', letterSpacing: '0.05em' }],
+        meta:     ['12px', { lineHeight: '16px', letterSpacing: '0.04em' }],
       },
       borderRadius: {
         sm: '8px', md: '12px', lg: '18px', xl: '24px', pill: '999px',
