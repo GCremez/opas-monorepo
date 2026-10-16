@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, Dimensions, Pressable, FlatList } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as SecureStore from 'expo-secure-store';
 import { useThemeColors } from '../../src/store/themeStore';
+import { useAuthStore } from '../../src/store/authStore';
 
 const { width } = Dimensions.get('window');
 
@@ -87,6 +88,24 @@ export default function OnboardingScreen() {
 
   const isLast = index === slides.length - 1;
 
+  // The app opens here on every launch, so this screen decides where people belong:
+  // a signed-in user goes straight to their record, and someone who has already been
+  // through onboarding goes to sign in. Only first-time visitors see the slides.
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [routeChecked, setRouteChecked] = useState(false);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(tabs)');
+      return;
+    }
+    SecureStore.getItemAsync('has_seen_onboarding')
+      .then((seen) => {
+        if (seen === 'true') router.replace('/(auth)/welcome');
+        else setRouteChecked(true);
+      })
+      .catch(() => setRouteChecked(true));
+  }, [isAuthenticated, router]);
+
   const complete = async () => {
     await SecureStore.setItemAsync('has_seen_onboarding', 'true');
     router.replace('/(auth)/welcome');
@@ -100,6 +119,10 @@ export default function OnboardingScreen() {
   const onViewable = useRef(({ viewableItems }: { viewableItems: { index: number | null }[] }) => {
     if (viewableItems[0]?.index != null) setIndex(viewableItems[0].index);
   }).current;
+
+  if (!routeChecked) {
+    return <View className="flex-1 bg-bg" />;
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>

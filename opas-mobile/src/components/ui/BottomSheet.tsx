@@ -21,12 +21,15 @@ interface BottomSheetProps {
   title?: string;
   actions: BottomSheetAction[];
   onClose: () => void;
+  /** iOS: fires once the sheet has fully slid away. Present another screen from here,
+   *  not from an action's onPress — iOS drops a presentation made mid-dismiss. */
+  onDismiss?: () => void;
 }
 
-export function BottomSheet({ visible, title, actions, onClose }: BottomSheetProps) {
+export function BottomSheet({ visible, title, actions, onClose, onDismiss }: BottomSheetProps) {
   const insets = useSafeAreaInsets();
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} onDismiss={onDismiss}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <TouchableWithoutFeedback>

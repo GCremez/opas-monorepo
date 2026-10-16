@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { toDecodeView } from '../../src/lib/decodeView';
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Animated, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, Animated, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -147,8 +147,21 @@ export default function ScanScreen() {
     }
   };
 
-  const handlePickFromGallery = async () => {
+  // The picker has to wait for the sheet to finish closing: on iOS, presenting it while
+  // the sheet's modal is still animating away is silently ignored and nothing opens.
+  const galleryPendingRef = useRef(false);
+  const handleGalleryChosen = () => {
+    galleryPendingRef.current = true;
     setGalleryOpen(false);
+    if (Platform.OS !== 'ios') openGalleryIfPending();
+  };
+  const openGalleryIfPending = () => {
+    if (!galleryPendingRef.current) return;
+    galleryPendingRef.current = false;
+    handlePickFromGallery();
+  };
+
+  const handlePickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       quality: 0.8,
@@ -345,11 +358,12 @@ export default function ScanScreen() {
       <BottomSheet
         visible={galleryOpen}
         onClose={() => setGalleryOpen(false)}
+        onDismiss={openGalleryIfPending}
         actions={[
           {
-            icon: <GalleryIcon size={22} color="rgba(255,255,255,.7)" />,
+            icon: <GalleryIcon size={22} color={c['fg-soft']} />,
             label: t('scan.gallery'),
-            onPress: handlePickFromGallery,
+            onPress: handleGalleryChosen,
           },
         ]}
       />
