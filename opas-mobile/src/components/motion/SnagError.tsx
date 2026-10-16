@@ -111,7 +111,7 @@ export function SnagError({
 
       <View className="flex-row gap-2">
         <Pressable onPress={onPrimary} className="rounded-[9px] px-3.5 py-2" style={{ backgroundColor: c.accent }}>
-          <Text className="font-body font-semibold text-[9px] tracking-[0.14em] uppercase" style={{ color: c['on-accent'] }}>
+          <Text className="font-body font-semibold text-label tracking-[0.14em] uppercase" style={{ color: c['on-accent'] }}>
             {primaryLabel}
           </Text>
         </Pressable>
@@ -120,7 +120,7 @@ export function SnagError({
           className="rounded-[9px] px-3.5 py-2"
           style={{ borderWidth: 1, borderColor: `${c.muted}55` }}
         >
-          <Text className="font-body font-semibold text-[9px] tracking-[0.14em] uppercase" style={{ color: c['fg-soft'] }}>
+          <Text className="font-body font-semibold text-label tracking-[0.14em] uppercase" style={{ color: c['fg-soft'] }}>
             {secondaryLabel}
           </Text>
         </Pressable>

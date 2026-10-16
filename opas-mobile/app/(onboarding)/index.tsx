@@ -11,7 +11,7 @@ import { useThemeColors } from '../../src/store/themeStore';
 const { width } = Dimensions.get('window');
 
 // Diagonal "paper" striping for the slide-1 illustration panel (design 2d).
-function StripePanel({ caption, color, line }: { caption: string; color: string; line: string }) {
+function StripePanel({ color, line }: { color: string; line: string }) {
   const W = 320, H = 170, gap = 18;
   const lines = [];
   for (let x = -H; x < W; x += gap) {
@@ -22,7 +22,6 @@ function StripePanel({ caption, color, line }: { caption: string; color: string;
       <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ position: 'absolute' }}>
         {lines}
       </Svg>
-      <Text className="font-mono text-[10px] tracking-[0.08em]" style={{ color }}>[ {caption} ]</Text>
     </View>
   );
 }
@@ -33,7 +32,7 @@ function MiniLedger({ rows }: { rows: { label: string; value: string; tone: stri
       {rows.map((r, i) => (
         <View key={r.label} className={`flex-row items-center justify-between py-2.5${i < rows.length - 1 ? ' border-b border-hairline' : ''}`}>
           <Text className="font-serif text-[14px] text-fg">{r.label}</Text>
-          <Text className={`font-mono text-[10px] tracking-[0.05em] uppercase ${r.tone}`}>{r.value}</Text>
+          <Text className={`font-mono text-label tracking-[0.05em] uppercase ${r.tone}`}>{r.value}</Text>
         </View>
       ))}
     </View>
@@ -53,7 +52,7 @@ export default function OnboardingScreen() {
       eyebrow: t('onboarding.eyebrow_1'),
       title: t('onboarding.slide_1_title'),
       desc: t('onboarding.slide_1_desc'),
-      illo: <StripePanel caption={t('onboarding.illo_caption')} color={c.muted} line={c['surface-2']} />,
+      illo: <StripePanel color={c.muted} line={c['surface-2']} />,
     },
     {
       key: 'dates',
@@ -63,8 +62,8 @@ export default function OnboardingScreen() {
       illo: (
         <MiniLedger
           rows={[
-            { label: 'Report income change', value: '9 days', tone: 'text-danger' },
-            { label: 'Extend permit', value: '3 weeks', tone: 'text-warning' },
+            { label: t('onboarding.mini_1_row_1_label'), value: t('onboarding.mini_1_row_1_value'), tone: 'text-danger' },
+            { label: t('onboarding.mini_1_row_2_label'), value: t('onboarding.mini_1_row_2_value'), tone: 'text-warning' },
           ]}
         />
       ),
@@ -77,9 +76,9 @@ export default function OnboardingScreen() {
       illo: (
         <MiniLedger
           rows={[
-            { label: 'KELA', value: '5 docs', tone: 'text-muted' },
-            { label: 'Verohallinto', value: '3 docs', tone: 'text-muted' },
-            { label: 'Migri', value: '2 · 1 due', tone: 'text-warning' },
+            { label: t('onboarding.mini_2_row_1_label'), value: t('onboarding.mini_2_row_1_value'), tone: 'text-muted' },
+            { label: t('onboarding.mini_2_row_2_label'), value: t('onboarding.mini_2_row_2_value'), tone: 'text-muted' },
+            { label: t('onboarding.mini_2_row_3_label'), value: t('onboarding.mini_2_row_3_value'), tone: 'text-warning' },
           ]}
         />
       ),
@@ -106,12 +105,12 @@ export default function OnboardingScreen() {
     <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
       {/* Fixed header: step counter + skip */}
       <View className="flex-row items-center justify-between px-6 pt-2.5">
-        <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">
+        <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">
           {t('onboarding.step', { n: index + 1 })}
         </Text>
         {!isLast && (
           <Pressable onPress={complete} hitSlop={8}>
-            <Text className="font-semibold text-[10px] tracking-[0.13em] uppercase text-muted">{t('onboarding.skip')}</Text>
+            <Text className="font-semibold text-label tracking-[0.13em] uppercase text-muted">{t('onboarding.skip')}</Text>
           </Pressable>
         )}
       </View>
@@ -130,7 +129,7 @@ export default function OnboardingScreen() {
         renderItem={({ item }) => (
           <View style={{ width }} className="flex-1 justify-center px-[30px]">
             {item.illo}
-            <Text className="font-semibold text-[10px] tracking-[0.18em] uppercase text-accent mb-3.5">{item.eyebrow}</Text>
+            <Text className="font-semibold text-label tracking-[0.18em] uppercase text-accent mb-3.5">{item.eyebrow}</Text>
             <Text className="font-display text-[34px] leading-[37px] tracking-[-0.01em] text-fg">{item.title}</Text>
             <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mt-4">{item.desc}</Text>
           </View>
@@ -158,7 +157,7 @@ export default function OnboardingScreen() {
               ))}
             </View>
             <Pressable onPress={next} className="bg-accent rounded-pill px-6 py-3 min-h-touch items-center justify-center">
-              <Text className="font-semibold text-[11px] tracking-[0.08em] uppercase text-on-accent">{t('onboarding.next')} →</Text>
+              <Text className="font-semibold text-label tracking-[0.08em] uppercase text-on-accent">{t('onboarding.next')} →</Text>
             </Pressable>
           </View>
         )}

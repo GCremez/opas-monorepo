@@ -34,9 +34,9 @@ export default function ApplicationScreen() {
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View className="px-6 pt-3 pb-5">
-          <Text className="font-semibold text-[10px] tracking-[0.16em] uppercase text-muted">{APP.authority}</Text>
+          <Text className="font-semibold text-label tracking-[0.16em] uppercase text-muted">{APP.authority}</Text>
           <Text className="font-display text-[27px] leading-[30px] tracking-[-0.01em] text-fg mt-2">{APP.title}</Text>
-          <Text className="font-mono text-[10px] tracking-[0.05em] text-muted mt-2.5">{APP.meta}</Text>
+          <Text className="font-mono text-meta tracking-[0.05em] text-muted mt-2.5">{APP.meta}</Text>
         </View>
 
         {/* Status timeline */}
@@ -56,13 +56,13 @@ export default function ApplicationScreen() {
                       borderWidth: s.state === 'future' ? 2 : 0, borderColor: c.rule,
                     }}
                   >
-                    {s.state === 'done' && <Text className="text-on-accent text-[10px] font-semibold">✓</Text>}
+                    {s.state === 'done' && <Text className="text-on-accent text-meta font-semibold">✓</Text>}
                   </View>
                   {!isLast && <View className="flex-1 w-0.5 my-1" style={{ backgroundColor: c.hairline }} />}
                 </View>
                 <View className="flex-1 pb-6">
                   <Text className={`font-display text-[16px] ${s.state === 'future' ? 'text-fg-soft' : 'text-fg'}`}>{s.label}</Text>
-                  <Text className={`font-mono text-[10px] tracking-[0.04em] mt-1 ${metaTone}`}>{s.meta}</Text>
+                  <Text className={`font-mono text-meta tracking-[0.04em] mt-1 ${metaTone}`}>{s.meta}</Text>
                 </View>
               </View>
             );

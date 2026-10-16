@@ -57,7 +57,7 @@ export default function DraftLetterScreen() {
       <TouchableOpacity onPress={() => router.back()} hitSlop={8} accessibilityLabel={t('common.back')}>
         <ChevronLeftIcon size={22} color={c['fg-soft']} />
       </TouchableOpacity>
-      <Text className="font-semibold text-[9.5px] tracking-[0.16em] uppercase text-muted flex-1 text-center" numberOfLines={1}>
+      <Text className="font-semibold text-label tracking-[0.16em] uppercase text-muted flex-1 text-center" numberOfLines={1}>
         {title}
       </Text>
       <View className="w-6" />
@@ -98,7 +98,7 @@ export default function DraftLetterScreen() {
                     onPress={() => setTone(tn)}
                     className={`flex-1 rounded-md border py-3 items-center ${active ? 'bg-accent border-accent' : 'border-rule'}`}
                   >
-                    <Text className={`font-semibold text-[11px] tracking-[0.06em] uppercase ${active ? 'text-on-accent' : 'text-fg-soft'}`}>
+                    <Text className={`font-semibold text-label tracking-[0.06em] uppercase ${active ? 'text-on-accent' : 'text-fg-soft'}`}>
                       {t(`draftLetter.tone_${tn}`)}
                     </Text>
                   </Pressable>
@@ -108,7 +108,7 @@ export default function DraftLetterScreen() {
 
             <TouchableOpacity onPress={() => setIncludeOriginal(!includeOriginal)} className="flex-row items-center gap-3 py-3">
               <View className={`w-5 h-5 rounded-sm border items-center justify-center ${includeOriginal ? 'bg-accent border-accent' : 'border-rule'}`}>
-                {includeOriginal && <Text className="text-on-accent text-[11px] font-semibold">✓</Text>}
+                {includeOriginal && <Text className="text-on-accent text-meta font-semibold">✓</Text>}
               </View>
               <Text className="font-body text-body text-fg">{t('draftLetter.include_details')}</Text>
             </TouchableOpacity>

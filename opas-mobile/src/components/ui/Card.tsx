@@ -39,7 +39,7 @@ export function Card({ badge, title, description, meta, interactive, onPress, ch
       {description && (
         <Text className="font-serif text-prose text-fg-soft mb-2">{description}</Text>
       )}
-      {meta && <Text className="font-mono text-[11px] text-muted">{meta}</Text>}
+      {meta && <Text className="font-mono text-meta text-muted">{meta}</Text>}
       {children}
     </>
   );
@@ -79,7 +79,7 @@ export function DocCard({ title, subtitle, deadline, deadlineUrgent, badge: badg
       >
         <View className="flex-1 min-w-0">
           <Text className="font-medium text-body text-fg" numberOfLines={1}>{title}</Text>
-          <Text className="font-mono text-[10px] tracking-[0.04em] uppercase text-muted mt-1" numberOfLines={1}>{subtitle}</Text>
+          <Text className="font-mono text-label tracking-[0.04em] uppercase text-muted mt-1" numberOfLines={1}>{subtitle}</Text>
         </View>
         {deadline && (
           <Text className={`font-mono-medium text-data ${deadlineUrgent ? 'text-danger' : 'text-warning'}`}>

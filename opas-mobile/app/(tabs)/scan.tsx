@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { toDecodeView } from '../../src/lib/decodeView';
 import { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Animated, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,6 +15,7 @@ import { Button } from '../../src/components/ui/Button';
 import { useDocumentStore } from '../../src/store/documentStore';
 import { useToast } from '../../src/components/ui/ToastProvider';
 import { useThemeColors } from '../../src/store/themeStore';
+import { track } from '../../src/lib/analytics';
 
 type ScanState = 'ready' | 'scanning' | 'processing' | 'success' | 'error';
 
@@ -38,10 +40,10 @@ function ScanProgress({ filename }: { filename?: string }) {
 
   return (
     <View className="w-full px-8">
-      <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted">
+      <Text className="font-mono text-label tracking-[0.05em] uppercase text-muted">
         {(filename ?? 'document').toUpperCase()}
       </Text>
-      <Text className="font-semibold text-[10px] tracking-[0.18em] uppercase text-muted mt-6">{t('scan.please_wait')}</Text>
+      <Text className="font-semibold text-label tracking-[0.18em] uppercase text-muted mt-6">{t('scan.please_wait')}</Text>
       <Text className="font-display text-[27px] leading-[30px] tracking-[-0.01em] text-fg mt-2 mb-8">{t('scan.reading')}</Text>
 
       {STEPS.map((step, i) => {
@@ -107,10 +109,13 @@ export default function ScanScreen() {
     if (!cameraRef.current) return;
     cancelledRef.current = false;
     setState('scanning');
+    track('scan_started', { source: 'camera' });
+    const startedAt = Date.now();
 
     try {
       const photo = await cameraRef.current.takePictureAsync({ quality: 0.8 });
       if (!photo || cancelledRef.current) return;
+      track('scan_photo_captured');
 
       setState('processing');
       const result = await uploadAndDecode(
@@ -122,19 +127,22 @@ export default function ScanScreen() {
 
       if (result) {
         setLastResult({
-          name: `Document #${result.documentId.slice(0, 8)}`,
+          name: toDecodeView(result)?.title ?? t('scan.document_decoded'),
           meta: t('scan.document_decoded'),
         });
         showToast(t('scan.document_decoded'));
         setState('success');
+        track('scan_completed', { document_id: result.documentId, duration_ms: Date.now() - startedAt });
       } else {
         showToast(t('scan.scan_failed_desc'));
         setState('error');
+        track('scan_failed', { error: 'decode_returned_null', stage: 'decode' });
       }
     } catch {
       if (!cancelledRef.current) {
         showToast(t('scan.scan_failed_desc'));
         setState('error');
+        track('scan_failed', { error: 'capture_exception', stage: 'capture' });
       }
     }
   };
@@ -142,12 +150,15 @@ export default function ScanScreen() {
   const handlePickFromGallery = async () => {
     setGalleryOpen(false);
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: 0.8,
     });
     if (result.canceled || !result.assets[0]) return;
     cancelledRef.current = true;
     const asset = result.assets[0];
+    track('scan_started', { source: 'gallery' });
+    track('scan_gallery_pick');
+    const startedAt = Date.now();
 
     setState('processing');
     const uploadResult = await uploadAndDecode(
@@ -157,18 +168,21 @@ export default function ScanScreen() {
     );
     if (uploadResult) {
       setLastResult({
-        name: `Document #${uploadResult.documentId.slice(0, 8)}`,
+        name: toDecodeView(uploadResult)?.title ?? asset.fileName ?? t('scan.document_decoded'),
         meta: t('scan.document_decoded'),
       });
       setState('success');
+      track('scan_completed', { document_id: uploadResult.documentId, duration_ms: Date.now() - startedAt });
     } else {
       setState('error');
+      track('scan_failed', { error: 'decode_returned_null', stage: 'decode' });
     }
   };
 
   const handleCancel = () => {
     cancelledRef.current = true;
     setState('ready');
+    track('scan_cancelled', { at_state: state });
   };
 
   const handleClose = () => {
@@ -190,9 +204,9 @@ export default function ScanScreen() {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="font-display text-title text-fg text-center mb-2">Camera access needed</Text>
-          <Text className="font-serif text-prose text-fg-soft text-center mb-6">Grant camera access in Settings to scan documents.</Text>
-          <Button variant="primary" onPress={requestPermission}>Grant permission</Button>
+          <Text className="font-display text-title text-fg text-center mb-2">{t('common.camera_access_needed')}</Text>
+          <Text className="font-serif text-prose text-fg-soft text-center mb-6">{t('scan.grant_permission_desc')}</Text>
+          <Button variant="primary" onPress={requestPermission}>{t('common.grant_permission')}</Button>
         </View>
       </SafeAreaView>
     );
@@ -257,7 +271,7 @@ export default function ScanScreen() {
             {t('scan.document_decoded')}
           </Text>
           {lastResult && (
-            <Text className="font-mono text-[11px] text-muted text-center mb-6">
+            <Text className="font-mono text-meta text-muted text-center mb-6">
               {lastResult.name}
             </Text>
           )}
@@ -316,7 +330,7 @@ export default function ScanScreen() {
             onPress={() => setFlashOn(!flashOn)}
             className="w-[52px] h-[52px] rounded-full bg-[rgba(28,28,30,.6)] border border-[rgba(255,255,255,.1)] items-center justify-center"
           >
-            <FlashIcon size={20} color={flashOn ? '#8fbb9f' : 'rgba(255,255,255,.7)'} />
+            <FlashIcon size={20} color={flashOn ? c.accent : 'rgba(255,255,255,.7)'} />
           </Pressable>
           <Pressable
             onPress={handleCapture}

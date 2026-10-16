@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { documentName } from '../../src/lib/decodeView';
 import { useState, useRef, useMemo } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,25 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { SearchIcon, XIcon } from '../../src/components/icons';
 import { useDocumentStore } from '../../src/store/documentStore';
-import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
 
 type Authority = 'all' | 'kela' | 'vero' | 'migri' | 'suomi';
-
-type RecentDoc = { id: string; name: string; meta: string; authority: Authority };
-
-const recentDocs: RecentDoc[] = [
-  { id: 'sample-1', name: 'KELA — Housing Benefit', meta: '2H', authority: 'kela' },
-  { id: 'sample-2', name: 'Tax Card 2025', meta: '1D', authority: 'vero' },
-  { id: 'sample-3', name: 'Residence Permit Extension', meta: '3D', authority: 'migri' },
-  { id: 'sample-4', name: 'Finnish Tax Decision 2024', meta: '1W', authority: 'vero' },
-];
-
-const TOPICS = [
-  { key: 'housing', label: 'Housing & benefits', count: '4 DOCS' },
-  { key: 'taxes', label: 'Taxes', count: '3 DOCS' },
-  { key: 'residence', label: 'Residence & permits', count: '2 DOCS' },
-];
 
 const AUTHORITIES: { key: Authority; labelKey: string }[] = [
   { key: 'all', labelKey: 'search.filters.all' },
@@ -39,36 +24,36 @@ export default function SearchScreen() {
   const c = useThemeColors();
   const inputRef = useRef<TextInput>(null);
   const { documents } = useDocumentStore();
-  const { isDemo } = useAuthStore();
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<Authority>('all');
+
+  const toRow = (d: (typeof documents)[number]) => ({
+    id: d.id,
+    name: documentName(d),
+    meta: (d.authority ?? t(`status.${d.status}`)).toUpperCase(),
+  });
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    const fromReal = documents.filter((d) => {
-      const matchesQuery = d.filename.toLowerCase().includes(q);
-      const matchesFilter = activeFilter === 'all' || d.filename.toLowerCase().includes(activeFilter);
-      return matchesQuery && matchesFilter;
-    });
-    if (fromReal.length > 0) return fromReal.map((d) => ({ id: d.id, name: d.filename, meta: d.status.toUpperCase() }));
-    if (!isDemo) return [];
-    return recentDocs.filter((d) => {
-      const matchesQuery = d.name.toLowerCase().includes(q);
-      const matchesFilter = activeFilter === 'all' || d.authority === activeFilter;
-      return matchesQuery && matchesFilter;
-    });
-  }, [query, documents, activeFilter, isDemo]);
+    return documents.filter((d) => {
+      // Match what the user sees — decoded title and sender — not just the upload filename.
+      const haystack = [d.title, d.authority, d.filename].filter(Boolean).join(' ').toLowerCase();
+      const matchesFilter = activeFilter === 'all' || (d.authority ?? '').toLowerCase().includes(activeFilter);
+      return haystack.includes(q) && matchesFilter;
+    }).map(toRow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, documents, activeFilter]);
 
   const recent = useMemo(() => {
-    if (isDemo) return activeFilter === 'all' ? recentDocs : recentDocs.filter((d) => d.authority === activeFilter);
-    return documents.slice(0, 6).map((d) => ({ id: d.id, name: d.filename, meta: d.status.toUpperCase() }));
-  }, [isDemo, documents, activeFilter]);
+    return documents.slice(0, 6).map(toRow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documents]);
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
       <View className="px-6 pt-3">
-        <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">
+        <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">
           Opas · {t('tabs.search')}
         </Text>
 
@@ -101,7 +86,7 @@ export default function SearchScreen() {
                 onPress={() => setActiveFilter(auth.key)}
                 className={`rounded-pill px-3 py-1.5 border ${active ? 'bg-accent border-accent' : 'border-rule'}`}
               >
-                <Text className={`font-semibold text-[9.5px] tracking-[0.11em] uppercase ${active ? 'text-on-accent' : 'text-fg-soft'}`}>
+                <Text className={`font-semibold text-label tracking-[0.11em] uppercase ${active ? 'text-on-accent' : 'text-fg-soft'}`}>
                   {t(auth.labelKey)}
                 </Text>
               </Pressable>
@@ -124,7 +109,7 @@ export default function SearchScreen() {
                   className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
                 >
                   <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{doc.name}</Text>
-                  <Text className="font-mono text-[10px] text-muted">{doc.meta}</Text>
+                  <Text className="font-mono text-meta text-muted">{doc.meta}</Text>
                 </Pressable>
               ))}
             </View>
@@ -136,19 +121,6 @@ export default function SearchScreen() {
           )
         ) : (
           <>
-            {/* Browse by topic (demo) */}
-            {isDemo && (
-              <View className="px-6 mt-8">
-                <Text className="font-semibold text-label uppercase text-fg pb-2.5 border-b border-rule">Browse by topic</Text>
-                {TOPICS.map((topic) => (
-                  <Pressable key={topic.key} className="flex-row items-baseline justify-between py-3.5 border-b border-hairline">
-                    <Text className="font-display text-heading text-fg">{topic.label}</Text>
-                    <Text className="font-mono text-[11px] text-muted">{topic.count} ›</Text>
-                  </Pressable>
-                ))}
-              </View>
-            )}
-
             {/* Recent */}
             {recent.length > 0 && (
               <View className="px-6 mt-8">
@@ -156,7 +128,7 @@ export default function SearchScreen() {
                   <Text className="font-semibold text-label uppercase text-fg">{t('search.recent')}</Text>
                   {activeFilter !== 'all' && (
                     <Pressable onPress={() => setActiveFilter('all')}>
-                      <Text className="font-semibold text-[10px] tracking-[0.14em] uppercase text-muted">{t('search.show_all')}</Text>
+                      <Text className="font-semibold text-label tracking-[0.14em] uppercase text-muted">{t('search.show_all')}</Text>
                     </Pressable>
                   )}
                 </View>
@@ -167,13 +139,13 @@ export default function SearchScreen() {
                     className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
                   >
                     <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{doc.name}</Text>
-                    <Text className="font-mono text-[10px] text-muted">{doc.meta}</Text>
+                    <Text className="font-mono text-meta text-muted">{doc.meta}</Text>
                   </Pressable>
                 ))}
               </View>
             )}
 
-            {!isDemo && recent.length === 0 && (
+            {recent.length === 0 && (
               <View className="items-center pt-20 px-8">
                 <Text className="font-display text-title text-fg mb-2">{t('search.empty_title')}</Text>
                 <Text className="font-serif text-prose text-fg-soft text-center">{t('search.empty_desc')}</Text>

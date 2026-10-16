@@ -90,7 +90,7 @@ export default function SubscriptionScreen() {
 
         {/* Masthead */}
         <View className="px-6 pt-2 pb-6">
-          <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-accent">{t('subscription.premium_eyebrow')}</Text>
+          <Text className="font-semibold text-label tracking-[0.20em] uppercase text-accent">{t('subscription.premium_eyebrow')}</Text>
           <Text className="font-display text-[32px] leading-[35px] tracking-[-0.01em] text-fg mt-2.5">{t('subscription.title')}</Text>
         </View>
 
@@ -99,14 +99,14 @@ export default function SubscriptionScreen() {
           <View className="flex-row items-end justify-between">
             <Text className="font-display text-[44px] leading-[44px] text-fg">
               {price.amount}
-              <Text className="font-mono text-[11px] tracking-[0.05em] uppercase text-muted"> {price.period}</Text>
+              <Text className="font-mono text-label tracking-[0.05em] uppercase text-muted"> {price.period}</Text>
             </Text>
           </View>
           <Pressable
             onPress={() => setInterval((iv) => (iv === 'monthly' ? 'yearly' : 'monthly'))}
             className={`self-start mt-3 rounded-pill border px-3 py-1.5 ${interval === 'yearly' ? 'bg-accent border-accent' : 'border-rule'}`}
           >
-            <Text className={`font-semibold text-[9.5px] tracking-[0.11em] uppercase ${interval === 'yearly' ? 'text-on-accent' : 'text-accent'}`}>
+            <Text className={`font-semibold text-label tracking-[0.11em] uppercase ${interval === 'yearly' ? 'text-on-accent' : 'text-accent'}`}>
               {t('subscription.save_yearly')}
             </Text>
           </Pressable>

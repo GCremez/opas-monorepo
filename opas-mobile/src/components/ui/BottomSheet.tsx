@@ -51,7 +51,7 @@ export function BottomSheet({ visible, title, actions, onClose }: BottomSheetPro
                     {action.label}
                   </Text>
                   {action.description && (
-                    <Text className="font-mono text-[11px] text-muted text-right">{action.description}</Text>
+                    <Text className="font-mono text-meta text-muted text-right">{action.description}</Text>
                   )}
                 </TouchableOpacity>
               ))}

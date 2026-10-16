@@ -12,6 +12,11 @@ import { useDocumentStore } from '../../src/store/documentStore';
 import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { usePremium } from '../../src/hooks/usePremium';
 import { useThemeColors } from '../../src/store/themeStore';
+import { track } from '../../src/lib/analytics';
+import { collectDeadlines, documentName, formatDate } from '../../src/lib/decodeView';
+
+// "Needs you" covers deadlines stated in the user's documents within this many days.
+const NEEDS_YOU_WINDOW_DAYS = 14;
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -27,7 +32,7 @@ function SectionHeader({ title, onSeeAll, seeAllLabel }: { title: string; onSeeA
       <Text className="font-semibold text-label uppercase text-fg">{title}</Text>
       {onSeeAll && (
         <Pressable onPress={onSeeAll} accessibilityRole="button">
-          <Text className="font-semibold text-[10px] tracking-[0.14em] uppercase text-muted">{seeAllLabel}</Text>
+          <Text className="font-semibold text-label tracking-[0.14em] uppercase text-muted">{seeAllLabel}</Text>
         </Pressable>
       )}
     </View>
@@ -51,11 +56,11 @@ function ActionRow({
     >
       <View className="flex-1">
         <Text className="font-display text-heading text-fg" numberOfLines={1}>{title}</Text>
-        <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted mt-1">{meta}</Text>
+        <Text className="font-mono text-label tracking-[0.05em] uppercase text-muted mt-1">{meta}</Text>
       </View>
       <View className="items-end">
         <Text className={`font-mono-medium text-data ${tone}`}>{date}</Text>
-        <Text className={`font-semibold text-[9px] tracking-[0.11em] uppercase mt-1 ${tone}`}>{note}</Text>
+        <Text className={`font-semibold text-label tracking-[0.11em] uppercase mt-1 ${tone}`}>{note}</Text>
       </View>
     </Pressable>
   );
@@ -77,24 +82,11 @@ function DocRow({
       <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{name}</Text>
       <View className="flex-row items-baseline gap-2.5">
         <Text className={`font-mono-medium text-data ${valueTone}`}>{value}</Text>
-        <Text className="font-mono text-[10px] tracking-[0.04em] text-muted">{age}</Text>
+        <Text className="font-mono text-meta tracking-[0.04em] text-muted">{age}</Text>
       </View>
     </Pressable>
   );
 }
-
-// The nearest deadline the home surfaces under "Needs you" — mirrors the Alerts
-// THIS WEEK ledger so the masthead's "one thing needs you" promise has a payoff.
-const NEEDS_YOU = [
-  {
-    id: 'sample-3',
-    title: 'Extend residence permit',
-    meta: 'MIGRI',
-    date: '30 JUN',
-    note: '9 DAYS',
-    urgency: 'danger' as const,
-  },
-];
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -105,7 +97,7 @@ function timeAgo(iso: string): string {
 }
 
 export default function RecordScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { documents, loading, error, fetchDocuments, clearError } = useDocumentStore();
@@ -119,12 +111,25 @@ export default function RecordScreen() {
     fetchUsage();
   }, []);
 
+  // Fire documents_list_viewed once, after the first load settles (mount count is
+  // always 0). Guard so pull-to-refresh doesn't re-emit it.
+  const listViewed = React.useRef(false);
+  useEffect(() => {
+    if (!loading && !error && !listViewed.current) {
+      listViewed.current = true;
+      track('documents_list_viewed', { count: documents.length, is_free: isFree });
+    }
+  }, [loading, error, documents.length, isFree]);
+
   const onRefresh = useCallback(() => {
     fetchDocuments();
   }, [fetchDocuments]);
 
   const hasDocuments = documents.length > 0;
   const docCount = documents.length;
+  const needsYou = collectDeadlines(documents)
+    .filter((item) => item.days >= 0 && item.days <= NEEDS_YOU_WINDOW_DAYS)
+    .slice(0, 3);
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
@@ -137,7 +142,7 @@ export default function RecordScreen() {
         {/* Masthead */}
         <View className="px-6 pt-3 pb-6">
           <View className="flex-row items-start justify-between">
-            <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">
+            <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">
               {t('record.eyebrow')}
             </Text>
             <Pressable
@@ -153,8 +158,11 @@ export default function RecordScreen() {
           </Text>
           {hasDocuments && (
             <Text className="font-serif text-[15px] leading-[23px] text-fg-soft mt-3">
-              {t('record.all_clear')}
-              <Text className="text-danger">{t('record.one_thing')}</Text>
+              {needsYou.length > 0 ? (
+                <Text className="text-danger">{t('record.needs_count', { count: needsYou.length }).trim()}</Text>
+              ) : (
+                t('record.nothing_needs')
+              )}
             </Text>
           )}
         </View>
@@ -162,9 +170,7 @@ export default function RecordScreen() {
         {error && (
           <ErrorState
             title={error}
-            description={documents.length === 0
-              ? 'Make sure the backend server is running and your device is on the same network. Pull down to retry.'
-              : 'Pull down to retry.'}
+            description={t('record.load_error_desc')}
             onRetry={() => { clearError(); fetchDocuments(); }}
           />
         )}
@@ -177,33 +183,32 @@ export default function RecordScreen() {
             </View>
             <Text className="font-display text-[27px] leading-[31px] tracking-[-0.01em] text-fg text-center">{t('record.empty_title')}</Text>
             <Text className="font-serif text-[16px] leading-[26px] text-fg-soft text-center mt-3 mb-8">{t('record.empty_desc')}</Text>
-            <Button variant="primary" size="lg" block onPress={() => router.push('/(tabs)/scan')}>
+            <Button variant="primary" size="lg" block onPress={() => { track('empty_state_cta_tap'); router.push('/(tabs)/scan'); }}>
               {t('record.scan_first')}
             </Button>
             <Pressable onPress={() => router.push('/(onboarding)')} className="items-center py-3.5 mt-3 min-h-touch justify-center">
-              <Text className="font-semibold text-[11px] tracking-[0.06em] uppercase text-muted">{t('record.see_how')}</Text>
+              <Text className="font-semibold text-label tracking-[0.06em] uppercase text-muted">{t('record.see_how')}</Text>
             </Pressable>
           </View>
         )}
 
-        {/* Needs you — the nearest deadline, surfaced above the record so the
-            masthead's "one thing needs you" line resolves to a real action. */}
-        {hasDocuments && NEEDS_YOU.length > 0 && (
+        {/* Needs you — the nearest deadlines stated in the user's own documents. */}
+        {needsYou.length > 0 && (
           <View className="px-6 mt-2">
             <SectionHeader
               title={t('record.needs_you')}
               onSeeAll={() => router.push('/(tabs)/alerts')}
               seeAllLabel={t('record.see_all')}
             />
-            {NEEDS_YOU.map((a) => (
+            {needsYou.map(({ document, deadline, days }) => (
               <ActionRow
-                key={a.id}
-                title={a.title}
-                meta={a.meta}
-                date={a.date}
-                note={a.note}
-                urgency={a.urgency}
-                onPress={() => router.push('/(tabs)/alerts')}
+                key={`${document.id}-${deadline.date}-${deadline.description}`}
+                title={deadline.description || documentName(document)}
+                meta={document.authority ?? documentName(document)}
+                date={formatDate(deadline.date, i18n.language)}
+                note={days === 0 ? t('document.due_today') : t('document.days_left', { count: days })}
+                urgency={days <= 3 ? 'danger' : days <= 7 ? 'warning' : 'muted'}
+                onPress={() => router.push(`/document/${document.id}`)}
               />
             ))}
           </View>
@@ -220,11 +225,14 @@ export default function RecordScreen() {
             {documents.slice(0, 6).map((d) => (
               <DocRow
                 key={d.id}
-                name={d.filename}
-                value={d.status === 'ready' ? 'READ' : d.status.toUpperCase()}
+                name={documentName(d)}
+                value={t(`status.${d.status}`).toUpperCase()}
                 age={timeAgo(d.updatedAt)}
                 valueTone={d.status === 'ready' ? 'text-accent' : 'text-muted'}
-                onPress={() => router.push(`/document/${d.id}`)}
+                onPress={() => {
+                  track('document_tap', { doc_id: d.id, status: d.status });
+                  router.push(`/document/${d.id}`);
+                }}
               />
             ))}
             <Text className="font-serif-italic text-[14px] leading-[22px] text-muted pt-4">
@@ -236,7 +244,10 @@ export default function RecordScreen() {
         {/* Free-tier nudge */}
         {isFree && hasDocuments && (
           <Pressable
-            onPress={() => router.push('/subscription')}
+            onPress={() => {
+              track('upgrade_nudge_tap', { remaining: usage?.remaining ?? null, limit: usage?.limit ?? null });
+              router.push('/subscription');
+            }}
             className="mx-6 mt-8 p-5 rounded-lg bg-surface border border-hairline"
           >
             <Text className="font-semibold text-label uppercase text-warning mb-1.5">
@@ -251,7 +262,7 @@ export default function RecordScreen() {
                     style={{ width: `${Math.min(100, (usage.remaining / Math.max(usage.limit, 1)) * 100)}%` }}
                   />
                 </View>
-                <Text className="font-mono text-[11px] text-muted">
+                <Text className="font-mono text-meta text-muted">
                   {t('profile.remaining_decodes', { remaining: usage.remaining, limit: usage.limit })}
                 </Text>
               </View>

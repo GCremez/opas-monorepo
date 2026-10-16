@@ -23,8 +23,14 @@ export async function getDocument(id: string): Promise<Document> {
   return data;
 }
 
-export async function requestUploadUrl(filename: string, contentType: string): Promise<Document> {
-  const { data } = await apiClient.post('/documents/upload-url', { filename, contentType });
+// fileSize must be the exact byte count: the backend signs it into the presigned PUT,
+// so S3 rejects an upload whose Content-Length differs.
+export async function requestUploadUrl(
+  filename: string,
+  contentType: string,
+  fileSize: number
+): Promise<Document> {
+  const { data } = await apiClient.post('/documents/upload-url', { filename, contentType, fileSize });
   return data;
 }
 

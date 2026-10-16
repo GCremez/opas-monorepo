@@ -43,7 +43,9 @@ const APPEARANCE: { key: Appearance_; label: string }[] = [
   { key: 'system', label: 'System' },
 ];
 
-const MIN_PASSWORD_LENGTH = 6;
+// Must match registration (register.tsx) and the backend's ChangePasswordRequest
+// @Size(min = 8); a lower value here would let users downgrade to a weaker password.
+const MIN_PASSWORD_LENGTH = 8;
 
 // Section header — tracked caps over a rule underline.
 function SectionHeader({ title }: { title: string }) {
@@ -70,7 +72,7 @@ function ValueRow({
     >
       <Text className="font-medium text-body text-fg">{label}</Text>
       <View className="flex-row items-center gap-1.5">
-        {value ? <Text className={`font-mono text-[10px] tracking-[0.05em] uppercase ${valueTone}`}>{value}</Text> : null}
+        {value ? <Text className={`font-mono text-label tracking-[0.05em] uppercase ${valueTone}`}>{value}</Text> : null}
         {hideChevron ? <View className="w-[15px]" /> : <ChevronRightIcon size={15} color={c.muted} />}
       </View>
     </TouchableOpacity>
@@ -191,12 +193,12 @@ export default function ProfileScreen() {
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false} accessibilityLabel={t('profile.title')} contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Masthead + identity (design 2f) */}
         <View className="px-6 pt-3 pb-8 items-center">
-          <Text className="self-start font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">Opas · {t('tabs.you')}</Text>
+          <Text className="self-start font-semibold text-label tracking-[0.20em] uppercase text-muted">Opas · {t('tabs.you')}</Text>
           <View className="w-20 h-20 rounded-full bg-accent items-center justify-center mt-6">
             <Text className="font-display text-[30px] text-on-accent">{initial}</Text>
           </View>
           <Text className="font-display text-title text-fg mt-4" numberOfLines={1}>{user?.name ?? ''}</Text>
-          <Text className="font-mono text-[10px] tracking-[0.05em] uppercase text-muted mt-1.5">
+          <Text className="font-mono text-label tracking-[0.05em] uppercase text-muted mt-1.5">
             {tier === 'premium' ? t('profile.premium_plan') : t('profile.free_plan')}
             {usage && tier !== 'premium' ? ` · ${usage.remaining}/${usage.limit}` : ''}
           </Text>
@@ -262,9 +264,9 @@ export default function ProfileScreen() {
             className="py-3 min-h-touch justify-center"
             accessibilityLabel={t('profile.sign_out')}
           >
-            <Text className="font-semibold text-[11px] tracking-[0.14em] uppercase text-danger">{t('profile.sign_out')}</Text>
+            <Text className="font-semibold text-label tracking-[0.14em] uppercase text-danger">{t('profile.sign_out')}</Text>
           </TouchableOpacity>
-          <Text className="font-mono text-[11px] text-muted mt-1">{t('profile.version')}</Text>
+          <Text className="font-mono text-meta text-muted mt-1">{t('profile.version')}</Text>
         </View>
       </ScrollView>
 

@@ -75,7 +75,7 @@ export function RedactionSkeleton({
           <Text className="font-display text-[13px]" style={{ color: c.fg }}>
             {title}
           </Text>
-          <Text className="font-mono text-[11px] mt-0.5" style={{ color: c.muted }}>
+          <Text className="font-mono text-meta mt-0.5" style={{ color: c.muted }}>
             {status}
           </Text>
         </View>

@@ -31,12 +31,17 @@ export interface Document {
   updatedAt: string;
   uploadUrl: string | null;
   downloadUrl: string | null;
+  // From the document's latest decode; absent/empty until it has been analyzed.
+  title?: string | null;
+  authority?: string | null;
+  deadlines?: { date: string; description: string }[];
 }
 
 export interface DecodeResult {
   id: string;
   documentId: string;
-  rawResponse: Record<string, unknown> | null;
+  // The model's verbatim reply (plain text).
+  rawResponse: string | null;
   structuredData: Record<string, unknown> | null;
   piiScrubbed: boolean;
   model: string | null;

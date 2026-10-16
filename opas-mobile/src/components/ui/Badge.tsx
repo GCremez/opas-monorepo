@@ -23,7 +23,7 @@ const badgeText: Record<BadgeVariant, string> = {
 export function Badge({ variant = 'neutral', children }: BadgeProps) {
   return (
     <View className="self-start rounded-sm bg-surface px-2 py-1">
-      <Text className={`font-semibold text-[9px] tracking-[0.11em] uppercase ${badgeText[variant]}`}>
+      <Text className={`font-semibold text-label tracking-[0.11em] uppercase ${badgeText[variant]}`}>
         {children}
       </Text>
     </View>
@@ -51,7 +51,7 @@ export function Pill({ variant = 'neutral', children }: PillProps) {
   const s = pillStyles[variant];
   return (
     <View className={`self-start rounded-pill border px-3 py-1.5 items-center justify-center ${s.border}`}>
-      <Text className={`font-semibold text-[9.5px] tracking-[0.12em] uppercase ${s.text}`}>
+      <Text className={`font-semibold text-label tracking-[0.12em] uppercase ${s.text}`}>
         {children}
       </Text>
     </View>

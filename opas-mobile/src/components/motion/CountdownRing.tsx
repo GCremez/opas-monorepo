@@ -69,7 +69,7 @@ export function CountdownRing({ days, total = 30, size = 132, label = 'days to r
           {days}
         </Text>
         <Text
-          className="font-body font-semibold text-[8px] tracking-[0.2em] uppercase mt-1"
+          className="font-body font-semibold text-label tracking-[0.2em] uppercase mt-1"
           style={{ color: stroke }}
         >
           {label}

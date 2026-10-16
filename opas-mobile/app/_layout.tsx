@@ -28,11 +28,17 @@ import { useAuthStore } from '../src/store/authStore';
 import { useThemeStore } from '../src/store/themeStore';
 import { themeVars } from '../src/lib/tokens';
 import { registerForPushNotifications } from '../src/utils/notifications';
+import { initAnalytics } from '../src/lib/analytics';
+import { initSentry } from '../src/lib/sentry';
+
+// Boot crash reporting + analytics once, before the app tree renders. Both no-op
+// when their EXPO_PUBLIC_* keys are unset (local dev), so this is safe everywhere.
+initSentry();
+initAnalytics();
 
 export default function RootLayout() {
   const hydrateAuth = useAuthStore((s) => s.hydrate);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isDemo = useAuthStore((s) => s.isDemo);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
   const active = useThemeStore((s) => s.active);
   const isDark = useThemeStore((s) => s.isDark);
@@ -58,14 +64,14 @@ export default function RootLayout() {
     Promise.all([hydrateTheme(), hydrateAuth()]).finally(() => setHydrated(true));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Register this device for push once, after a real (non-demo) sign-in.
+  // Register this device for push once after a real sign-in.
   const registered = useRef(false);
   useEffect(() => {
-    if (isAuthenticated && !isDemo && !registered.current) {
+    if (isAuthenticated && !registered.current) {
       registered.current = true;
       registerForPushNotifications();
     }
-  }, [isAuthenticated, isDemo]);
+  }, [isAuthenticated]);
 
   // Theme tokens are applied as CSS variables on the root wrapper (via vars) so every
   // token utility resolves from them and switching Paper <-> Ink reverts both ways.

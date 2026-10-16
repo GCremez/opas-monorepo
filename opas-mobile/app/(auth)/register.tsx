@@ -18,7 +18,7 @@ function Field({
   const c = useThemeColors();
   return (
     <>
-      <Text className="font-semibold text-[9.5px] tracking-[0.14em] uppercase text-muted mb-2">{label}</Text>
+      <Text className="font-semibold text-label tracking-[0.14em] uppercase text-muted mb-2">{label}</Text>
       <View className="border-b border-rule pb-2 mb-7">
         <TextInput
           className="font-body text-[17px] text-fg"
@@ -78,7 +78,7 @@ export default function RegisterScreen() {
           <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/welcome'))} hitSlop={8} accessibilityLabel={t('common.back')}>
             <ChevronLeftIcon size={22} color={c['fg-soft']} />
           </Pressable>
-          <Text className="font-semibold text-[10.5px] tracking-[0.20em] uppercase text-muted">{t('auth.create_account')}</Text>
+          <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">{t('auth.create_account')}</Text>
         </View>
 
         <ScrollView contentContainerClassName="flex-grow px-6 pt-8" keyboardShouldPersistTaps="handled">
@@ -102,9 +102,9 @@ export default function RegisterScreen() {
           />
 
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="font-semibold text-[9.5px] tracking-[0.14em] uppercase text-muted">{t('auth.password')}</Text>
+            <Text className="font-semibold text-label tracking-[0.14em] uppercase text-muted">{t('auth.password')}</Text>
             <Pressable onPress={() => setShowPw((s) => !s)} hitSlop={6}>
-              <Text className="font-semibold text-[9.5px] tracking-[0.08em] uppercase text-muted">{showPw ? t('common.hide') : t('common.show')}</Text>
+              <Text className="font-semibold text-label tracking-[0.08em] uppercase text-muted">{showPw ? t('common.hide') : t('common.show')}</Text>
             </Pressable>
           </View>
           <View className="border-b border-rule pb-2">

@@ -3,7 +3,7 @@ import type { Subscription } from '../types';
 import * as api from '../api/subscription';
 import * as usageApi from '../api/usage';
 import type { UsageResponse } from '../api/usage';
-import { useAuthStore } from './authStore';
+import { track } from '../lib/analytics';
 
 interface SubscriptionState {
   subscription: Subscription | null;
@@ -32,11 +32,6 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   },
 
   fetchUsage: async () => {
-    // Guest/demo mode: show a representative usage meter, skip the authed API.
-    if (useAuthStore.getState().isDemo) {
-      set({ usage: { remaining: 3, limit: 5, period: 'month' } });
-      return;
-    }
     try {
       const usage = await usageApi.getUsage();
       set({ usage });
@@ -45,10 +40,15 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   },
 
   checkout: async (priceId) => {
+    // checkout_initiated fires here; checkout_completed is authoritative on the
+    // backend (Stripe webhook -> opas.subscription.upgraded), since the payment
+    // finishes in an external browser the app can't reliably observe.
+    track('checkout_initiated', { price_id: priceId });
     try {
       const { url } = await api.createCheckoutSession(priceId);
       return url;
-    } catch {
+    } catch (err: any) {
+      track('checkout_failed', { error: err?.response?.status ?? 'network' });
       return null;
     }
   },
@@ -56,6 +56,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   openPortal: async () => {
     try {
       const { url } = await api.createPortalSession();
+      track('portal_opened');
       return url;
     } catch {
       return null;

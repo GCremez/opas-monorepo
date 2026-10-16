@@ -12,12 +12,12 @@
   --surface-2: #e3dbc8;
   --fg:        #211e16;
   --fg-soft:   #4c473c;
-  --muted:     #8a8272;
+  --muted:     #666054;
   --hairline:  rgba(33,30,22,0.12);
   --rule:      rgba(33,30,22,0.22);
   --accent:    #35503f;
   --on-accent: #f2ede2;
-  --warning:   #916219;
+  --warning:   #835817;
   --danger:    #9c3a2c;
   --info:      #42606f;
   --node:      #cdbfa6;
@@ -29,7 +29,7 @@
   --surface-2: #2a2820;
   --fg:        #ece6d8;
   --fg-soft:   #b6ae9e;
-  --muted:     #857e6f;
+  --muted:     #948e81;
   --hairline:  rgba(236,230,216,0.13);
   --rule:      rgba(236,230,216,0.24);
   --accent:    #8fbb9f;

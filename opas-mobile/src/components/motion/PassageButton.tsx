@@ -109,7 +109,7 @@ export function PassageButton({ label, processingLabel, doneLabel, state, onPres
       )}
 
       <Text
-        className="font-body font-semibold text-[10px] tracking-[0.16em] uppercase"
+        className="font-body font-semibold text-label tracking-[0.16em] uppercase"
         style={{ color: state === 'done' ? c['on-accent'] : c.bg }}
       >
         {text}

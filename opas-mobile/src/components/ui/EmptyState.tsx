@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 import { EmptyRecord } from '../motion';
 
@@ -30,6 +31,7 @@ export function ErrorState({
   description?: string;
   onRetry?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="items-center justify-center px-5 py-12 max-w-[360px] mx-auto">
       <Text className="font-display text-[36px] mb-3 text-danger">⚠</Text>
@@ -39,7 +41,7 @@ export function ErrorState({
       </Text>
       {onRetry && (
         <Button variant="outline" onPress={onRetry}>
-          Try again
+          {t('common.retry')}
         </Button>
       )}
     </View>
