@@ -282,6 +282,22 @@ public class AuthService {
         return authHeader.substring(7).trim();
     }
 
+    /** Accepts en/fi/sv (any case, with optional region like "fi-FI"); anything else falls back to English. */
+    static String normalizeLanguage(@Nullable String language) {
+        if (language == null || language.isBlank()) {
+            return "en";
+        }
+        String code = language.trim().toLowerCase(java.util.Locale.ROOT);
+        int sep = code.indexOf('-') >= 0 ? code.indexOf('-') : code.indexOf('_');
+        if (sep > 0) {
+            code = code.substring(0, sep);
+        }
+        return switch (code) {
+            case "fi", "sv" -> code;
+            default -> "en";
+        };
+    }
+
     private static String sha256Hex(String value) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));

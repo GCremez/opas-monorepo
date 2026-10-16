@@ -106,7 +106,7 @@ class AuthServiceTest {
         });
         when(subscriptionRepository.save(any())).thenReturn(subscription);
 
-        RegisterResponse response = service.register(new RegisterRequest("new@example.com", "password123", "New User"));
+        RegisterResponse response = service.register(new RegisterRequest("new@example.com", "password123", "New User", null));
 
         assertNotNull(response);
         assertTrue(response.verificationRequired());
@@ -126,7 +126,7 @@ class AuthServiceTest {
         when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.register(new RegisterRequest("existing@example.com", "password123", "User")));
+                () -> service.register(new RegisterRequest("existing@example.com", "password123", "User", null)));
     }
 
     // --- verify-email ---
@@ -426,5 +426,15 @@ class AuthServiceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void normalizeLanguageKeepsSupportedCodesAndDefaultsToEnglish() {
+        assertEquals("fi", AuthService.normalizeLanguage("fi"));
+        assertEquals("sv", AuthService.normalizeLanguage("SV-fi"));
+        assertEquals("fi", AuthService.normalizeLanguage("fi_FI"));
+        assertEquals("en", AuthService.normalizeLanguage("de"));
+        assertEquals("en", AuthService.normalizeLanguage(" "));
+        assertEquals("en", AuthService.normalizeLanguage(null));
     }
 }

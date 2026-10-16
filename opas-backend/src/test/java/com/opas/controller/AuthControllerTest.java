@@ -38,7 +38,7 @@ class AuthControllerTest {
 
     @Test
     void registerReturns202RequiringVerification() {
-        var request = new RegisterRequest("new@example.com", "password123", "New User");
+        var request = new RegisterRequest("new@example.com", "password123", "New User", null);
         when(authService.register(request))
                 .thenReturn(RegisterResponse.verificationRequired("new@example.com"));
 
