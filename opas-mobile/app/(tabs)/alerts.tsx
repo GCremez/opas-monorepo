@@ -28,7 +28,7 @@ function DeadlineRow({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row items-center justify-between gap-3.5 py-4 border-b border-hairline"
+      className="flex-row items-center justify-between gap-3.5 py-4 border-b border-line"
       accessibilityRole="button"
       accessibilityLabel={`${title} — ${note}`}
     >

@@ -20,7 +20,7 @@ interface ButtonProps extends PressableProps {
 // hairline-ruled pills; ghost is bare. Labels are Instrument semibold.
 const variantStyles: Record<ButtonVariant, { bg: string; text: string; border: string }> = {
   primary: { bg: 'bg-accent', text: 'text-on-accent', border: 'border-accent' },
-  secondary: { bg: 'bg-surface', text: 'text-fg', border: 'border-hairline' },
+  secondary: { bg: 'bg-surface', text: 'text-fg', border: 'border-line' },
   outline: { bg: 'bg-transparent', text: 'text-fg', border: 'border-rule' },
   ghost: { bg: 'bg-transparent', text: 'text-muted', border: 'border-transparent' },
   danger: { bg: 'bg-danger', text: 'text-on-accent', border: 'border-danger' },

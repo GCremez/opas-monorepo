@@ -66,7 +66,7 @@ export default function GuideScreen() {
               <Pressable
                 key={s.title}
                 onPress={() => toggle(i)}
-                className="flex-row gap-3.5 py-3.5 border-b border-hairline"
+                className="flex-row gap-3.5 py-3.5 border-b border-line"
               >
                 <View className={`w-6 h-6 rounded-full border items-center justify-center ${isDone ? 'bg-accent border-accent' : 'border-rule'}`}>
                   <Text className={`text-meta font-semibold ${isDone ? 'text-on-accent' : 'text-fg-soft'}`}>{isDone ? '✓' : i + 1}</Text>

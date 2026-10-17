@@ -63,7 +63,7 @@ export default function FolderScreen() {
                 <Pressable
                   key={d.id}
                   onPress={() => router.push(`/document/${d.id}`)}
-                  className="flex-row items-baseline justify-between gap-3 py-3.5 border-b border-hairline min-h-touch"
+                  className="flex-row items-baseline justify-between gap-3 py-3.5 border-b border-line min-h-touch"
                   accessibilityRole="button"
                 >
                   <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{documentName(d)}</Text>

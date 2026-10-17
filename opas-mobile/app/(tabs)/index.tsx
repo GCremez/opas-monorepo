@@ -50,7 +50,7 @@ function ActionRow({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row items-center justify-between gap-3.5 py-4 border-b border-hairline"
+      className="flex-row items-center justify-between gap-3.5 py-4 border-b border-line"
       accessibilityRole="button"
       accessibilityLabel={`${title} — ${note}`}
     >
@@ -75,7 +75,7 @@ function DocRow({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row items-baseline justify-between gap-3 py-3.5 border-b border-hairline"
+      className="flex-row items-baseline justify-between gap-3 py-3.5 border-b border-line"
       accessibilityRole="button"
       accessibilityLabel={name}
     >
@@ -248,14 +248,14 @@ export default function RecordScreen() {
               track('upgrade_nudge_tap', { remaining: usage?.remaining ?? null, limit: usage?.limit ?? null });
               router.push('/subscription');
             }}
-            className="mx-6 mt-8 p-5 rounded-lg bg-surface border border-hairline"
+            className="mx-6 mt-8 p-5 rounded-lg bg-surface border border-line"
           >
             <Text className="font-semibold text-label uppercase text-warning mb-1.5">
               {t('profile.upgrade_title')}
             </Text>
             <Text className="font-serif text-prose text-fg-soft">{t('profile.upgrade_desc')}</Text>
             {usage && (
-              <View className="flex-row items-center gap-3 mt-4 pt-3 border-t border-hairline">
+              <View className="flex-row items-center gap-3 mt-4 pt-3 border-t border-line">
                 <View className="flex-1 h-1.5 bg-surface-2 rounded-pill overflow-hidden">
                   <View
                     className="h-full bg-accent rounded-pill"

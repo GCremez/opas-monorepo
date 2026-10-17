@@ -115,7 +115,7 @@ export default function SubscriptionScreen() {
         {/* Features */}
         <View className="px-6 pt-8">
           {features.map((feature, i) => (
-            <View key={i} className="flex-row items-baseline gap-3 py-3.5 border-b border-hairline">
+            <View key={i} className="flex-row items-baseline gap-3 py-3.5 border-b border-line">
               <Text className="font-mono text-[13px] text-accent">✓</Text>
               <Text className="font-serif text-[16px] leading-[24px] text-fg flex-1">{feature}</Text>
             </View>

@@ -67,7 +67,7 @@ function ValueRow({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      className="flex-row items-center justify-between py-4 border-b border-hairline"
+      className="flex-row items-center justify-between py-4 border-b border-line"
       accessibilityLabel={`${label}${value ? ` — ${value}` : ''}`}
     >
       <Text className="font-medium text-body text-fg">{label}</Text>
@@ -238,7 +238,7 @@ export default function ProfileScreen() {
                 key={item.key}
                 activeOpacity={0.7}
                 onPress={handlePress}
-                className="flex-row items-center justify-between py-4 border-b border-hairline"
+                className="flex-row items-center justify-between py-4 border-b border-line"
                 accessibilityLabel={t(`profile.${item.key}`)}
               >
                 <Text className={`font-medium text-body ${item.destructive ? 'text-danger' : 'text-fg'}`}>
@@ -327,7 +327,7 @@ export default function ProfileScreen() {
           <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <ScrollView className="flex-1 px-6 pt-5" keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
               <Text className="font-semibold text-label uppercase text-muted mb-3">{t('profile.current_password')}</Text>
-              <View className="bg-surface border border-hairline rounded-md mb-7 overflow-hidden">
+              <View className="bg-surface border border-line rounded-md mb-7 overflow-hidden">
                 <View className="flex-row items-center">
                   <TextInput
                     className="flex-1 font-body text-[16px] text-fg px-4 py-3.5"
@@ -347,7 +347,7 @@ export default function ProfileScreen() {
               </View>
 
               <Text className="font-semibold text-label uppercase text-muted mb-3">{t('profile.new_password')}</Text>
-              <View className="bg-surface border border-hairline rounded-md mb-7 overflow-hidden">
+              <View className="bg-surface border border-line rounded-md mb-7 overflow-hidden">
                 <View className="flex-row items-center">
                   <TextInput
                     className="flex-1 font-body text-[16px] text-fg px-4 py-3.5"
@@ -380,7 +380,7 @@ export default function ProfileScreen() {
               </View>
 
               <Text className="font-semibold text-label uppercase text-muted mb-3">{t('profile.confirm_password')}</Text>
-              <View className={`bg-surface border rounded-md mb-7 overflow-hidden ${pwConfirm.length > 0 && !passwordsMatch ? 'border-danger' : 'border-hairline'}`}>
+              <View className={`bg-surface border rounded-md mb-7 overflow-hidden ${pwConfirm.length > 0 && !passwordsMatch ? 'border-danger' : 'border-line'}`}>
                 <View className="flex-row items-center">
                   <TextInput
                     className="flex-1 font-body text-[16px] text-fg px-4 py-3.5"

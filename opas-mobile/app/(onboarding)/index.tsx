@@ -31,7 +31,7 @@ function MiniLedger({ rows }: { rows: { label: string; value: string; tone: stri
   return (
     <View className="rounded-lg bg-surface p-4 mb-8">
       {rows.map((r, i) => (
-        <View key={r.label} className={`flex-row items-center justify-between py-2.5${i < rows.length - 1 ? ' border-b border-hairline' : ''}`}>
+        <View key={r.label} className={`flex-row items-center justify-between py-2.5${i < rows.length - 1 ? ' border-b border-line' : ''}`}>
           <Text className="font-serif text-[14px] text-fg">{r.label}</Text>
           <Text className={`font-mono text-label tracking-[0.05em] uppercase ${r.tone}`}>{r.value}</Text>
         </View>

@@ -106,7 +106,7 @@ export default function SearchScreen() {
                 <Pressable
                   key={doc.id}
                   onPress={() => router.push(`/document/${doc.id}`)}
-                  className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
+                  className="flex-row items-baseline justify-between py-3.5 border-b border-line"
                 >
                   <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{doc.name}</Text>
                   <Text className="font-mono text-meta text-muted">{doc.meta}</Text>
@@ -136,7 +136,7 @@ export default function SearchScreen() {
                   <Pressable
                     key={doc.id}
                     onPress={() => router.push(`/document/${doc.id}`)}
-                    className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
+                    className="flex-row items-baseline justify-between py-3.5 border-b border-line"
                   >
                     <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{doc.name}</Text>
                     <Text className="font-mono text-meta text-muted">{doc.meta}</Text>

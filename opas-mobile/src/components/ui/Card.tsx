@@ -75,7 +75,7 @@ export function DocCard({ title, subtitle, deadline, deadlineUrgent, badge: badg
         onPress={onPress}
         onPressIn={() => { scale.value = withTiming(0.99, { duration: 150, easing: easeOutQuart }); }}
         onPressOut={() => { scale.value = withTiming(1, { duration: 150, easing: easeOutQuart }); }}
-        className="flex-row items-center gap-3 py-3.5 border-b border-hairline"
+        className="flex-row items-center gap-3 py-3.5 border-b border-line"
       >
         <View className="flex-1 min-w-0">
           <Text className="font-medium text-body text-fg" numberOfLines={1}>{title}</Text>

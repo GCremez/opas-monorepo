@@ -95,7 +95,7 @@ export default function FilesScreen() {
               onPress={() => router.push(`/folder/${f.id}`)}
               // Only folders the user made can be deleted; built-in categories always exist.
               onLongPress={f.categoryKey ? undefined : () => setFolderToDelete({ id: f.id, key: f.id })}
-              className="flex-row items-baseline justify-between py-4 border-b border-hairline min-h-touch"
+              className="flex-row items-baseline justify-between py-4 border-b border-line min-h-touch"
               accessibilityRole="button"
             >
               <Text className="font-display text-heading text-fg flex-1" numberOfLines={1}>{folderName(f, t)}</Text>
@@ -108,7 +108,7 @@ export default function FilesScreen() {
           {unfiledCount > 0 && (
             <Pressable
               onPress={() => router.push('/folder/unfiled')}
-              className="flex-row items-baseline justify-between py-4 border-b border-hairline min-h-touch"
+              className="flex-row items-baseline justify-between py-4 border-b border-line min-h-touch"
               accessibilityRole="button"
             >
               <Text className="font-display text-heading text-fg-soft flex-1">{t('documents.unfiled')}</Text>
@@ -126,7 +126,7 @@ export default function FilesScreen() {
                 key={d.id}
                 onPress={() => router.push(`/document/${d.id}`)}
                 onLongPress={() => setDeleteTarget(d.id)}
-                className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
+                className="flex-row items-baseline justify-between py-3.5 border-b border-line"
               >
                 <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{documentName(d)}</Text>
                 <Text className={`font-mono text-meta ${d.status === 'ready' ? 'text-accent' : 'text-muted'}`}>
@@ -143,7 +143,7 @@ export default function FilesScreen() {
             <View className="flex-row items-center gap-2">
               <TextInput
                 ref={inputRef}
-                className="flex-1 font-body text-body text-fg bg-surface border border-hairline rounded-md px-3 h-[44px]"
+                className="flex-1 font-body text-body text-fg bg-surface border border-line rounded-md px-3 h-[44px]"
                 placeholder={t('documents.folder_name_placeholder')}
                 placeholderTextColor={c.muted}
                 value={newFolderName}

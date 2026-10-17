@@ -50,7 +50,7 @@ function ScanProgress({ filename }: { filename?: string }) {
         const done = i < stepIndex;
         const active = i === stepIndex;
         return (
-          <View key={step.key} className="flex-row items-center gap-3 py-3 border-b border-hairline">
+          <View key={step.key} className="flex-row items-center gap-3 py-3 border-b border-line">
             <Text className={`font-mono text-[13px] ${done ? 'text-accent' : active ? 'text-warning' : 'text-muted'}`}>
               {done ? '✓' : active ? '◌' : '·'}
             </Text>

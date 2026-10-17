@@ -254,7 +254,7 @@ export default function DocumentDetailScreen() {
         </View>
 
         {/* Tab underline row — scrolls sideways when translated labels don't fit. */}
-        <View className="mx-6 border-b border-hairline">
+        <View className="mx-6 border-b border-line">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }} accessibilityRole="tablist">
             {tabs.map((tab) => {
               const active = activeTab === tab.key;
@@ -309,7 +309,7 @@ export default function DocumentDetailScreen() {
                 <View className="mt-7">
                   <Text className="font-semibold text-label uppercase text-muted mb-2">{t('document.key_details')}</Text>
                   {view.keyFields.map(([label, value]) => (
-                    <View key={label} className="flex-row justify-between gap-4 py-3 border-b border-hairline">
+                    <View key={label} className="flex-row justify-between gap-4 py-3 border-b border-line">
                       <Text className="font-body text-body-sm text-fg-soft flex-1">{label}</Text>
                       <Text className="font-mono text-data text-fg text-right flex-1">{value}</Text>
                     </View>
@@ -352,7 +352,7 @@ export default function DocumentDetailScreen() {
                   const days = daysUntil(d.date) ?? 0;
                   const status = days < 0 ? t('document.date_passed') : days === 0 ? t('document.due_today') : t('document.days_left', { count: days });
                   return (
-                    <View key={`${d.date}-${d.description}`} className="py-3 border-b border-hairline">
+                    <View key={`${d.date}-${d.description}`} className="py-3 border-b border-line">
                       <View className="flex-row justify-between">
                         <Text className="font-mono text-data text-fg">{formatDate(d.date, locale)}</Text>
                         <Text className={`font-body text-body-sm ${days < 0 ? 'text-muted' : 'text-warning'}`}>{status}</Text>
@@ -373,7 +373,7 @@ export default function DocumentDetailScreen() {
               <Text className="font-semibold text-label uppercase text-fg mb-2">{t('document.required_actions')}</Text>
               {view?.actions.length ? (
                 view.actions.map((action, i) => (
-                  <View key={i} className="flex-row gap-3 py-3 border-b border-hairline">
+                  <View key={i} className="flex-row gap-3 py-3 border-b border-line">
                     <Text className="font-mono text-data text-muted">{String(i + 1).padStart(2, '0')}</Text>
                     <Text className="font-body text-body text-fg flex-1">{action}</Text>
                   </View>
