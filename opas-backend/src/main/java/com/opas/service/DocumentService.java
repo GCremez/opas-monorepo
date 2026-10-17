@@ -196,6 +196,7 @@ public class DocumentService {
             DocumentInsights.Insights insights) {
         return new DocumentResponse(doc.getId(), doc.getFilename(), doc.getContentType(), doc.getFileSize(),
                 doc.getStatus(), doc.getFolderId(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl,
-                insights.title(), insights.authority(), insights.deadlines());
+                insights.title(), insights.authority(), insights.deadlines(), insights.documentType(),
+                insights.summary(), insights.actions(), insights.keyFigure());
     }
 }

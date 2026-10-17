@@ -40,4 +40,23 @@ class DocumentInsightsTest {
         assertEquals(List.of(), insights.from("not json").deadlines());
         assertEquals(List.of(), insights.from("[1,2]").deadlines());
     }
+
+    @Test
+    void extractsWhatListsAndSearchShow() {
+        var result = insights.from("""
+                {"documentType": "Päätös asumistuesta", "summary": "Your housing allowance is approved.",
+                 "actions": ["Report income changes", 3, " "],
+                 "keyFields": {"Amount": "€387.20/mo", "Valid from": "2026-04-01"}}
+                """);
+        assertEquals("Päätös asumistuesta", result.documentType());
+        assertEquals("Your housing allowance is approved.", result.summary());
+        assertEquals(List.of("Report income changes"), result.actions());
+        assertEquals("€387.20/mo", result.keyFigure());
+    }
+
+    @Test
+    void keyFigureIsNullWithoutKeyFields() {
+        assertNull(insights.from("{\"keyFields\": {}}").keyFigure());
+        assertNull(insights.from("{\"title\": \"x\"}").keyFigure());
+    }
 }

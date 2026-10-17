@@ -12,15 +12,22 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
- * Pulls the list-level facts (title, authority, stated deadlines) out of a decode's
+ * Pulls the list-level facts (title, authority, stated deadlines, the headline figure and
+ * the text that search matches against) out of a decode's
  * structured JSON so document lists can show them without every client re-parsing the
  * whole decode. The JSON is model output: anything malformed is dropped, never thrown.
  */
 @Component
 public class DocumentInsights {
 
-    public record Insights(@Nullable String title, @Nullable String authority, List<DocumentDeadline> deadlines) {
-        static final Insights EMPTY = new Insights(null, null, List.of());
+    /**
+     * @param keyFigure the first key field's value (an amount, a percentage, a period), shown
+     *     next to the document in lists
+     */
+    public record Insights(@Nullable String title, @Nullable String authority, List<DocumentDeadline> deadlines,
+            @Nullable String documentType, @Nullable String summary, List<String> actions,
+            @Nullable String keyFigure) {
+        static final Insights EMPTY = new Insights(null, null, List.of(), null, null, List.of(), null);
     }
 
     private final ObjectMapper objectMapper;
@@ -54,7 +61,23 @@ public class DocumentInsights {
             }
         }
         deadlines.sort(Comparator.comparing(DocumentDeadline::date));
-        return new Insights(text(root.path("title")), text(root.path("authority")), List.copyOf(deadlines));
+        List<String> actions = new ArrayList<>();
+        if (root.path("actions").isArray()) {
+            for (JsonNode item : root.path("actions")) {
+                String action = text(item);
+                if (action != null) {
+                    actions.add(action);
+                }
+            }
+        }
+        String keyFigure = null;
+        JsonNode keyFields = root.path("keyFields");
+        if (keyFields.isObject() && !keyFields.isEmpty()) {
+            JsonNode first = keyFields.elements().next();
+            keyFigure = first.isNumber() ? first.asText() : text(first);
+        }
+        return new Insights(text(root.path("title")), text(root.path("authority")), List.copyOf(deadlines),
+                text(root.path("documentType")), text(root.path("summary")), List.copyOf(actions), keyFigure);
     }
 
     @Nullable
