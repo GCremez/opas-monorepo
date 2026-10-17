@@ -7,9 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "description": "OPAS helps you manage official letters from Finnish authorities — Kela, Vero, Migri, and more. Scan, decode, and organize documents with AI-powered analysis.",
-    "splash": {
-      "backgroundColor": "#f2ede2"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -78,7 +75,16 @@
         }
       ],
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f2ede2",
+          "dark": {
+            "backgroundColor": "#16150e"
+          }
+        }
+      ]
     ],
     "extra": {
       "apiBaseUrl": "http://192.168.0.14:8080/api/v1"
