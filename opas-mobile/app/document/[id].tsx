@@ -11,6 +11,8 @@ import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { getDocument } from '../../src/api/documents';
 import { decodeDocument, getDecodeResult, pollDecodeResult } from '../../src/api/decode';
 import { useDocumentStore } from '../../src/store/documentStore';
+import { useFolderStore } from '../../src/store/folderStore';
+import { folderName } from '../../src/lib/folders';
 import { ChevronLeftIcon, DotsIcon } from '../../src/components/icons';
 import { useThemeColors } from '../../src/store/themeStore';
 import type { Document, DecodeResult } from '../../src/types';
@@ -27,7 +29,9 @@ export default function DocumentDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useThemeColors();
-  const { deleteDocument, archiveDocument } = useDocumentStore();
+  const { deleteDocument, archiveDocument, assignFolder } = useDocumentStore();
+  const { folders, fetchFolders } = useFolderStore();
+  const [categorySheet, setCategorySheet] = useState(false);
   const { isPremium } = usePremium();
   const [doc, setDoc] = useState<Document | null>(null);
   const [decode, setDecode] = useState<DecodeResult | null>(null);
@@ -81,6 +85,24 @@ export default function DocumentDetailScreen() {
       cancelled = true;
     };
   }, [id, runDecode]);
+
+  useEffect(() => {
+    if (folders.length === 0) fetchFolders();
+  }, [folders.length, fetchFolders]);
+
+  const fileUnder = async (folderId: string | null) => {
+    setCategorySheet(false);
+    if (!doc || !id || doc.folderId === folderId) return;
+    const previous = doc.folderId;
+    setDoc({ ...doc, folderId }); // optimistic; reverted below if the request fails
+    try {
+      await assignFolder(id, folderId);
+      fetchFolders(); // refresh the per-category counts on the Files screen
+    } catch {
+      setDoc((d) => (d ? { ...d, folderId: previous } : d));
+      Alert.alert(t('common.error'));
+    }
+  };
 
   const handleDecode = () => {
     if (id) runDecode(() => decodeDocument(id));
@@ -178,6 +200,7 @@ export default function DocumentDetailScreen() {
   ];
 
   const decoding = decodeState === 'running';
+  const currentFolder = folders.find((f) => f.id === doc.folderId) ?? null;
   const canDecode = !decode && !decoding && (doc.status === 'uploaded' || doc.status === 'failed');
   const isImage = (doc.contentType ?? '').startsWith('image/');
   const docLanguage = view?.language?.toLowerCase();
@@ -216,6 +239,18 @@ export default function DocumentDetailScreen() {
             {view?.title ?? doc.filename}
           </Text>
           <Text className="font-mono text-meta text-muted mt-2.5">{mastheadMeta}</Text>
+          {/* Category — pre-filled by the AI, always changeable by the user */}
+          <Pressable
+            onPress={() => setCategorySheet(true)}
+            className="flex-row items-center gap-2 self-start mt-3 min-h-touch"
+            accessibilityRole="button"
+            accessibilityLabel={`${t('document.category')}: ${currentFolder ? folderName(currentFolder, t) : t('document.no_category')}`}
+          >
+            <Text className="font-semibold text-label uppercase text-muted">{t('document.category')}</Text>
+            <Text className={`font-body text-body-sm ${currentFolder ? 'text-accent' : 'text-fg-soft'}`}>
+              {currentFolder ? folderName(currentFolder, t) : t('document.choose_category')} ›
+            </Text>
+          </Pressable>
         </View>
 
         {/* Tab underline row — scrolls sideways when translated labels don't fit. */}
@@ -382,6 +417,18 @@ export default function DocumentDetailScreen() {
           { label: t('document.delete_document'), onPress: confirmDelete, destructive: true },
         ]}
         onClose={() => setSheetVisible(false)}
+      />
+      <BottomSheet
+        visible={categorySheet}
+        title={t('document.category_title')}
+        actions={[
+          ...folders.map((f) => ({
+            label: `${f.id === doc.folderId ? '✓  ' : ''}${folderName(f, t)}`,
+            onPress: () => fileUnder(f.id),
+          })),
+          { label: `${doc.folderId ? '' : '✓  '}${t('document.no_category')}`, onPress: () => fileUnder(null) },
+        ]}
+        onClose={() => setCategorySheet(false)}
       />
     </SafeAreaView>
   );

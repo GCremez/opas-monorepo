@@ -16,6 +16,8 @@ interface DocumentState {
     uri: string
   ) => Promise<DecodeResult | null>;
   deleteDocument: (id: string) => Promise<void>;
+  /** File a document into a folder, or pass null to take it out of every folder. */
+  assignFolder: (id: string, folderId: string | null) => Promise<void>;
   archiveDocument: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -45,7 +47,12 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   uploadAndDecode: async (filename, contentType, uri) => {
     try {
       // Read the file first: the upload URL is issued for its exact size.
-      const blob = await fetch(uri).then((r) => r.blob());
+      const file = await fetch(uri).then((r) => r.blob());
+      // React Native sends a Blob body with the Blob's own type and ignores the
+      // Content-Type header. A photo read from disk has no type, so S3 stored uploads as
+      // binary/octet-stream and the backend rejected them at confirm. Re-wrap the bytes
+      // with the declared type so the PUT carries it.
+      const blob = file.type === contentType ? file : new Blob([file], { type: contentType });
       const upload = await api.requestUploadUrl(filename, contentType, blob.size);
       const putRes = await fetch(upload.uploadUrl!, {
         method: 'PUT',
@@ -82,6 +89,12 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     } catch {
       set({ error: 'Failed to delete document' });
     }
+  },
+
+  assignFolder: async (id, folderId) => {
+    const updated = await api.assignFolder(id, folderId);
+    set((s) => ({ documents: s.documents.map((d) => (d.id === id ? { ...d, ...updated } : d)) }));
+    track('document_filed', { doc_id: id, has_folder: folderId !== null });
   },
 
   archiveDocument: async (id) => {

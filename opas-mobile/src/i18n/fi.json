@@ -269,7 +269,12 @@
     "delete_folder_label": "Poista",
     "no_documents_in_folder": "Ei asiakirjoja",
     "delete_document_title": "Poista asiakirja",
-    "delete_document_message": "Tätä ei voi peruuttaa. Asiakirja poistetaan pysyvästi kirjastostasi."
+    "delete_document_message": "Tätä ei voi peruuttaa. Asiakirja poistetaan pysyvästi kirjastostasi.",
+    "categories": "Kategoriat",
+    "unfiled": "Luokittelemattomat",
+    "docs_count": "{{count}} asiakirja",
+    "docs_count_plural": "{{count}} asiakirjaa",
+    "summary_counts": "{{docs}} asiakirjaa · {{folders}} kansiota"
   },
   "folders": {
     "title": "Kansiot",
@@ -407,7 +412,11 @@
     "days_left": "{{count}} päivä jäljellä",
     "days_left_plural": "{{count}} päivää jäljellä",
     "no_dates": "Asiakirjassa ei mainita päivämääriä tai määräaikoja.",
-    "more": "Lisää toimintoja"
+    "more": "Lisää toimintoja",
+    "category": "Kategoria",
+    "choose_category": "Lisää kategoriaan",
+    "no_category": "Ei kategoriaa",
+    "category_title": "Tallenna kategoriaan"
   },
   "draftLetter": {
     "title": "Kirjeluonnos",
@@ -468,5 +477,9 @@
     "ready": "Luettu",
     "failed": "Epäonnistui",
     "archived": "Arkistoitu"
+  },
+  "folder": {
+    "empty": "Täällä ei ole vielä asiakirjoja.",
+    "empty_unfiled": "Kaikki on luokiteltu."
   }
 }

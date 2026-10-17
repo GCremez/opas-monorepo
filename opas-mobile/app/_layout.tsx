@@ -98,6 +98,7 @@ export default function RootLayout() {
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="document/[id]" />
+            <Stack.Screen name="folder/[id]" />
             <Stack.Screen name="draft/[id]" />
             <Stack.Screen name="subscription/index" />
             <Stack.Screen name="ask" />

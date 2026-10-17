@@ -72,6 +72,8 @@ export interface Folder {
   id: string;
   name: string;
   description: string | null;
+  // Built-in category key ("tax", "kela", ...), or null for a folder the user created.
+  categoryKey?: string | null;
   documentCount: number;
   createdAt: string;
   updatedAt: string;

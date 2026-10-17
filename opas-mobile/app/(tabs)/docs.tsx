@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { documentName } from '../../src/lib/decodeView';
+import { folderName } from '../../src/lib/folders';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Pressable, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,10 +11,6 @@ import { ConfirmSheet } from '../../src/components/ui/ConfirmSheet';
 import { useDocumentStore } from '../../src/store/documentStore';
 import { useFolderStore } from '../../src/store/folderStore';
 import { useThemeColors } from '../../src/store/themeStore';
-
-const BUILT_IN_FOLDERS = [
-  'tax', 'residence', 'kela', 'healthcare', 'employment', 'education', 'housing', 'finance',
-] as const;
 
 export default function FilesScreen() {
   const { t } = useTranslation();
@@ -51,17 +48,13 @@ export default function FilesScreen() {
 
   const handleDeleteFolder = async () => {
     if (!folderToDelete) return;
-    if (!folderToDelete.id.startsWith('custom-')) await apiDeleteFolder(folderToDelete.id);
+    await apiDeleteFolder(folderToDelete.id);
     setFolderToDelete(null);
   };
 
-  const customFolders = useMemo(
-    () => folders.map((f) => ({ key: f.id, folderId: f.id, name: f.name })),
-    [folders],
-  );
-
+  // The backend returns the built-in categories first, then the user's own folders.
+  const unfiledCount = useMemo(() => documents.filter((d) => !d.folderId).length, [documents]);
   const totalDocs = documents.length;
-  const totalFolders = BUILT_IN_FOLDERS.length + customFolders.length;
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
@@ -80,7 +73,7 @@ export default function FilesScreen() {
             {t('documents.title')}
           </Text>
           <Text className="font-mono text-meta tracking-[0.05em] text-muted mt-2">
-            {`${totalDocs} DOCUMENTS · ${totalFolders} FOLDERS`}
+            {t('documents.summary_counts', { docs: totalDocs, folders: folders.length }).toUpperCase()}
           </Text>
         </View>
 
@@ -92,33 +85,36 @@ export default function FilesScreen() {
           />
         )}
 
-        {/* By authority */}
+        {/* Categories: built-in ones, then the user's own folders, then what's unfiled */}
         <View className="px-6">
-          <Text className="font-semibold text-label uppercase text-fg pb-2.5 border-b border-rule">By authority</Text>
+          <Text className="font-semibold text-label uppercase text-fg pb-2.5 border-b border-rule">{t('documents.categories')}</Text>
 
-          {BUILT_IN_FOLDERS.map((key) => {
-            const count = documents.length && key === 'kela' ? documents.length : 0;
-            return (
-              <View
-                key={key}
-                className="flex-row items-baseline justify-between py-4 border-b border-hairline"
-              >
-                <Text className="font-display text-heading text-fg">{t(`folders.folder_${key}`)}</Text>
-                <Text className="font-mono text-meta text-muted">{count} DOCS ›</Text>
-              </View>
-            );
-          })}
-
-          {customFolders.map((f) => (
+          {folders.map((f) => (
             <Pressable
-              key={f.key}
-              onLongPress={() => setFolderToDelete({ id: f.folderId, key: f.key })}
-              className="flex-row items-baseline justify-between py-4 border-b border-hairline"
+              key={f.id}
+              onPress={() => router.push(`/folder/${f.id}`)}
+              // Only folders the user made can be deleted; built-in categories always exist.
+              onLongPress={f.categoryKey ? undefined : () => setFolderToDelete({ id: f.id, key: f.id })}
+              className="flex-row items-baseline justify-between py-4 border-b border-hairline min-h-touch"
+              accessibilityRole="button"
             >
-              <Text className="font-display text-heading text-fg">{f.name}</Text>
-              <Text className="font-mono text-meta text-muted">›</Text>
+              <Text className="font-display text-heading text-fg flex-1" numberOfLines={1}>{folderName(f, t)}</Text>
+              <Text className={`font-mono text-meta ${f.documentCount > 0 ? 'text-fg-soft' : 'text-muted'}`}>
+                {t('documents.docs_count', { count: f.documentCount }).toUpperCase()} ›
+              </Text>
             </Pressable>
           ))}
+
+          {unfiledCount > 0 && (
+            <Pressable
+              onPress={() => router.push('/folder/unfiled')}
+              className="flex-row items-baseline justify-between py-4 border-b border-hairline min-h-touch"
+              accessibilityRole="button"
+            >
+              <Text className="font-display text-heading text-fg-soft flex-1">{t('documents.unfiled')}</Text>
+              <Text className="font-mono text-meta text-muted">{t('documents.docs_count', { count: unfiledCount }).toUpperCase()} ›</Text>
+            </Pressable>
+          )}
         </View>
 
         {/* All documents ledger */}

@@ -32,10 +32,12 @@ describe('documentStore.uploadAndDecode', () => {
 
     // The backend rejects a missing size and signs this exact size into the PUT URL.
     expect(mockedApi.requestUploadUrl).toHaveBeenCalledWith('scan.jpg', 'image/jpeg', bytes.size);
-    expect(fetchMock).toHaveBeenLastCalledWith(
-      'https://s3/put',
-      expect.objectContaining({ method: 'PUT', body: bytes, headers: { 'Content-Type': 'image/jpeg' } })
-    );
+    const [, init] = fetchMock.mock.calls[1] as [string, { method: string; body: Blob; headers: object }];
+    expect(init.method).toBe('PUT');
+    expect(init.headers).toEqual({ 'Content-Type': 'image/jpeg' });
+    // The body itself must carry the type: React Native sends the Blob's type, not the header.
+    expect(init.body.type).toBe('image/jpeg');
+    expect(init.body.size).toBe(bytes.size);
     expect(mockedApi.confirmUpload).toHaveBeenCalledWith('doc-1');
     expect(result).toEqual({ documentId: 'doc-1' });
   });

@@ -269,7 +269,12 @@
     "delete_folder_label": "Delete",
     "no_documents_in_folder": "No documents yet",
     "delete_document_title": "Delete document",
-    "delete_document_message": "This cannot be undone. The document will be permanently removed from your library."
+    "delete_document_message": "This cannot be undone. The document will be permanently removed from your library.",
+    "categories": "Categories",
+    "unfiled": "Unfiled",
+    "docs_count": "{{count}} doc",
+    "docs_count_plural": "{{count}} docs",
+    "summary_counts": "{{docs}} documents · {{folders}} folders"
   },
   "folders": {
     "title": "Folders",
@@ -407,7 +412,11 @@
     "days_left": "{{count}} day left",
     "days_left_plural": "{{count}} days left",
     "no_dates": "This document doesn't state any dates or deadlines.",
-    "more": "More options"
+    "more": "More options",
+    "category": "Category",
+    "choose_category": "Add to a category",
+    "no_category": "No category",
+    "category_title": "File under"
   },
   "draftLetter": {
     "title": "Draft Letter",
@@ -468,5 +477,9 @@
     "ready": "Read",
     "failed": "Failed",
     "archived": "Archived"
+  },
+  "folder": {
+    "empty": "No documents here yet.",
+    "empty_unfiled": "Everything is filed."
   }
 }

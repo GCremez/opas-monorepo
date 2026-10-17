@@ -269,7 +269,12 @@
     "delete_folder_label": "Radera",
     "no_documents_in_folder": "Inga dokument än",
     "delete_document_title": "Radera dokument",
-    "delete_document_message": "Detta kan inte ångras. Dokumentet tas bort permanent från ditt bibliotek."
+    "delete_document_message": "Detta kan inte ångras. Dokumentet tas bort permanent från ditt bibliotek.",
+    "categories": "Kategorier",
+    "unfiled": "Okategoriserade",
+    "docs_count": "{{count}} dokument",
+    "docs_count_plural": "{{count}} dokument",
+    "summary_counts": "{{docs}} dokument · {{folders}} mappar"
   },
   "folders": {
     "title": "Mappar",
@@ -407,7 +412,11 @@
     "days_left": "{{count}} dag kvar",
     "days_left_plural": "{{count}} dagar kvar",
     "no_dates": "Dokumentet anger inga datum eller tidsfrister.",
-    "more": "Fler alternativ"
+    "more": "Fler alternativ",
+    "category": "Kategori",
+    "choose_category": "Lägg i en kategori",
+    "no_category": "Ingen kategori",
+    "category_title": "Arkivera under"
   },
   "draftLetter": {
     "title": "Utkast till brev",
@@ -468,5 +477,9 @@
     "ready": "Läst",
     "failed": "Misslyckades",
     "archived": "Arkiverat"
+  },
+  "folder": {
+    "empty": "Inga dokument här än.",
+    "empty_unfiled": "Allt är kategoriserat."
   }
 }
