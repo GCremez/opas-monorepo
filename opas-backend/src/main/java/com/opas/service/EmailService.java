@@ -87,6 +87,34 @@ public class EmailService {
                     "Koden gäller i 15 minuter.", "Din guide genom finländskt pappersarbete.",
                     "Du får det här meddelandet eftersom någon begärde en lösenordsåterställning för ditt Opas-konto."));
 
+    /**
+     * "Your letter is ready", sent when a decoded result is still unopened a while later.
+     * It never says anything about the letter itself: mail is not where a government
+     * decision should be readable.
+     */
+    static final Map<String, Copy> RESULT_READY = Map.of(
+            "en", new Copy("en", "Your letter is ready in Opas", "Your letter is ready",
+                    "Opas has finished reading the letter you scanned.",
+                    "Open it to see what it says in plain words and what you need to do.",
+                    "For your privacy, this email never includes what the letter says.",
+                    "Opas has finished reading your letter.", "Your guide through Finnish paperwork.",
+                    "You're receiving this because you scanned a letter with Opas and haven't opened the result yet."),
+            "fi", new Copy("fi", "Kirjeesi on valmis Opaksessa", "Kirjeesi on valmis",
+                    "Opas on lukenut skannaamasi kirjeen.",
+                    "Avaa se nähdäksesi, mitä siinä sanotaan selkokielellä ja mitä sinun pitää tehdä.",
+                    "Yksityisyytesi vuoksi tämä viesti ei koskaan kerro, mitä kirjeessä lukee.",
+                    "Opas on lukenut kirjeesi.", "Oppaasi suomalaiseen paperityöhön.",
+                    "Saat tämän viestin, koska skannasit kirjeen Opaksella etkä ole vielä avannut tulosta."),
+            "sv", new Copy("sv", "Ditt brev är klart i Opas", "Ditt brev är klart",
+                    "Opas har läst brevet du skannade.",
+                    "Öppna det för att se vad det står i klartext och vad du behöver göra.",
+                    "Av integritetsskäl innehåller det här meddelandet aldrig vad brevet säger.",
+                    "Opas har läst ditt brev.", "Din guide genom finländskt pappersarbete.",
+                    "Du får det här meddelandet eftersom du skannade ett brev med Opas och inte har öppnat resultatet ännu."));
+
+    static final Map<String, String> OPEN_BUTTON = Map.of(
+            "en", "Open in Opas", "fi", "Avaa Opaksessa", "sv", "Öppna i Opas");
+
     private final SesV2Client sesClient;
     private final boolean enabled;
     private final String fromAddress;
@@ -120,6 +148,20 @@ public class EmailService {
         send(toAddress, copy, code);
     }
 
+    /** Tells the user a scanned letter is ready, with a button that opens it in the app. */
+    public void sendResultReady(String toAddress, String link, String language) {
+        Copy copy = copyFor(RESULT_READY, language);
+        String button = OPEN_BUTTON.getOrDefault(copy.lang(), OPEN_BUTTON.get("en"));
+        if (!enabled) {
+            log.warn("[mail disabled] result-ready email for {} would link to {}", toAddress, link);
+            return;
+        }
+        deliver(toAddress, copy.subject(),
+                String.join("\n\n", copy.intro(), copy.instructions(), button + ": " + link, copy.ignore(),
+                        "Opas — " + copy.tagline()) + "\n",
+                page(copy, button(link, button)));
+    }
+
     static Copy copyFor(Map<String, Copy> copies, String language) {
         return copies.getOrDefault(language == null ? "en" : language, copies.get("en"));
     }
@@ -142,6 +184,29 @@ public class EmailService {
      * the trust this mail must project, so the wordmark is set in type.
      */
     static String html(Copy copy, String code) {
+        return page(copy, """
+                <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" bgcolor="%1$s" style="background:%1$s;border:1px solid %2$s;border-radius:8px;padding:22px 16px;font-family:%3$s;font-size:34px;font-weight:700;letter-spacing:10px;color:%4$s;">%5$s</td>
+                  </tr>
+                </table>""".formatted(CODE_BG, BORDER, MONO, INK, code));
+    }
+
+    /** The app's primary pill, as a link. Bulletproof: a padded table cell, no images or VML. */
+    static String button(String link, String label) {
+        String href = link.replace("&", "&amp;").replace("\"", "&quot;");
+        return """
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                  <tr>
+                    <td align="center" bgcolor="%1$s" style="background:%1$s;border-radius:999px;">
+                      <a href="%2$s" style="display:inline-block;padding:14px 30px;font-family:%3$s;font-size:15px;font-weight:600;color:%4$s;text-decoration:none;border-radius:999px;">%5$s</a>
+                    </td>
+                  </tr>
+                </table>""".formatted(PINE, href, SANS, CARD, label);
+    }
+
+    /** The branded page around one centerpiece (a code box or a button). */
+    static String page(Copy copy, String centerpiece) {
         return """
                 <!DOCTYPE html>
                 <html lang="%1$s">
@@ -169,24 +234,20 @@ public class EmailService {
                           </tr>
                           <tr>
                             <td align="center" style="padding:0 40px;">
-                              <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                  <td align="center" bgcolor="%13$s" style="background:%13$s;border:1px solid %5$s;border-radius:8px;padding:22px 16px;font-family:%14$s;font-size:34px;font-weight:700;letter-spacing:10px;color:%7$s;">%15$s</td>
-                                </tr>
-                              </table>
+                              %13$s
                             </td>
                           </tr>
                           <tr>
                             <td style="padding:20px 40px 0 40px;font-family:%10$s;">
-                              <p style="margin:0;font-size:15px;color:%11$s;line-height:1.55;">%16$s</p>
-                              <p style="margin:20px 0 0 0;font-size:13px;color:%17$s;line-height:1.55;">%18$s</p>
+                              <p style="margin:0;font-size:15px;color:%11$s;line-height:1.55;">%14$s</p>
+                              <p style="margin:20px 0 0 0;font-size:13px;color:%15$s;line-height:1.55;">%16$s</p>
                             </td>
                           </tr>
                           <tr>
                             <td style="padding:32px 40px 36px 40px;">
                               <div style="border-top:1px solid %5$s;margin-bottom:16px;"></div>
                               <p style="margin:0 0 4px 0;font-family:%6$s;font-size:14px;font-weight:500;color:%11$s;">Opas<span style="color:%8$s;">.</span></p>
-                              <p style="margin:0;font-family:%10$s;font-size:12px;color:%17$s;line-height:1.5;">%19$s<br>%20$s</p>
+                              <p style="margin:0;font-family:%10$s;font-size:12px;color:%15$s;line-height:1.5;">%17$s<br>%18$s</p>
                             </td>
                           </tr>
                         </table>
@@ -196,11 +257,15 @@ public class EmailService {
                 </body>
                 </html>
                 """.formatted(copy.lang(), PAGE, copy.preheader(), CARD, BORDER, SERIF, INK, PINE, copy.heading(),
-                SANS, INK_SOFT, copy.intro(), CODE_BG, MONO, code, copy.instructions(), MUTED, copy.ignore(),
+                SANS, INK_SOFT, copy.intro(), centerpiece, copy.instructions(), MUTED, copy.ignore(),
                 copy.tagline(), copy.reason());
     }
 
     private void send(String toAddress, Copy copy, String code) {
+        deliver(toAddress, subject(copy, code), text(copy, code), html(copy, code));
+    }
+
+    private void deliver(String toAddress, String subject, String text, String html) {
         try {
             SendEmailRequest request = SendEmailRequest.builder()
                     // Friendly sender name in the inbox — a bare Gmail address reads as spam.
@@ -208,10 +273,10 @@ public class EmailService {
                     .destination(Destination.builder().toAddresses(toAddress).build())
                     .content(EmailContent.builder()
                             .simple(Message.builder()
-                                    .subject(Content.builder().data(subject(copy, code)).charset("UTF-8").build())
+                                    .subject(Content.builder().data(subject).charset("UTF-8").build())
                                     .body(Body.builder()
-                                            .text(Content.builder().data(text(copy, code)).charset("UTF-8").build())
-                                            .html(Content.builder().data(html(copy, code)).charset("UTF-8").build())
+                                            .text(Content.builder().data(text).charset("UTF-8").build())
+                                            .html(Content.builder().data(html).charset("UTF-8").build())
                                             .build())
                                     .build())
                             .build())
