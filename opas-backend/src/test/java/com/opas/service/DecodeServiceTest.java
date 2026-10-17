@@ -50,6 +50,8 @@ class DecodeServiceTest {
     private ClaudeClient claudeClient;
     @Mock
     private FolderService folderService;
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher events;
 
     private DecodeService service;
     private UUID userId;
@@ -61,7 +63,7 @@ class DecodeServiceTest {
     void setUp() {
         service = new DecodeService(documentRepository, userRepository, decodeResultRepository, subscriptionRepository,
                 storageService, presidioService, textExtractionService, embeddingService, usageTracker, claudeClient, folderService,
-                new com.fasterxml.jackson.databind.ObjectMapper(),
+                new com.fasterxml.jackson.databind.ObjectMapper(), events,
                 new io.micrometer.core.instrument.simple.SimpleMeterRegistry(), 5, 2.00, 10.00);
         userId = UUID.randomUUID();
         user = new User();
@@ -167,6 +169,8 @@ class DecodeServiceTest {
         assertEquals("claude-sonnet-5-5", saved.getValue().getModel());
         assertEquals(1200, saved.getValue().getTokensIn());
         assertEquals("{\"title\": \"Decoded\"}", saved.getValue().getStructuredData());
+        // Announced so the "letter is ready" push goes out once this commits.
+        verify(events).publishEvent(new DecodeReadyEvent(userId, documentId));
     }
 
     @Test
@@ -239,6 +243,48 @@ class DecodeServiceTest {
         when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of());
 
         assertThrows(com.opas.config.DecodeFailedException.class, () -> service.getResult(userId, documentId));
+    }
+
+    @Test
+    void openingAFinishedResultMarksItSeen() {
+        document.setStatus("ready");
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of(finishedResult()));
+
+        assertNotNull(service.getResult(userId, documentId));
+        verify(documentRepository).markResultSeen(eq(documentId), any());
+    }
+
+    @Test
+    void resultSeenBeforeIsNotMarkedAgain() {
+        document.setStatus("ready");
+        org.springframework.test.util.ReflectionTestUtils.setField(document, "resultSeenAt", java.time.Instant.now());
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of(finishedResult()));
+
+        service.getResult(userId, documentId);
+        verify(documentRepository, never()).markResultSeen(any(), any());
+    }
+
+    @Test
+    void pollingWhileProcessingDoesNotMarkSeen() {
+        document.setStatus("processing");
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of());
+
+        service.getResult(userId, documentId);
+        verify(documentRepository, never()).markResultSeen(any(), any());
+    }
+
+    private DecodeResult finishedResult() {
+        DecodeResult r = new DecodeResult();
+        r.setId(UUID.randomUUID());
+        r.setDocument(document);
+        r.setUser(user);
+        r.setRawResponse("{}");
+        r.setStructuredData("{}");
+        org.springframework.test.util.ReflectionTestUtils.setField(r, "createdAt", java.time.Instant.now());
+        return r;
     }
 
     @Test

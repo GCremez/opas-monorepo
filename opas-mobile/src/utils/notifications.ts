@@ -4,14 +4,19 @@ import { Platform } from 'react-native';
 import { apiClient } from '../api/client';
 import { track } from '../lib/analytics';
 
+// Runs only while the app is open. "Your letter is ready" is for people who left;
+// in the app the result is already on screen (or a tap away on Home), so stay quiet.
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
+  handleNotification: async (notification) => {
+    const show = notification.request.content.data?.type !== 'decode_ready';
+    return {
+      shouldShowAlert: show,
+      shouldPlaySound: show,
+      shouldSetBadge: show,
+      shouldShowBanner: show,
+      shouldShowList: show,
+    };
+  },
 });
 
 /** Register this device's push token with the backend, if notifications are allowed. */
