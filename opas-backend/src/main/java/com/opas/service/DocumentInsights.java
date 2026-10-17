@@ -8,6 +8,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -22,13 +23,16 @@ public class DocumentInsights {
 
     /**
      * @param keyFigure the first key field's value (an amount, a percentage, a period), shown
-     *     next to the document in lists
+     *     next to the document in lists; an amount or percentage when there is one
      */
     public record Insights(@Nullable String title, @Nullable String authority, List<DocumentDeadline> deadlines,
             @Nullable String documentType, @Nullable String summary, List<String> actions,
             @Nullable String keyFigure) {
         static final Insights EMPTY = new Insights(null, null, List.of(), null, null, List.of(), null);
     }
+
+    private static final Pattern MONEY_OR_PERCENT =
+            Pattern.compile("[€$£%]|\\b(EUR|euroa?)\\b", Pattern.CASE_INSENSITIVE);
 
     private final ObjectMapper objectMapper;
 
@@ -70,11 +74,20 @@ public class DocumentInsights {
                 }
             }
         }
+        // jsonb doesn't keep the model's key order, so "first" means nothing on its own:
+        // prefer an amount or a percentage, which is what the list should show.
         String keyFigure = null;
         JsonNode keyFields = root.path("keyFields");
-        if (keyFields.isObject() && !keyFields.isEmpty()) {
-            JsonNode first = keyFields.elements().next();
-            keyFigure = first.isNumber() ? first.asText() : text(first);
+        if (keyFields.isObject()) {
+            List<String> values = new ArrayList<>();
+            keyFields.elements().forEachRemaining(v -> {
+                String value = v.isNumber() ? v.asText() : text(v);
+                if (value != null) {
+                    values.add(value);
+                }
+            });
+            keyFigure = values.stream().filter(v -> MONEY_OR_PERCENT.matcher(v).find()).findFirst()
+                    .orElse(values.isEmpty() ? null : values.getFirst());
         }
         return new Insights(text(root.path("title")), text(root.path("authority")), List.copyOf(deadlines),
                 text(root.path("documentType")), text(root.path("summary")), List.copyOf(actions), keyFigure);

@@ -59,4 +59,13 @@ class DocumentInsightsTest {
         assertNull(insights.from("{\"keyFields\": {}}").keyFigure());
         assertNull(insights.from("{\"title\": \"x\"}").keyFigure());
     }
+
+    @Test
+    void keyFigurePrefersAnAmountOverOtherFields() {
+        // jsonb reorders keys (shorter first), so the amount isn't necessarily first.
+        var result = insights.from("{\"keyFields\": {\"Period\": \"1.11.2026–31.10.2027\", \"Housing allowance\": \"€387.20/mo\"}}");
+        assertEquals("€387.20/mo", result.keyFigure());
+        assertEquals("21.5 %", insights.from("{\"keyFields\": {\"Year\": \"2025\", \"Withholding\": \"21.5 %\"}}").keyFigure());
+        assertEquals("2025", insights.from("{\"keyFields\": {\"Year\": \"2025\"}}").keyFigure());
+    }
 }
