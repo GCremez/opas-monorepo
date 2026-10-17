@@ -193,8 +193,8 @@
   },
   "search": {
     "title": "Search",
-    "placeholder": "Search documents, folders…",
-    "recent": "Recent Documents",
+    "placeholder": "Find a document or topic…",
+    "recent": "Recent",
     "browse_by_authority": "Browse by Authority",
     "empty_title": "Search your documents",
     "empty_desc": "Find any scanned document by name, authority, or date range. Start typing above or browse by authority.",
@@ -215,8 +215,14 @@
       "kela": "Kela",
       "vero": "Vero",
       "migri": "Migri",
-      "suomi": "Suomi.fi"
-    }
+      "suomi": "Suomi.fi",
+      "dvv": "DVV"
+    },
+    "results_across": "{{results}} · across {{docs}}",
+    "topic": "Topic",
+    "in_topic": "{{count}} document in this topic",
+    "in_topic_plural": "{{count}} documents in this topic",
+    "browse_by_topic": "Browse by topic"
   },
   "scan": {
     "flash": "Flash",
@@ -289,7 +295,18 @@
     "unfiled": "Unfiled",
     "docs_count": "{{count}} doc",
     "docs_count_plural": "{{count}} docs",
-    "summary_counts": "{{docs}} documents · {{folders}} folders"
+    "summary_counts": "{{docs}} documents · {{folders}} folders",
+    "files_title": "Everything,\nin order.",
+    "by_authority": "By authority",
+    "summary_docs": "{{count}} document",
+    "summary_docs_plural": "{{count}} documents",
+    "summary_folders": "{{count}} folder",
+    "summary_folders_plural": "{{count}} folders",
+    "updated_ago": "Updated {{ago}} ago",
+    "not_read": "Not read yet",
+    "due_count": "{{count}} due",
+    "due_count_plural": "{{count}} due",
+    "files_empty": "Scan a letter and it will be filed here under the authority that sent it."
   },
   "folders": {
     "title": "Folders",
@@ -495,6 +512,23 @@
   },
   "folder": {
     "empty": "No documents here yet.",
-    "empty_unfiled": "Everything is filed."
+    "empty_unfiled": "Everything is filed.",
+    "authority": "Authority",
+    "folder": "Folder",
+    "topic": "Topic",
+    "not_sorted": "Not sorted yet",
+    "documents": "{{count}} document",
+    "documents_plural": "{{count}} documents",
+    "actions_due": "{{count}} action due",
+    "actions_due_plural": "{{count}} actions due",
+    "status_action": "Action",
+    "status_read": "Read",
+    "due": "Due {{date}}",
+    "in_days": "{{count}} day",
+    "in_days_plural": "{{count}} days",
+    "in_weeks": "{{count}} week",
+    "in_weeks_plural": "{{count}} weeks",
+    "documents_heading": "Documents",
+    "options": "Folder options"
   }
 }

@@ -193,8 +193,8 @@
   },
   "search": {
     "title": "Haku",
-    "placeholder": "Etsi asiakirjoja, kansioita…",
-    "recent": "Viimeisimmät asiakirjat",
+    "placeholder": "Etsi asiakirjaa tai aihetta…",
+    "recent": "Viimeisimmät",
     "browse_by_authority": "Selaa virastojen mukaan",
     "empty_title": "Etsi asiakirjojasi",
     "empty_desc": "Löydä skannattuja asiakirjoja nimen, viraston tai päivämäärän perusteella. Aloita kirjoittaminen tai selaa virastoittain.",
@@ -215,8 +215,14 @@
       "kela": "Kela",
       "vero": "Vero",
       "migri": "Migri",
-      "suomi": "Suomi.fi"
-    }
+      "suomi": "Suomi.fi",
+      "dvv": "DVV"
+    },
+    "results_across": "{{results}} · {{docs}} joukosta",
+    "topic": "Aihe",
+    "in_topic": "{{count}} asiakirja tässä aiheessa",
+    "in_topic_plural": "{{count}} asiakirjaa tässä aiheessa",
+    "browse_by_topic": "Selaa aiheittain"
   },
   "scan": {
     "flash": "Salama",
@@ -289,7 +295,18 @@
     "unfiled": "Luokittelemattomat",
     "docs_count": "{{count}} asiakirja",
     "docs_count_plural": "{{count}} asiakirjaa",
-    "summary_counts": "{{docs}} asiakirjaa · {{folders}} kansiota"
+    "summary_counts": "{{docs}} asiakirjaa · {{folders}} kansiota",
+    "files_title": "Kaikki\njärjestyksessä.",
+    "by_authority": "Viranomaisittain",
+    "summary_docs": "{{count}} asiakirja",
+    "summary_docs_plural": "{{count}} asiakirjaa",
+    "summary_folders": "{{count}} kansio",
+    "summary_folders_plural": "{{count}} kansiota",
+    "updated_ago": "Päivitetty {{ago}} sitten",
+    "not_read": "Ei vielä luettu",
+    "due_count": "{{count}} erääntyy",
+    "due_count_plural": "{{count}} erääntyy",
+    "files_empty": "Skannaa kirje, niin se arkistoidaan tänne lähettäjäviranomaisen alle."
   },
   "folders": {
     "title": "Kansiot",
@@ -495,6 +512,23 @@
   },
   "folder": {
     "empty": "Täällä ei ole vielä asiakirjoja.",
-    "empty_unfiled": "Kaikki on luokiteltu."
+    "empty_unfiled": "Kaikki on luokiteltu.",
+    "authority": "Viranomainen",
+    "folder": "Kansio",
+    "topic": "Aihe",
+    "not_sorted": "Ei vielä lajiteltu",
+    "documents": "{{count}} asiakirja",
+    "documents_plural": "{{count}} asiakirjaa",
+    "actions_due": "{{count}} toimenpide erääntyy",
+    "actions_due_plural": "{{count}} toimenpidettä erääntyy",
+    "status_action": "Toimi",
+    "status_read": "Luettu",
+    "due": "Eräpäivä {{date}}",
+    "in_days": "{{count}} päivä",
+    "in_days_plural": "{{count}} päivää",
+    "in_weeks": "{{count}} viikko",
+    "in_weeks_plural": "{{count}} viikkoa",
+    "documents_heading": "Asiakirjat",
+    "options": "Kansion asetukset"
   }
 }

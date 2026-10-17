@@ -35,6 +35,12 @@ export interface Document {
   title?: string | null;
   authority?: string | null;
   deadlines?: { date: string; description: string }[];
+  /** The letter's own title in its original language. */
+  documentType?: string | null;
+  summary?: string | null;
+  actions?: string[];
+  /** Headline figure for lists, e.g. "€387.20/mo". */
+  keyFigure?: string | null;
 }
 
 export interface DecodeResult {

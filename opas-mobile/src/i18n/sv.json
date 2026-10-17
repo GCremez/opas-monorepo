@@ -193,8 +193,8 @@
   },
   "search": {
     "title": "Sök",
-    "placeholder": "Sök dokument, mappar…",
-    "recent": "Senaste dokument",
+    "placeholder": "Hitta ett dokument eller ämne…",
+    "recent": "Senaste",
     "browse_by_authority": "Bläddra efter myndighet",
     "empty_title": "Sök i dina dokument",
     "empty_desc": "Hitta skannade dokument efter namn, myndighet eller datumintervall. Börja skriva ovan eller bläddra efter myndighet.",
@@ -215,8 +215,14 @@
       "kela": "Kela",
       "vero": "Vero",
       "migri": "Migri",
-      "suomi": "Suomi.fi"
-    }
+      "suomi": "Suomi.fi",
+      "dvv": "DVV"
+    },
+    "results_across": "{{results}} · bland {{docs}}",
+    "topic": "Ämne",
+    "in_topic": "{{count}} dokument i det här ämnet",
+    "in_topic_plural": "{{count}} dokument i det här ämnet",
+    "browse_by_topic": "Bläddra per ämne"
   },
   "scan": {
     "flash": "Blixt",
@@ -289,7 +295,18 @@
     "unfiled": "Okategoriserade",
     "docs_count": "{{count}} dokument",
     "docs_count_plural": "{{count}} dokument",
-    "summary_counts": "{{docs}} dokument · {{folders}} mappar"
+    "summary_counts": "{{docs}} dokument · {{folders}} mappar",
+    "files_title": "Allt\ni ordning.",
+    "by_authority": "Per myndighet",
+    "summary_docs": "{{count}} dokument",
+    "summary_docs_plural": "{{count}} dokument",
+    "summary_folders": "{{count}} mapp",
+    "summary_folders_plural": "{{count}} mappar",
+    "updated_ago": "Uppdaterad för {{ago}} sedan",
+    "not_read": "Inte läst än",
+    "due_count": "{{count}} förfaller",
+    "due_count_plural": "{{count}} förfaller",
+    "files_empty": "Skanna ett brev så arkiveras det här under myndigheten som skickade det."
   },
   "folders": {
     "title": "Mappar",
@@ -495,6 +512,23 @@
   },
   "folder": {
     "empty": "Inga dokument här än.",
-    "empty_unfiled": "Allt är kategoriserat."
+    "empty_unfiled": "Allt är kategoriserat.",
+    "authority": "Myndighet",
+    "folder": "Mapp",
+    "topic": "Ämne",
+    "not_sorted": "Inte sorterat än",
+    "documents": "{{count}} dokument",
+    "documents_plural": "{{count}} dokument",
+    "actions_due": "{{count}} åtgärd förfaller",
+    "actions_due_plural": "{{count}} åtgärder förfaller",
+    "status_action": "Åtgärd",
+    "status_read": "Läst",
+    "due": "Förfaller {{date}}",
+    "in_days": "{{count}} dag",
+    "in_days_plural": "{{count}} dagar",
+    "in_weeks": "{{count}} vecka",
+    "in_weeks_plural": "{{count}} veckor",
+    "documents_heading": "Dokument",
+    "options": "Mappalternativ"
   }
 }
