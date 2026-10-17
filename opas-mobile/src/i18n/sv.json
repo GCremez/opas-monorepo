@@ -329,7 +329,7 @@
     "folder_tax_count": "3 dokument",
     "folder_residence": "Uppehållstillstånd & immigration",
     "folder_residence_count": "2 dokument",
-    "folder_kela": "KELA & förmåner",
+    "folder_kela": "FPA & förmåner",
     "folder_kela_count": "4 dokument",
     "folder_healthcare": "Hälsovård",
     "folder_healthcare_count": "1 dokument",
@@ -342,7 +342,7 @@
     "folder_finance": "Ekonomi",
     "folder_finance_count": "1 dokument",
     "deadline_residence": "Förlängning av uppehållstillstånd",
-    "deadline_residence_sub": "KELA & förmåner • 2 bilagor behövs",
+    "deadline_residence_sub": "FPA & förmåner • 2 bilagor behövs",
     "deadline_tax": "Skatteåterbäring 2025",
     "deadline_tax_sub": "Skatt & ekonomi • Slutlig granskning"
   },

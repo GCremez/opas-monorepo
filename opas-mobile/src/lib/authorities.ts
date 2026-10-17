@@ -13,7 +13,7 @@ export interface Authority {
 }
 
 const KNOWN: (Authority & { match: RegExp })[] = [
-  { key: 'kela', name: 'KELA', match: /\bkela\b|\bfpa\b|social insurance institution/i },
+  { key: 'kela', name: 'Kela', match: /\bkela\b|\bfpa\b|social insurance institution/i },
   { key: 'vero', name: 'Verohallinto', match: /\bvero(hallinto)?\b|tax administration|skatteförvaltning/i },
   { key: 'migri', name: 'Migri', match: /\bmigri\b|maahanmuuttovirasto|immigration service|migrationsverket/i },
   { key: 'dvv', name: 'DVV', match: /\bdvv\b|digi- ja väestötieto|digital and population data|myndigheten för digitalisering/i },
