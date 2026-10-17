@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Materialize } from '../../src/components/motion';
+import { Materialize, GatherScrollView } from '../../src/components/motion';
 import { RemindersPrompt } from '../../src/components/RemindersPrompt';
 import { useReminderStore } from '../../src/store/reminderStore';
 import { authorityOf } from '../../src/lib/authorities';
@@ -141,11 +141,12 @@ export default function RecordScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
-      <ScrollView
+      <GatherScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
+        refreshing={loading}
+        onRefresh={onRefresh}
       >
         {/* Warm load (motion 08): returning to Home, the sections surface in, staggered. */}
         <Materialize index={0}>
@@ -163,7 +164,7 @@ export default function RecordScreen() {
               </Pressable>
             </View>
             <Text className="font-display text-[31px] leading-[34px] tracking-[-0.01em] text-fg mt-2">
-              {t(`home.${getGreeting()}`)},{firstName ? `\n${firstName}.` : '.'}
+              {t(`home.${getGreeting()}`)}{firstName ? `,\n${firstName}.` : '.'}
             </Text>
             {hasDocuments && (
               <Text className="font-serif text-[15px] leading-[23px] text-fg-soft mt-3">
@@ -182,8 +183,6 @@ export default function RecordScreen() {
 
         {error && (
           <ErrorState
-            title={error}
-            description={t('record.load_error_desc')}
             onRetry={() => { clearError(); fetchDocuments(); }}
           />
         )}
@@ -259,7 +258,7 @@ export default function RecordScreen() {
           </Materialize>
         )}
 
-      </ScrollView>
+      </GatherScrollView>
       <RemindersPrompt visible={askForReminders} />
     </SafeAreaView>
   );

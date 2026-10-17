@@ -18,7 +18,9 @@
     "close": "Stäng",
     "camera_access_needed": "Kamerans åtkomst behövs",
     "grant_permission": "Bevilja behörighet",
-    "open_original": "Öppna originaldokumentet"
+    "open_original": "Öppna originaldokumentet",
+    "pull_to_refresh": "Dra för att uppdatera",
+    "gathering": "Samlar…"
   },
   "onboarding": {
     "skip": "Hoppa över",

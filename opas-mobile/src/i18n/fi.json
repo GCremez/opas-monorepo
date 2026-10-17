@@ -18,7 +18,9 @@
     "close": "Sulje",
     "camera_access_needed": "Kameran käyttö tarvitaan",
     "grant_permission": "Myöntä lupa",
-    "open_original": "Avaa alkuperäinen asiakirja"
+    "open_original": "Avaa alkuperäinen asiakirja",
+    "pull_to_refresh": "Vedä päivittääksesi",
+    "gathering": "Kootaan…"
   },
   "onboarding": {
     "skip": "Ohita",

@@ -18,7 +18,9 @@
     "see_all": "See all",
     "camera_access_needed": "Camera access needed",
     "grant_permission": "Grant permission",
-    "open_original": "Open original document"
+    "open_original": "Open original document",
+    "pull_to_refresh": "Pull to refresh",
+    "gathering": "Gathering…"
   },
   "onboarding": {
     "skip": "Skip",

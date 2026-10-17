@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Pressable, RefreshControl } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import { GatherScrollView } from '../../src/components/motion';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -93,11 +94,12 @@ export default function FilesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
-      <ScrollView
+      <GatherScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
+        refreshing={loading}
+        onRefresh={onRefresh}
       >
         <View className="px-6 pt-3 pb-[22px]">
           <Text className="font-semibold text-label uppercase text-muted">Opas · {t('tabs.files')}</Text>
@@ -109,8 +111,6 @@ export default function FilesScreen() {
 
         {error && documents.length === 0 && (
           <ErrorState
-            title={t('common.connection_lost')}
-            description={error}
             onRetry={() => { clearError(); fetchDocuments(); }}
           />
         )}
@@ -188,7 +188,7 @@ export default function FilesScreen() {
             </TouchableOpacity>
           )}
         </View>
-      </ScrollView>
+      </GatherScrollView>
 
       <ConfirmSheet
         visible={folderToDelete !== null}

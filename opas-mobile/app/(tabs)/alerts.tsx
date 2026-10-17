@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
+import { GatherScrollView } from '../../src/components/motion';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { useDocumentStore } from '../../src/store/documentStore';
-import { useThemeColors } from '../../src/store/themeStore';
 import { collectDeadlines, documentName, formatDate, type DeadlineItem } from '../../src/lib/decodeView';
 import { authorityOf } from '../../src/lib/authorities';
 import { completedAt, deadlineKey } from '../../src/lib/tasks';
@@ -50,7 +50,6 @@ function DeadlineRow({
 export default function AlertsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const c = useThemeColors();
   const { documents, loading, fetchDocuments } = useDocumentStore();
 
   useEffect(() => {
@@ -94,11 +93,12 @@ export default function AlertsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
-      <ScrollView
+      <GatherScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
+        refreshing={loading}
+        onRefresh={onRefresh}
       >
         <View className="px-6 pt-3 pb-[22px]">
           <Text className="font-semibold text-label uppercase text-muted">{t('alerts.eyebrow')}</Text>
@@ -140,7 +140,7 @@ export default function AlertsScreen() {
             ))}
           </View>
         )}
-      </ScrollView>
+      </GatherScrollView>
     </SafeAreaView>
   );
 }

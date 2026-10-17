@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { XIcon } from '../../src/components/icons';
-import { AssemblyLoader, OrbitLoader } from '../../src/components/motion';
+import { AssemblyLoader, ScanLoader } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { Button } from '../../src/components/ui/Button';
 import { useDocumentStore } from '../../src/store/documentStore';
@@ -70,7 +70,8 @@ function ScanProgress({ filename }: { filename: string }) {
         );
       })}
 
-      <View className="mt-8 self-start"><OrbitLoader size={36} /></View>
+      {/* The Scan (motion 09): a reading line sweeps the letter while it's read. */}
+      <View className="mt-8 self-center"><ScanLoader /></View>
     </View>
   );
 }
