@@ -43,7 +43,10 @@
     "mini_2_row_2_label": "Verohallinto",
     "mini_2_row_2_value": "3 docs",
     "mini_2_row_3_label": "Migri",
-    "mini_2_row_3_value": "2 · 1 due"
+    "mini_2_row_3_value": "2 · 1 due",
+    "illo_plain": "Your housing allowance was approved.",
+    "illo_action": "Report income changes by 30 Nov",
+    "illo_meaning": "What it means"
   },
   "auth": {
     "welcome_back": "Welcome back.",

@@ -43,7 +43,10 @@
     "mini_2_row_2_label": "Verohallinto",
     "mini_2_row_2_value": "3 asiakirjaa",
     "mini_2_row_3_label": "Migri",
-    "mini_2_row_3_value": "2 · 1 eräpäivä"
+    "mini_2_row_3_value": "2 · 1 eräpäivä",
+    "illo_plain": "Asumistukesi on myönnetty.",
+    "illo_action": "Ilmoita tulomuutoksista 30.11. mennessä",
+    "illo_meaning": "Mitä se tarkoittaa"
   },
   "auth": {
     "welcome_back": "Tervetuloa takaisin.",

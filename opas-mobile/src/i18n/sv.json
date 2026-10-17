@@ -43,7 +43,10 @@
     "mini_2_row_2_label": "Verohallinto",
     "mini_2_row_2_value": "3 dokument",
     "mini_2_row_3_label": "Migri",
-    "mini_2_row_3_value": "2 · 1 förfaller"
+    "mini_2_row_3_value": "2 · 1 förfaller",
+    "illo_plain": "Ditt bostadsbidrag har beviljats.",
+    "illo_action": "Anmäl inkomständringar senast 30.11",
+    "illo_meaning": "Vad det betyder"
   },
   "auth": {
     "welcome_back": "Välkommen tillbaka.",

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, Dimensions, Pressable, FlatList } from 'react-native';
-import Svg, { Line } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -11,18 +10,26 @@ import { useAuthStore } from '../../src/store/authStore';
 
 const { width } = Dimensions.get('window');
 
-// Diagonal "paper" striping for the slide-1 illustration panel (design 2d).
-function StripePanel({ color, line }: { color: string; line: string }) {
-  const W = 320, H = 170, gap = 18;
-  const lines = [];
-  for (let x = -H; x < W; x += gap) {
-    lines.push(<Line key={x} x1={x} y1={H} x2={x + H} y2={0} stroke={line} strokeWidth={7} />);
-  }
+// Slide 1: a Kela letter as Opas reads it. The Finnish original with the name
+// blacked out (personal details are hidden first), then what it means in plain words.
+function LetterPreview() {
+  const { t } = useTranslation();
   return (
-    <View className="h-[170px] rounded-lg bg-surface overflow-hidden items-center justify-center mb-8">
-      <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ position: 'absolute' }}>
-        {lines}
-      </Svg>
+    <View className="rounded-lg bg-surface p-4 mb-8" accessible accessibilityLabel={t('onboarding.illo_plain')}>
+      <Text className="font-mono text-meta uppercase text-muted">Kela · Päätös</Text>
+      <View className="flex-row items-center gap-2 mt-3">
+        <View className="h-2.5 w-24 rounded-sm bg-fg" />
+        <View className="h-1.5 w-14 rounded-sm bg-node" />
+      </View>
+      <Text className="font-serif text-[14px] text-fg-soft mt-2.5">Päätös yleisestä asumistuesta</Text>
+      <View className="h-1.5 w-[85%] rounded-sm bg-node mt-2.5" />
+      <View className="h-1.5 w-[60%] rounded-sm bg-node mt-1.5" />
+
+      <View className="border-t border-rule mt-4 pt-3">
+        <Text className="font-semibold text-label uppercase text-accent">{t('onboarding.illo_meaning')}</Text>
+        <Text className="font-serif text-[16px] leading-[22px] text-fg mt-1.5">{t('onboarding.illo_plain')}</Text>
+        <Text className="font-mono text-meta uppercase text-warning mt-2">→ {t('onboarding.illo_action')}</Text>
+      </View>
     </View>
   );
 }
@@ -53,7 +60,7 @@ export default function OnboardingScreen() {
       eyebrow: t('onboarding.eyebrow_1'),
       title: t('onboarding.slide_1_title'),
       desc: t('onboarding.slide_1_desc'),
-      illo: <StripePanel color={c.muted} line={c['surface-2']} />,
+      illo: <LetterPreview />,
     },
     {
       key: 'dates',
@@ -151,7 +158,8 @@ export default function OnboardingScreen() {
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         renderItem={({ item }) => (
           <View style={{ width }} className="flex-1 justify-center px-[30px]">
-            {item.illo}
+            {/* Fixed-height stage so the heading sits at the same height on every slide. */}
+            <View className="h-[250px] justify-end">{item.illo}</View>
             <Text className="font-semibold text-label tracking-[0.18em] uppercase text-accent mb-3.5">{item.eyebrow}</Text>
             <Text className="font-display text-[34px] leading-[37px] tracking-[-0.01em] text-fg">{item.title}</Text>
             <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mt-4">{item.desc}</Text>
