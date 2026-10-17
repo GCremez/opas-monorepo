@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 public class DocumentInsights {
 
     /**
-     * @param keyFigure the first key field's value (an amount, a percentage, a period), shown
-     *     next to the document in lists; an amount or percentage when there is one
+     * @param keyFigure the letter's headline amount or percentage, shown next to it in lists;
+     *     null when it has none (the list then shows the status instead)
      */
     public record Insights(@Nullable String title, @Nullable String authority, List<DocumentDeadline> deadlines,
             @Nullable String documentType, @Nullable String summary, List<String> actions,
@@ -75,7 +75,8 @@ public class DocumentInsights {
             }
         }
         // jsonb doesn't keep the model's key order, so "first" means nothing on its own:
-        // prefer an amount or a percentage, which is what the list should show.
+        // only an amount or a percentage makes a headline. Anything else (a permit type,
+        // an application number) read as noise next to the title.
         String keyFigure = null;
         JsonNode keyFields = root.path("keyFields");
         if (keyFields.isObject()) {
@@ -87,7 +88,7 @@ public class DocumentInsights {
                 }
             });
             keyFigure = values.stream().filter(v -> MONEY_OR_PERCENT.matcher(v).find()).findFirst()
-                    .orElse(values.isEmpty() ? null : values.getFirst());
+                    .orElse(null);
         }
         return new Insights(text(root.path("title")), text(root.path("authority")), List.copyOf(deadlines),
                 text(root.path("documentType")), text(root.path("summary")), List.copyOf(actions), keyFigure);

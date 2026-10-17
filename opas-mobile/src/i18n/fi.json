@@ -142,7 +142,11 @@
     "welcome": "Tervetuloa",
     "needs_count": " {{count}} määräaika lähestyy.",
     "needs_count_plural": " {{count}} määräaikaa lähestyy.",
-    "load_error_desc": "Tarkista yhteys ja vedä alas yrittääksesi uudelleen."
+    "load_error_desc": "Tarkista yhteys ja vedä alas yrittääksesi uudelleen.",
+    "passed_count": "{{count}} määräaika on mennyt.",
+    "passed_count_plural": "{{count}} määräaikaa on mennyt.",
+    "more_coming": " {{count}} muu lähestyy.",
+    "more_coming_plural": " {{count}} muuta lähestyy."
   },
   "alerts": {
     "eyebrow": "Opas · Muistutukset",
@@ -325,7 +329,7 @@
     "folder_tax_count": "3 asiakirjaa",
     "folder_residence": "Oleskelu & maahanmuutto",
     "folder_residence_count": "2 asiakirjaa",
-    "folder_kela": "KELA & etuudet",
+    "folder_kela": "Kela & etuudet",
     "folder_kela_count": "4 asiakirjaa",
     "folder_healthcare": "Terveydenhuolto",
     "folder_healthcare_count": "1 asiakirja",
@@ -338,7 +342,7 @@
     "folder_finance": "Talous",
     "folder_finance_count": "1 asiakirja",
     "deadline_residence": "Oleskelulupahakemuksen jatko",
-    "deadline_residence_sub": "KELA & etuudet • 2 liitettä tarvitaan",
+    "deadline_residence_sub": "Kela & etuudet • 2 liitettä tarvitaan",
     "deadline_tax": "Veronpalautus 2025",
     "deadline_tax_sub": "Vero & talous • Lopullinen tarkistus"
   },
