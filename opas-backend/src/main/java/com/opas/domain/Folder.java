@@ -33,6 +33,11 @@ public class Folder {
     @Nullable
     private String description;
 
+    /** Set for the built-in categories (see {@link DocumentCategory}); null for custom folders. */
+    @Nullable
+    @Column(name = "category_key")
+    private String categoryKey;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -63,6 +68,9 @@ public class Folder {
     public String getDescription() { return description; }
     public void setDescription(@Nullable String description) { this.description = description; }
 
+    @Nullable
+    public String getCategoryKey() { return categoryKey; }
+    public void setCategoryKey(@Nullable String categoryKey) { this.categoryKey = categoryKey; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 

@@ -232,4 +232,16 @@ class DocumentServiceTest {
         verify(storageService, never()).deleteObject(any());
         verify(documentRepository, never()).delete(any());
     }
+
+    @Test
+    void assigningAFolderRecordsItAsTheUsersChoice() {
+        document.setStatus("ready");
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(documentRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.assignFolder(userId, documentId, null);
+
+        assertTrue(document.isFolderSetByUser());
+        assertNull(document.getFolderId());
+    }
 }

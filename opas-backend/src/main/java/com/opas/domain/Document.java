@@ -37,6 +37,11 @@ public class Document {
     @Column(name = "folder_id")
     private UUID folderId;
 
+    // True once the user has filed (or unfiled) the document themselves; the AI's
+    // suggested category is only applied while this is false.
+    @Column(name = "folder_set_by_user", nullable = false)
+    private boolean folderSetByUser;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -115,6 +120,14 @@ public class Document {
     @Nullable
     public UUID getFolderId() {
         return folderId;
+    }
+
+    public boolean isFolderSetByUser() {
+        return folderSetByUser;
+    }
+
+    public void setFolderSetByUser(boolean folderSetByUser) {
+        this.folderSetByUser = folderSetByUser;
     }
 
     public void setFolderId(UUID folderId) {

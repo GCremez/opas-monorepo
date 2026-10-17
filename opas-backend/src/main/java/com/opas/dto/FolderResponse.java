@@ -9,6 +9,8 @@ public record FolderResponse(
         UUID id,
         String name,
         @Nullable String description,
+        // Built-in category key (e.g. "kela"), or null for a folder the user created.
+        @Nullable String categoryKey,
         long documentCount,
         Instant createdAt,
         Instant updatedAt
@@ -18,6 +20,7 @@ public record FolderResponse(
                 folder.getId(),
                 folder.getName(),
                 folder.getDescription(),
+                folder.getCategoryKey(),
                 documentCount,
                 folder.getCreatedAt(),
                 folder.getUpdatedAt()

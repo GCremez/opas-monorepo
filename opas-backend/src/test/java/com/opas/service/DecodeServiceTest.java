@@ -48,6 +48,8 @@ class DecodeServiceTest {
     private UsageTracker usageTracker;
     @Mock
     private ClaudeClient claudeClient;
+    @Mock
+    private FolderService folderService;
 
     private DecodeService service;
     private UUID userId;
@@ -58,7 +60,7 @@ class DecodeServiceTest {
     @BeforeEach
     void setUp() {
         service = new DecodeService(documentRepository, userRepository, decodeResultRepository, subscriptionRepository,
-                storageService, presidioService, textExtractionService, embeddingService, usageTracker, claudeClient,
+                storageService, presidioService, textExtractionService, embeddingService, usageTracker, claudeClient, folderService,
                 new com.fasterxml.jackson.databind.ObjectMapper(),
                 new io.micrometer.core.instrument.simple.SimpleMeterRegistry(), 5, 2.00, 10.00);
         userId = UUID.randomUUID();
@@ -265,5 +267,54 @@ class DecodeServiceTest {
 
         // Exactly one real end marker: the one the template places after the content.
         assertEquals(1, prompt.split("END_DOCUMENT\n", -1).length - 1);
+    }
+
+    private void stubDecodePipeline(String structuredJson) {
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of());
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(userRepository.getReferenceById(userId)).thenReturn(user);
+        when(storageService.getObjectBytes(anyString())).thenReturn("x".getBytes());
+        when(textExtractionService.extract(any(), any())).thenReturn("Verohallinto päätös");
+        when(claudeClient.complete(anyString())).thenReturn(
+                new ClaudeClient.Reply(structuredJson, "claude-sonnet-5-5", 100, 50));
+        when(decodeResultRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    }
+
+    @Test
+    void decodedDocumentIsFiledIntoTheSuggestedCategory() {
+        stubDecodePipeline("{\"title\": \"Tax decision\", \"category\": \"tax\"}");
+        var taxFolder = new com.opas.domain.Folder();
+        taxFolder.setId(UUID.randomUUID());
+        when(folderService.builtInFolder(userId, com.opas.domain.DocumentCategory.TAX)).thenReturn(taxFolder);
+
+        service.processDecode(new DecodeMessage(userId, documentId, false));
+
+        assertEquals(taxFolder.getId(), document.getFolderId());
+    }
+
+    @Test
+    void suggestedCategoryNeverOverridesTheUsersChoice() {
+        stubDecodePipeline("{\"category\": \"tax\"}");
+        document.setFolderSetByUser(true); // the user chose "unfiled" on purpose
+
+        service.processDecode(new DecodeMessage(userId, documentId, false));
+
+        assertNull(document.getFolderId());
+        verify(folderService, never()).builtInFolder(any(), any());
+    }
+
+    @Test
+    void unknownOrMissingCategoryLeavesDocumentUnfiled() {
+        stubDecodePipeline("{\"category\": \"astrology\"}");
+
+        service.processDecode(new DecodeMessage(userId, documentId, false));
+
+        assertNull(document.getFolderId());
+        verify(folderService, never()).builtInFolder(any(), any());
+    }
+
+    @Test
+    void promptAsksForACategory() {
+        assertTrue(DecodeService.buildDecodePrompt("a.jpg", "x", "en").contains("\"category\""));
     }
 }

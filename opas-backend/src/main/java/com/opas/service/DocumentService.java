@@ -63,6 +63,9 @@ public class DocumentService {
             }
         }
         document.setFolderId(folderId);
+        // A choice the user made (including moving it out of every folder) is final: the
+        // AI's suggested category won't be applied over it.
+        document.setFolderSetByUser(true);
         document = documentRepository.save(document);
         return toResponse(document, null, generateDownloadUrl(document), insightsFor(document.getId()));
     }

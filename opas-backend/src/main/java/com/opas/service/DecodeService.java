@@ -5,6 +5,7 @@ import com.opas.config.DecodeFailedException;
 import com.opas.config.QuotaExceededException;
 import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.DecodeResult;
+import com.opas.domain.DocumentCategory;
 import com.opas.domain.Document;
 import com.opas.domain.Subscription;
 import com.opas.domain.User;
@@ -42,6 +43,7 @@ public class DecodeService {
     private final EmbeddingService embeddingService;
     private final UsageTracker usageTracker;
     private final ClaudeClient claudeClient;
+    private final FolderService folderService;
     private final ObjectMapper objectMapper;
     private final int freeTierLimit;
     private final double inputPricePerMTok;
@@ -62,7 +64,8 @@ public class DecodeService {
             DecodeResultRepository decodeResultRepository, SubscriptionRepository subscriptionRepository,
             StorageService storageService, PresidioService presidioService,
             TextExtractionService textExtractionService, EmbeddingService embeddingService,
-            UsageTracker usageTracker, ClaudeClient claudeClient, ObjectMapper objectMapper,
+            UsageTracker usageTracker, ClaudeClient claudeClient, FolderService folderService,
+            ObjectMapper objectMapper,
             MeterRegistry registry,
             @Value("${opas.free-tier.monthly-decode-limit}") int freeTierLimit,
             @Value("${opas.ai.input-price-per-mtok}") double inputPricePerMTok,
@@ -77,6 +80,7 @@ public class DecodeService {
         this.embeddingService = embeddingService;
         this.usageTracker = usageTracker;
         this.claudeClient = claudeClient;
+        this.folderService = folderService;
         this.objectMapper = objectMapper;
         this.freeTierLimit = freeTierLimit;
         this.inputPricePerMTok = inputPricePerMTok;
@@ -192,6 +196,12 @@ public class DecodeService {
         result = decodeResultRepository.save(result);
 
         document.setStatus("ready");
+        // Pre-file into the category the model suggested, unless the user already filed
+        // the document (or deliberately left it unfiled) — their choice always wins.
+        if (document.getFolderId() == null && !document.isFolderSetByUser()) {
+            suggestedCategory(result.getStructuredData()).ifPresent(category ->
+                    document.setFolderId(folderService.builtInFolder(message.userId(), category).getId()));
+        }
         documentRepository.save(document);
 
         // Record business metrics for the successful decode. duration is the Claude
@@ -277,6 +287,17 @@ public class DecodeService {
         }
     }
 
+    private java.util.Optional<DocumentCategory> suggestedCategory(String structuredData) {
+        if (structuredData == null) {
+            return java.util.Optional.empty();
+        }
+        try {
+            return DocumentCategory.fromKey(objectMapper.readTree(structuredData).path("category").asText(null));
+        } catch (Exception e) {
+            return java.util.Optional.empty();
+        }
+    }
+
     public long getRemainingDecodes(UUID userId) {
         int limit = resolveLimit(userId);
         return usageTracker.getRemaining(userId.toString(), "decodes", limit);
@@ -328,7 +349,9 @@ public class DecodeService {
                   "issuedDate": "YYYY-MM-DD" or null,
                   "deadlines": [{"date": "YYYY-MM-DD", "description": "what is due by then"}],
                   "actions": ["a concrete step the reader has to take"],
-                  "keyFields": {"label": "value"}
+                  "keyFields": {"label": "value"},
+                  "category": the best fit of "tax", "residence", "kela", "healthcare", "employment",
+                              "education", "housing", "finance", or null if none fits
                 }
 
                 Write title, summary, deadline descriptions, actions and keyFields labels in %s.
@@ -336,6 +359,9 @@ public class DecodeService {
                 keyFields holds amounts, case or reference numbers and periods.
                 Only include dates the document actually states; never infer or guess one.
                 Use [] for deadlines or actions when there are none.
+                For category: "kela" covers Kela and other social benefits, "residence" covers
+                Migri, DVV and immigration, "tax" covers Vero, "employment" covers TE services
+                and employers.
                 """
                 .formatted(filename, fenced, readerLanguage(userLanguage));
     }
