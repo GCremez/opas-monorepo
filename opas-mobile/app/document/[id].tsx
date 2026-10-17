@@ -11,6 +11,7 @@ import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { getDocument } from '../../src/api/documents';
 import { decodeDocument, getDecodeResult, pollDecodeResult } from '../../src/api/decode';
 import { useDocumentStore } from '../../src/store/documentStore';
+import { completedAt, tasksOf } from '../../src/lib/tasks';
 import { useFolderStore } from '../../src/store/folderStore';
 import { folderName } from '../../src/lib/folders';
 import { ChevronLeftIcon, DotsIcon } from '../../src/components/icons';
@@ -29,7 +30,7 @@ export default function DocumentDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useThemeColors();
-  const { deleteDocument, archiveDocument, assignFolder } = useDocumentStore();
+  const { deleteDocument, archiveDocument, assignFolder, setTaskDone } = useDocumentStore();
   const { folders, fetchFolders } = useFolderStore();
   const [categorySheet, setCategorySheet] = useState(false);
   const { isPremium } = usePremium();
@@ -42,6 +43,22 @@ export default function DocumentDetailScreen() {
 
   const view = toDecodeView(decode);
   const upcoming = nextDeadline(view);
+  const tasks = view ? tasksOf(view.deadlines, view.actions) : [];
+  const doneCount = tasks.filter((task) => completedAt(doc, task.key)).length;
+
+  // Optimistic: the box ticks at once and unticks again if the server refuses.
+  const toggleTask = async (key: string, done: boolean) => {
+    if (!doc || !id) return;
+    const before = doc;
+    const others = (doc.completedTasks ?? []).filter((task) => task.key !== key);
+    setDoc({ ...doc, completedTasks: done ? [...others, { key, completedAt: new Date().toISOString() }] : others });
+    try {
+      const updated = await setTaskDone(id, key, done);
+      setDoc((d) => (d ? { ...d, completedTasks: updated.completedTasks } : d));
+    } catch {
+      setDoc(before);
+    }
+  };
   const locale = i18n.language;
 
   // Runs a decode step and maps its outcome onto the screen state. Every path ends the
@@ -367,19 +384,60 @@ export default function DocumentDetailScreen() {
             </View>
           )}
 
-          {/* ACTIONS */}
+          {/* ACTIONS — a checklist of the deadlines and actions (design 4a) */}
           {!decoding && activeTab === 'actions' && (
             <View className="px-6 pt-5">
-              <Text className="font-semibold text-label uppercase text-fg mb-2">{t('document.required_actions')}</Text>
-              {view?.actions.length ? (
-                view.actions.map((action, i) => (
-                  <View key={i} className="flex-row gap-3 py-3 border-b border-line">
-                    <Text className="font-mono text-data text-muted">{String(i + 1).padStart(2, '0')}</Text>
-                    <Text className="font-body text-body text-fg flex-1">{action}</Text>
-                  </View>
-                ))
+              <View className="flex-row items-baseline justify-between pb-1.5">
+                <Text className="font-semibold text-label uppercase text-fg">{t('document.required_actions')}</Text>
+                {tasks.length > 0 && (
+                  <Text className="font-mono text-meta uppercase text-warning">
+                    {t('document.done_count', { done: doneCount, total: tasks.length })}
+                  </Text>
+                )}
+              </View>
+              {tasks.length ? (
+                tasks.map((task) => {
+                  const doneAt = completedAt(doc, task.key);
+                  const days = task.date ? daysUntil(task.date) : null;
+                  const meta = doneAt
+                    ? t('document.done_on', { date: formatDate(doneAt.slice(0, 10), locale) })
+                    : task.date && days !== null
+                      ? days < 0
+                        ? t('document.date_passed')
+                        : days <= 14
+                          ? t('document.due_in', { count: days })
+                          : t('document.by_date', { date: formatDate(task.date, locale) })
+                      : null;
+                  return (
+                    <Pressable
+                      key={task.key}
+                      onPress={() => toggleTask(task.key, !doneAt)}
+                      className="flex-row gap-[13px] py-[15px] border-b border-line"
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: !!doneAt }}
+                      accessibilityLabel={task.title}
+                    >
+                      <View
+                        className={`w-5 h-5 rounded-[5px] mt-0.5 items-center justify-center ${doneAt ? 'bg-accent border-accent' : 'border-rule'}`}
+                        style={{ borderWidth: 1.5 }}
+                      >
+                        {doneAt && <Text className="font-semibold text-[11px] text-on-accent">✓</Text>}
+                      </View>
+                      <View className="flex-1">
+                        <Text className={`font-display text-[16px] leading-[20px] ${doneAt ? 'text-muted line-through' : 'text-fg'}`}>
+                          {task.title}
+                        </Text>
+                        {meta && (
+                          <Text className={`font-mono text-meta uppercase mt-1.5 ${doneAt ? 'text-muted' : days !== null && days >= 0 && days <= 14 ? 'text-warning' : 'text-muted'}`}>
+                            {meta}
+                          </Text>
+                        )}
+                      </View>
+                    </Pressable>
+                  );
+                })
               ) : (
-                <Text className="font-body text-body-sm text-muted">{decode ? t('document.no_actions') : t('document.not_decoded')}</Text>
+                <Text className="font-body text-body-sm text-muted pt-2">{decode ? t('document.no_actions') : t('document.not_decoded')}</Text>
               )}
               <Button variant="primary" block size="lg" className="mt-7" onPress={handleDraftLetter}>
                 {t('document.draft_letter')}

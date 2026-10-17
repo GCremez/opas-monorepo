@@ -20,6 +20,8 @@ interface DocumentState {
   deleteDocument: (id: string) => Promise<void>;
   /** File a document into a folder, or pass null to take it out of every folder. */
   assignFolder: (id: string, folderId: string | null) => Promise<void>;
+  /** Tick a deadline or action off (or back on). Throws if the server refuses. */
+  setTaskDone: (id: string, key: string, done: boolean) => Promise<Document>;
   archiveDocument: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -109,6 +111,13 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     const updated = await api.assignFolder(id, folderId);
     set((s) => ({ documents: s.documents.map((d) => (d.id === id ? { ...d, ...updated } : d)) }));
     track('document_filed', { doc_id: id, has_folder: folderId !== null });
+  },
+
+  setTaskDone: async (id, key, done) => {
+    const updated = await api.setTaskDone(id, key, done);
+    set((s) => ({ documents: s.documents.map((d) => (d.id === id ? { ...d, ...updated } : d)) }));
+    track('task_marked', { doc_id: id, done });
+    return updated;
   },
 
   archiveDocument: async (id) => {

@@ -148,7 +148,8 @@
     "no_alerts_desc": "When a document has a deadline, it shows up here.",
     "days_left": "{{count}} days",
     "day_left": "{{count}} day",
-    "passed": "Passed"
+    "passed": "Passed",
+    "later_this_month": "Later this month"
   },
   "home": {
     "title": "Home",
@@ -448,7 +449,12 @@
     "category": "Category",
     "choose_category": "Add to a category",
     "no_category": "No category",
-    "category_title": "File under"
+    "category_title": "File under",
+    "done_count": "{{done}} / {{total}} done",
+    "done_on": "Done · {{date}}",
+    "due_in": "Due in {{count}} day",
+    "due_in_plural": "Due in {{count}} days",
+    "by_date": "By {{date}}"
   },
   "draftLetter": {
     "title": "Draft Letter",

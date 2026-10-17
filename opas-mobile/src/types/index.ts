@@ -41,6 +41,8 @@ export interface Document {
   actions?: string[];
   /** Headline figure for lists, e.g. "€387.20/mo". */
   keyFigure?: string | null;
+  /** Deadlines and actions the user has marked done (see lib/tasks). */
+  completedTasks?: { key: string; completedAt: string }[];
 }
 
 export interface DecodeResult {

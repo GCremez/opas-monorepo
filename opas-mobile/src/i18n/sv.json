@@ -148,7 +148,8 @@
     "no_alerts_desc": "När ett dokument har en tidsfrist visas det här.",
     "days_left": "{{count}} dgr",
     "day_left": "{{count}} dg",
-    "passed": "Passerade"
+    "passed": "Passerade",
+    "later_this_month": "Senare denna månad"
   },
   "home": {
     "title": "Hem",
@@ -448,7 +449,12 @@
     "category": "Kategori",
     "choose_category": "Lägg i en kategori",
     "no_category": "Ingen kategori",
-    "category_title": "Arkivera under"
+    "category_title": "Arkivera under",
+    "done_count": "{{done}} / {{total}} klara",
+    "done_on": "Klart · {{date}}",
+    "due_in": "Förfaller om {{count}} dag",
+    "due_in_plural": "Förfaller om {{count}} dagar",
+    "by_date": "Senast {{date}}"
   },
   "draftLetter": {
     "title": "Utkast till brev",

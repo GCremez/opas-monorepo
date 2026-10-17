@@ -47,6 +47,12 @@ export async function archiveDocument(id: string): Promise<void> {
 }
 
 // File a document under a folder, or pass null to remove it from its folder.
+/** Mark one of a document's deadlines or actions done (or not done again). */
+export async function setTaskDone(id: string, key: string, done: boolean): Promise<Document> {
+  const { data } = await apiClient.put(`/documents/${id}/tasks`, { key, done });
+  return data;
+}
+
 export async function assignFolder(id: string, folderId: string | null): Promise<Document> {
   const { data } = await apiClient.patch(`/documents/${id}/folder`, { folderId });
   return data;

@@ -143,12 +143,13 @@
     "title": "Määräajat ja\nmuistutukset.",
     "this_week": "Tällä viikolla",
     "later": "Myöhemmin",
-    "done": "Valmis",
+    "done": "Tehty",
     "no_alerts": "Ei määräaikoja",
     "no_alerts_desc": "Kun asiakirjalla on määräaika, se näkyy täällä.",
     "days_left": "{{count}} pv",
     "day_left": "{{count}} pv",
-    "passed": "Menneet"
+    "passed": "Menneet",
+    "later_this_month": "Myöhemmin tässä kuussa"
   },
   "home": {
     "title": "Koti",
@@ -448,7 +449,12 @@
     "category": "Kategoria",
     "choose_category": "Lisää kategoriaan",
     "no_category": "Ei kategoriaa",
-    "category_title": "Tallenna kategoriaan"
+    "category_title": "Tallenna kategoriaan",
+    "done_count": "{{done}} / {{total}} tehty",
+    "done_on": "Tehty · {{date}}",
+    "due_in": "Erääntyy {{count}} päivässä",
+    "due_in_plural": "Erääntyy {{count}} päivässä",
+    "by_date": "Viimeistään {{date}}"
   },
   "draftLetter": {
     "title": "Kirjeluonnos",
