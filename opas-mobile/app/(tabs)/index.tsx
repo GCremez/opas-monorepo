@@ -3,6 +3,7 @@ import { useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Materialize } from '../../src/components/motion';
 import { authorityOf } from '../../src/lib/authorities';
 import { completedAt, deadlineKey } from '../../src/lib/tasks';
 import { useTranslation } from 'react-i18next';
@@ -139,36 +140,38 @@ export default function RecordScreen() {
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
       >
-        {/* Masthead */}
-        <View className="px-6 pt-3 pb-6">
-          <View className="flex-row items-start justify-between">
-            <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">
-              {t('record.eyebrow')}
+        {/* Warm load (motion 08): returning to Home, the sections surface in, staggered. */}
+        <Materialize index={0}>
+          <View className="px-6 pt-3 pb-6">
+            <View className="flex-row items-start justify-between">
+              <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">
+                {t('record.eyebrow')}
+              </Text>
+              <Pressable
+                onPress={() => router.push('/(tabs)/search')}
+                className="w-9 h-9 -mt-2 items-center justify-center"
+                accessibilityLabel={t('tabs.search')}
+              >
+                <SearchIcon size={20} color={c.muted} />
+              </Pressable>
+            </View>
+            <Text className="font-display text-[31px] leading-[34px] tracking-[-0.01em] text-fg mt-2">
+              {t(`home.${getGreeting()}`)},{firstName ? `\n${firstName}.` : '.'}
             </Text>
-            <Pressable
-              onPress={() => router.push('/(tabs)/search')}
-              className="w-9 h-9 -mt-2 items-center justify-center"
-              accessibilityLabel={t('tabs.search')}
-            >
-              <SearchIcon size={20} color={c.muted} />
-            </Pressable>
+            {hasDocuments && (
+              <Text className="font-serif text-[15px] leading-[23px] text-fg-soft mt-3">
+                {needsYou.length > 0 ? (
+                  <>
+                    {t('record.all_clear')}
+                    <Text className="text-danger">{t('record.needs_count', { count: needsYou.length })}</Text>
+                  </>
+                ) : (
+                  t('record.nothing_needs')
+                )}
+              </Text>
+            )}
           </View>
-          <Text className="font-display text-[31px] leading-[34px] tracking-[-0.01em] text-fg mt-2">
-            {t(`home.${getGreeting()}`)},{firstName ? `\n${firstName}.` : '.'}
-          </Text>
-          {hasDocuments && (
-            <Text className="font-serif text-[15px] leading-[23px] text-fg-soft mt-3">
-              {needsYou.length > 0 ? (
-                <>
-                  {t('record.all_clear')}
-                  <Text className="text-danger">{t('record.needs_count', { count: needsYou.length })}</Text>
-                </>
-              ) : (
-                t('record.nothing_needs')
-              )}
-            </Text>
-          )}
-        </View>
+        </Materialize>
 
         {error && (
           <ErrorState
@@ -197,52 +200,56 @@ export default function RecordScreen() {
 
         {/* Needs you — the nearest deadlines stated in the user's own documents. */}
         {needsYou.length > 0 && (
-          <View className="px-6 mt-2">
-            <SectionHeader
-              title={t('record.needs_you')}
-              onSeeAll={() => router.push('/(tabs)/alerts')}
-              seeAllLabel={t('record.see_all')}
-            />
-            {needsYou.map(({ document, deadline, days }) => (
-              <ActionRow
-                key={`${document.id}-${deadline.date}-${deadline.description}`}
-                title={deadline.description || documentName(document)}
-                meta={authorityOf(document.authority)?.name ?? documentName(document)}
-                date={formatDate(deadline.date, i18n.language)}
-                note={days === 0 ? t('document.due_today') : t('document.days_left', { count: days })}
-                urgency={days <= 3 ? 'danger' : days <= 7 ? 'warning' : 'muted'}
-                onPress={() => router.push(`/document/${document.id}`)}
+          <Materialize index={1}>
+            <View className="px-6 mt-2">
+              <SectionHeader
+                title={t('record.needs_you')}
+                onSeeAll={() => router.push('/(tabs)/alerts')}
+                seeAllLabel={t('record.see_all')}
               />
-            ))}
-          </View>
+              {needsYou.map(({ document, deadline, days }) => (
+                <ActionRow
+                  key={`${document.id}-${deadline.date}-${deadline.description}`}
+                  title={deadline.description || documentName(document)}
+                  meta={authorityOf(document.authority)?.name ?? documentName(document)}
+                  date={formatDate(deadline.date, i18n.language)}
+                  note={days === 0 ? t('document.due_today') : t('document.days_left', { count: days })}
+                  urgency={days <= 3 ? 'danger' : days <= 7 ? 'warning' : 'muted'}
+                  onPress={() => router.push(`/document/${document.id}`)}
+                />
+              ))}
+            </View>
+          </Materialize>
         )}
 
         {/* Your documents */}
         {hasDocuments && (
-          <View className="px-6 mt-8">
-            <SectionHeader
-              title={t('record.your_documents')}
-              onSeeAll={() => router.push('/(tabs)/docs')}
-              seeAllLabel={t('record.see_all')}
-            />
-            {documents.slice(0, 6).map((d) => (
-              <DocRow
-                key={d.id}
-                name={documentName(d)}
-                // The headline figure from the letter (design 1a), or where it is in the process.
-                value={d.keyFigure ?? t(`status.${d.status}`).toUpperCase()}
-                age={timeAgo(d.updatedAt)}
-                valueTone={d.keyFigure ? 'text-accent' : d.status === 'failed' ? 'text-danger' : 'text-muted'}
-                onPress={() => {
-                  track('document_tap', { doc_id: d.id, status: d.status });
-                  router.push(`/document/${d.id}`);
-                }}
+          <Materialize index={2}>
+            <View className="px-6 mt-8">
+              <SectionHeader
+                title={t('record.your_documents')}
+                onSeeAll={() => router.push('/(tabs)/docs')}
+                seeAllLabel={t('record.see_all')}
               />
-            ))}
-            <Text className="font-serif-italic text-[14px] leading-[22px] text-muted pt-4">
-              {t(docCount === 1 ? 'record.footer_one' : 'record.footer_other', { count: docCount })}
-            </Text>
-          </View>
+              {documents.slice(0, 6).map((d) => (
+                <DocRow
+                  key={d.id}
+                  name={documentName(d)}
+                  // The headline figure from the letter (design 1a), or where it is in the process.
+                  value={d.keyFigure ?? t(`status.${d.status}`).toUpperCase()}
+                  age={timeAgo(d.updatedAt)}
+                  valueTone={d.keyFigure ? 'text-accent' : d.status === 'failed' ? 'text-danger' : 'text-muted'}
+                  onPress={() => {
+                    track('document_tap', { doc_id: d.id, status: d.status });
+                    router.push(`/document/${d.id}`);
+                  }}
+                />
+              ))}
+              <Text className="font-serif-italic text-[14px] leading-[22px] text-muted pt-4">
+                {t(docCount === 1 ? 'record.footer_one' : 'record.footer_other', { count: docCount })}
+              </Text>
+            </View>
+          </Materialize>
         )}
 
       </ScrollView>

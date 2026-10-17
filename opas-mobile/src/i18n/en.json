@@ -99,7 +99,11 @@
     "reset_password_min": "New password must be at least 8 characters",
     "reset_invalid": "That code is invalid or expired. Request a new one.",
     "reset_done_title": "Password updated.",
-    "reset_done_body": "Sign in with your new password."
+    "reset_done_body": "Sign in with your new password.",
+    "signing_in": "Signing in…",
+    "signed_in": "Signed in",
+    "creating_account": "Creating your account…",
+    "account_created": "Account created"
   },
   "tabs": {
     "home": "Home",
@@ -261,7 +265,8 @@
     "open_saved_copy": "Or open the copy that was saved",
     "tip_flatten": "Flatten the page",
     "tip_glare": "Avoid shadows & glare",
-    "tip_corners": "Fit all four corners"
+    "tip_corners": "Fit all four corners",
+    "filing": "Filing your letter…"
   },
   "documents": {
     "title": "Documents",

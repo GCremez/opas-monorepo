@@ -58,7 +58,8 @@ export function PassageButton({ label, processingLabel, doneLabel, state, onPres
   const checkProps = useAnimatedProps(() => ({ strokeDashoffset: 44 * (1 - check.value) }));
 
   const onLayout = (e: LayoutChangeEvent) => setW(e.nativeEvent.layout.width);
-  const bg = state === 'done' ? c.accent : c.fg;
+  // Idle it's the app's primary pill; while working it turns ink so the track reads.
+  const bg = state === 'processing' ? c.fg : c.accent;
   const text =
     state === 'done' ? doneLabel ?? 'Filed · Arrived' : state === 'processing' ? processingLabel ?? label : label;
 
@@ -66,7 +67,10 @@ export function PassageButton({ label, processingLabel, doneLabel, state, onPres
     <Pressable
       onPress={state === 'idle' ? onPress : undefined}
       onLayout={onLayout}
-      className="h-[50px] rounded-[12px] overflow-hidden items-center justify-center flex-row gap-2"
+      accessibilityRole="button"
+      accessibilityLabel={text}
+      accessibilityState={{ busy: state === 'processing', disabled: state !== 'idle' }}
+      className="h-[52px] rounded-pill overflow-hidden items-center justify-center flex-row gap-2"
       style={{ backgroundColor: bg }}
     >
       {/* Dashed track — only while processing */}
@@ -109,8 +113,8 @@ export function PassageButton({ label, processingLabel, doneLabel, state, onPres
       )}
 
       <Text
-        className="font-body font-semibold text-label tracking-[0.16em] uppercase"
-        style={{ color: state === 'done' ? c['on-accent'] : c.bg }}
+        className="font-semibold text-[14px] tracking-[0.04em]"
+        style={{ color: state === 'processing' ? c.bg : c['on-accent'] }}
       >
         {text}
       </Text>

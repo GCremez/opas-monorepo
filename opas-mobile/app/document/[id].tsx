@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../src/components/ui/Button';
 import { Spinner } from '../../src/components/ui/Loading';
-import { DecodeScramble, CountdownRing } from '../../src/components/motion';
+import { DecodeScramble, CountdownRing, StreamingText } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { getDocument } from '../../src/api/documents';
 import { decodeDocument, getDecodeResult, pollDecodeResult } from '../../src/api/decode';
@@ -39,6 +39,9 @@ export default function DocumentDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [decodeState, setDecodeState] = useState<DecodeState>('idle');
   const [activeTab, setActiveTab] = useState<TabView>('summary');
+  // The Plain Words (motion 13): a summary that was just written types itself in;
+  // one opened later is simply there.
+  const [justDecoded, setJustDecoded] = useState(false);
   const [sheetVisible, setSheetVisible] = useState(false);
 
   const view = toDecodeView(decode);
@@ -67,6 +70,7 @@ export default function DocumentDetailScreen() {
     setDecodeState('running');
     try {
       setDecode(await step());
+      setJustDecoded(true);
       setDecodeState('idle');
     } catch {
       // DecodeFailedError (backend gave up), a timeout, or a network error: all retryable.
@@ -315,7 +319,11 @@ export default function DocumentDetailScreen() {
           {!decoding && activeTab === 'summary' && decode && (
             <View className="px-6 pt-5">
               {view?.summary ? (
-                <Text className="font-serif text-prose text-fg">{view.summary}</Text>
+                justDecoded ? (
+                  <StreamingText text={view.summary} className="font-serif text-prose text-fg" />
+                ) : (
+                  <Text className="font-serif text-prose text-fg">{view.summary}</Text>
+                )
               ) : decode.rawResponse ? (
                 // Older results (or a reply that wasn't valid JSON) only have the raw text.
                 <Text className="font-serif text-prose text-fg-soft">{decode.rawResponse}</Text>

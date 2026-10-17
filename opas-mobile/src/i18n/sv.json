@@ -99,7 +99,11 @@
     "reset_password_min": "Det nya lösenordet måste vara minst 8 tecken",
     "reset_invalid": "Koden är ogiltig eller har gått ut. Begär en ny.",
     "reset_done_title": "Lösenordet uppdaterat.",
-    "reset_done_body": "Logga in med ditt nya lösenord."
+    "reset_done_body": "Logga in med ditt nya lösenord.",
+    "signing_in": "Loggar in…",
+    "signed_in": "Inloggad",
+    "creating_account": "Skapar ditt konto…",
+    "account_created": "Konto skapat"
   },
   "tabs": {
     "home": "Hem",
@@ -261,7 +265,8 @@
     "open_saved_copy": "Eller öppna kopian som sparades",
     "tip_flatten": "Släta ut sidan",
     "tip_glare": "Undvik skuggor och blänk",
-    "tip_corners": "Få med alla fyra hörn"
+    "tip_corners": "Få med alla fyra hörn",
+    "filing": "Arkiverar ditt brev…"
   },
   "documents": {
     "title": "Dokument",

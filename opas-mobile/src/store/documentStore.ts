@@ -15,7 +15,9 @@ interface DocumentState {
   uploadAndDecode: (
     filename: string,
     contentType: string,
-    uri: string
+    uri: string,
+    /** Told when the upload is done and reading starts. */
+    onStage?: (stage: 'decode') => void
   ) => Promise<DecodeResult | null>;
   deleteDocument: (id: string) => Promise<void>;
   /** File a document into a folder, or pass null to take it out of every folder. */
@@ -49,7 +51,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     }
   },
 
-  uploadAndDecode: async (filename, contentType, uri) => {
+  uploadAndDecode: async (filename, contentType, uri, onStage) => {
     let stage: 'upload' | 'decode' = 'upload';
     let documentId: string | null = null;
     try {
@@ -75,6 +77,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       await api.confirmUpload(upload.id);
       stage = 'decode';
       documentId = upload.id;
+      onStage?.('decode');
       const result = await decodeApi.decodeDocument(upload.id);
       await get().fetchDocuments();
       return result;

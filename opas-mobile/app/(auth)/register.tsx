@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../src/components/ui/Button';
+import { PassageButton, type PassageState } from '../../src/components/motion';
 import { ChevronLeftIcon } from '../../src/components/icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
@@ -42,7 +42,8 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // The Passage (motion 05): the waypoint travels while the request runs, then the check lands.
+  const [passage, setPassage] = useState<PassageState>('idle');
   const [error, setError] = useState('');
 
   const handleRegister = async () => {
@@ -54,20 +55,21 @@ export default function RegisterScreen() {
       setError(t('auth.password_min'));
       return;
     }
-    setLoading(true);
+    setPassage('processing');
     setError('');
     try {
       const { email: registeredEmail } = await register(name, email, password);
       await SecureStore.setItemAsync('has_registered', 'true');
       // Hard verification gate: no session yet — collect the emailed code next.
+      setPassage('done');
+      await new Promise((r) => setTimeout(r, 450));
       router.replace({ pathname: '/(auth)/verify', params: { email: registeredEmail } });
     } catch (e: any) {
       console.error('[register] failed:', e?.message, e?.code, e?.config?.baseURL, e?.config?.url);
       // Uniform generic message — must not reveal whether the email is already
       // registered (account enumeration) or that the server errored.
       setError(t('auth.registration_failed'));
-    } finally {
-      setLoading(false);
+      setPassage('idle');
     }
   };
 
@@ -122,9 +124,13 @@ export default function RegisterScreen() {
           {/* Spacer pushes the action to the bottom of the screen, per the design. */}
           <View className="flex-1 min-h-[32px]" />
 
-          <Button variant="primary" block size="lg" loading={loading} onPress={handleRegister}>
-            {t('auth.create_account')}
-          </Button>
+          <PassageButton
+            label={t('auth.create_account')}
+            processingLabel={t('auth.creating_account')}
+            doneLabel={t('auth.account_created')}
+            state={passage}
+            onPress={handleRegister}
+          />
 
           <View className="flex-row justify-center mt-5 pb-2">
             <Text className="font-serif-italic text-[14px] text-muted">{t('auth.has_account')} </Text>

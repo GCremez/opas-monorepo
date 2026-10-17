@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { XIcon } from '../../src/components/icons';
-import { OrbitLoader } from '../../src/components/motion';
+import { AssemblyLoader, OrbitLoader } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { Button } from '../../src/components/ui/Button';
 import { useDocumentStore } from '../../src/store/documentStore';
@@ -139,6 +139,8 @@ export default function ScanScreen() {
   const [state, setState] = useState<ScanState>('ready');
   const [flashOn, setFlashOn] = useState(false);
   const [filename, setFilename] = useState('');
+  // Uploading shows The Assembly; once the letter is stored, the reading checklist takes over.
+  const [phase, setPhase] = useState<'upload' | 'decode'>('upload');
   const [found, setFound] = useState<{ documentId: string; view: DecodeView | null; folderId: string | null } | null>(null);
   const [categorySheet, setCategorySheet] = useState(false);
 
@@ -150,8 +152,11 @@ export default function ScanScreen() {
     const runId = ++runRef.current;
     clearError();
     setFilename(name);
+    setPhase('upload');
     setState('processing');
-    const result = await uploadAndDecode(name, contentType, uri);
+    const result = await uploadAndDecode(name, contentType, uri, () => {
+      if (runId === runRef.current) setPhase('decode');
+    });
     if (runId !== runRef.current) return;
 
     if (result) {
@@ -236,7 +241,19 @@ export default function ScanScreen() {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
         <View className="flex-1 justify-center">
-          <ScanProgress filename={filename} />
+          {phase === 'upload' ? (
+            // The Assembly (motion 04): fragments stack into a record while it uploads.
+            <View className="px-[30px]">
+              <Text className="font-mono text-meta uppercase text-muted" numberOfLines={1}>{filename}</Text>
+              <View className="self-center my-8"><AssemblyLoader size={150} /></View>
+              <Text className="font-semibold text-label uppercase text-muted">{t('scan.please_wait')}</Text>
+              <Text className="font-display text-[30px] leading-[33px] tracking-[-0.01em] text-fg mt-2" accessibilityRole="header">
+                {t('scan.filing')}
+              </Text>
+            </View>
+          ) : (
+            <ScanProgress filename={filename} />
+          )}
         </View>
         <Text className="font-serif-italic text-[14px] leading-[22px] text-muted text-center px-10">{t('scan.privacy_note')}</Text>
         <View className="px-6 pt-4 pb-2">

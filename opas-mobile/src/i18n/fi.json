@@ -99,7 +99,11 @@
     "reset_password_min": "Uuden salasanan on oltava vähintään 8 merkkiä",
     "reset_invalid": "Koodi on virheellinen tai vanhentunut. Pyydä uusi.",
     "reset_done_title": "Salasana päivitetty.",
-    "reset_done_body": "Kirjaudu sisään uudella salasanallasi."
+    "reset_done_body": "Kirjaudu sisään uudella salasanallasi.",
+    "signing_in": "Kirjaudutaan…",
+    "signed_in": "Kirjauduttu",
+    "creating_account": "Luodaan tiliä…",
+    "account_created": "Tili luotu"
   },
   "tabs": {
     "home": "Koti",
@@ -261,7 +265,8 @@
     "open_saved_copy": "Tai avaa tallennettu kopio",
     "tip_flatten": "Suorista sivu",
     "tip_glare": "Vältä varjoja ja heijastuksia",
-    "tip_corners": "Kaikki neljä kulmaa kuvaan"
+    "tip_corners": "Kaikki neljä kulmaa kuvaan",
+    "filing": "Arkistoidaan kirjettäsi…"
   },
   "documents": {
     "title": "Asiakirjat",
