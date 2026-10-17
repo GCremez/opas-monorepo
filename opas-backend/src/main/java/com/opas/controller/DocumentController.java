@@ -3,6 +3,7 @@ package com.opas.controller;
 import com.opas.dto.AssignFolderRequest;
 import com.opas.dto.ConfirmUploadRequest;
 import com.opas.dto.DocumentResponse;
+import com.opas.dto.TaskRequest;
 import com.opas.dto.UploadUrlRequest;
 import com.opas.service.DocumentService;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -100,6 +102,13 @@ public class DocumentController {
             @RequestBody AssignFolderRequest request) {
         UUID userId = resolveUserId(authentication);
         return ResponseEntity.ok(documentService.assignFolder(userId, id, request.folderId()));
+    }
+
+    @PutMapping("/{id}/tasks")
+    public ResponseEntity<DocumentResponse> setTaskDone(Authentication authentication, @PathVariable UUID id,
+            @Valid @RequestBody TaskRequest request) {
+        UUID userId = resolveUserId(authentication);
+        return ResponseEntity.ok(documentService.setTaskDone(userId, id, request.key(), request.done()));
     }
 
 }

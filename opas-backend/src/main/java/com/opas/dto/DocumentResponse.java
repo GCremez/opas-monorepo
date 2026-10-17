@@ -14,5 +14,7 @@ public record DocumentResponse(UUID id, String filename, String contentType, Lon
         // actions: what search matches against on the phone.
         @Nullable String documentType, @Nullable String summary, List<String> actions,
         // The headline figure for lists, e.g. "€387.20/mo".
-        @Nullable String keyFigure) {
+        @Nullable String keyFigure,
+        // Deadlines and actions the user has marked done.
+        List<CompletedTaskResponse> completedTasks) {
 }
