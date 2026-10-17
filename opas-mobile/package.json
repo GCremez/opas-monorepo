@@ -13,6 +13,7 @@
     "test:ci": "jest --ci --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@bacons/apple-targets": "^5.0.0",
     "@expo-google-fonts/instrument-sans": "^0.4.2",
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo-google-fonts/newsreader": "^0.4.1",

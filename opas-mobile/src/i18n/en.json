@@ -552,5 +552,15 @@
     "turn_on": "Turn on reminders",
     "not_now": "Not now",
     "blocked": "Notifications are off for Opas. Turn them on in Settings."
+  },
+  "widget": {
+    "header": "Opas · Next deadline",
+    "days_left": "days left",
+    "day_left": "day left",
+    "due_today": "Due today",
+    "due": "Due",
+    "empty": "Nothing due. You're on top of it.",
+    "scan_header": "Opas · Scan",
+    "scan_cta": "Tap to scan a new letter →"
   }
 }

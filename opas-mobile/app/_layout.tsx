@@ -33,6 +33,7 @@ import * as Notifications from 'expo-notifications';
 import { useDocumentStore } from '../src/store/documentStore';
 import { useReminderStore } from '../src/store/reminderStore';
 import { syncReminders } from '../src/lib/reminders';
+import { updateWidget } from '../src/lib/widget';
 import { initAnalytics } from '../src/lib/analytics';
 import { initSentry } from '../src/lib/sentry';
 
@@ -80,8 +81,8 @@ export default function RootLayout() {
     }
   }, [isAuthenticated]);
 
-  // Deadline reminders (design 6f): keep the device's schedule in step with the documents,
-  // the user's choice and the language the reminders are written in.
+  // Deadline reminders (design 6f) and the home-screen widget (6g): keep both in step with
+  // the documents, the user's choice and the language they're written in.
   const documents = useDocumentStore((s) => s.documents);
   const remindersOn = useReminderStore((s) => s.enabled);
   const permission = useReminderStore((s) => s.permission);
@@ -91,6 +92,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (!isAuthenticated) return;
     syncReminders(documents, remindersOn, i18n.t, i18n.language).catch(() => {});
+    updateWidget(documents, i18n.t, i18n.language);
   }, [isAuthenticated, documents, remindersOn, permission, i18n.t, i18n.language]);
 
   // Tapping a reminder opens its document, whether the app was running or not.

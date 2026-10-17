@@ -552,5 +552,15 @@
     "turn_on": "Ota muistutukset käyttöön",
     "not_now": "Ei nyt",
     "blocked": "Ilmoitukset ovat pois päältä. Ota ne käyttöön Asetuksista."
+  },
+  "widget": {
+    "header": "Opas · Seuraava määräaika",
+    "days_left": "päivää jäljellä",
+    "day_left": "päivä jäljellä",
+    "due_today": "Erääntyy tänään",
+    "due": "Eräpäivä",
+    "empty": "Ei mitään erääntyvää. Hyvin hoidettu.",
+    "scan_header": "Opas · Skannaa",
+    "scan_cta": "Skannaa uusi kirje →"
   }
 }

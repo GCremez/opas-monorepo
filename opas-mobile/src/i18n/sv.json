@@ -552,5 +552,15 @@
     "turn_on": "Slå på påminnelser",
     "not_now": "Inte nu",
     "blocked": "Notiser är avstängda för Opas. Slå på dem i Inställningar."
+  },
+  "widget": {
+    "header": "Opas · Nästa tidsfrist",
+    "days_left": "dagar kvar",
+    "day_left": "dag kvar",
+    "due_today": "Förfaller i dag",
+    "due": "Förfaller",
+    "empty": "Inget förfaller. Du har koll.",
+    "scan_header": "Opas · Skanna",
+    "scan_cta": "Tryck för att skanna ett brev →"
   }
 }
