@@ -123,7 +123,7 @@ export default function OnboardingScreen() {
     else flatRef.current?.scrollToIndex({ index: index + 1, animated: true });
   };
 
-  const onViewable = useRef(({ viewableItems }: { viewableItems: { index: number | null }[] }) => {
+  const onViewable = useRef(({ viewableItems }: { viewableItems: { index?: number | null }[] }) => {
     if (viewableItems[0]?.index != null) setIndex(viewableItems[0].index);
   }).current;
 

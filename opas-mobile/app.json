@@ -90,7 +90,8 @@
           }
         }
       ],
-      "@bacons/apple-targets"
+      "@bacons/apple-targets",
+      "expo-status-bar"
     ],
     "extra": {
       "apiBaseUrl": "http://192.168.0.14:8080/api/v1"

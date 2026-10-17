@@ -30,6 +30,8 @@ export async function registerForPushNotifications(): Promise<string | null> {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'default',
+      // Exported at runtime; import/namespace can't read SDK 58's compiled enum.
+      // eslint-disable-next-line import/namespace
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
     });
