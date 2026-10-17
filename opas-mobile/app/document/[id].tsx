@@ -378,7 +378,7 @@ export default function DocumentDetailScreen() {
                   const status = days < 0 ? t('document.date_passed') : days === 0 ? t('document.due_today') : t('document.days_left', { count: days });
                   return (
                     <View key={`${d.date}-${d.description}`} className="py-3 border-b border-line">
-                      <View className="flex-row justify-between">
+                      <View className="flex-row items-baseline justify-between">
                         <Text className="font-mono text-data text-fg">{formatDate(d.date, locale)}</Text>
                         <Text className={`font-body text-body-sm ${days < 0 ? 'text-muted' : 'text-warning'}`}>{status}</Text>
                       </View>

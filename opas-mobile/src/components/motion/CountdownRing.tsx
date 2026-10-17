@@ -48,33 +48,37 @@ export function CountdownRing({ days, total = 30, size = 132, label = 'days to r
   // Urgency color: pine when plenty of time, ochre closing in, brick when tight.
   const stroke = days <= 3 ? c.danger : days <= 7 ? c.warning : c.accent;
 
+  // Only the number sits inside the ring; the label goes underneath. Inside, it had
+  // ~76pt to fit in, and "days to deadline" (longer still in fi/sv) wrapped across the arc.
   return (
-    <View style={{ width: size, height: size }} className="items-center justify-center">
-      <Svg width={size} height={size} viewBox={`0 0 ${VB} ${VB}`} style={{ transform: [{ rotate: '-90deg' }] }}>
-        <Circle cx={VB / 2} cy={VB / 2} r={R} fill="none" stroke={c.muted} strokeWidth={8} strokeOpacity={0.25} />
-        <AnimatedCircle
-          cx={VB / 2}
-          cy={VB / 2}
-          r={R}
-          fill="none"
-          stroke={stroke}
-          strokeWidth={8}
-          strokeLinecap="round"
-          strokeDasharray={CIRC}
-          animatedProps={animatedProps}
-        />
-      </Svg>
-      <View className="absolute items-center">
-        <Text className="font-display text-[34px] leading-none" style={{ color: c.fg }}>
-          {days}
-        </Text>
-        <Text
-          className="font-body font-semibold text-label tracking-[0.2em] uppercase mt-1"
-          style={{ color: stroke }}
-        >
-          {label}
-        </Text>
+    <View className="items-center">
+      <View style={{ width: size, height: size }} className="items-center justify-center">
+        <Svg width={size} height={size} viewBox={`0 0 ${VB} ${VB}`} style={{ transform: [{ rotate: '-90deg' }] }}>
+          <Circle cx={VB / 2} cy={VB / 2} r={R} fill="none" stroke={c.muted} strokeWidth={8} strokeOpacity={0.25} />
+          <AnimatedCircle
+            cx={VB / 2}
+            cy={VB / 2}
+            r={R}
+            fill="none"
+            stroke={stroke}
+            strokeWidth={8}
+            strokeLinecap="round"
+            strokeDasharray={CIRC}
+            animatedProps={animatedProps}
+          />
+        </Svg>
+        <View className="absolute inset-0 items-center justify-center">
+          <Text className="font-display text-[34px] leading-none" style={{ color: c.fg }}>
+            {days}
+          </Text>
+        </View>
       </View>
+      <Text
+        className="font-body font-semibold text-label tracking-[0.2em] uppercase text-center"
+        style={{ color: stroke }}
+      >
+        {label}
+      </Text>
     </View>
   );
 }
