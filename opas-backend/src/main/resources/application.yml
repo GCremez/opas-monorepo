@@ -137,6 +137,13 @@ opas:
     enabled: ${MAIL_ENABLED:false}
     # A verified SES sender identity (address or domain) in the configured AWS region.
     from: ${MAIL_FROM:no-reply@opas.fi}
+  # Links in email open the app. {base-url}/d/{documentId} must be set up as a universal
+  # link (apple-app-site-association on the domain) for the button to open Opas directly.
+  links:
+    base-url: ${APP_LINK_BASE_URL:https://opas.app}
+  notify:
+    # "Your letter is ready" email, if the result is still unopened this long after it's done.
+    ready-email-after: ${READY_EMAIL_AFTER:PT10M}
   free-tier:
     monthly-decode-limit: 5
 

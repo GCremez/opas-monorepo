@@ -25,6 +25,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class DecodeService {
     private final ClaudeClient claudeClient;
     private final FolderService folderService;
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher events;
     private final int freeTierLimit;
     private final double inputPricePerMTok;
     private final double outputPricePerMTok;
@@ -65,7 +67,7 @@ public class DecodeService {
             StorageService storageService, PresidioService presidioService,
             TextExtractionService textExtractionService, EmbeddingService embeddingService,
             UsageTracker usageTracker, ClaudeClient claudeClient, FolderService folderService,
-            ObjectMapper objectMapper,
+            ObjectMapper objectMapper, ApplicationEventPublisher events,
             MeterRegistry registry,
             @Value("${opas.free-tier.monthly-decode-limit}") int freeTierLimit,
             @Value("${opas.ai.input-price-per-mtok}") double inputPricePerMTok,
@@ -82,6 +84,7 @@ public class DecodeService {
         this.claudeClient = claudeClient;
         this.folderService = folderService;
         this.objectMapper = objectMapper;
+        this.events = events;
         this.freeTierLimit = freeTierLimit;
         this.inputPricePerMTok = inputPricePerMTok;
         this.outputPricePerMTok = outputPricePerMTok;
@@ -161,6 +164,7 @@ public class DecodeService {
 
         User user = userRepository.getReferenceById(message.userId());
 
+        Instant pipelineStartedAt = Instant.now();
         byte[] fileBytes = storageService.getObjectBytes(document.getS3Key());
         // Extract real text from the image or PDF. Reading raw bytes as a UTF-8 string
         // (the old behaviour) produced garbage for everything except plain-text uploads.
@@ -223,6 +227,12 @@ public class DecodeService {
         // is rare enough not to warrant per-model pricing here.
         double totalCost = tokensIn * inputPricePerMTok / 1_000_000 + tokensOut * outputPricePerMTok / 1_000_000;
         decodeCostUsd.increment(totalCost);
+
+        // Push "your letter is ready" once this transaction commits (ResultReadyNotifier).
+        events.publishEvent(new DecodeReadyEvent(message.userId(), message.documentId()));
+        log.info("Decode timing: documentId={}, readAndScrubMs={}, claudeMs={}",
+                message.documentId(), Duration.between(pipelineStartedAt, startedAt).toMillis(),
+                Duration.between(startedAt, completedAt).toMillis());
         log.info("Decode cost: userId={}, documentId={}, tokensIn={}, tokensOut={}, model={}, cost=${}",
                 message.userId(), message.documentId(), tokensIn, tokensOut, reply.model(),
                 String.format("%.4f", totalCost));
@@ -249,7 +259,7 @@ public class DecodeService {
      * result exists yet (still processing), so the controller can answer 404 and the
      * client keeps polling.
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public DecodeResponse getResult(UUID userId, UUID documentId) {
         Document document = documentRepository.findById(documentId).orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
@@ -260,6 +270,10 @@ public class DecodeService {
                 .map(DecodeService::toResponse).orElse(null);
         if (latest == null && "failed".equals(document.getStatus())) {
             throw new DecodeFailedException("The document could not be analyzed");
+        }
+        if (latest != null && document.getResultSeenAt() == null) {
+            // The owner has the result in front of them: no "your letter is ready" email.
+            documentRepository.markResultSeen(documentId, Instant.now());
         }
         return latest;
     }
