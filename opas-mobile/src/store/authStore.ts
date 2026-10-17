@@ -11,6 +11,10 @@ function identifyUser(id: string | undefined, plan: 'free' | 'premium'): void {
   identify(id, { plan, is_demo: false });
 }
 
+// iOS appends a space after an autofill/suggestion pick, and the backend matches emails
+// exactly, so " you@x.fi " would fail to log in. Every auth call sends the trimmed address.
+const cleanEmail = (email: string) => email.trim();
+
 interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -75,14 +79,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   requestPasswordReset: async (email) => {
-    await apiClient.post('/auth/forgot-password', { email });
+    await apiClient.post('/auth/forgot-password', { email: cleanEmail(email) });
   },
 
   confirmPasswordReset: async (email, code, newPassword) => {
     // Backend consumes the one-time code, sets the new password, and invalidates all
     // existing sessions. It does NOT log the user in — they return to sign-in and log
     // in with the new password. A bad/expired code surfaces as a 400.
-    await apiClient.post('/auth/reset-password', { email, code, newPassword });
+    await apiClient.post('/auth/reset-password', { email: cleanEmail(email), code, newPassword });
   },
 
   deleteAccount: async () => {
@@ -99,7 +103,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   login: async (email, password) => {
     try {
-      const { data } = await apiClient.post('/auth/login', { email, password });
+      const { data } = await apiClient.post('/auth/login', { email: cleanEmail(email), password });
       await SecureStore.setItemAsync('access_token', data.accessToken);
       await SecureStore.setItemAsync('refresh_token', data.refreshToken);
       set({
@@ -120,13 +124,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Registration no longer logs the user in. The backend creates an unverified
     // account and emails a 6-digit code; the caller must route to the verify screen.
     track('auth_register_started');
-    const { data } = await apiClient.post('/auth/register', { name, email, password });
+    const { data } = await apiClient.post('/auth/register', { name, email: cleanEmail(email), password });
     track('auth_register_completed', { method: 'email' });
-    return { email: data.email ?? email };
+    return { email: data.email ?? cleanEmail(email) };
   },
 
   verifyEmail: async (email, code) => {
-    const { data } = await apiClient.post('/auth/verify-email', { email, code });
+    const { data } = await apiClient.post('/auth/verify-email', { email: cleanEmail(email), code: code.trim() });
     await SecureStore.setItemAsync('access_token', data.accessToken);
     await SecureStore.setItemAsync('refresh_token', data.refreshToken);
     set({
@@ -139,7 +143,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   resendVerification: async (email) => {
-    await apiClient.post('/auth/resend-verification', { email });
+    await apiClient.post('/auth/resend-verification', { email: cleanEmail(email) });
   },
 
   logout: async () => {
