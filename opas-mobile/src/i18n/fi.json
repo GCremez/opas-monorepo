@@ -541,5 +541,16 @@
     "in_weeks_plural": "{{count}} viikkoa",
     "documents_heading": "Asiakirjat",
     "options": "Kansion asetukset"
+  },
+  "reminders": {
+    "due_today": "erääntyy tänään",
+    "days_left": "{{count}} päivä jäljellä",
+    "days_left_plural": "{{count}} päivää jäljellä",
+    "body": "{{what}} viimeistään {{date}}. Avaa napauttamalla.",
+    "prompt_title": "Älä koskaan unohda määräaikaa.",
+    "prompt_desc": "Opas muistuttaa ennen kuin jokin erääntyy — hiljaa ja vain silloin, kun sillä on merkitystä.",
+    "turn_on": "Ota muistutukset käyttöön",
+    "not_now": "Ei nyt",
+    "blocked": "Ilmoitukset ovat pois päältä. Ota ne käyttöön Asetuksista."
   }
 }

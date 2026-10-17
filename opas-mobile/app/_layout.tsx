@@ -2,7 +2,8 @@ import '../global.css';
 import '../src/i18n';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { vars } from 'nativewind';
@@ -28,6 +29,10 @@ import { useAuthStore } from '../src/store/authStore';
 import { useThemeStore } from '../src/store/themeStore';
 import { themeVars } from '../src/lib/tokens';
 import { registerForPushNotifications } from '../src/utils/notifications';
+import * as Notifications from 'expo-notifications';
+import { useDocumentStore } from '../src/store/documentStore';
+import { useReminderStore } from '../src/store/reminderStore';
+import { syncReminders } from '../src/lib/reminders';
 import { initAnalytics } from '../src/lib/analytics';
 import { initSentry } from '../src/lib/sentry';
 
@@ -39,6 +44,8 @@ initAnalytics();
 export default function RootLayout() {
   const hydrateAuth = useAuthStore((s) => s.hydrate);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const router = useRouter();
+  const { i18n } = useTranslation();
   const hydrateTheme = useThemeStore((s) => s.hydrate);
   const active = useThemeStore((s) => s.active);
   const isDark = useThemeStore((s) => s.isDark);
@@ -64,7 +71,7 @@ export default function RootLayout() {
     Promise.all([hydrateTheme(), hydrateAuth()]).finally(() => setHydrated(true));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Register this device for push once after a real sign-in.
+  // Register this device for push once after a real sign-in (only if already allowed).
   const registered = useRef(false);
   useEffect(() => {
     if (isAuthenticated && !registered.current) {
@@ -72,6 +79,30 @@ export default function RootLayout() {
       registerForPushNotifications();
     }
   }, [isAuthenticated]);
+
+  // Deadline reminders (design 6f): keep the device's schedule in step with the documents,
+  // the user's choice and the language the reminders are written in.
+  const documents = useDocumentStore((s) => s.documents);
+  const remindersOn = useReminderStore((s) => s.enabled);
+  const permission = useReminderStore((s) => s.permission);
+  useEffect(() => {
+    useReminderStore.getState().hydrate();
+  }, []);
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    syncReminders(documents, remindersOn, i18n.t, i18n.language).catch(() => {});
+  }, [isAuthenticated, documents, remindersOn, permission, i18n.t, i18n.language]);
+
+  // Tapping a reminder opens its document, whether the app was running or not.
+  useEffect(() => {
+    const open = (response: Notifications.NotificationResponse | null) => {
+      const id = response?.notification.request.content.data?.documentId;
+      if (typeof id === 'string') router.push(`/document/${id}`);
+    };
+    Notifications.getLastNotificationResponseAsync().then(open).catch(() => {});
+    const sub = Notifications.addNotificationResponseReceivedListener(open);
+    return () => sub.remove();
+  }, [router]);
 
   // Theme tokens are applied as CSS variables on the root wrapper (via vars) so every
   // token utility resolves from them and switching Paper <-> Ink reverts both ways.

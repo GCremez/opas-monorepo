@@ -541,5 +541,16 @@
     "in_weeks_plural": "{{count}} veckor",
     "documents_heading": "Dokument",
     "options": "Mappalternativ"
+  },
+  "reminders": {
+    "due_today": "förfaller i dag",
+    "days_left": "{{count}} dag kvar",
+    "days_left_plural": "{{count}} dagar kvar",
+    "body": "{{what}} senast {{date}}. Tryck för att öppna.",
+    "prompt_title": "Missa aldrig en tidsfrist.",
+    "prompt_desc": "Låt Opas påminna dig innan något förfaller — diskret, och bara när det spelar roll.",
+    "turn_on": "Slå på påminnelser",
+    "not_now": "Inte nu",
+    "blocked": "Notiser är avstängda för Opas. Slå på dem i Inställningar."
   }
 }

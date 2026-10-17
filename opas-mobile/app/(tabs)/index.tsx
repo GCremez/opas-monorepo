@@ -4,6 +4,8 @@ import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Materialize } from '../../src/components/motion';
+import { RemindersPrompt } from '../../src/components/RemindersPrompt';
+import { useReminderStore } from '../../src/store/reminderStore';
 import { authorityOf } from '../../src/lib/authorities';
 import { completedAt, deadlineKey } from '../../src/lib/tasks';
 import { useTranslation } from 'react-i18next';
@@ -127,6 +129,11 @@ export default function RecordScreen() {
 
   const hasDocuments = documents.length > 0;
   const docCount = documents.length;
+  const reminders = useReminderStore();
+  const upcomingDeadline = collectDeadlines(documents).some((i) => i.days >= 0);
+  const askForReminders =
+    reminders.hydrated && reminders.permission === 'undetermined' && !reminders.promptDismissed && upcomingDeadline;
+
   const needsYou = collectDeadlines(documents)
     .filter((item) => item.days >= 0 && item.days <= NEEDS_YOU_WINDOW_DAYS)
     .filter((item) => !completedAt(item.document, deadlineKey(item.deadline)))
@@ -253,6 +260,7 @@ export default function RecordScreen() {
         )}
 
       </ScrollView>
+      <RemindersPrompt visible={askForReminders} />
     </SafeAreaView>
   );
 }

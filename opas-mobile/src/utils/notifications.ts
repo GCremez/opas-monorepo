@@ -14,21 +14,16 @@ Notifications.setNotificationHandler({
   }),
 });
 
+/** Register this device's push token with the backend, if notifications are allowed. */
 export async function registerForPushNotifications(): Promise<string | null> {
   if (!Device.isDevice) {
     return null;
   }
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    track('push_denied', { platform: Platform.OS });
+  // Never ask here: permission is asked for in context, when the user turns reminders
+  // on (Home prompt or Profile). This only registers a device that already allows it.
+  const { status } = await Notifications.getPermissionsAsync();
+  if (status !== 'granted') {
     return null;
   }
 

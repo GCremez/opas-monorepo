@@ -541,5 +541,16 @@
     "in_weeks_plural": "{{count}} weeks",
     "documents_heading": "Documents",
     "options": "Folder options"
+  },
+  "reminders": {
+    "due_today": "due today",
+    "days_left": "{{count}} day left",
+    "days_left_plural": "{{count}} days left",
+    "body": "{{what}} by {{date}}. Tap to open it.",
+    "prompt_title": "Never miss a deadline.",
+    "prompt_desc": "Let Opas remind you before anything's due — quietly, and only when it matters.",
+    "turn_on": "Turn on reminders",
+    "not_now": "Not now",
+    "blocked": "Notifications are off for Opas. Turn them on in Settings."
   }
 }

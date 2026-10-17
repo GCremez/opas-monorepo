@@ -11,6 +11,7 @@ import { useToast } from '../../src/components/ui/ToastProvider';
 import { EyeIcon, EyeOffIcon, CheckIcon, ChevronRightIcon } from '../../src/components/icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { useSubscriptionStore } from '../../src/store/subscriptionStore';
+import { useReminderStore } from '../../src/store/reminderStore';
 import { useThemeStore, useThemeColors, type Appearance_ } from '../../src/store/themeStore';
 
 type Lang = 'en' | 'fi' | 'sv';
@@ -101,7 +102,10 @@ export default function ProfileScreen() {
   const [showPasswordSheet, setShowPasswordSheet] = useState(false);
   const [langSheetOpen, setLangSheetOpen] = useState(false);
   const [appearanceSheetOpen, setAppearanceSheetOpen] = useState(false);
-  const [deadlineOn, setDeadlineOn] = useState(true);
+  // Deadline reminders: on only when the user wants them and the system allows them.
+  const remindersWanted = useReminderStore((s) => s.enabled);
+  const remindersAllowed = useReminderStore((s) => s.permission === 'granted');
+  const deadlineOn = remindersWanted && remindersAllowed;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -218,7 +222,11 @@ export default function ProfileScreen() {
             value={deadlineOn ? t('profile.on') : t('profile.off')}
             valueTone={deadlineOn ? 'text-accent' : 'text-muted'}
             hideChevron
-            onPress={() => { setDeadlineOn((v) => !v); showToast(`${t('profile.deadline_reminders')} ${!deadlineOn ? t('profile.on') : t('profile.off')}`); }}
+            onPress={async () => {
+              const on = await useReminderStore.getState().setEnabled(!deadlineOn);
+              // Asked to turn on but the system said no: point to Settings rather than fail silently.
+              showToast(!deadlineOn && !on ? t('reminders.blocked') : `${t('profile.deadline_reminders')} ${on ? t('profile.on') : t('profile.off')}`);
+            }}
           />
         </View>
 
