@@ -142,7 +142,11 @@
     "welcome": "Welcome",
     "needs_count": " {{count}} deadline is coming up.",
     "needs_count_plural": " {{count}} deadlines are coming up.",
-    "load_error_desc": "Check your connection, then pull down to try again."
+    "load_error_desc": "Check your connection, then pull down to try again.",
+    "passed_count": "{{count}} deadline has passed.",
+    "passed_count_plural": "{{count}} deadlines have passed.",
+    "more_coming": " {{count}} more is coming up.",
+    "more_coming_plural": " {{count}} more are coming up."
   },
   "alerts": {
     "eyebrow": "Opas · Alerts",

@@ -142,7 +142,11 @@
     "welcome": "Välkommen",
     "needs_count": " {{count}} tidsfrist närmar sig.",
     "needs_count_plural": " {{count}} tidsfrister närmar sig.",
-    "load_error_desc": "Kontrollera anslutningen och dra nedåt för att försöka igen."
+    "load_error_desc": "Kontrollera anslutningen och dra nedåt för att försöka igen.",
+    "passed_count": "{{count}} tidsfrist har passerat.",
+    "passed_count_plural": "{{count}} tidsfrister har passerat.",
+    "more_coming": " {{count}} till närmar sig.",
+    "more_coming_plural": " {{count}} till närmar sig."
   },
   "alerts": {
     "eyebrow": "Opas · Påminnelser",

@@ -142,7 +142,11 @@
     "welcome": "Tervetuloa",
     "needs_count": " {{count}} määräaika lähestyy.",
     "needs_count_plural": " {{count}} määräaikaa lähestyy.",
-    "load_error_desc": "Tarkista yhteys ja vedä alas yrittääksesi uudelleen."
+    "load_error_desc": "Tarkista yhteys ja vedä alas yrittääksesi uudelleen.",
+    "passed_count": "{{count}} määräaika on mennyt.",
+    "passed_count_plural": "{{count}} määräaikaa on mennyt.",
+    "more_coming": " {{count}} muu lähestyy.",
+    "more_coming_plural": " {{count}} muuta lähestyy."
   },
   "alerts": {
     "eyebrow": "Opas · Muistutukset",
