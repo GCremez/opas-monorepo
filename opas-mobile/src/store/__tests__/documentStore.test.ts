@@ -16,7 +16,7 @@ describe('documentStore.uploadAndDecode', () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
-    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    global.fetch = fetchMock as unknown as typeof fetch;
     // 1st fetch reads the local file, 2nd is the presigned S3 PUT.
     fetchMock
       .mockResolvedValueOnce({ blob: () => Promise.resolve(bytes) })

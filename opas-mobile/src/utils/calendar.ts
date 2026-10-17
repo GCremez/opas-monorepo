@@ -1,4 +1,4 @@
-import * as Calendar from 'expo-calendar/legacy';
+import * as Calendar from 'expo-calendar';
 import { Platform, Alert } from 'react-native';
 
 const CALENDAR_TITLE = 'Opas';
