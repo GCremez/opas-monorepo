@@ -8,6 +8,8 @@ interface DocumentState {
   documents: Document[];
   loading: boolean;
   error: string | null;
+  /** Set with DECODE_FAILED: the document was saved, only reading it failed. */
+  failedDocumentId: string | null;
 
   fetchDocuments: () => Promise<void>;
   uploadAndDecode: (
@@ -26,6 +28,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   documents: [],
   loading: false,
   error: null,
+  failedDocumentId: null,
 
   fetchDocuments: async () => {
     set({ loading: true, error: null });
@@ -45,6 +48,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   },
 
   uploadAndDecode: async (filename, contentType, uri) => {
+    let stage: 'upload' | 'decode' = 'upload';
+    let documentId: string | null = null;
     try {
       // Read the file first: the upload URL is issued for its exact size.
       const file = await fetch(uri).then((r) => r.blob());
@@ -66,6 +71,8 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
         throw new Error(`Upload failed with status ${putRes.status}`);
       }
       await api.confirmUpload(upload.id);
+      stage = 'decode';
+      documentId = upload.id;
       const result = await decodeApi.decodeDocument(upload.id);
       await get().fetchDocuments();
       return result;
@@ -76,7 +83,14 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       if (status === 402) {
         track('decode_limit_hit', { remaining: 0 });
       }
-      set({ error: status === 402 ? 'DECODE_LIMIT_REACHED' : 'Failed to upload document' });
+      // The document exists once confirmed; refresh first, since fetching clears `error`.
+      if (stage === 'decode') await get().fetchDocuments();
+      // Error codes, not messages: the scan screen words them per stage, so a letter
+      // that uploaded fine but couldn't be read isn't reported as an upload failure.
+      set({
+        error: status === 402 ? 'DECODE_LIMIT_REACHED' : stage === 'upload' ? 'UPLOAD_FAILED' : 'DECODE_FAILED',
+        failedDocumentId: stage === 'decode' && status !== 402 ? documentId : null,
+      });
       return null;
     }
   },
@@ -107,5 +121,5 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     }
   },
 
-  clearError: () => set({ error: null }),
+  clearError: () => set({ error: null, failedDocumentId: null }),
 }));

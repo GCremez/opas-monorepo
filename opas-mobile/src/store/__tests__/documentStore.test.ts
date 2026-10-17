@@ -52,6 +52,25 @@ describe('documentStore.uploadAndDecode', () => {
 
     expect(result).toBeNull();
     expect(mockedApi.confirmUpload).not.toHaveBeenCalled();
-    expect(useDocumentStore.getState().error).toBe('Failed to upload document');
+    expect(useDocumentStore.getState().error).toBe('UPLOAD_FAILED');
+  });
+
+  it('reports a letter that uploaded but could not be read as a decode failure', async () => {
+    mockedDecode.decodeDocument.mockRejectedValue(new Error('DECODE_FAILED'));
+
+    const result = await useDocumentStore.getState().uploadAndDecode('scan.jpg', 'image/jpeg', 'file:///scan.jpg');
+
+    expect(result).toBeNull();
+    expect(mockedApi.confirmUpload).toHaveBeenCalledWith('doc-1');
+    expect(useDocumentStore.getState().error).toBe('DECODE_FAILED');
+    expect(useDocumentStore.getState().failedDocumentId).toBe('doc-1');
+  });
+
+  it('reports the monthly limit separately', async () => {
+    mockedDecode.decodeDocument.mockRejectedValue({ response: { status: 402 } });
+
+    await useDocumentStore.getState().uploadAndDecode('scan.jpg', 'image/jpeg', 'file:///scan.jpg');
+
+    expect(useDocumentStore.getState().error).toBe('DECODE_LIMIT_REACHED');
   });
 });
