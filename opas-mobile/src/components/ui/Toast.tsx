@@ -34,7 +34,7 @@ export function Toast({
 
   return (
     <Animated.View
-      className="self-center px-5 py-2.5 rounded-pill bg-surface border border-hairline"
+      className="self-center px-5 py-2.5 rounded-pill bg-surface border border-line"
       style={{
         opacity,
         transform: [{ translateY }],

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { documentName } from '../../src/lib/decodeView';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Pressable, RefreshControl } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import { GatherScrollView } from '../../src/components/motion';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -10,22 +10,43 @@ import { ConfirmSheet } from '../../src/components/ui/ConfirmSheet';
 import { useDocumentStore } from '../../src/store/documentStore';
 import { useFolderStore } from '../../src/store/folderStore';
 import { useThemeColors } from '../../src/store/themeStore';
+import { collectDeadlines } from '../../src/lib/decodeView';
+import { authorityOf, groupByAuthority, UNREAD } from '../../src/lib/authorities';
 
-const BUILT_IN_FOLDERS = [
-  'tax', 'residence', 'kela', 'healthcare', 'employment', 'education', 'housing', 'finance',
-] as const;
+/** "2H" / "3D" since the most recent change. */
+function shortAgo(iso: string): string {
+  const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000);
+  if (h < 1) return '<1H';
+  return h < 24 ? `${h}H` : `${Math.floor(h / 24)}D`;
+}
+
+function GroupRow({ name, meta, tone, onPress, onLongPress, muted }: {
+  name: string; meta: string; tone: string; onPress: () => void; onLongPress?: () => void; muted?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      onLongPress={onLongPress}
+      className="flex-row items-baseline justify-between gap-3 py-[15px] border-b border-line min-h-touch"
+      accessibilityRole="button"
+      accessibilityLabel={`${name}, ${meta}`}
+    >
+      <Text className={`font-display text-[17px] flex-1 ${muted ? 'text-fg-soft' : 'text-fg'}`} numberOfLines={1}>{name}</Text>
+      <Text className={`font-mono text-meta uppercase ${tone}`}>{meta} ›</Text>
+    </Pressable>
+  );
+}
 
 export default function FilesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { documents, loading, error, fetchDocuments, deleteDocument, clearError } = useDocumentStore();
+  const { documents, loading, error, fetchDocuments, clearError } = useDocumentStore();
   const { folders, fetchFolders, createFolder: apiCreateFolder, deleteFolder: apiDeleteFolder } = useFolderStore();
   const inputRef = useRef<TextInput>(null);
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
-  const [folderToDelete, setFolderToDelete] = useState<{ id: string; key: string } | null>(null);
+  const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDocuments();
@@ -51,103 +72,97 @@ export default function FilesScreen() {
 
   const handleDeleteFolder = async () => {
     if (!folderToDelete) return;
-    if (!folderToDelete.id.startsWith('custom-')) await apiDeleteFolder(folderToDelete.id);
+    await apiDeleteFolder(folderToDelete);
     setFolderToDelete(null);
   };
 
-  const customFolders = useMemo(
-    () => folders.map((f) => ({ key: f.id, folderId: f.id, name: f.name })),
-    [folders],
-  );
+  // Design 2c: grouped by the sender. The user's own folders sit in the same list;
+  // the built-in topics are browsed from Search instead.
+  const authorities = useMemo(() => groupByAuthority(documents), [documents]);
+  const ownFolders = folders.filter((f) => !f.categoryKey);
+  const unread = documents.filter((d) => !authorityOf(d.authority));
+  const groupCount = authorities.length + ownFolders.length;
+  const lastUpdate = documents.reduce<string | null>((max, d) => (!max || d.updatedAt > max ? d.updatedAt : max), null);
 
-  const totalDocs = documents.length;
-  const totalFolders = BUILT_IN_FOLDERS.length + customFolders.length;
+  const meta = [t('documents.summary_docs', { count: documents.length }), t('documents.summary_folders', { count: groupCount })];
+  if (lastUpdate) meta.push(t('documents.updated_ago', { ago: shortAgo(lastUpdate) }));
+
+  const countLabel = (docs: { id: string }[], dueCount: number) =>
+    dueCount > 0
+      ? `${t('documents.docs_count', { count: docs.length })} · ${t('documents.due_count', { count: dueCount })}`
+      : t('documents.docs_count', { count: docs.length });
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
-      <ScrollView
+      <GatherScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} tintColor={c.accent} />}
+        refreshing={loading}
+        onRefresh={onRefresh}
       >
-        {/* Masthead */}
-        <View className="px-6 pt-3 pb-5">
-          <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">
-            Opas · {t('tabs.files')}
+        <View className="px-6 pt-3 pb-[22px]">
+          <Text className="font-semibold text-label uppercase text-muted">Opas · {t('tabs.files')}</Text>
+          <Text className="font-display text-[30px] leading-[32px] tracking-[-0.01em] text-fg mt-2" accessibilityRole="header">
+            {t('documents.files_title')}
           </Text>
-          <Text className="font-display text-[30px] leading-[32px] tracking-[-0.01em] text-fg mt-2.5">
-            {t('documents.title')}
-          </Text>
-          <Text className="font-mono text-meta tracking-[0.05em] text-muted mt-2">
-            {`${totalDocs} DOCUMENTS · ${totalFolders} FOLDERS`}
-          </Text>
+          <Text className="font-mono text-meta uppercase text-muted mt-1.5">{meta.join(' · ')}</Text>
         </View>
 
         {error && documents.length === 0 && (
           <ErrorState
-            title={t('common.connection_lost')}
-            description={error}
             onRetry={() => { clearError(); fetchDocuments(); }}
           />
         )}
 
-        {/* By authority */}
         <View className="px-6">
-          <Text className="font-semibold text-label uppercase text-fg pb-2.5 border-b border-rule">By authority</Text>
-
-          {BUILT_IN_FOLDERS.map((key) => {
-            const count = documents.length && key === 'kela' ? documents.length : 0;
+          <Text className="font-semibold text-label uppercase text-fg pb-2.5 border-b border-rule">{t('documents.by_authority')}</Text>
+          {authorities.map((g) => {
+            const due = collectDeadlines(g.documents).filter((d) => d.days >= 0).length;
             return (
-              <View
-                key={key}
-                className="flex-row items-baseline justify-between py-4 border-b border-hairline"
-              >
-                <Text className="font-display text-heading text-fg">{t(`folders.folder_${key}`)}</Text>
-                <Text className="font-mono text-meta text-muted">{count} DOCS ›</Text>
-              </View>
+              <GroupRow
+                key={g.key}
+                name={g.name}
+                meta={countLabel(g.documents, due)}
+                tone={due > 0 ? 'text-danger' : 'text-muted'}
+                onPress={() => router.push(`/authority/${encodeURIComponent(g.key)}`)}
+              />
             );
           })}
-
-          {customFolders.map((f) => (
-            <Pressable
-              key={f.key}
-              onLongPress={() => setFolderToDelete({ id: f.folderId, key: f.key })}
-              className="flex-row items-baseline justify-between py-4 border-b border-hairline"
-            >
-              <Text className="font-display text-heading text-fg">{f.name}</Text>
-              <Text className="font-mono text-meta text-muted">›</Text>
-            </Pressable>
-          ))}
+          {ownFolders.map((f) => {
+            const docs = documents.filter((d) => d.folderId === f.id);
+            const due = collectDeadlines(docs).filter((d) => d.days >= 0).length;
+            return (
+              <GroupRow
+                key={f.id}
+                name={f.name}
+                meta={countLabel(docs, due)}
+                tone={due > 0 ? 'text-danger' : 'text-muted'}
+                onPress={() => router.push(`/folder/${f.id}`)}
+                onLongPress={() => setFolderToDelete(f.id)}
+              />
+            );
+          })}
+          {unread.length > 0 && (
+            <GroupRow
+              name={t('documents.not_read')}
+              meta={t('documents.docs_count', { count: unread.length })}
+              tone="text-muted"
+              muted
+              onPress={() => router.push(`/authority/${UNREAD}`)}
+            />
+          )}
+          {groupCount === 0 && unread.length === 0 && !loading && (
+            <Text className="font-serif text-prose text-fg-soft pt-4">{t('documents.files_empty')}</Text>
+          )}
         </View>
 
-        {/* All documents ledger */}
-        {documents.length > 0 && (
-          <View className="px-6 mt-8">
-            <Text className="font-semibold text-label uppercase text-fg pb-2.5 border-b border-rule">{t('documents.title')}</Text>
-            {documents.map((d) => (
-              <Pressable
-                key={d.id}
-                onPress={() => router.push(`/document/${d.id}`)}
-                onLongPress={() => setDeleteTarget(d.id)}
-                className="flex-row items-baseline justify-between py-3.5 border-b border-hairline"
-              >
-                <Text className="font-medium text-body text-fg flex-1" numberOfLines={1}>{documentName(d)}</Text>
-                <Text className={`font-mono text-meta ${d.status === 'ready' ? 'text-accent' : 'text-muted'}`}>
-                  {(d.authority ?? t(`status.${d.status}`)).toUpperCase()}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
-
-        {/* New folder */}
-        <View className="px-6 mt-6">
+        <View className="px-6 mt-[18px]">
           {isCreatingFolder ? (
             <View className="flex-row items-center gap-2">
               <TextInput
                 ref={inputRef}
-                className="flex-1 font-body text-body text-fg bg-surface border border-hairline rounded-md px-3 h-[44px]"
+                className="flex-1 font-body text-body text-fg bg-surface border border-line rounded-md px-3 h-[44px]"
                 placeholder={t('documents.folder_name_placeholder')}
                 placeholderTextColor={c.muted}
                 value={newFolderName}
@@ -166,27 +181,14 @@ export default function FilesScreen() {
           ) : (
             <TouchableOpacity
               onPress={() => { setIsCreatingFolder(true); setNewFolderName(''); }}
-              className="min-h-touch justify-center"
+              className="min-h-touch justify-center self-start"
               accessibilityLabel={t('documents.new_folder')}
             >
-              <Text className="font-semibold text-label tracking-[0.14em] uppercase text-accent">+ {t('documents.new_folder')}</Text>
+              <Text className="font-semibold text-label uppercase text-accent">+ {t('documents.new_folder')}</Text>
             </TouchableOpacity>
           )}
         </View>
-      </ScrollView>
-
-      <ConfirmSheet
-        visible={deleteTarget !== null}
-        title={t('documents.delete_document_title')}
-        message={t('documents.delete_document_message')}
-        confirmLabel={t('common.delete')}
-        destructive
-        onConfirm={async () => {
-          if (deleteTarget) await deleteDocument(deleteTarget);
-          setDeleteTarget(null);
-        }}
-        onCancel={() => setDeleteTarget(null)}
-      />
+      </GatherScrollView>
 
       <ConfirmSheet
         visible={folderToDelete !== null}

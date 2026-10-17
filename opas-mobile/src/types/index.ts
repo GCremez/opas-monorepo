@@ -35,6 +35,14 @@ export interface Document {
   title?: string | null;
   authority?: string | null;
   deadlines?: { date: string; description: string }[];
+  /** The letter's own title in its original language. */
+  documentType?: string | null;
+  summary?: string | null;
+  actions?: string[];
+  /** Headline figure for lists, e.g. "€387.20/mo". */
+  keyFigure?: string | null;
+  /** Deadlines and actions the user has marked done (see lib/tasks). */
+  completedTasks?: { key: string; completedAt: string }[];
 }
 
 export interface DecodeResult {
@@ -72,6 +80,8 @@ export interface Folder {
   id: string;
   name: string;
   description: string | null;
+  // Built-in category key ("tax", "kela", ...), or null for a folder the user created.
+  categoryKey?: string | null;
   documentCount: number;
   createdAt: string;
   updatedAt: string;

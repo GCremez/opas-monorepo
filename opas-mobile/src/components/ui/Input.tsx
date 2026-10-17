@@ -20,7 +20,7 @@ export function Input({ label, hint, error, className = '', ...props }: InputPro
         className={`
           font-body text-[16px] text-fg bg-surface border
           px-4 py-3.5 rounded-md min-h-touch
-          ${error ? 'border-danger' : 'border-hairline'}
+          ${error ? 'border-danger' : 'border-line'}
           ${className}
         `}
         {...props}

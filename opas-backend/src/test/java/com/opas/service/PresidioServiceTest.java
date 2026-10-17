@@ -32,7 +32,7 @@ class PresidioServiceTest {
     void setUp() {
         when(restClientBuilder.baseUrl(anyString())).thenReturn(restClientBuilder);
         when(restClientBuilder.build()).thenReturn(restClient);
-        service = new PresidioService(restClientBuilder, "http://localhost:5001", "en", false);
+        service = new PresidioService(restClientBuilder, "http://localhost:5001", "http://localhost:5002", "en", false);
     }
 
     private void mockPostChain() {
@@ -140,5 +140,30 @@ class PresidioServiceTest {
         assertTrue(json.contains("\"analyzer_results\""), json);
         assertTrue(json.contains("\"entity_type\":\"PHONE_NUMBER\""), json);
         assertFalse(json.contains("analyzerResults"), json);
+    }
+
+    @Test
+    void analyzerAndAnonymizerUseTheirOwnServices() {
+        // Regression: both calls went to the analyzer URL, which has no /anonymize.
+        org.mockito.Mockito.verify(restClientBuilder).baseUrl("http://localhost:5001");
+        org.mockito.Mockito.verify(restClientBuilder).baseUrl("http://localhost:5002");
+    }
+
+    @Test
+    void analyzeRequestCarriesFinnishPersonalIdRecognizer() throws Exception {
+        var request = new PresidioService.AnalyzeRequest("x", "fi",
+                java.util.List.of(PresidioService.finnishPersonalId("fi")));
+
+        var json = new com.fasterxml.jackson.databind.ObjectMapper().readTree(
+                new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(request));
+
+        var recognizer = json.get("ad_hoc_recognizers").get(0);
+        assertEquals("FI_PERSONAL_ID", recognizer.get("supported_entity").asText());
+        assertEquals("fi", recognizer.get("supported_language").asText());
+        java.util.regex.Pattern hetu = java.util.regex.Pattern.compile(
+                recognizer.get("patterns").get(0).get("regex").asText());
+        assertTrue(hetu.matcher("Henkilötunnus 010190-123A").find());
+        assertTrue(hetu.matcher("131052A308T").find()); // 2000s century sign
+        assertFalse(hetu.matcher("2026/AT/48213").find());
     }
 }

@@ -61,7 +61,7 @@ export function StreamingText({ text, streaming = true, className = '' }: Stream
 
   return (
     <View className="flex-row flex-wrap items-baseline">
-      <Text className={`font-serif ${className}`}>{shown}</Text>
+      <Text className={`font-serif flex-shrink ${className}`}>{shown}</Text>
       {streaming && !done && <Caret color={c.warning} />}
     </View>
   );

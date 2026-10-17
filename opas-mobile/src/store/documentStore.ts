@@ -8,14 +8,22 @@ interface DocumentState {
   documents: Document[];
   loading: boolean;
   error: string | null;
+  /** Set with DECODE_FAILED: the document was saved, only reading it failed. */
+  failedDocumentId: string | null;
 
   fetchDocuments: () => Promise<void>;
   uploadAndDecode: (
     filename: string,
     contentType: string,
-    uri: string
+    uri: string,
+    /** Told when the upload is done and reading starts. */
+    onStage?: (stage: 'decode') => void
   ) => Promise<DecodeResult | null>;
   deleteDocument: (id: string) => Promise<void>;
+  /** File a document into a folder, or pass null to take it out of every folder. */
+  assignFolder: (id: string, folderId: string | null) => Promise<void>;
+  /** Tick a deadline or action off (or back on). Throws if the server refuses. */
+  setTaskDone: (id: string, key: string, done: boolean) => Promise<Document>;
   archiveDocument: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -24,6 +32,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   documents: [],
   loading: false,
   error: null,
+  failedDocumentId: null,
 
   fetchDocuments: async () => {
     set({ loading: true, error: null });
@@ -42,10 +51,17 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     }
   },
 
-  uploadAndDecode: async (filename, contentType, uri) => {
+  uploadAndDecode: async (filename, contentType, uri, onStage) => {
+    let stage: 'upload' | 'decode' = 'upload';
+    let documentId: string | null = null;
     try {
       // Read the file first: the upload URL is issued for its exact size.
-      const blob = await fetch(uri).then((r) => r.blob());
+      const file = await fetch(uri).then((r) => r.blob());
+      // React Native sends a Blob body with the Blob's own type and ignores the
+      // Content-Type header. A photo read from disk has no type, so S3 stored uploads as
+      // binary/octet-stream and the backend rejected them at confirm. Re-wrap the bytes
+      // with the declared type so the PUT carries it.
+      const blob = file.type === contentType ? file : new Blob([file], { type: contentType });
       const upload = await api.requestUploadUrl(filename, contentType, blob.size);
       const putRes = await fetch(upload.uploadUrl!, {
         method: 'PUT',
@@ -59,6 +75,9 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
         throw new Error(`Upload failed with status ${putRes.status}`);
       }
       await api.confirmUpload(upload.id);
+      stage = 'decode';
+      documentId = upload.id;
+      onStage?.('decode');
       const result = await decodeApi.decodeDocument(upload.id);
       await get().fetchDocuments();
       return result;
@@ -69,7 +88,14 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       if (status === 402) {
         track('decode_limit_hit', { remaining: 0 });
       }
-      set({ error: status === 402 ? 'DECODE_LIMIT_REACHED' : 'Failed to upload document' });
+      // The document exists once confirmed; refresh first, since fetching clears `error`.
+      if (stage === 'decode') await get().fetchDocuments();
+      // Error codes, not messages: the scan screen words them per stage, so a letter
+      // that uploaded fine but couldn't be read isn't reported as an upload failure.
+      set({
+        error: status === 402 ? 'DECODE_LIMIT_REACHED' : stage === 'upload' ? 'UPLOAD_FAILED' : 'DECODE_FAILED',
+        failedDocumentId: stage === 'decode' && status !== 402 ? documentId : null,
+      });
       return null;
     }
   },
@@ -84,6 +110,19 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     }
   },
 
+  assignFolder: async (id, folderId) => {
+    const updated = await api.assignFolder(id, folderId);
+    set((s) => ({ documents: s.documents.map((d) => (d.id === id ? { ...d, ...updated } : d)) }));
+    track('document_filed', { doc_id: id, has_folder: folderId !== null });
+  },
+
+  setTaskDone: async (id, key, done) => {
+    const updated = await api.setTaskDone(id, key, done);
+    set((s) => ({ documents: s.documents.map((d) => (d.id === id ? { ...d, ...updated } : d)) }));
+    track('task_marked', { doc_id: id, done });
+    return updated;
+  },
+
   archiveDocument: async (id) => {
     try {
       await api.archiveDocument(id);
@@ -94,5 +133,5 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     }
   },
 
-  clearError: () => set({ error: null }),
+  clearError: () => set({ error: null, failedDocumentId: null }),
 }));

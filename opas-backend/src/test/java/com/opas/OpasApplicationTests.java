@@ -1,7 +1,6 @@
 package com.opas;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,7 +27,7 @@ class OpasApplicationTests {
     static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine").withExposedPorts(6379);
 
     @MockBean
-    private ChatModel chatModel;
+    private com.opas.service.ClaudeClient claudeClient;
 
     @MockBean
     private EmbeddingModel embeddingModel;

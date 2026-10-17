@@ -1,5 +1,6 @@
-import { useState, type ReactNode } from 'react';
-import { View, Text } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
+import { View, Platform, RefreshControl, type ScrollViewProps } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Svg, { Circle } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -12,6 +13,8 @@ import Animated, {
   interpolate,
   useReducedMotion,
   Easing,
+  useAnimatedScrollHandler,
+  cancelAnimation,
   type SharedValue,
 } from 'react-native-reanimated';
 import { useThemeColors } from '../../store/themeStore';
@@ -144,5 +147,124 @@ export function PullToGather({ children, onRefresh, refreshing: controlled }: Pu
         <Animated.View style={sheetStyle}>{children}</Animated.View>
       </View>
     </GestureDetector>
+  );
+}
+
+// ── The Gather on a real list ──────────────────────────────────────
+// Drop-in for a tab's ScrollView. The platform RefreshControl still owns the
+// gesture, threshold and bounce (so scrolling never fights a second pan); only
+// its spinner is hidden, and the Gather mark is drawn behind the content,
+// driven by the overscroll. Invisible at rest, so it never shows through the
+// page header.
+
+const LIST_HEADER = 64;
+
+interface GatherScrollViewProps extends Omit<ScrollViewProps, 'refreshControl' | 'onScroll'> {
+  refreshing: boolean;
+  onRefresh: () => void;
+  children: ReactNode;
+}
+
+export function GatherScrollView({ refreshing, onRefresh, children, ...rest }: GatherScrollViewProps) {
+  const c = useThemeColors();
+  const { t } = useTranslation();
+  const reduced = useReducedMotion();
+  const pull = useSharedValue(0);
+  const busy = useSharedValue(0);
+  const spin = useSharedValue(0);
+
+  useEffect(() => {
+    busy.value = refreshing ? 1 : 0;
+    if (refreshing && !reduced) {
+      spin.value = withRepeat(withTiming(360, { duration: 900, easing: Easing.linear }), -1, false);
+    } else {
+      cancelAnimation(spin);
+      spin.value = 0;
+    }
+  }, [refreshing, reduced]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onScroll = useAnimatedScrollHandler((e) => {
+    pull.value = Math.max(0, -e.contentOffset.y);
+  });
+
+  // Android has no overscroll to follow, so there the mark only appears,
+  // gathered, while refreshing.
+  const progress = (): number => {
+    'worklet';
+    return Math.max(busy.value, Math.min(1, pull.value / THRESHOLD));
+  };
+
+  const markStyle = useAnimatedStyle(() => ({
+    opacity: busy.value ? 1 : interpolate(pull.value, [6, 30], [0, 1], 'clamp'),
+  }));
+  const ringStyle = useAnimatedStyle(() => ({
+    opacity: 0.3 + 0.7 * progress(),
+    transform: [{ rotate: `${spin.value}deg` }],
+  }));
+  return (
+    <View className="flex-1">
+      <Animated.View
+        pointerEvents="none"
+        className="absolute top-0 left-0 right-0 items-center justify-center"
+        style={[{ height: LIST_HEADER }, markStyle]}
+      >
+        <View style={{ width: 38, height: 38 }}>
+          <Animated.View style={[{ position: 'absolute', inset: 0 } as object, ringStyle]}>
+            <Svg width={38} height={38} viewBox="0 0 38 38">
+              <Circle cx={19} cy={19} r={15} fill="none" stroke={c.node} strokeWidth={2} strokeDasharray="3 8" strokeLinecap="round" />
+            </Svg>
+          </Animated.View>
+          {!reduced && (
+            <>
+              <ListFragment index={0} pull={pull} busy={busy} color={c.accent} />
+              <ListFragment index={1} pull={pull} busy={busy} color={c.warning} />
+              <ListFragment index={2} pull={pull} busy={busy} color={c.danger} />
+            </>
+          )}
+        </View>
+        <Animated.Text className="font-body font-semibold text-[8.5px] tracking-[0.2em] uppercase mt-1" style={{ color: c.muted }}>
+          {refreshing ? t('common.gathering') : t('common.pull_to_refresh')}
+        </Animated.Text>
+      </Animated.View>
+      <Animated.ScrollView
+        {...rest}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="transparent"
+            colors={['transparent']}
+            progressBackgroundColor={Platform.OS === 'android' ? 'transparent' : undefined}
+          />
+        }
+      >
+        {children}
+      </Animated.ScrollView>
+    </View>
+  );
+}
+
+function ListFragment({ index, pull, busy, color }: { index: number; pull: SharedValue<number>; busy: SharedValue<number>; color: string }) {
+  const style = useAnimatedStyle(() => {
+    const p = Math.max(busy.value, Math.min(1, pull.value / THRESHOLD));
+    const [sx, sy] = SCATTER[index];
+    const [dx, dy] = DEST[index];
+    return {
+      opacity: 0.35 + 0.65 * p,
+      transform: [
+        { translateX: sx + (dx - sx) * p },
+        { translateY: sy + (dy - sy) * p },
+        { scale: 0.6 + 0.4 * p },
+      ],
+    };
+  });
+  return (
+    <Animated.View
+      pointerEvents="none"
+      className="absolute rounded-full"
+      style={[{ width: 9, height: 9, left: '50%', top: '50%', marginLeft: -4.5, marginTop: -4.5, backgroundColor: color }, style]}
+    />
   );
 }

@@ -18,7 +18,9 @@
     "see_all": "See all",
     "camera_access_needed": "Camera access needed",
     "grant_permission": "Grant permission",
-    "open_original": "Open original document"
+    "open_original": "Open original document",
+    "pull_to_refresh": "Pull to refresh",
+    "gathering": "Gathering…"
   },
   "onboarding": {
     "skip": "Skip",
@@ -43,7 +45,10 @@
     "mini_2_row_2_label": "Verohallinto",
     "mini_2_row_2_value": "3 docs",
     "mini_2_row_3_label": "Migri",
-    "mini_2_row_3_value": "2 · 1 due"
+    "mini_2_row_3_value": "2 · 1 due",
+    "illo_plain": "Your housing allowance was approved.",
+    "illo_action": "Report income changes by 30 Nov",
+    "illo_meaning": "What it means"
   },
   "auth": {
     "welcome_back": "Welcome back.",
@@ -96,7 +101,11 @@
     "reset_password_min": "New password must be at least 8 characters",
     "reset_invalid": "That code is invalid or expired. Request a new one.",
     "reset_done_title": "Password updated.",
-    "reset_done_body": "Sign in with your new password."
+    "reset_done_body": "Sign in with your new password.",
+    "signing_in": "Signing in…",
+    "signed_in": "Signed in",
+    "creating_account": "Creating your account…",
+    "account_created": "Account created"
   },
   "tabs": {
     "home": "Home",
@@ -117,8 +126,8 @@
     "all_clear": "Everything's in order.",
     "one_thing": " One thing needs you this week.",
     "nothing_needs": "Nothing needs you right now. You're on top of it.",
-    "footer_one": "Registered in Finland · {{count}} document kept.",
-    "footer_other": "Registered in Finland · {{count}} documents kept.",
+    "footer_one": "{{count}} document kept.",
+    "footer_other": "{{count}} documents kept.",
     "explore": "Explore Opas",
     "ask_opas": "Ask Opas",
     "ask_opas_meta": "Answers grounded in your record",
@@ -145,7 +154,8 @@
     "no_alerts_desc": "When a document has a deadline, it shows up here.",
     "days_left": "{{count}} days",
     "day_left": "{{count}} day",
-    "passed": "Passed"
+    "passed": "Passed",
+    "later_this_month": "Later this month"
   },
   "home": {
     "title": "Home",
@@ -190,8 +200,8 @@
   },
   "search": {
     "title": "Search",
-    "placeholder": "Search documents, folders…",
-    "recent": "Recent Documents",
+    "placeholder": "Find a document or topic…",
+    "recent": "Recent",
     "browse_by_authority": "Browse by Authority",
     "empty_title": "Search your documents",
     "empty_desc": "Find any scanned document by name, authority, or date range. Start typing above or browse by authority.",
@@ -212,34 +222,53 @@
       "kela": "Kela",
       "vero": "Vero",
       "migri": "Migri",
-      "suomi": "Suomi.fi"
-    }
+      "suomi": "Suomi.fi",
+      "dvv": "DVV"
+    },
+    "results_across": "{{results}} · across {{docs}}",
+    "topic": "Topic",
+    "in_topic": "{{count}} document in this topic",
+    "in_topic_plural": "{{count}} documents in this topic",
+    "browse_by_topic": "Browse by topic"
   },
   "scan": {
-    "title": "Scan Document",
-    "description": "Photograph any official letter from Kela, Vero, Migri, or other Finnish authorities",
-    "align_in_frame": "Place the document in the frame",
-    "auto_capturing": "Auto-scanning in 1.5s…",
-    "start_scanning": "Start scanning",
     "flash": "Flash",
-    "auto_frame": "Auto-frame",
     "gallery": "Upload from Gallery",
-    "browse_files": "Browse Files",
-    "scanned_document": "Scanned document",
     "decoding": "Analyzing document…",
-    "extracting": "Extracting text and deadlines",
-    "document_decoded": "Document analyzed",
-    "extracted_actions": "Extracted actions:",
-    "scan_another": "Scan another",
-    "scan_failed_title": "Couldn't scan this document",
-    "scan_failed_desc": "Make sure the document is well-lit, flat, and fully visible in the frame. Avoid glare and shadows.",
     "step_uploading": "Hiding personal info",
     "step_analyzing": "Translating FI → EN",
     "step_extracting": "Finding dates & actions",
     "reading": "Reading your letter…",
     "please_wait": "Please wait",
     "privacy_note": "Your document never leaves your control. Personal details are hidden before anything is read.",
-    "grant_permission_desc": "Grant camera access in Settings to scan documents."
+    "grant_permission_desc": "Grant camera access in Settings to scan documents.",
+    "flash_on": "Flash · on",
+    "flash_off": "Flash · off",
+    "gallery_short": "Gallery",
+    "capture": "Take photo",
+    "upload_failed_title": "Couldn't upload this document",
+    "upload_failed_desc": "Check your connection and try again. Nothing was saved.",
+    "limit_title": "You've used this month's scans",
+    "limit_desc": "Free accounts include 5 scans a month. Upgrade for unlimited scans, or wait until next month.",
+    "upgrade": "See Premium",
+    "new_scan": "New scan",
+    "align_frame": "[ ALIGN LETTER\nWITHIN FRAME ]",
+    "point_title": "Point at your letter.",
+    "point_sub": "Opas reads the rest.",
+    "found_eyebrow": "Here's what we found",
+    "translated": "TRANSLATED · {{from}} → {{to}}",
+    "action_needed": "Action needed",
+    "save_record": "Looks right — save to record",
+    "rescan": "Rescan",
+    "edit_details": "Edit details",
+    "cant_read_title": "We couldn't read this one.",
+    "cant_read_desc": "Try again in good light, keeping the whole page flat inside the frame.",
+    "pick_gallery_instead": "Pick from gallery instead",
+    "open_saved_copy": "Or open the copy that was saved",
+    "tip_flatten": "Flatten the page",
+    "tip_glare": "Avoid shadows & glare",
+    "tip_corners": "Fit all four corners",
+    "filing": "Filing your letter…"
   },
   "documents": {
     "title": "Documents",
@@ -269,7 +298,23 @@
     "delete_folder_label": "Delete",
     "no_documents_in_folder": "No documents yet",
     "delete_document_title": "Delete document",
-    "delete_document_message": "This cannot be undone. The document will be permanently removed from your library."
+    "delete_document_message": "This cannot be undone. The document will be permanently removed from your library.",
+    "categories": "Categories",
+    "unfiled": "Unfiled",
+    "docs_count": "{{count}} doc",
+    "docs_count_plural": "{{count}} docs",
+    "summary_counts": "{{docs}} documents · {{folders}} folders",
+    "files_title": "Everything,\nin order.",
+    "by_authority": "By authority",
+    "summary_docs": "{{count}} document",
+    "summary_docs_plural": "{{count}} documents",
+    "summary_folders": "{{count}} folder",
+    "summary_folders_plural": "{{count}} folders",
+    "updated_ago": "Updated {{ago}} ago",
+    "not_read": "Not read yet",
+    "due_count": "{{count}} due",
+    "due_count_plural": "{{count}} due",
+    "files_empty": "Scan a letter and it will be filed here under the authority that sent it."
   },
   "folders": {
     "title": "Folders",
@@ -364,7 +409,8 @@
     "lang_sv_native": "Swedish",
     "deadline_reminders": "Deadline reminders",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "remaining_short": "{{remaining}} of {{limit}} left"
   },
   "document": {
     "title": "Document",
@@ -406,7 +452,16 @@
     "days_left": "{{count}} day left",
     "days_left_plural": "{{count}} days left",
     "no_dates": "This document doesn't state any dates or deadlines.",
-    "more": "More options"
+    "more": "More options",
+    "category": "Category",
+    "choose_category": "Add to a category",
+    "no_category": "No category",
+    "category_title": "File under",
+    "done_count": "{{done}} / {{total}} done",
+    "done_on": "Done · {{date}}",
+    "due_in": "Due in {{count}} day",
+    "due_in_plural": "Due in {{count}} days",
+    "by_date": "By {{date}}"
   },
   "draftLetter": {
     "title": "Draft Letter",
@@ -467,5 +522,47 @@
     "ready": "Read",
     "failed": "Failed",
     "archived": "Archived"
+  },
+  "folder": {
+    "empty": "No documents here yet.",
+    "empty_unfiled": "Everything is filed.",
+    "authority": "Authority",
+    "folder": "Folder",
+    "topic": "Topic",
+    "not_sorted": "Not sorted yet",
+    "documents": "{{count}} document",
+    "documents_plural": "{{count}} documents",
+    "actions_due": "{{count}} action due",
+    "actions_due_plural": "{{count}} actions due",
+    "status_action": "Action",
+    "status_read": "Read",
+    "due": "Due {{date}}",
+    "in_days": "{{count}} day",
+    "in_days_plural": "{{count}} days",
+    "in_weeks": "{{count}} week",
+    "in_weeks_plural": "{{count}} weeks",
+    "documents_heading": "Documents",
+    "options": "Folder options"
+  },
+  "reminders": {
+    "due_today": "due today",
+    "days_left": "{{count}} day left",
+    "days_left_plural": "{{count}} days left",
+    "body": "{{what}} by {{date}}. Tap to open it.",
+    "prompt_title": "Never miss a deadline.",
+    "prompt_desc": "Let Opas remind you before anything's due — quietly, and only when it matters.",
+    "turn_on": "Turn on reminders",
+    "not_now": "Not now",
+    "blocked": "Notifications are off for Opas. Turn them on in Settings."
+  },
+  "widget": {
+    "header": "Opas · Next deadline",
+    "days_left": "days left",
+    "day_left": "day left",
+    "due_today": "Due today",
+    "due": "Due",
+    "empty": "Nothing due. You're on top of it.",
+    "scan_header": "Opas · Scan",
+    "scan_cta": "Tap to scan a new letter →"
   }
 }

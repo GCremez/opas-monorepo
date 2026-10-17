@@ -6,11 +6,14 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../src/components/ui/Button';
 import { Spinner } from '../../src/components/ui/Loading';
-import { DecodeScramble, CountdownRing } from '../../src/components/motion';
+import { DecodeScramble, CountdownRing, StreamingText } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { getDocument } from '../../src/api/documents';
 import { decodeDocument, getDecodeResult, pollDecodeResult } from '../../src/api/decode';
 import { useDocumentStore } from '../../src/store/documentStore';
+import { completedAt, tasksOf } from '../../src/lib/tasks';
+import { useFolderStore } from '../../src/store/folderStore';
+import { folderName } from '../../src/lib/folders';
 import { ChevronLeftIcon, DotsIcon } from '../../src/components/icons';
 import { useThemeColors } from '../../src/store/themeStore';
 import type { Document, DecodeResult } from '../../src/types';
@@ -27,17 +30,38 @@ export default function DocumentDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useThemeColors();
-  const { deleteDocument, archiveDocument } = useDocumentStore();
+  const { deleteDocument, archiveDocument, assignFolder, setTaskDone } = useDocumentStore();
+  const { folders, fetchFolders } = useFolderStore();
+  const [categorySheet, setCategorySheet] = useState(false);
   const { isPremium } = usePremium();
   const [doc, setDoc] = useState<Document | null>(null);
   const [decode, setDecode] = useState<DecodeResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [decodeState, setDecodeState] = useState<DecodeState>('idle');
   const [activeTab, setActiveTab] = useState<TabView>('summary');
+  // The Plain Words (motion 13): a summary that was just written types itself in;
+  // one opened later is simply there.
+  const [justDecoded, setJustDecoded] = useState(false);
   const [sheetVisible, setSheetVisible] = useState(false);
 
   const view = toDecodeView(decode);
   const upcoming = nextDeadline(view);
+  const tasks = view ? tasksOf(view.deadlines, view.actions) : [];
+  const doneCount = tasks.filter((task) => completedAt(doc, task.key)).length;
+
+  // Optimistic: the box ticks at once and unticks again if the server refuses.
+  const toggleTask = async (key: string, done: boolean) => {
+    if (!doc || !id) return;
+    const before = doc;
+    const others = (doc.completedTasks ?? []).filter((task) => task.key !== key);
+    setDoc({ ...doc, completedTasks: done ? [...others, { key, completedAt: new Date().toISOString() }] : others });
+    try {
+      const updated = await setTaskDone(id, key, done);
+      setDoc((d) => (d ? { ...d, completedTasks: updated.completedTasks } : d));
+    } catch {
+      setDoc(before);
+    }
+  };
   const locale = i18n.language;
 
   // Runs a decode step and maps its outcome onto the screen state. Every path ends the
@@ -46,6 +70,7 @@ export default function DocumentDetailScreen() {
     setDecodeState('running');
     try {
       setDecode(await step());
+      setJustDecoded(true);
       setDecodeState('idle');
     } catch {
       // DecodeFailedError (backend gave up), a timeout, or a network error: all retryable.
@@ -81,6 +106,24 @@ export default function DocumentDetailScreen() {
       cancelled = true;
     };
   }, [id, runDecode]);
+
+  useEffect(() => {
+    if (folders.length === 0) fetchFolders();
+  }, [folders.length, fetchFolders]);
+
+  const fileUnder = async (folderId: string | null) => {
+    setCategorySheet(false);
+    if (!doc || !id || doc.folderId === folderId) return;
+    const previous = doc.folderId;
+    setDoc({ ...doc, folderId }); // optimistic; reverted below if the request fails
+    try {
+      await assignFolder(id, folderId);
+      fetchFolders(); // refresh the per-category counts on the Files screen
+    } catch {
+      setDoc((d) => (d ? { ...d, folderId: previous } : d));
+      Alert.alert(t('common.error'));
+    }
+  };
 
   const handleDecode = () => {
     if (id) runDecode(() => decodeDocument(id));
@@ -178,6 +221,7 @@ export default function DocumentDetailScreen() {
   ];
 
   const decoding = decodeState === 'running';
+  const currentFolder = folders.find((f) => f.id === doc.folderId) ?? null;
   const canDecode = !decode && !decoding && (doc.status === 'uploaded' || doc.status === 'failed');
   const isImage = (doc.contentType ?? '').startsWith('image/');
   const docLanguage = view?.language?.toLowerCase();
@@ -216,10 +260,22 @@ export default function DocumentDetailScreen() {
             {view?.title ?? doc.filename}
           </Text>
           <Text className="font-mono text-meta text-muted mt-2.5">{mastheadMeta}</Text>
+          {/* Category — pre-filled by the AI, always changeable by the user */}
+          <Pressable
+            onPress={() => setCategorySheet(true)}
+            className="flex-row items-center gap-2 self-start mt-3 min-h-touch"
+            accessibilityRole="button"
+            accessibilityLabel={`${t('document.category')}: ${currentFolder ? folderName(currentFolder, t) : t('document.no_category')}`}
+          >
+            <Text className="font-semibold text-label uppercase text-muted">{t('document.category')}</Text>
+            <Text className={`font-body text-body-sm ${currentFolder ? 'text-accent' : 'text-fg-soft'}`}>
+              {currentFolder ? folderName(currentFolder, t) : t('document.choose_category')} ›
+            </Text>
+          </Pressable>
         </View>
 
         {/* Tab underline row — scrolls sideways when translated labels don't fit. */}
-        <View className="mx-6 border-b border-hairline">
+        <View className="mx-6 border-b border-line">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }} accessibilityRole="tablist">
             {tabs.map((tab) => {
               const active = activeTab === tab.key;
@@ -263,7 +319,11 @@ export default function DocumentDetailScreen() {
           {!decoding && activeTab === 'summary' && decode && (
             <View className="px-6 pt-5">
               {view?.summary ? (
-                <Text className="font-serif text-prose text-fg">{view.summary}</Text>
+                justDecoded ? (
+                  <StreamingText text={view.summary} className="font-serif text-prose text-fg" />
+                ) : (
+                  <Text className="font-serif text-prose text-fg">{view.summary}</Text>
+                )
               ) : decode.rawResponse ? (
                 // Older results (or a reply that wasn't valid JSON) only have the raw text.
                 <Text className="font-serif text-prose text-fg-soft">{decode.rawResponse}</Text>
@@ -274,7 +334,7 @@ export default function DocumentDetailScreen() {
                 <View className="mt-7">
                   <Text className="font-semibold text-label uppercase text-muted mb-2">{t('document.key_details')}</Text>
                   {view.keyFields.map(([label, value]) => (
-                    <View key={label} className="flex-row justify-between gap-4 py-3 border-b border-hairline">
+                    <View key={label} className="flex-row justify-between gap-4 py-3 border-b border-line">
                       <Text className="font-body text-body-sm text-fg-soft flex-1">{label}</Text>
                       <Text className="font-mono text-data text-fg text-right flex-1">{value}</Text>
                     </View>
@@ -317,8 +377,8 @@ export default function DocumentDetailScreen() {
                   const days = daysUntil(d.date) ?? 0;
                   const status = days < 0 ? t('document.date_passed') : days === 0 ? t('document.due_today') : t('document.days_left', { count: days });
                   return (
-                    <View key={`${d.date}-${d.description}`} className="py-3 border-b border-hairline">
-                      <View className="flex-row justify-between">
+                    <View key={`${d.date}-${d.description}`} className="py-3 border-b border-line">
+                      <View className="flex-row items-baseline justify-between">
                         <Text className="font-mono text-data text-fg">{formatDate(d.date, locale)}</Text>
                         <Text className={`font-body text-body-sm ${days < 0 ? 'text-muted' : 'text-warning'}`}>{status}</Text>
                       </View>
@@ -332,19 +392,60 @@ export default function DocumentDetailScreen() {
             </View>
           )}
 
-          {/* ACTIONS */}
+          {/* ACTIONS — a checklist of the deadlines and actions (design 4a) */}
           {!decoding && activeTab === 'actions' && (
             <View className="px-6 pt-5">
-              <Text className="font-semibold text-label uppercase text-fg mb-2">{t('document.required_actions')}</Text>
-              {view?.actions.length ? (
-                view.actions.map((action, i) => (
-                  <View key={i} className="flex-row gap-3 py-3 border-b border-hairline">
-                    <Text className="font-mono text-data text-muted">{String(i + 1).padStart(2, '0')}</Text>
-                    <Text className="font-body text-body text-fg flex-1">{action}</Text>
-                  </View>
-                ))
+              <View className="flex-row items-baseline justify-between pb-1.5">
+                <Text className="font-semibold text-label uppercase text-fg">{t('document.required_actions')}</Text>
+                {tasks.length > 0 && (
+                  <Text className="font-mono text-meta uppercase text-warning">
+                    {t('document.done_count', { done: doneCount, total: tasks.length })}
+                  </Text>
+                )}
+              </View>
+              {tasks.length ? (
+                tasks.map((task) => {
+                  const doneAt = completedAt(doc, task.key);
+                  const days = task.date ? daysUntil(task.date) : null;
+                  const meta = doneAt
+                    ? t('document.done_on', { date: formatDate(doneAt.slice(0, 10), locale) })
+                    : task.date && days !== null
+                      ? days < 0
+                        ? t('document.date_passed')
+                        : days <= 14
+                          ? t('document.due_in', { count: days })
+                          : t('document.by_date', { date: formatDate(task.date, locale) })
+                      : null;
+                  return (
+                    <Pressable
+                      key={task.key}
+                      onPress={() => toggleTask(task.key, !doneAt)}
+                      className="flex-row gap-[13px] py-[15px] border-b border-line"
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: !!doneAt }}
+                      accessibilityLabel={task.title}
+                    >
+                      <View
+                        className={`w-5 h-5 rounded-[5px] mt-0.5 items-center justify-center ${doneAt ? 'bg-accent border-accent' : 'border-rule'}`}
+                        style={{ borderWidth: 1.5 }}
+                      >
+                        {doneAt && <Text className="font-semibold text-[11px] text-on-accent">✓</Text>}
+                      </View>
+                      <View className="flex-1">
+                        <Text className={`font-display text-[16px] leading-[20px] ${doneAt ? 'text-muted line-through' : 'text-fg'}`}>
+                          {task.title}
+                        </Text>
+                        {meta && (
+                          <Text className={`font-mono text-meta uppercase mt-1.5 ${doneAt ? 'text-muted' : days !== null && days >= 0 && days <= 14 ? 'text-warning' : 'text-muted'}`}>
+                            {meta}
+                          </Text>
+                        )}
+                      </View>
+                    </Pressable>
+                  );
+                })
               ) : (
-                <Text className="font-body text-body-sm text-muted">{decode ? t('document.no_actions') : t('document.not_decoded')}</Text>
+                <Text className="font-body text-body-sm text-muted pt-2">{decode ? t('document.no_actions') : t('document.not_decoded')}</Text>
               )}
               <Button variant="primary" block size="lg" className="mt-7" onPress={handleDraftLetter}>
                 {t('document.draft_letter')}
@@ -382,6 +483,18 @@ export default function DocumentDetailScreen() {
           { label: t('document.delete_document'), onPress: confirmDelete, destructive: true },
         ]}
         onClose={() => setSheetVisible(false)}
+      />
+      <BottomSheet
+        visible={categorySheet}
+        title={t('document.category_title')}
+        actions={[
+          ...folders.map((f) => ({
+            label: `${f.id === doc.folderId ? '✓  ' : ''}${folderName(f, t)}`,
+            onPress: () => fileUnder(f.id),
+          })),
+          { label: `${doc.folderId ? '' : '✓  '}${t('document.no_category')}`, onPress: () => fileUnder(null) },
+        ]}
+        onClose={() => setCategorySheet(false)}
       />
     </SafeAreaView>
   );

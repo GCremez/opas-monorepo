@@ -7,9 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "description": "OPAS helps you manage official letters from Finnish authorities — Kela, Vero, Migri, and more. Scan, decode, and organize documents with AI-powered analysis.",
-    "splash": {
-      "backgroundColor": "#f2ede2"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -26,12 +23,17 @@
         "NSRemindersUsageDescription": "Opas uses reminders to notify you of upcoming document deadlines.",
         "NSPhotoLibraryUsageDescription": "Opas needs access to your photos to import documents.",
         "NSCameraUsageDescription": "Opas needs camera access to scan your documents."
+      },
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.opas.app"
+        ]
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#35503f"
       },
       "package": "com.opas.app",
       "versionCode": 1,
@@ -78,7 +80,17 @@
         }
       ],
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f2ede2",
+          "dark": {
+            "backgroundColor": "#16150e"
+          }
+        }
+      ],
+      "@bacons/apple-targets"
     ],
     "extra": {
       "apiBaseUrl": "http://192.168.0.14:8080/api/v1"

@@ -2,7 +2,7 @@
 // Dual theme (paper / ink). Use `colors` for the light default; use
 // `themes.paper` / `themes.ink` when passing hex strings to SVG icons
 // (per convention: icons take hex, not class names). NativeWind classes
-// (bg-bg, text-fg, border-hairline, bg-accent, text-warning…) resolve to
+// (bg-bg, text-fg, border-line, bg-accent, text-warning…) resolve to
 // the active theme automatically via the CSS variables in global.css.
 
 export const themes = {
@@ -49,7 +49,7 @@ export const colors = themes.paper;
 /**
  * CSS-variable map for a theme, e.g. { '--bg': '#f2ede2', ... }. Applied via
  * NativeWind's `vars()` on the root wrapper so the token utilities (bg-bg, text-fg,
- * border-hairline …) resolve from these. This drives theming inline and switches
+ * border-line …) resolve from these. This drives theming inline and switches
  * reliably in BOTH directions — unlike the `.dark:root` selector approach, which did
  * not revert Ink → Paper on native.
  */

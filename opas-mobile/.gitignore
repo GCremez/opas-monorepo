@@ -13,7 +13,7 @@ web-build/
 .env
 .env.*
 !.env.example
-ios/
-android/
+/ios/
+/android/
 *.DS_Store
 coverage/

@@ -84,6 +84,16 @@ public class DecodeMessageListener implements ChannelAwareMessageListener {
         if (e instanceof PresidioUnavailableException) {
             return true;
         }
+        // Claude errors are typed by the SDK, which has already retried these twice.
+        if (e instanceof com.anthropic.errors.RateLimitException
+                || e instanceof com.anthropic.errors.InternalServerException
+                || e instanceof com.anthropic.errors.AnthropicIoException) {
+            return true;
+        }
+        if (e instanceof com.opas.service.ClaudeRefusalException
+                || e instanceof com.anthropic.errors.AnthropicServiceException) {
+            return false; // refusals and 4xx (bad request, auth, billing) fail the same way again
+        }
         String message = e.getMessage();
         if (message == null) {
             return false;

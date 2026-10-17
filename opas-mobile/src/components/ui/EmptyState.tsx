@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 import { EmptyRecord } from '../motion';
+import { useThemeColors } from '../../store/themeStore';
 
 interface EmptyStateProps {
   icon?: string;
@@ -22,9 +23,12 @@ export function EmptyState({ title, description, actionLabel, onAction }: EmptyS
   );
 }
 
+// Same look as the scan error (design 5c): a small tinted "!" mark, a serif
+// title and one way forward. Defaults to the app's own wording, never a raw
+// error string like axios' "Network Error".
 export function ErrorState({
-  title = 'Connection lost',
-  description = "Your documents are saved locally. We'll sync them automatically when your connection returns.",
+  title,
+  description,
   onRetry,
 }: {
   title?: string;
@@ -32,15 +36,23 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   const { t } = useTranslation();
+  const c = useThemeColors();
   return (
-    <View className="items-center justify-center px-5 py-12 max-w-[360px] mx-auto">
-      <Text className="font-display text-[36px] mb-3 text-danger">⚠</Text>
-      <Text className="font-display text-title text-fg text-center mb-2">{title}</Text>
-      <Text className="font-serif text-prose text-fg-soft text-center mb-6">
-        {description}
+    <View className="items-center justify-center px-[34px] py-12 max-w-[360px] mx-auto">
+      <View
+        className="w-[50px] h-[50px] rounded-full items-center justify-center mb-[22px]"
+        style={{ backgroundColor: `${c.danger}1a` }}
+      >
+        <Text className="font-body text-[20px] text-danger">!</Text>
+      </View>
+      <Text className="font-display text-[24px] leading-[28px] text-fg text-center" accessibilityRole="header">
+        {title ?? t('common.connection_lost')}
+      </Text>
+      <Text className="font-serif text-[16px] leading-[26px] text-fg-soft text-center mt-3 mb-[22px]">
+        {description ?? t('record.load_error_desc')}
       </Text>
       {onRetry && (
-        <Button variant="outline" onPress={onRetry}>
+        <Button variant="primary" onPress={onRetry}>
           {t('common.retry')}
         </Button>
       )}

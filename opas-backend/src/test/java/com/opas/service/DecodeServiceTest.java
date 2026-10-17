@@ -24,13 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.metadata.ChatResponseMetadata;
-import org.springframework.ai.chat.metadata.Usage;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.chat.prompt.Prompt;
 
 @ExtendWith(MockitoExtension.class)
 class DecodeServiceTest {
@@ -54,7 +47,9 @@ class DecodeServiceTest {
     @Mock
     private UsageTracker usageTracker;
     @Mock
-    private ChatModel chatModel;
+    private ClaudeClient claudeClient;
+    @Mock
+    private FolderService folderService;
 
     private DecodeService service;
     private UUID userId;
@@ -65,9 +60,9 @@ class DecodeServiceTest {
     @BeforeEach
     void setUp() {
         service = new DecodeService(documentRepository, userRepository, decodeResultRepository, subscriptionRepository,
-                storageService, presidioService, textExtractionService, embeddingService, usageTracker, chatModel,
+                storageService, presidioService, textExtractionService, embeddingService, usageTracker, claudeClient, folderService,
                 new com.fasterxml.jackson.databind.ObjectMapper(),
-                new io.micrometer.core.instrument.simple.SimpleMeterRegistry(), 5, "claude-sonnet-4-20250514");
+                new io.micrometer.core.instrument.simple.SimpleMeterRegistry(), 5, 2.00, 10.00);
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);
@@ -154,15 +149,7 @@ class DecodeServiceTest {
         when(textExtractionService.extract(any(), any())).thenReturn("file content");
         when(presidioService.scrubPii(anyString())).thenReturn("scrubbed content");
 
-        ChatResponse chatResponse = mock(ChatResponse.class);
-        Generation generation = mock(Generation.class);
-        AssistantMessage message = mock(AssistantMessage.class);
-        when(chatResponse.getResult()).thenReturn(generation);
-        when(generation.getOutput()).thenReturn(message);
-        when(message.getText()).thenReturn("decoded text");
-        when(chatResponse.getMetadata()).thenReturn(mock(ChatResponseMetadata.class));
-        when(chatResponse.getMetadata().getUsage()).thenReturn(mock(Usage.class));
-        when(chatModel.call(any(Prompt.class))).thenReturn(chatResponse);
+        mockClaude();
 
         when(decodeResultRepository.save(any())).thenAnswer(invocation -> {
             DecodeResult r = invocation.getArgument(0);
@@ -175,6 +162,11 @@ class DecodeServiceTest {
 
         verify(documentRepository).save(document);
         assertEquals("ready", document.getStatus());
+        var saved = org.mockito.ArgumentCaptor.forClass(DecodeResult.class);
+        verify(decodeResultRepository).save(saved.capture());
+        assertEquals("claude-sonnet-5-5", saved.getValue().getModel());
+        assertEquals(1200, saved.getValue().getTokensIn());
+        assertEquals("{\"title\": \"Decoded\"}", saved.getValue().getStructuredData());
     }
 
     @Test
@@ -185,7 +177,7 @@ class DecodeServiceTest {
         when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
         when(textExtractionService.extract(any(), any())).thenReturn("file content");
 
-        mockChatModel();
+        mockClaude();
 
         when(decodeResultRepository.save(any())).thenAnswer(invocation -> {
             DecodeResult r = invocation.getArgument(0);
@@ -211,19 +203,12 @@ class DecodeServiceTest {
         // Should NOT have touched the document or storage — the guard short-circuits.
         verify(documentRepository, never()).findById(any());
         verify(storageService, never()).getObjectBytes(any());
-        verify(chatModel, never()).call(any(Prompt.class));
+        verify(claudeClient, never()).complete(anyString());
     }
 
-    private void mockChatModel() {
-        ChatResponse chatResponse = mock(ChatResponse.class);
-        Generation generation = mock(Generation.class);
-        AssistantMessage message = mock(AssistantMessage.class);
-        when(chatResponse.getResult()).thenReturn(generation);
-        when(generation.getOutput()).thenReturn(message);
-        when(message.getText()).thenReturn("decoded text");
-        when(chatResponse.getMetadata()).thenReturn(mock(ChatResponseMetadata.class));
-        when(chatResponse.getMetadata().getUsage()).thenReturn(mock(Usage.class));
-        when(chatModel.call(any(Prompt.class))).thenReturn(chatResponse);
+    private void mockClaude() {
+        when(claudeClient.complete(anyString())).thenReturn(
+                new ClaudeClient.Reply("{\"title\": \"Decoded\"}", "claude-sonnet-5-5", 1200, 300));
     }
 
     @Test
@@ -282,5 +267,54 @@ class DecodeServiceTest {
 
         // Exactly one real end marker: the one the template places after the content.
         assertEquals(1, prompt.split("END_DOCUMENT\n", -1).length - 1);
+    }
+
+    private void stubDecodePipeline(String structuredJson) {
+        when(decodeResultRepository.findByDocumentId(documentId)).thenReturn(List.of());
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(userRepository.getReferenceById(userId)).thenReturn(user);
+        when(storageService.getObjectBytes(anyString())).thenReturn("x".getBytes());
+        when(textExtractionService.extract(any(), any())).thenReturn("Verohallinto päätös");
+        when(claudeClient.complete(anyString())).thenReturn(
+                new ClaudeClient.Reply(structuredJson, "claude-sonnet-5-5", 100, 50));
+        when(decodeResultRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    }
+
+    @Test
+    void decodedDocumentIsFiledIntoTheSuggestedCategory() {
+        stubDecodePipeline("{\"title\": \"Tax decision\", \"category\": \"tax\"}");
+        var taxFolder = new com.opas.domain.Folder();
+        taxFolder.setId(UUID.randomUUID());
+        when(folderService.builtInFolder(userId, com.opas.domain.DocumentCategory.TAX)).thenReturn(taxFolder);
+
+        service.processDecode(new DecodeMessage(userId, documentId, false));
+
+        assertEquals(taxFolder.getId(), document.getFolderId());
+    }
+
+    @Test
+    void suggestedCategoryNeverOverridesTheUsersChoice() {
+        stubDecodePipeline("{\"category\": \"tax\"}");
+        document.setFolderSetByUser(true); // the user chose "unfiled" on purpose
+
+        service.processDecode(new DecodeMessage(userId, documentId, false));
+
+        assertNull(document.getFolderId());
+        verify(folderService, never()).builtInFolder(any(), any());
+    }
+
+    @Test
+    void unknownOrMissingCategoryLeavesDocumentUnfiled() {
+        stubDecodePipeline("{\"category\": \"astrology\"}");
+
+        service.processDecode(new DecodeMessage(userId, documentId, false));
+
+        assertNull(document.getFolderId());
+        verify(folderService, never()).builtInFolder(any(), any());
+    }
+
+    @Test
+    void promptAsksForACategory() {
+        assertTrue(DecodeService.buildDecodePrompt("a.jpg", "x", "en").contains("\"category\""));
     }
 }

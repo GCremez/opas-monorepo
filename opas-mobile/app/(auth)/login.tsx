@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../src/components/ui/Button';
+import { PassageButton, type PassageState } from '../../src/components/motion';
 import { ChevronLeftIcon } from '../../src/components/icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
@@ -18,7 +18,8 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // The Passage (motion 05): the waypoint travels while the request runs, then the check lands.
+  const [passage, setPassage] = useState<PassageState>('idle');
   const [error, setError] = useState('');
   const [isReturning, setIsReturning] = useState(false);
 
@@ -33,16 +34,19 @@ export default function LoginScreen() {
       setError(t('auth.enter_email_password'));
       return;
     }
-    setLoading(true);
+    setPassage('processing');
     setError('');
     try {
       await login(email, password);
+      setPassage('done');
+      await new Promise((r) => setTimeout(r, 450));
       router.replace('/(tabs)');
     } catch (e: any) {
       // Correct credentials but an unverified email → route to verification.
       // The backend returns 403 with code "email_not_verified" only after a
       // correct password, so this is safe to distinguish from a bad login.
       if (e?.response?.status === 403 && e?.response?.data?.code === 'email_not_verified') {
+        setPassage('idle');
         router.push({ pathname: '/(auth)/verify', params: { email } });
         return;
       }
@@ -50,8 +54,7 @@ export default function LoginScreen() {
       // password, connectivity, or the server (prevents account enumeration
       // and backend-state disclosure).
       setError(t('auth.invalid_credentials'));
-    } finally {
-      setLoading(false);
+      setPassage('idle');
     }
   };
 
@@ -121,9 +124,13 @@ export default function LoginScreen() {
           {/* Spacer pushes the action to the bottom of the screen, per the design. */}
           <View className="flex-1 min-h-[32px]" />
 
-          <Button variant="primary" block size="lg" loading={loading} onPress={handleLogin}>
-            {t('auth.sign_in')}
-          </Button>
+          <PassageButton
+            label={t('auth.sign_in')}
+            processingLabel={t('auth.signing_in')}
+            doneLabel={t('auth.signed_in')}
+            state={passage}
+            onPress={handleLogin}
+          />
 
           <View className="flex-row justify-center mt-5 pb-2">
             <Text className="font-serif-italic text-[14px] text-muted">{t('auth.no_account')} </Text>

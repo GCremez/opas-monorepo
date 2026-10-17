@@ -36,6 +36,8 @@ class DocumentServiceTest {
     private com.opas.repository.FolderRepository folderRepository;
     @Mock
     private com.opas.repository.DecodeResultRepository decodeResultRepository;
+    @Mock
+    private com.opas.repository.CompletedTaskRepository completedTaskRepository;
 
     private DocumentService service;
     private UUID userId;
@@ -46,7 +48,7 @@ class DocumentServiceTest {
     @BeforeEach
     void setUp() {
         service = new DocumentService(documentRepository, userRepository, folderRepository,
-                decodeResultRepository, storageService,
+                decodeResultRepository, completedTaskRepository, storageService,
                 new DocumentInsights(new com.fasterxml.jackson.databind.ObjectMapper()), 15);
         userId = UUID.randomUUID();
         user = new User();
@@ -231,5 +233,60 @@ class DocumentServiceTest {
 
         verify(storageService, never()).deleteObject(any());
         verify(documentRepository, never()).delete(any());
+    }
+
+    @Test
+    void assigningAFolderRecordsItAsTheUsersChoice() {
+        document.setStatus("ready");
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(documentRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.assignFolder(userId, documentId, null);
+
+        assertTrue(document.isFolderSetByUser());
+        assertNull(document.getFolderId());
+    }
+
+    @Test
+    void markingATaskDoneStoresItOnce() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(completedTaskRepository.findByDocumentIdAndTaskKey(documentId, "action:Read the decision"))
+                .thenReturn(Optional.empty());
+
+        service.setTaskDone(userId, documentId, "action:Read the decision", true);
+
+        verify(completedTaskRepository).save(argThat(t -> t.getDocumentId().equals(documentId)
+                && t.getTaskKey().equals("action:Read the decision")));
+    }
+
+    @Test
+    void markingADoneTaskDoneAgainKeepsTheFirstCompletion() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(completedTaskRepository.findByDocumentIdAndTaskKey(documentId, "k"))
+                .thenReturn(Optional.of(new com.opas.domain.CompletedTask()));
+
+        service.setTaskDone(userId, documentId, "k", true);
+
+        verify(completedTaskRepository, never()).save(any());
+    }
+
+    @Test
+    void undoingATaskRemovesIt() {
+        var task = new com.opas.domain.CompletedTask();
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(completedTaskRepository.findByDocumentIdAndTaskKey(documentId, "k")).thenReturn(Optional.of(task));
+
+        service.setTaskDone(userId, documentId, "k", false);
+
+        verify(completedTaskRepository).delete(task);
+    }
+
+    @Test
+    void cannotMarkTasksOnSomeoneElsesDocument() {
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> service.setTaskDone(UUID.randomUUID(), documentId, "k", true));
+        verify(completedTaskRepository, never()).save(any());
     }
 }

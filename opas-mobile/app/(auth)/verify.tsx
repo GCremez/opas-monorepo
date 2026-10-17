@@ -82,7 +82,7 @@ export default function VerifyScreen() {
 
         <ScrollView contentContainerClassName="flex-grow px-6 pt-8" keyboardShouldPersistTaps="handled">
           <Text className="font-display text-[32px] leading-[35px] tracking-[-0.01em] text-fg mb-4">{t('auth.verify_title')}</Text>
-          <Text className="font-body text-[15px] leading-[22px] text-muted mb-9">
+          <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mb-9">
             {t('auth.verify_body', { email: String(email) })}
           </Text>
 

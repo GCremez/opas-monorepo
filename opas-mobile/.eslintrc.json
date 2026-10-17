@@ -1,6 +1,10 @@
 {
   "extends": "expo",
   "rules": {
-    "react-native/no-inline-styles": "off"
+    "react-native/no-inline-styles": "off",
+    "react-hooks/refs": "warn",
+    "react-hooks/immutability": "warn",
+    "react-hooks/set-state-in-effect": "warn",
+    "react-hooks/static-components": "warn"
   }
 }

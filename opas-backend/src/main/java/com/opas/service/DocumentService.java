@@ -1,12 +1,15 @@
 package com.opas.service;
 
 import com.opas.config.ResourceNotFoundException;
+import com.opas.domain.CompletedTask;
 import com.opas.domain.DecodeResult;
 import com.opas.domain.Document;
 import com.opas.domain.User;
+import com.opas.dto.CompletedTaskResponse;
 import com.opas.dto.ConfirmUploadRequest;
 import com.opas.dto.DocumentResponse;
 import com.opas.dto.UploadUrlRequest;
+import com.opas.repository.CompletedTaskRepository;
 import com.opas.repository.DecodeResultRepository;
 import com.opas.repository.DocumentRepository;
 import com.opas.repository.FolderRepository;
@@ -17,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -29,18 +33,21 @@ public class DocumentService {
     private final UserRepository userRepository;
     private final FolderRepository folderRepository;
     private final DecodeResultRepository decodeResultRepository;
+    private final CompletedTaskRepository completedTaskRepository;
     private final StorageService storageService;
     private final DocumentInsights documentInsights;
     private final Duration uploadTtl;
 
     public DocumentService(DocumentRepository documentRepository, UserRepository userRepository,
             FolderRepository folderRepository, DecodeResultRepository decodeResultRepository,
-            StorageService storageService, DocumentInsights documentInsights,
+            CompletedTaskRepository completedTaskRepository, StorageService storageService,
+            DocumentInsights documentInsights,
             @Value("${opas.s3.upload-ttl-minutes}") int uploadTtlMinutes) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.folderRepository = folderRepository;
         this.decodeResultRepository = decodeResultRepository;
+        this.completedTaskRepository = completedTaskRepository;
         this.storageService = storageService;
         this.documentInsights = documentInsights;
         this.uploadTtl = Duration.ofMinutes(uploadTtlMinutes);
@@ -63,8 +70,35 @@ public class DocumentService {
             }
         }
         document.setFolderId(folderId);
+        // A choice the user made (including moving it out of every folder) is final: the
+        // AI's suggested category won't be applied over it.
+        document.setFolderSetByUser(true);
         document = documentRepository.save(document);
-        return toResponse(document, null, generateDownloadUrl(document), insightsFor(document.getId()));
+        return toResponse(document, null, generateDownloadUrl(document), insightsFor(document.getId()),
+                completedFor(document.getId()));
+    }
+
+    /**
+     * Mark one of a document's deadlines or actions done, or undo that. Idempotent: marking a
+     * task done twice keeps the first completion time.
+     */
+    @Transactional
+    public DocumentResponse setTaskDone(UUID userId, UUID documentId, String taskKey, boolean done) {
+        Document document = documentRepository.findById(documentId).orElseThrow(ResourceNotFoundException::new);
+        if (!document.getUser().getId().equals(userId)) {
+            throw new ResourceNotFoundException();
+        }
+        var existing = completedTaskRepository.findByDocumentIdAndTaskKey(documentId, taskKey);
+        if (done && existing.isEmpty()) {
+            CompletedTask task = new CompletedTask();
+            task.setDocumentId(documentId);
+            task.setTaskKey(taskKey);
+            completedTaskRepository.save(task);
+        } else if (!done) {
+            existing.ifPresent(completedTaskRepository::delete);
+        }
+        return toResponse(document, null, generateDownloadUrl(document), insightsFor(documentId),
+                completedFor(documentId));
     }
 
     @Transactional
@@ -83,7 +117,7 @@ public class DocumentService {
 
         String uploadUrl = storageService.generatePresignedUploadUrl(s3Key, request.contentType(),
                 request.fileSize(), uploadTtl);
-        return toResponse(document, uploadUrl, null, DocumentInsights.Insights.EMPTY);
+        return toResponse(document, uploadUrl, null, DocumentInsights.Insights.EMPTY, List.of());
     }
 
     @Transactional
@@ -129,9 +163,15 @@ public class DocumentService {
         for (DecodeResult result : decodeResultRepository.findByUserIdOrderByCreatedAtDesc(userId)) {
             latestDecode.putIfAbsent(result.getDocument().getId(), result.getStructuredData());
         }
-        return documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(userId, "archived").stream()
+        List<Document> documents = documentRepository.findByUserIdAndStatusNotOrderByCreatedAtDesc(userId, "archived");
+        Map<UUID, List<CompletedTaskResponse>> completed = completedTaskRepository
+                .findByDocumentIdIn(documents.stream().map(Document::getId).toList()).stream()
+                .collect(Collectors.groupingBy(CompletedTask::getDocumentId,
+                        Collectors.mapping(DocumentService::toTaskResponse, Collectors.toList())));
+        return documents.stream()
                 .map(doc -> toResponse(doc, null, generateDownloadUrl(doc),
-                        documentInsights.from(latestDecode.get(doc.getId()))))
+                        documentInsights.from(latestDecode.get(doc.getId())),
+                        completed.getOrDefault(doc.getId(), List.of())))
                 .toList();
     }
 
@@ -142,7 +182,8 @@ public class DocumentService {
         if (!document.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
         }
-        return toResponse(document, null, generateDownloadUrl(document), insightsFor(documentId));
+        return toResponse(document, null, generateDownloadUrl(document), insightsFor(documentId),
+                completedFor(documentId));
     }
 
     @Transactional
@@ -189,10 +230,19 @@ public class DocumentService {
                 .orElse(DocumentInsights.Insights.EMPTY);
     }
 
+    private List<CompletedTaskResponse> completedFor(UUID documentId) {
+        return completedTaskRepository.findByDocumentId(documentId).stream().map(DocumentService::toTaskResponse).toList();
+    }
+
+    private static CompletedTaskResponse toTaskResponse(CompletedTask task) {
+        return new CompletedTaskResponse(task.getTaskKey(), task.getCompletedAt());
+    }
+
     private static DocumentResponse toResponse(Document doc, String uploadUrl, String downloadUrl,
-            DocumentInsights.Insights insights) {
+            DocumentInsights.Insights insights, List<CompletedTaskResponse> completedTasks) {
         return new DocumentResponse(doc.getId(), doc.getFilename(), doc.getContentType(), doc.getFileSize(),
                 doc.getStatus(), doc.getFolderId(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl,
-                insights.title(), insights.authority(), insights.deadlines());
+                insights.title(), insights.authority(), insights.deadlines(), insights.documentType(),
+                insights.summary(), insights.actions(), insights.keyFigure(), completedTasks);
     }
 }

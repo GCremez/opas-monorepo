@@ -1,27 +1,35 @@
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, Dimensions, Pressable, FlatList } from 'react-native';
-import Svg, { Line } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as SecureStore from 'expo-secure-store';
 import { useThemeColors } from '../../src/store/themeStore';
+import { useAuthStore } from '../../src/store/authStore';
 
 const { width } = Dimensions.get('window');
 
-// Diagonal "paper" striping for the slide-1 illustration panel (design 2d).
-function StripePanel({ color, line }: { color: string; line: string }) {
-  const W = 320, H = 170, gap = 18;
-  const lines = [];
-  for (let x = -H; x < W; x += gap) {
-    lines.push(<Line key={x} x1={x} y1={H} x2={x + H} y2={0} stroke={line} strokeWidth={7} />);
-  }
+// Slide 1: a Kela letter as Opas reads it. The Finnish original with the name
+// blacked out (personal details are hidden first), then what it means in plain words.
+function LetterPreview() {
+  const { t } = useTranslation();
   return (
-    <View className="h-[170px] rounded-lg bg-surface overflow-hidden items-center justify-center mb-8">
-      <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ position: 'absolute' }}>
-        {lines}
-      </Svg>
+    <View className="rounded-lg bg-surface p-4 mb-8" accessible accessibilityLabel={t('onboarding.illo_plain')}>
+      <Text className="font-mono text-meta uppercase text-muted">Kela · Päätös</Text>
+      <View className="flex-row items-center gap-2 mt-3">
+        <View className="h-2.5 w-24 rounded-sm bg-fg" />
+        <View className="h-1.5 w-14 rounded-sm bg-node" />
+      </View>
+      <Text className="font-serif text-[14px] text-fg-soft mt-2.5">Päätös yleisestä asumistuesta</Text>
+      <View className="h-1.5 w-[85%] rounded-sm bg-node mt-2.5" />
+      <View className="h-1.5 w-[60%] rounded-sm bg-node mt-1.5" />
+
+      <View className="border-t border-rule mt-4 pt-3">
+        <Text className="font-semibold text-label uppercase text-accent">{t('onboarding.illo_meaning')}</Text>
+        <Text className="font-serif text-[16px] leading-[22px] text-fg mt-1.5">{t('onboarding.illo_plain')}</Text>
+        <Text className="font-mono text-meta uppercase text-warning mt-2">→ {t('onboarding.illo_action')}</Text>
+      </View>
     </View>
   );
 }
@@ -30,7 +38,7 @@ function MiniLedger({ rows }: { rows: { label: string; value: string; tone: stri
   return (
     <View className="rounded-lg bg-surface p-4 mb-8">
       {rows.map((r, i) => (
-        <View key={r.label} className={`flex-row items-center justify-between py-2.5${i < rows.length - 1 ? ' border-b border-hairline' : ''}`}>
+        <View key={r.label} className={`flex-row items-center justify-between py-2.5${i < rows.length - 1 ? ' border-b border-line' : ''}`}>
           <Text className="font-serif text-[14px] text-fg">{r.label}</Text>
           <Text className={`font-mono text-label tracking-[0.05em] uppercase ${r.tone}`}>{r.value}</Text>
         </View>
@@ -52,7 +60,7 @@ export default function OnboardingScreen() {
       eyebrow: t('onboarding.eyebrow_1'),
       title: t('onboarding.slide_1_title'),
       desc: t('onboarding.slide_1_desc'),
-      illo: <StripePanel color={c.muted} line={c['surface-2']} />,
+      illo: <LetterPreview />,
     },
     {
       key: 'dates',
@@ -87,6 +95,24 @@ export default function OnboardingScreen() {
 
   const isLast = index === slides.length - 1;
 
+  // The app opens here on every launch, so this screen decides where people belong:
+  // a signed-in user goes straight to their record, and someone who has already been
+  // through onboarding goes to sign in. Only first-time visitors see the slides.
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [routeChecked, setRouteChecked] = useState(false);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(tabs)');
+      return;
+    }
+    SecureStore.getItemAsync('has_seen_onboarding')
+      .then((seen) => {
+        if (seen === 'true') router.replace('/(auth)/welcome');
+        else setRouteChecked(true);
+      })
+      .catch(() => setRouteChecked(true));
+  }, [isAuthenticated, router]);
+
   const complete = async () => {
     await SecureStore.setItemAsync('has_seen_onboarding', 'true');
     router.replace('/(auth)/welcome');
@@ -100,6 +126,10 @@ export default function OnboardingScreen() {
   const onViewable = useRef(({ viewableItems }: { viewableItems: { index: number | null }[] }) => {
     if (viewableItems[0]?.index != null) setIndex(viewableItems[0].index);
   }).current;
+
+  if (!routeChecked) {
+    return <View className="flex-1 bg-bg" />;
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
@@ -128,7 +158,8 @@ export default function OnboardingScreen() {
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         renderItem={({ item }) => (
           <View style={{ width }} className="flex-1 justify-center px-[30px]">
-            {item.illo}
+            {/* Fixed-height stage so the heading sits at the same height on every slide. */}
+            <View className="h-[250px] justify-end">{item.illo}</View>
             <Text className="font-semibold text-label tracking-[0.18em] uppercase text-accent mb-3.5">{item.eyebrow}</Text>
             <Text className="font-display text-[34px] leading-[37px] tracking-[-0.01em] text-fg">{item.title}</Text>
             <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mt-4">{item.desc}</Text>

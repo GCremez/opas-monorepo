@@ -30,7 +30,9 @@ export default function AuthLayout() {
     }
   }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (checking) {
+  // Signed in: we're on our way to the tabs, so don't mount the auth stack at all.
+  // Mounting it mid-redirect made it report its routes to a navigator already gone.
+  if (checking || isAuthenticated) {
     return (
       <View className="flex-1 items-center justify-center bg-bg">
         <Spinner size="lg" />

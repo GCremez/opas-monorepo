@@ -15,7 +15,10 @@ module.exports = {
         fg:          'var(--fg)',
         'fg-soft':   'var(--fg-soft)',
         muted:       'var(--muted)',
+        // `border-hairline` is NativeWind's built-in width utility (all four
+        // sides), so border colour uses `line` instead.
         hairline:    'var(--hairline)',
+        line:        'var(--hairline)',
         rule:        'var(--rule)',
         accent:      'var(--accent)',
         'on-accent': 'var(--on-accent)',

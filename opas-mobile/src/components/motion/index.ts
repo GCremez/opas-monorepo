@@ -7,7 +7,7 @@ export { RedactionSkeleton } from './RedactionSkeleton'; // 02 · The Redaction 
 export { DecodeScramble } from './DecodeScramble'; // 03 · The Decode (Fi→En scramble)
 export { AssemblyLoader } from './AssemblyLoader'; // 04 · The Assembly (save / upload)
 export { PassageButton, type PassageState } from './PassageButton'; // 05 · The Passage (submit button)
-export { PullToGather } from './PullToGather'; // 06 · The Gather (pull-to-refresh)
+export { PullToGather, GatherScrollView } from './PullToGather'; // 06 · The Gather (pull-to-refresh)
 export { ScanLoader } from './ScanLoader'; // 09 · The Scan (camera OCR)
 export { StreamingText } from './StreamingText'; // 13 · The Plain Words (streaming explanation)
 export { CountdownRing } from './CountdownRing'; // 12 · The Countdown (deadline)

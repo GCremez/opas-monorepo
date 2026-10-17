@@ -18,7 +18,9 @@
     "close": "Sulje",
     "camera_access_needed": "Kameran käyttö tarvitaan",
     "grant_permission": "Myöntä lupa",
-    "open_original": "Avaa alkuperäinen asiakirja"
+    "open_original": "Avaa alkuperäinen asiakirja",
+    "pull_to_refresh": "Vedä päivittääksesi",
+    "gathering": "Kootaan…"
   },
   "onboarding": {
     "skip": "Ohita",
@@ -43,7 +45,10 @@
     "mini_2_row_2_label": "Verohallinto",
     "mini_2_row_2_value": "3 asiakirjaa",
     "mini_2_row_3_label": "Migri",
-    "mini_2_row_3_value": "2 · 1 eräpäivä"
+    "mini_2_row_3_value": "2 · 1 eräpäivä",
+    "illo_plain": "Asumistukesi on myönnetty.",
+    "illo_action": "Ilmoita tulomuutoksista 30.11. mennessä",
+    "illo_meaning": "Mitä se tarkoittaa"
   },
   "auth": {
     "welcome_back": "Tervetuloa takaisin.",
@@ -96,7 +101,11 @@
     "reset_password_min": "Uuden salasanan on oltava vähintään 8 merkkiä",
     "reset_invalid": "Koodi on virheellinen tai vanhentunut. Pyydä uusi.",
     "reset_done_title": "Salasana päivitetty.",
-    "reset_done_body": "Kirjaudu sisään uudella salasanallasi."
+    "reset_done_body": "Kirjaudu sisään uudella salasanallasi.",
+    "signing_in": "Kirjaudutaan…",
+    "signed_in": "Kirjauduttu",
+    "creating_account": "Luodaan tiliä…",
+    "account_created": "Tili luotu"
   },
   "tabs": {
     "home": "Koti",
@@ -117,8 +126,8 @@
     "all_clear": "Kaikki on kunnossa.",
     "one_thing": " Yksi asia vaatii huomiotasi tällä viikolla.",
     "nothing_needs": "Mikään ei vaadi huomiotasi juuri nyt. Olet ajan tasalla.",
-    "footer_one": "Rekisteröity Suomeen · {{count}} asiakirja tallennettu.",
-    "footer_other": "Rekisteröity Suomeen · {{count}} asiakirjaa tallennettu.",
+    "footer_one": "{{count}} asiakirja tallessa.",
+    "footer_other": "{{count}} asiakirjaa tallessa.",
     "explore": "Tutustu Opasiin",
     "ask_opas": "Kysy Opasilta",
     "ask_opas_meta": "Vastaukset tietojesi pohjalta",
@@ -140,12 +149,13 @@
     "title": "Määräajat ja\nmuistutukset.",
     "this_week": "Tällä viikolla",
     "later": "Myöhemmin",
-    "done": "Valmis",
+    "done": "Tehty",
     "no_alerts": "Ei määräaikoja",
     "no_alerts_desc": "Kun asiakirjalla on määräaika, se näkyy täällä.",
     "days_left": "{{count}} pv",
     "day_left": "{{count}} pv",
-    "passed": "Menneet"
+    "passed": "Menneet",
+    "later_this_month": "Myöhemmin tässä kuussa"
   },
   "home": {
     "title": "Koti",
@@ -190,8 +200,8 @@
   },
   "search": {
     "title": "Haku",
-    "placeholder": "Etsi asiakirjoja, kansioita…",
-    "recent": "Viimeisimmät asiakirjat",
+    "placeholder": "Etsi asiakirjaa tai aihetta…",
+    "recent": "Viimeisimmät",
     "browse_by_authority": "Selaa virastojen mukaan",
     "empty_title": "Etsi asiakirjojasi",
     "empty_desc": "Löydä skannattuja asiakirjoja nimen, viraston tai päivämäärän perusteella. Aloita kirjoittaminen tai selaa virastoittain.",
@@ -212,34 +222,53 @@
       "kela": "Kela",
       "vero": "Vero",
       "migri": "Migri",
-      "suomi": "Suomi.fi"
-    }
+      "suomi": "Suomi.fi",
+      "dvv": "DVV"
+    },
+    "results_across": "{{results}} · {{docs}} joukosta",
+    "topic": "Aihe",
+    "in_topic": "{{count}} asiakirja tässä aiheessa",
+    "in_topic_plural": "{{count}} asiakirjaa tässä aiheessa",
+    "browse_by_topic": "Selaa aiheittain"
   },
   "scan": {
-    "title": "Skannaa asiakirja",
-    "description": "Kuvaa mikä tahansa virallinen kirje Kelasta, Verosta, Migristä tai muilta viranomaisilta",
-    "align_in_frame": "Aseta asiakirja kehykseen",
-    "auto_capturing": "Automaattinen kuvaus 1,5 sekunnissa…",
-    "start_scanning": "Aloita skannaus",
     "flash": "Salama",
-    "auto_frame": "Automaattikehys",
     "gallery": "Lataa galleriasta",
-    "browse_files": "Selaa tiedostoja",
-    "scanned_document": "Skannattu asiakirja",
     "decoding": "Analysoidaan asiakirjaa…",
-    "extracting": "Poimitaan tekstiä ja määräaikoja",
-    "document_decoded": "Asiakirja analysoitu",
-    "extracted_actions": "Poimitut toimenpiteet:",
-    "scan_another": "Skannaa toinen",
-    "scan_failed_title": "Asiakirjaa ei voitu skannata",
-    "scan_failed_desc": "Varmista, että asiakirja on hyvin valaistu, tasainen ja kokonaan kuvassa. Vältä heijastuksia ja varjoja.",
     "step_uploading": "Piilotetaan henkilötiedot",
     "step_analyzing": "Käännetään FI → EN",
     "step_extracting": "Etsitään päivämääriä ja toimia",
     "reading": "Luetaan kirjettäsi…",
     "please_wait": "Odota hetki",
     "privacy_note": "Asiakirjasi pysyy hallinnassasi. Henkilötiedot piilotetaan ennen kuin mitään luetaan.",
-    "grant_permission_desc": "Myöntä kameran käyttöasetuksista, jotta voit skannata asiakirjoja."
+    "grant_permission_desc": "Myöntä kameran käyttöasetuksista, jotta voit skannata asiakirjoja.",
+    "flash_on": "Salama · päällä",
+    "flash_off": "Salama · pois",
+    "gallery_short": "Galleria",
+    "capture": "Ota kuva",
+    "upload_failed_title": "Asiakirjaa ei voitu ladata",
+    "upload_failed_desc": "Tarkista yhteys ja yritä uudelleen. Mitään ei tallennettu.",
+    "limit_title": "Tämän kuun skannaukset on käytetty",
+    "limit_desc": "Ilmaistiliin sisältyy 5 skannausta kuukaudessa. Päivitä rajattomiin skannauksiin tai odota ensi kuuhun.",
+    "upgrade": "Katso Premium",
+    "new_scan": "Uusi skannaus",
+    "align_frame": "[ ASETA KIRJE\nKEHYKSEEN ]",
+    "point_title": "Osoita kirjettä.",
+    "point_sub": "Opas lukee loput.",
+    "found_eyebrow": "Tämän löysimme",
+    "translated": "KÄÄNNETTY · {{from}} → {{to}}",
+    "action_needed": "Toimenpide",
+    "save_record": "Näyttää oikealta — tallenna",
+    "rescan": "Skannaa uudelleen",
+    "edit_details": "Muokkaa tietoja",
+    "cant_read_title": "Emme saaneet tästä selvää.",
+    "cant_read_desc": "Yritä uudelleen hyvässä valossa niin, että koko sivu on tasaisena kehyksen sisällä.",
+    "pick_gallery_instead": "Valitse galleriasta",
+    "open_saved_copy": "Tai avaa tallennettu kopio",
+    "tip_flatten": "Suorista sivu",
+    "tip_glare": "Vältä varjoja ja heijastuksia",
+    "tip_corners": "Kaikki neljä kulmaa kuvaan",
+    "filing": "Arkistoidaan kirjettäsi…"
   },
   "documents": {
     "title": "Asiakirjat",
@@ -269,7 +298,23 @@
     "delete_folder_label": "Poista",
     "no_documents_in_folder": "Ei asiakirjoja",
     "delete_document_title": "Poista asiakirja",
-    "delete_document_message": "Tätä ei voi peruuttaa. Asiakirja poistetaan pysyvästi kirjastostasi."
+    "delete_document_message": "Tätä ei voi peruuttaa. Asiakirja poistetaan pysyvästi kirjastostasi.",
+    "categories": "Kategoriat",
+    "unfiled": "Luokittelemattomat",
+    "docs_count": "{{count}} asiakirja",
+    "docs_count_plural": "{{count}} asiakirjaa",
+    "summary_counts": "{{docs}} asiakirjaa · {{folders}} kansiota",
+    "files_title": "Kaikki\njärjestyksessä.",
+    "by_authority": "Viranomaisittain",
+    "summary_docs": "{{count}} asiakirja",
+    "summary_docs_plural": "{{count}} asiakirjaa",
+    "summary_folders": "{{count}} kansio",
+    "summary_folders_plural": "{{count}} kansiota",
+    "updated_ago": "Päivitetty {{ago}} sitten",
+    "not_read": "Ei vielä luettu",
+    "due_count": "{{count}} erääntyy",
+    "due_count_plural": "{{count}} erääntyy",
+    "files_empty": "Skannaa kirje, niin se arkistoidaan tänne lähettäjäviranomaisen alle."
   },
   "folders": {
     "title": "Kansiot",
@@ -364,7 +409,8 @@
     "lang_sv_native": "Ruotsi",
     "deadline_reminders": "Määräaikamuistutukset",
     "on": "Päällä",
-    "off": "Pois"
+    "off": "Pois",
+    "remaining_short": "{{remaining}}/{{limit}} jäljellä"
   },
   "document": {
     "title": "Asiakirja",
@@ -406,7 +452,16 @@
     "days_left": "{{count}} päivä jäljellä",
     "days_left_plural": "{{count}} päivää jäljellä",
     "no_dates": "Asiakirjassa ei mainita päivämääriä tai määräaikoja.",
-    "more": "Lisää toimintoja"
+    "more": "Lisää toimintoja",
+    "category": "Kategoria",
+    "choose_category": "Lisää kategoriaan",
+    "no_category": "Ei kategoriaa",
+    "category_title": "Tallenna kategoriaan",
+    "done_count": "{{done}} / {{total}} tehty",
+    "done_on": "Tehty · {{date}}",
+    "due_in": "Erääntyy {{count}} päivässä",
+    "due_in_plural": "Erääntyy {{count}} päivässä",
+    "by_date": "Viimeistään {{date}}"
   },
   "draftLetter": {
     "title": "Kirjeluonnos",
@@ -467,5 +522,47 @@
     "ready": "Luettu",
     "failed": "Epäonnistui",
     "archived": "Arkistoitu"
+  },
+  "folder": {
+    "empty": "Täällä ei ole vielä asiakirjoja.",
+    "empty_unfiled": "Kaikki on luokiteltu.",
+    "authority": "Viranomainen",
+    "folder": "Kansio",
+    "topic": "Aihe",
+    "not_sorted": "Ei vielä lajiteltu",
+    "documents": "{{count}} asiakirja",
+    "documents_plural": "{{count}} asiakirjaa",
+    "actions_due": "{{count}} toimenpide erääntyy",
+    "actions_due_plural": "{{count}} toimenpidettä erääntyy",
+    "status_action": "Toimi",
+    "status_read": "Luettu",
+    "due": "Eräpäivä {{date}}",
+    "in_days": "{{count}} päivä",
+    "in_days_plural": "{{count}} päivää",
+    "in_weeks": "{{count}} viikko",
+    "in_weeks_plural": "{{count}} viikkoa",
+    "documents_heading": "Asiakirjat",
+    "options": "Kansion asetukset"
+  },
+  "reminders": {
+    "due_today": "erääntyy tänään",
+    "days_left": "{{count}} päivä jäljellä",
+    "days_left_plural": "{{count}} päivää jäljellä",
+    "body": "{{what}} viimeistään {{date}}. Avaa napauttamalla.",
+    "prompt_title": "Älä koskaan unohda määräaikaa.",
+    "prompt_desc": "Opas muistuttaa ennen kuin jokin erääntyy — hiljaa ja vain silloin, kun sillä on merkitystä.",
+    "turn_on": "Ota muistutukset käyttöön",
+    "not_now": "Ei nyt",
+    "blocked": "Ilmoitukset ovat pois päältä. Ota ne käyttöön Asetuksista."
+  },
+  "widget": {
+    "header": "Opas · Seuraava määräaika",
+    "days_left": "päivää jäljellä",
+    "day_left": "päivä jäljellä",
+    "due_today": "Erääntyy tänään",
+    "due": "Eräpäivä",
+    "empty": "Ei mitään erääntyvää. Hyvin hoidettu.",
+    "scan_header": "Opas · Skannaa",
+    "scan_cta": "Skannaa uusi kirje →"
   }
 }

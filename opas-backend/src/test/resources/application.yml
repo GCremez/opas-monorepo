@@ -28,12 +28,6 @@ spring:
     embedding:
       transformer:
         enabled: false
-    anthropic:
-      api-key: test-key-not-used
-      chat:
-        options:
-          model: claude-sonnet-4-20250514
-          max-tokens: 256
 
 jwt:
   access-token-ttl-minutes: 15
@@ -79,8 +73,16 @@ jwt:
     -----END PUBLIC KEY-----
 
 opas:
+  ai:
+    api-key: test-key-not-used
+    model: claude-sonnet-5-5
+    max-tokens: 16000
+    refusal-fallback: true
+    input-price-per-mtok: 2.00
+    output-price-per-mtok: 10.00
   presidio:
     url: http://localhost:5001
+    anonymizer-url: http://localhost:5002
   s3:
     bucket: opas-test
     region: eu-north-1

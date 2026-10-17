@@ -11,6 +11,7 @@ import { useToast } from '../../src/components/ui/ToastProvider';
 import { EyeIcon, EyeOffIcon, CheckIcon, ChevronRightIcon } from '../../src/components/icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { useSubscriptionStore } from '../../src/store/subscriptionStore';
+import { useReminderStore } from '../../src/store/reminderStore';
 import { useThemeStore, useThemeColors, type Appearance_ } from '../../src/store/themeStore';
 
 type Lang = 'en' | 'fi' | 'sv';
@@ -67,7 +68,7 @@ function ValueRow({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      className="flex-row items-center justify-between py-4 border-b border-hairline"
+      className="flex-row items-center justify-between py-4 border-b border-line"
       accessibilityLabel={`${label}${value ? ` — ${value}` : ''}`}
     >
       <Text className="font-medium text-body text-fg">{label}</Text>
@@ -101,7 +102,10 @@ export default function ProfileScreen() {
   const [showPasswordSheet, setShowPasswordSheet] = useState(false);
   const [langSheetOpen, setLangSheetOpen] = useState(false);
   const [appearanceSheetOpen, setAppearanceSheetOpen] = useState(false);
-  const [deadlineOn, setDeadlineOn] = useState(true);
+  // Deadline reminders: on only when the user wants them and the system allows them.
+  const remindersWanted = useReminderStore((s) => s.enabled);
+  const remindersAllowed = useReminderStore((s) => s.permission === 'granted');
+  const deadlineOn = remindersWanted && remindersAllowed;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -200,7 +204,10 @@ export default function ProfileScreen() {
           <Text className="font-display text-title text-fg mt-4" numberOfLines={1}>{user?.name ?? ''}</Text>
           <Text className="font-mono text-label tracking-[0.05em] uppercase text-muted mt-1.5">
             {tier === 'premium' ? t('profile.premium_plan') : t('profile.free_plan')}
-            {usage && tier !== 'premium' ? ` · ${usage.remaining}/${usage.limit}` : ''}
+            {/* Spell out "left": a bare "5/5" read as five of five already used. */}
+            {usage && tier !== 'premium'
+              ? ` · ${t('profile.remaining_short', { remaining: usage.remaining, limit: usage.limit })}`
+              : ''}
           </Text>
         </View>
 
@@ -215,7 +222,11 @@ export default function ProfileScreen() {
             value={deadlineOn ? t('profile.on') : t('profile.off')}
             valueTone={deadlineOn ? 'text-accent' : 'text-muted'}
             hideChevron
-            onPress={() => { setDeadlineOn((v) => !v); showToast(`${t('profile.deadline_reminders')} ${!deadlineOn ? t('profile.on') : t('profile.off')}`); }}
+            onPress={async () => {
+              const on = await useReminderStore.getState().setEnabled(!deadlineOn);
+              // Asked to turn on but the system said no: point to Settings rather than fail silently.
+              showToast(!deadlineOn && !on ? t('reminders.blocked') : `${t('profile.deadline_reminders')} ${on ? t('profile.on') : t('profile.off')}`);
+            }}
           />
         </View>
 
@@ -235,7 +246,7 @@ export default function ProfileScreen() {
                 key={item.key}
                 activeOpacity={0.7}
                 onPress={handlePress}
-                className="flex-row items-center justify-between py-4 border-b border-hairline"
+                className="flex-row items-center justify-between py-4 border-b border-line"
                 accessibilityLabel={t(`profile.${item.key}`)}
               >
                 <Text className={`font-medium text-body ${item.destructive ? 'text-danger' : 'text-fg'}`}>
@@ -324,7 +335,7 @@ export default function ProfileScreen() {
           <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <ScrollView className="flex-1 px-6 pt-5" keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
               <Text className="font-semibold text-label uppercase text-muted mb-3">{t('profile.current_password')}</Text>
-              <View className="bg-surface border border-hairline rounded-md mb-7 overflow-hidden">
+              <View className="bg-surface border border-line rounded-md mb-7 overflow-hidden">
                 <View className="flex-row items-center">
                   <TextInput
                     className="flex-1 font-body text-[16px] text-fg px-4 py-3.5"
@@ -344,7 +355,7 @@ export default function ProfileScreen() {
               </View>
 
               <Text className="font-semibold text-label uppercase text-muted mb-3">{t('profile.new_password')}</Text>
-              <View className="bg-surface border border-hairline rounded-md mb-7 overflow-hidden">
+              <View className="bg-surface border border-line rounded-md mb-7 overflow-hidden">
                 <View className="flex-row items-center">
                   <TextInput
                     className="flex-1 font-body text-[16px] text-fg px-4 py-3.5"
@@ -377,7 +388,7 @@ export default function ProfileScreen() {
               </View>
 
               <Text className="font-semibold text-label uppercase text-muted mb-3">{t('profile.confirm_password')}</Text>
-              <View className={`bg-surface border rounded-md mb-7 overflow-hidden ${pwConfirm.length > 0 && !passwordsMatch ? 'border-danger' : 'border-hairline'}`}>
+              <View className={`bg-surface border rounded-md mb-7 overflow-hidden ${pwConfirm.length > 0 && !passwordsMatch ? 'border-danger' : 'border-line'}`}>
                 <View className="flex-row items-center">
                   <TextInput
                     className="flex-1 font-body text-[16px] text-fg px-4 py-3.5"
