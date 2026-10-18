@@ -30,15 +30,20 @@ public class NotificationService {
     }
 
     public void sendToUser(java.util.UUID userId, String title, String body) {
-        sendToTokens(pushTokenRepository.findByUserId(userId), title, body);
+        sendToTokens(pushTokenRepository.findByUserId(userId), title, body, Map.of());
+    }
+
+    /** {@code data} rides along to the app, e.g. {@code documentId} so a tap opens it. */
+    public void sendToUser(java.util.UUID userId, String title, String body, Map<String, String> data) {
+        sendToTokens(pushTokenRepository.findByUserId(userId), title, body, data);
     }
 
     public void sendToAllUsers(String title, String body) {
         List<PushToken> allTokens = pushTokenRepository.findAll();
-        sendToTokens(allTokens, title, body);
+        sendToTokens(allTokens, title, body, Map.of());
     }
 
-    private void sendToTokens(List<PushToken> tokens, String title, String body) {
+    private void sendToTokens(List<PushToken> tokens, String title, String body, Map<String, String> data) {
         for (PushToken token : tokens) {
             try {
                 Map<String, Object> payload = Map.of(
@@ -46,6 +51,7 @@ public class NotificationService {
                         "sound", "default",
                         "title", title,
                         "body", body,
+                        "data", data,
                         "priority", "high");
                 @SuppressWarnings("unchecked")
                 Map<String, Object> response = restClient.post()

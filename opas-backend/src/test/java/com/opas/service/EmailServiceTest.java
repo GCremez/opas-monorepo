@@ -57,4 +57,19 @@ class EmailServiceTest {
         new EmailService(ses, false, "no-reply@opas.fi").sendVerificationCode("a@b.fi", "123456", "en");
         verify(ses, never()).sendEmail(any(SendEmailRequest.class));
     }
+
+    @Test
+    void resultReadyEmailHasAButtonToTheLetterAndNothingFromIt() {
+        String link = "https://opas.app/d/25c4f7a2-71b9-4e81-92af-3a3ae5fd7b3a";
+        enabled.sendResultReady("a@b.fi", link, "fi");
+
+        var message = sent().content().simple();
+        assertEquals("Kirjeesi on valmis Opaksessa", message.subject().data());
+        String html = message.body().html().data();
+        assertTrue(html.contains("<html lang=\"fi\">"));
+        assertTrue(html.contains("href=\"" + link + "\""), "button links to the result");
+        assertTrue(html.contains("Avaa Opaksessa"));
+        assertFalse(html.matches("(?s).*%(\\d+\\$)?s.*"), "no unformatted placeholders");
+        assertTrue(message.body().text().data().contains(link), "plain-text part carries the link too");
+    }
 }

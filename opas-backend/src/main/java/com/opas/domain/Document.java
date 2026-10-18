@@ -42,6 +42,15 @@ public class Document {
     @Column(name = "folder_set_by_user", nullable = false)
     private boolean folderSetByUser;
 
+    // First time the owner fetched the finished result. While null, the "letter is
+    // ready" email may still go out (V15).
+    @Column(name = "result_seen_at")
+    private Instant resultSeenAt;
+
+    // Set when that email is sent, so it goes out at most once.
+    @Column(name = "ready_email_sent_at")
+    private Instant readyEmailSentAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -132,6 +141,14 @@ public class Document {
 
     public void setFolderId(UUID folderId) {
         this.folderId = folderId;
+    }
+
+    public Instant getResultSeenAt() {
+        return resultSeenAt;
+    }
+
+    public Instant getReadyEmailSentAt() {
+        return readyEmailSentAt;
     }
 
     public Instant getCreatedAt() {
