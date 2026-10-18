@@ -27,9 +27,9 @@ describe('planReminders', () => {
       new Date(2026, 10, 29, 9),
       new Date(2026, 10, 30, 9),
     ]);
-    expect(plan[0].title).toBe('KELA — reminders.days_left(7)');
+    expect(plan[0].title).toBe('Kela — reminders.days_left(7)');
     expect(plan[0].body).toBe('reminders.body(Report income changes,Nov 30, 2026)');
-    expect(plan[2].title).toBe('KELA — reminders.due_today');
+    expect(plan[2].title).toBe('Kela — reminders.due_today');
     expect(plan[0].documentId).toBe('doc');
   });
 

@@ -142,7 +142,11 @@
     "welcome": "Welcome",
     "needs_count": " {{count}} deadline is coming up.",
     "needs_count_plural": " {{count}} deadlines are coming up.",
-    "load_error_desc": "Check your connection, then pull down to try again."
+    "load_error_desc": "Check your connection, then pull down to try again.",
+    "passed_count": "{{count}} deadline has passed.",
+    "passed_count_plural": "{{count}} deadlines have passed.",
+    "more_coming": " {{count}} more is coming up.",
+    "more_coming_plural": " {{count}} more are coming up."
   },
   "alerts": {
     "eyebrow": "Opas · Alerts",
@@ -325,7 +329,7 @@
     "folder_tax_count": "3 documents",
     "folder_residence": "Residence & Immigration",
     "folder_residence_count": "2 documents",
-    "folder_kela": "KELA & Benefits",
+    "folder_kela": "Kela & Benefits",
     "folder_kela_count": "4 documents",
     "folder_healthcare": "Healthcare",
     "folder_healthcare_count": "1 document",
@@ -338,7 +342,7 @@
     "folder_finance": "Finance",
     "folder_finance_count": "1 document",
     "deadline_residence": "Residence Permit Extension",
-    "deadline_residence_sub": "KELA & Benefits • 2 attachments needed",
+    "deadline_residence_sub": "Kela & Benefits • 2 attachments needed",
     "deadline_tax": "Tax Return 2025",
     "deadline_tax_sub": "Tax & Finance • Final review"
   },

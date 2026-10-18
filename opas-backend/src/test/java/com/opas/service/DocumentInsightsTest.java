@@ -66,6 +66,7 @@ class DocumentInsightsTest {
         var result = insights.from("{\"keyFields\": {\"Period\": \"1.11.2026–31.10.2027\", \"Housing allowance\": \"€387.20/mo\"}}");
         assertEquals("€387.20/mo", result.keyFigure());
         assertEquals("21.5 %", insights.from("{\"keyFields\": {\"Year\": \"2025\", \"Withholding\": \"21.5 %\"}}").keyFigure());
-        assertEquals("2025", insights.from("{\"keyFields\": {\"Year\": \"2025\"}}").keyFigure());
+        // No amount or percentage: no headline, rather than whatever value comes first.
+        assertNull(insights.from("{\"keyFields\": {\"Year\": \"2025\", \"Permit type\": \"Permanent (P)\"}}").keyFigure());
     }
 }

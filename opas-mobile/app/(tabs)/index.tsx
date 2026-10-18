@@ -21,6 +21,9 @@ import { collectDeadlines, documentName, formatDate } from '../../src/lib/decode
 
 // "Needs you" covers deadlines stated in the user's documents within this many days.
 const NEEDS_YOU_WINDOW_DAYS = 14;
+// A deadline missed in the last two weeks still needs the user (an appeal can often
+// still be sent late, a bill still paid). Older ones live under Passed in Alerts.
+const OVERDUE_WINDOW_DAYS = 14;
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -134,10 +137,14 @@ export default function RecordScreen() {
   const askForReminders =
     reminders.hydrated && reminders.permission === 'undetermined' && !reminders.promptDismissed && upcomingDeadline;
 
-  const needsYou = collectDeadlines(documents)
-    .filter((item) => item.days >= 0 && item.days <= NEEDS_YOU_WINDOW_DAYS)
-    .filter((item) => !completedAt(item.document, deadlineKey(item.deadline)))
-    .slice(0, 3);
+  const open = collectDeadlines(documents).filter((item) => !completedAt(item.document, deadlineKey(item.deadline)));
+  const overdue = open
+    .filter((item) => item.days < 0 && item.days >= -OVERDUE_WINDOW_DAYS)
+    .sort((a, b) => b.days - a.days);
+  const upcoming = open.filter((item) => item.days >= 0 && item.days <= NEEDS_YOU_WINDOW_DAYS);
+  const urgent = upcoming.some((item) => item.days <= 3);
+  // Missed deadlines first, then the nearest coming ones.
+  const needsYou = [...overdue, ...upcoming].slice(0, 3);
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
@@ -168,10 +175,21 @@ export default function RecordScreen() {
             </Text>
             {hasDocuments && (
               <Text className="font-serif text-[15px] leading-[23px] text-fg-soft mt-3">
-                {needsYou.length > 0 ? (
+                {/* Only "Everything's in order" when it is: not with a missed deadline
+                    or one due within three days. */}
+                {overdue.length > 0 ? (
                   <>
-                    {t('record.all_clear')}
-                    <Text className="text-danger">{t('record.needs_count', { count: needsYou.length })}</Text>
+                    <Text className="text-danger">{t('record.passed_count', { count: overdue.length })}</Text>
+                    {upcoming.length > 0 && t('record.more_coming', { count: upcoming.length })}
+                  </>
+                ) : upcoming.length > 0 ? (
+                  <>
+                    {!urgent && t('record.all_clear')}
+                    <Text className="text-danger">
+                      {urgent
+                        ? t('record.needs_count', { count: upcoming.length }).trim()
+                        : t('record.needs_count', { count: upcoming.length })}
+                    </Text>
                   </>
                 ) : (
                   t('record.nothing_needs')
@@ -219,7 +237,13 @@ export default function RecordScreen() {
                   title={deadline.description || documentName(document)}
                   meta={authorityOf(document.authority)?.name ?? documentName(document)}
                   date={formatDate(deadline.date, i18n.language)}
-                  note={days === 0 ? t('document.due_today') : t('document.days_left', { count: days })}
+                  note={
+                    days < 0
+                      ? t('document.date_passed')
+                      : days === 0
+                        ? t('document.due_today')
+                        : t('document.days_left', { count: days })
+                  }
                   urgency={days <= 3 ? 'danger' : days <= 7 ? 'warning' : 'muted'}
                   onPress={() => router.push(`/document/${document.id}`)}
                 />
