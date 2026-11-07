@@ -1,5 +1,6 @@
 package com.opas.config;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -50,6 +51,20 @@ class RateLimitAspectTest {
         assertThrows(RateLimitExceededException.class, () -> aspect.enforceRateLimit(joinPoint, rateLimit));
 
         verify(joinPoint, never()).proceed();
+    }
+
+    @Test
+    void clientIpIgnoresHopsTheClientCanForge() {
+        // Client sent "1.2.3.4"; the ALB appended the real address it connected from.
+        assertEquals("203.0.113.9", RateLimitAspect.clientIp("1.2.3.4, 203.0.113.9", "10.0.0.5"));
+        assertEquals("203.0.113.9", RateLimitAspect.clientIp("203.0.113.9", "10.0.0.5"));
+    }
+
+    @Test
+    void clientIpFallsBackToRemoteAddrWithoutAProxy() {
+        assertEquals("10.0.0.5", RateLimitAspect.clientIp(null, "10.0.0.5"));
+        assertEquals("10.0.0.5", RateLimitAspect.clientIp("  ", "10.0.0.5"));
+        assertEquals("10.0.0.5", RateLimitAspect.clientIp("1.2.3.4, ", "10.0.0.5"));
     }
 
     @Test

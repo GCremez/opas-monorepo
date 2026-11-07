@@ -54,11 +54,22 @@ public class RateLimitAspect {
             return "unknown";
         }
         HttpServletRequest request = attrs.getRequest();
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            // First hop is the original client; only trustworthy behind a known proxy.
-            return forwarded.split(",")[0].trim();
+        return clientIp(request.getHeader("X-Forwarded-For"), request.getRemoteAddr());
+    }
+
+    /**
+     * The ALB appends the address it saw to X-Forwarded-For, so the last hop is the only one
+     * a client can't choose. Earlier hops are whatever the client sent: keying on the first
+     * one let anyone rotate a fake value per request and never hit a limit.
+     */
+    static String clientIp(String forwardedFor, String remoteAddr) {
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            String[] hops = forwardedFor.split(",");
+            String last = hops[hops.length - 1].trim();
+            if (!last.isEmpty()) {
+                return last;
+            }
         }
-        return request.getRemoteAddr();
+        return remoteAddr;
     }
 }
