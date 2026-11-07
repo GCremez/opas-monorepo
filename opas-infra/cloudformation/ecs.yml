@@ -69,6 +69,15 @@ Mappings:
       FargateSpotWeight: 0
       LogRetentionDays: 90
 
+Rules:
+  # Without a certificate the ALB forwards plain HTTP, which is fine for a throwaway
+  # staging stack but would send passwords and letters in the clear in production.
+  ProductionNeedsHttps:
+    RuleCondition: !Equals [!Ref Environment, production]
+    Assertions:
+      - Assert: !Not [!Equals [!Ref CertificateArn, '']]
+        AssertDescription: Production must set CertificateArn so the ALB serves HTTPS.
+
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
