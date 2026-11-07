@@ -565,4 +565,10 @@ class AuthServiceTest {
         assertEquals("en", AuthService.normalizeLanguage(" "));
         assertEquals("en", AuthService.normalizeLanguage(null));
     }
+
+    @Test
+    void normalizeEmailMakesCaseAndSpacesIrrelevant() {
+        assertEquals("bob@x.fi", AuthService.normalizeEmail("  Bob@X.fi "));
+        assertEquals("bob@x.fi", AuthService.normalizeEmail("bob@x.fi"));
+    }
 }
