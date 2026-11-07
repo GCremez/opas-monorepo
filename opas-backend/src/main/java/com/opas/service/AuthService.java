@@ -84,14 +84,15 @@ public class AuthService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
+        String email = normalizeEmail(request.email());
+        if (userRepository.existsByEmail(email)) {
             // Generic message: do not confirm that the email is already registered
             // (account enumeration). Registration is also rate-limited (see AuthController).
             throw new IllegalArgumentException("Registration could not be completed");
         }
 
         User user = new User();
-        user.setEmail(request.email());
+        user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setName(request.name());
         user.setLanguage(normalizeLanguage(request.language()));
@@ -112,7 +113,7 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        Optional<User> maybeUser = userRepository.findByEmail(request.email());
+        Optional<User> maybeUser = userRepository.findByEmail(normalizeEmail(request.email()));
         // Always perform a bcrypt comparison — against the real hash if the user
         // exists, otherwise against a dummy hash — so the response time does not
         // reveal whether the email is registered (timing account enumeration).
@@ -139,7 +140,7 @@ public class AuthService {
      */
     @Transactional
     public AuthResponse verifyEmail(String email, String code) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid or expired verification code"));
         if (user.isEmailVerified()) {
             // Never issue tokens here without a valid code: an already-verified account
@@ -159,7 +160,7 @@ public class AuthService {
      * an existing unverified account, so it can't be used to enumerate accounts.
      */
     public void resendVerification(String email) {
-        userRepository.findByEmail(email)
+        userRepository.findByEmail(normalizeEmail(email))
                 .filter(u -> !u.isEmailVerified())
                 .ifPresent(emailVerificationService::generateAndSend);
     }
@@ -288,7 +289,7 @@ public class AuthService {
      */
     public void requestPasswordReset(String email) {
         try {
-            userRepository.findByEmail(email).ifPresent(passwordResetService::generateAndSend);
+            userRepository.findByEmail(normalizeEmail(email)).ifPresent(passwordResetService::generateAndSend);
         } catch (IllegalStateException e) {
             // A mail failure only ever happens for a registered email, so surfacing it
             // (500 vs 204) would reveal which addresses have accounts. The failure is
@@ -306,7 +307,7 @@ public class AuthService {
      */
     @Transactional
     public void resetPassword(String email, String code, String newPassword) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid or expired reset code"));
         if (!passwordResetService.verifyAndConsume(user, code)) {
             throw new IllegalArgumentException("Invalid or expired reset code");
@@ -365,6 +366,15 @@ public class AuthService {
             return null;
         }
         return authHeader.substring(7).trim();
+    }
+
+    /**
+     * Addresses are stored lower-cased, so Bob@x.fi and bob@x.fi are one account. The
+     * domain part is case-insensitive by spec; mail providers treat the local part the
+     * same way in practice.
+     */
+    static String normalizeEmail(String email) {
+        return email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 
     /** Accepts en/fi/sv (any case, with optional region like "fi-FI"); anything else falls back to English. */

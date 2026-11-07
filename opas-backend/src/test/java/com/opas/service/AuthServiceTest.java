@@ -590,4 +590,10 @@ class AuthServiceTest {
         assertEquals("v2", consent.version());
         assertEquals(java.time.Instant.parse("2026-11-11T12:00:00Z"), consent.grantedAt());
     }
+
+    @Test
+    void normalizeEmailMakesCaseAndSpacesIrrelevant() {
+        assertEquals("bob@x.fi", AuthService.normalizeEmail("  Bob@X.fi "));
+        assertEquals("bob@x.fi", AuthService.normalizeEmail("bob@x.fi"));
+    }
 }
