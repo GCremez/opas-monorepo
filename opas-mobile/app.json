@@ -15,9 +15,6 @@
       "bundleIdentifier": "app.getopas",
       "buildNumber": "1",
       "infoPlist": {
-        "NSAppTransportSecurity": {
-          "NSAllowsLocalNetworking": true
-        },
         "NSCalendarsUsageDescription": "Opas uses your calendar to add deadline reminders for your documents.",
         "NSCalendarsFullAccessUsageDescription": "Opas uses your calendar to add deadline reminders for your documents.",
         "NSRemindersUsageDescription": "Opas uses reminders to notify you of upcoming document deadlines.",
@@ -46,7 +43,6 @@
         "READ_CALENDAR",
         "WRITE_CALENDAR",
         "POST_NOTIFICATIONS",
-        "SCHEDULE_EXACT_ALARM",
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE"
       ],
@@ -66,6 +62,12 @@
             "DEFAULT"
           ]
         }
+      ],
+      "blockedPermissions": [
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW"
       ]
     },
     "scheme": "opas",
