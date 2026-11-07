@@ -25,17 +25,22 @@ public class DraftLetterService {
     private final SubscriptionRepository subscriptionRepository;
     private final StorageService storageService;
     private final ClaudeClient claudeClient;
+    private final TextExtractionService textExtractionService;
+    private final PresidioService presidioService;
 
     public DraftLetterService(DocumentRepository documentRepository,
             DraftLetterRepository draftLetterRepository, UserRepository userRepository,
             SubscriptionRepository subscriptionRepository, StorageService storageService,
-            ClaudeClient claudeClient) {
+            ClaudeClient claudeClient, TextExtractionService textExtractionService,
+            PresidioService presidioService) {
         this.documentRepository = documentRepository;
         this.draftLetterRepository = draftLetterRepository;
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.storageService = storageService;
         this.claudeClient = claudeClient;
+        this.textExtractionService = textExtractionService;
+        this.presidioService = presidioService;
     }
 
     @Transactional(readOnly = true)
@@ -66,7 +71,11 @@ public class DraftLetterService {
         User user = userRepository.getReferenceById(userId);
 
         byte[] fileBytes = storageService.getObjectBytes(document.getS3Key());
-        String content = new String(fileBytes, java.nio.charset.StandardCharsets.UTF_8);
+        // Same path as a decode: real text out of the PDF or image, then names, ID numbers
+        // and addresses removed before anything leaves for Anthropic. A draft is always
+        // scrubbed; the letter leaves room for the user to sign it themselves.
+        String content = presidioService.scrubPii(
+                textExtractionService.extract(document.getContentType(), fileBytes));
 
         String prompt = buildPrompt(document.getFilename(), content, request.tone(), request.includeOriginal());
         String generatedText = claudeClient.complete(prompt).text();
