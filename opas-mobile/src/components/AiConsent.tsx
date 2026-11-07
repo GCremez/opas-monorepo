@@ -39,21 +39,21 @@ export function AiConsent({ onDecline }: { onDecline: () => void }) {
         <Text className="font-display text-[30px] leading-[33px] tracking-[-0.01em] text-fg" accessibilityRole="header">
           {t('consent.title')}
         </Text>
-        <Text className="font-serif text-[16px] leading-[26px] text-fg-soft mt-4">{t('consent.lead')}</Text>
+        <Text className="font-serif text-prose text-fg-soft mt-4">{t('consent.lead')}</Text>
 
         <View className="mt-6">
           {POINTS.map((k, i) => (
             <View key={k} className={`py-3.5 ${i === POINTS.length - 1 ? '' : 'border-b border-rule'}`}>
-              <Text className="font-semibold text-label tracking-[0.11em] uppercase text-muted">{t(`consent.${k}_label`)}</Text>
-              <Text className="font-body text-[15px] leading-[22px] text-fg mt-1">{t(`consent.${k}`)}</Text>
+              <Text className="font-semibold text-label uppercase text-muted">{t(`consent.${k}_label`)}</Text>
+              <Text className="font-body text-body text-fg mt-1">{t(`consent.${k}`)}</Text>
             </View>
           ))}
         </View>
 
         <Pressable onPress={() => Linking.openURL(LINKS.privacy)} accessibilityRole="link" className="mt-4 py-2 min-h-touch justify-center">
-          <Text className="font-serif-italic text-[14px] text-accent">{t('consent.read_policy')}</Text>
+          <Text className="font-serif-italic text-body-sm text-accent">{t('consent.read_policy')}</Text>
         </Pressable>
-        {failed && <Text className="font-body text-[14px] text-danger mt-2">{t('consent.save_failed')}</Text>}
+        {failed && <Text className="font-body text-body-sm text-danger mt-2">{t('consent.save_failed')}</Text>}
       </ScrollView>
 
       <View className="px-6 pt-2 pb-2">

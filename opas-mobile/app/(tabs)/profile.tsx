@@ -302,7 +302,7 @@ export default function ProfileScreen() {
 
         {/* Independence statement, with the authorities' own sites (Play government-info policy). */}
         <View className="px-8 pb-4">
-          <Text className="font-serif-italic text-[13px] leading-[20px] text-muted text-center">{t('legal.not_affiliated')}</Text>
+          <Text className="font-serif-italic text-body-sm text-muted text-center">{t('legal.not_affiliated')}</Text>
           <View className="flex-row justify-center gap-4 mt-1">
             {OFFICIAL_SITES.map((site) => (
               <Pressable key={site.name} onPress={() => Linking.openURL(site.url)} accessibilityRole="link" className="py-2 min-h-touch justify-center">

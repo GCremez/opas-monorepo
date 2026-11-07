@@ -133,13 +133,13 @@ export default function RegisterScreen() {
             onPress={handleRegister}
           />
 
-          <Text className="font-serif-italic text-[13px] leading-[20px] text-muted text-center mt-4">{t('auth.agree_terms')}</Text>
+          <Text className="font-serif-italic text-body-sm text-muted text-center mt-4">{t('auth.agree_terms')}</Text>
           <View className="flex-row justify-center gap-5">
             <Pressable onPress={() => Linking.openURL(LINKS.terms)} accessibilityRole="link" className="py-2 min-h-touch justify-center">
-              <Text className="font-serif-italic text-[13px] text-accent">{t('profile.terms')}</Text>
+              <Text className="font-serif-italic text-body-sm text-accent">{t('profile.terms')}</Text>
             </Pressable>
             <Pressable onPress={() => Linking.openURL(LINKS.privacy)} accessibilityRole="link" className="py-2 min-h-touch justify-center">
-              <Text className="font-serif-italic text-[13px] text-accent">{t('profile.privacy')}</Text>
+              <Text className="font-serif-italic text-body-sm text-accent">{t('profile.privacy')}</Text>
             </Pressable>
           </View>
 
