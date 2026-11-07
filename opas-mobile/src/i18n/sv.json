@@ -105,7 +105,8 @@
     "signing_in": "Loggar in…",
     "signed_in": "Inloggad",
     "creating_account": "Skapar ditt konto…",
-    "account_created": "Konto skapat"
+    "account_created": "Konto skapat",
+    "agree_terms": "Genom att skapa ett konto godkänner du användarvillkoren och integritetspolicyn."
   },
   "tabs": {
     "home": "Hem",
@@ -415,7 +416,10 @@
     "deadline_reminders": "Påminnelser om tidsfrister",
     "on": "På",
     "off": "Av",
-    "remaining_short": "{{remaining}} av {{limit}} kvar"
+    "remaining_short": "{{remaining}} av {{limit}} kvar",
+    "terms": "Användarvillkor",
+    "ai_reading": "AI-läsning",
+    "ai_reading_off": "AI-läsning av. Opas läser inga nya brev."
   },
   "document": {
     "title": "Dokument",
@@ -569,5 +573,25 @@
     "empty": "Inget förfaller. Du har koll.",
     "scan_header": "Opas · Skanna",
     "scan_cta": "Tryck för att skanna ett brev →"
+  },
+  "consent": {
+    "eyebrow": "Före ditt första brev",
+    "title": "Opas läser dina brev med AI.",
+    "lead": "För att förklara ett brev skickar Opas dess text till en AI-tjänst. Vi behöver ditt samtycke först.",
+    "what_label": "Vad som skickas",
+    "what": "Texten som läses från brevet eller bilden du skannar. Inget annat från din telefon.",
+    "who_label": "Vem som läser",
+    "who": "Anthropic, företaget bakom AI-modellen Claude. Det behandlar texten åt Opas och använder den inte för att träna sina modeller.",
+    "scrub_label": "Vad vi tar bort först",
+    "scrub": "Namn, personbeteckningar, adresser och telefonnummer, där vi kan hitta dem.",
+    "withdraw_label": "Ditt val",
+    "withdraw": "Du kan stänga av det när som helst under Profil. Opas läser då inga nya brev.",
+    "read_policy": "Läs integritetspolicyn",
+    "save_failed": "Ditt svar kunde inte sparas. Kontrollera anslutningen och försök igen.",
+    "agree": "Jag godkänner",
+    "not_now": "Inte nu"
+  },
+  "legal": {
+    "not_affiliated": "Opas är en fristående app. Den har ingen koppling till FPA, Skatteförvaltningen, Migri eller någon finsk myndighet. Officiell information finns på deras egna webbplatser."
   }
 }

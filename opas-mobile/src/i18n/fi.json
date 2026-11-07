@@ -105,7 +105,8 @@
     "signing_in": "Kirjaudutaan…",
     "signed_in": "Kirjauduttu",
     "creating_account": "Luodaan tiliä…",
-    "account_created": "Tili luotu"
+    "account_created": "Tili luotu",
+    "agree_terms": "Luomalla tilin hyväksyt käyttöehdot ja tietosuojaselosteen."
   },
   "tabs": {
     "home": "Koti",
@@ -415,7 +416,10 @@
     "deadline_reminders": "Määräaikamuistutukset",
     "on": "Päällä",
     "off": "Pois",
-    "remaining_short": "{{remaining}}/{{limit}} jäljellä"
+    "remaining_short": "{{remaining}}/{{limit}} jäljellä",
+    "terms": "Käyttöehdot",
+    "ai_reading": "Tekoälyluku",
+    "ai_reading_off": "Tekoälyluku pois. Opas ei lue uusia kirjeitä."
   },
   "document": {
     "title": "Asiakirja",
@@ -569,5 +573,25 @@
     "empty": "Ei mitään erääntyvää. Hyvin hoidettu.",
     "scan_header": "Opas · Skannaa",
     "scan_cta": "Skannaa uusi kirje →"
+  },
+  "consent": {
+    "eyebrow": "Ennen ensimmäistä kirjettä",
+    "title": "Opas lukee kirjeesi tekoälyn avulla.",
+    "lead": "Selittääkseen kirjeen Opas lähettää sen tekstin tekoälypalveluun. Tarvitsemme siihen suostumuksesi.",
+    "what_label": "Mitä lähetetään",
+    "what": "Skannaamastasi kirjeestä tai kuvasta luettu teksti. Ei mitään muuta puhelimestasi.",
+    "who_label": "Kuka sen lukee",
+    "who": "Anthropic, Claude-tekoälymallin kehittäjä. Se käsittelee tekstin Oppaan puolesta eikä käytä sitä mallien kouluttamiseen.",
+    "scrub_label": "Mitä poistamme ensin",
+    "scrub": "Nimet, henkilötunnukset, osoitteet ja puhelinnumerot, kun tunnistamme ne.",
+    "withdraw_label": "Sinun valintasi",
+    "withdraw": "Voit perua suostumuksen milloin tahansa Profiilissa. Opas ei sen jälkeen lue uusia kirjeitä.",
+    "read_policy": "Lue tietosuojaseloste",
+    "save_failed": "Vastaustasi ei voitu tallentaa. Tarkista yhteys ja yritä uudelleen.",
+    "agree": "Hyväksyn",
+    "not_now": "Ei nyt"
+  },
+  "legal": {
+    "not_affiliated": "Opas on itsenäinen sovellus. Se ei liity Kelaan, Verohallintoon, Migriin tai muuhun suomalaiseen viranomaiseen. Virallisen tiedon löydät niiden omilta sivuilta."
   }
 }

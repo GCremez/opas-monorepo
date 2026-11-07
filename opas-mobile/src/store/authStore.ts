@@ -11,8 +11,8 @@ function identifyUser(id: string | undefined, plan: 'free' | 'premium'): void {
   identify(id, { plan, is_demo: false });
 }
 
-// iOS appends a space after an autofill/suggestion pick, and the backend matches emails
-// exactly, so " you@x.fi " would fail to log in. Every auth call sends the trimmed address.
+// iOS appends a space after an autofill/suggestion pick. The backend normalises too, but
+// trimming here keeps the address the app shows back to the user clean.
 const cleanEmail = (email: string) => email.trim();
 
 interface AuthState {
@@ -20,6 +20,9 @@ interface AuthState {
   isLoading: boolean;
   plan: 'free' | 'premium';
   user: Pick<User, 'name' | 'email'> | null;
+  // Whether the user agreed to letters going to the AI provider. null = not known yet.
+  aiConsent: boolean | null;
+  setAiConsent: (consent: boolean) => Promise<void>;
   setPlan: (plan: 'free' | 'premium') => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
@@ -39,6 +42,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
   plan: 'free',
   user: null,
+  aiConsent: null,
 
   hydrate: async () => {
     const token = await SecureStore.getItemAsync('access_token');
@@ -53,7 +57,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   fetchProfile: async () => {
     try {
       const { data } = await apiClient.get('/auth/me');
-      set({ user: { name: data.name, email: data.email }, plan: data.plan ?? 'free' });
+      set({ user: { name: data.name, email: data.email }, plan: data.plan ?? 'free', aiConsent: !!data.aiConsentAt });
       // Re-identify on every profile load so a session restored at app launch
       // (hydrate -> fetchProfile) is attributed to the right person.
       identifyUser(data.id, data.plan ?? 'free');
@@ -65,11 +69,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (err?.response?.status === 401) {
         await SecureStore.deleteItemAsync('access_token');
         await SecureStore.deleteItemAsync('refresh_token');
-        set({ isAuthenticated: false, plan: 'free', user: null });
+        set({ isAuthenticated: false, plan: 'free', user: null, aiConsent: null });
       } else {
         console.error('fetchProfile failed:', err?.message);
       }
     }
+  },
+
+  setAiConsent: async (consent) => {
+    if (consent) await apiClient.post('/auth/me/ai-consent');
+    else await apiClient.delete('/auth/me/ai-consent');
+    set({ aiConsent: consent });
+    track(consent ? 'ai_consent_given' : 'ai_consent_withdrawn');
   },
 
   setPlan: (plan) => set({ plan }),
@@ -97,7 +108,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // clear the flag or the login screen keeps greeting a deleted user with
     // "Welcome back". (Logout intentionally leaves it: that user is returning.)
     await SecureStore.deleteItemAsync('has_registered');
-    set({ isAuthenticated: false, plan: 'free', user: null });
+    set({ isAuthenticated: false, plan: 'free', user: null, aiConsent: null });
     resetAnalytics();
   },
 
@@ -110,6 +121,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: true,
         plan: data.plan ?? 'free',
         user: data.user ?? null,
+        aiConsent: !!data.user?.aiConsentAt,
       });
       identifyUser(data.user?.id, data.plan ?? 'free');
       track('auth_login_completed', { plan: data.plan ?? 'free', method: 'email' });
@@ -137,6 +149,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isAuthenticated: true,
       plan: data.plan ?? 'free',
       user: data.user ?? null,
+      aiConsent: !!data.user?.aiConsentAt,
     });
     identifyUser(data.user?.id, data.plan ?? 'free');
     track('auth_verify_completed');
@@ -157,7 +170,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } finally {
       await SecureStore.deleteItemAsync('access_token');
       await SecureStore.deleteItemAsync('refresh_token');
-      set({ isAuthenticated: false, plan: 'free', user: null });
+      set({ isAuthenticated: false, plan: 'free', user: null, aiConsent: null });
       track('auth_logout');
       // Sever the PostHog identity so the next (possibly different) user on this
       // device isn't merged into the previous person.
@@ -169,5 +182,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 // Let the axios interceptor flip the store to logged-out when a token refresh
 // fails outside of an explicit user action (e.g. a background request 401s).
 setOnAuthCleared(() => {
-  useAuthStore.setState({ isAuthenticated: false, plan: 'free', user: null });
+  useAuthStore.setState({ isAuthenticated: false, plan: 'free', user: null, aiConsent: null });
 });

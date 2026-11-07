@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useAuthStore } from './authStore';
 import type { Document, DecodeResult } from '../types';
 import * as api from '../api/documents';
 import * as decodeApi from '../api/decode';
@@ -87,6 +88,11 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       // the upgrade screen instead of showing a generic failure.
       if (status === 402) {
         track('decode_limit_hit', { remaining: 0 });
+      }
+      // Consent was withdrawn elsewhere (another device): the scan screen asks again.
+      const code = (e as { response?: { data?: { code?: string } } })?.response?.data?.code;
+      if (status === 403 && code === 'ai_consent_required') {
+        useAuthStore.setState({ aiConsent: false });
       }
       // The document exists once confirmed; refresh first, since fetching clears `error`.
       if (stage === 'decode') await get().fetchDocuments();

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, Pressable, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -9,6 +9,7 @@ import { PassageButton, type PassageState } from '../../src/components/motion';
 import { ChevronLeftIcon } from '../../src/components/icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
+import { LINKS } from '../../src/lib/links';
 
 function Field({
   label, value, onChangeText, placeholder, ...rest
@@ -131,6 +132,16 @@ export default function RegisterScreen() {
             state={passage}
             onPress={handleRegister}
           />
+
+          <Text className="font-serif-italic text-[13px] leading-[20px] text-muted text-center mt-4">{t('auth.agree_terms')}</Text>
+          <View className="flex-row justify-center gap-5">
+            <Pressable onPress={() => Linking.openURL(LINKS.terms)} accessibilityRole="link" className="py-2 min-h-touch justify-center">
+              <Text className="font-serif-italic text-[13px] text-accent">{t('profile.terms')}</Text>
+            </Pressable>
+            <Pressable onPress={() => Linking.openURL(LINKS.privacy)} accessibilityRole="link" className="py-2 min-h-touch justify-center">
+              <Text className="font-serif-italic text-[13px] text-accent">{t('profile.privacy')}</Text>
+            </Pressable>
+          </View>
 
           <View className="flex-row justify-center mt-5 pb-2">
             <Text className="font-serif-italic text-[14px] text-muted">{t('auth.has_account')} </Text>

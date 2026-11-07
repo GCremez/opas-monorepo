@@ -2,6 +2,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  // When the user agreed to letters being read by the AI provider; null = not yet.
+  aiConsentAt?: string | null;
 }
 
 export interface AuthResponse {

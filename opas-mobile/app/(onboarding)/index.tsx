@@ -171,6 +171,7 @@ export default function OnboardingScreen() {
       <View className="px-[30px] pt-6 pb-8">
         {isLast ? (
           <>
+            <Text className="font-serif-italic text-[13px] leading-[20px] text-muted mb-4">{t('legal.not_affiliated')}</Text>
             <Pressable onPress={complete} className="bg-accent rounded-pill py-4 items-center justify-center min-h-touch">
               <Text className="font-semibold text-[13px] tracking-[0.04em] text-on-accent">{t('onboarding.get_started')}</Text>
             </Pressable>

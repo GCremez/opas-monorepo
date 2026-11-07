@@ -11,6 +11,8 @@ import { XIcon } from '../../src/components/icons';
 import { AssemblyLoader, ScanLoader } from '../../src/components/motion';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { Button } from '../../src/components/ui/Button';
+import { AiConsent } from '../../src/components/AiConsent';
+import { useAuthStore } from '../../src/store/authStore';
 import { useDocumentStore } from '../../src/store/documentStore';
 import { useFolderStore } from '../../src/store/folderStore';
 import { useThemeColors } from '../../src/store/themeStore';
@@ -134,6 +136,7 @@ export default function ScanScreen() {
   const c = useThemeColors();
   const { uploadAndDecode, deleteDocument, assignFolder, error, failedDocumentId, clearError } = useDocumentStore();
   const { folders, fetchFolders } = useFolderStore();
+  const aiConsent = useAuthStore((s) => s.aiConsent);
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
   // Bumped on cancel/close so a late upload result doesn't flip the screen back.
@@ -146,9 +149,10 @@ export default function ScanScreen() {
   const [found, setFound] = useState<{ documentId: string; view: DecodeView | null; folderId: string | null } | null>(null);
   const [categorySheet, setCategorySheet] = useState(false);
 
+  // Camera access is asked for only once the user has agreed to letters being read.
   useEffect(() => {
-    if (permission && !permission.granted && permission.canAskAgain) requestPermission();
-  }, [permission, requestPermission]);
+    if (aiConsent && permission && !permission.granted && permission.canAskAgain) requestPermission();
+  }, [aiConsent, permission, requestPermission]);
 
   const run = async (name: string, contentType: string, uri: string, source: 'camera' | 'gallery', startedAt: number) => {
     const runId = ++runRef.current;
@@ -238,6 +242,11 @@ export default function ScanScreen() {
       setFound((f) => (f ? { ...f, folderId: previous } : f));
     }
   };
+
+  // Nothing is scanned until the user has agreed to letters going to the AI provider.
+  if (aiConsent !== true && (state === 'ready' || state === 'error')) {
+    return <AiConsent onDecline={handleClose} />;
+  }
 
   if (state === 'processing') {
     return (
