@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import {
   OrbitLoader,
   RedactionSkeleton,
@@ -38,7 +38,13 @@ function Section({ n, title, dark, children }: { n: string; title: string; dark?
   );
 }
 
+// A design tool for checking the motion components, not part of the product: release
+// builds send anyone who deep-links here back to Home.
 export default function MotionGallery() {
+  return __DEV__ ? <MotionGalleryScreen /> : <Redirect href="/" />;
+}
+
+function MotionGalleryScreen() {
   const router = useRouter();
   const [passage, setPassage] = useState<'idle' | 'processing' | 'done'>('idle');
 
