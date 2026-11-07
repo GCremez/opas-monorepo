@@ -118,6 +118,22 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/me/ai-consent")
+    public ResponseEntity<UserResponse> giveAiConsent(Authentication authentication) {
+        String name = authentication.getName();
+        if (name == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(authService.setAiConsent(UUID.fromString(name), true));
+    }
+
+    @DeleteMapping("/me/ai-consent")
+    public ResponseEntity<UserResponse> withdrawAiConsent(Authentication authentication) {
+        String name = authentication.getName();
+        if (name == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(authService.setAiConsent(UUID.fromString(name), false));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(Authentication authentication) {
         String name = authentication.getName();

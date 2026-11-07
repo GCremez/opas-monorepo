@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    @ExceptionHandler(AiConsentRequiredException.class)
+    public ProblemDetail handleAiConsentRequired(AiConsentRequiredException e) {
+        // 403 with its own code so the client shows the consent screen.
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+        detail.setType(URI.create("about:blank"));
+        detail.setTitle("AI Consent Required");
+        detail.setProperty("code", "ai_consent_required");
+        return detail;
+    }
+
     @ExceptionHandler(EmailNotVerifiedException.class)
     public ProblemDetail handleEmailNotVerified(EmailNotVerifiedException e) {
         // 403 with a distinct title so the client can route to the verification screen.

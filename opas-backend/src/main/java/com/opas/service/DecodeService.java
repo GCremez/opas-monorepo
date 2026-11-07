@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.AiConsentRequiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opas.config.DecodeFailedException;
 import com.opas.config.QuotaExceededException;
@@ -116,6 +117,9 @@ public class DecodeService {
                 .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
+        }
+        if (document.getUser().getAiConsentAt() == null) {
+            throw new AiConsentRequiredException();
         }
         // Only an uploaded document can start decoding — or a failed one, as a retry (its
         // quota was refunded when it failed). Once a decode is queued the status moves to

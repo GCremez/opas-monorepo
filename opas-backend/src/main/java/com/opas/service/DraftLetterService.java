@@ -1,5 +1,6 @@
 package com.opas.service;
 
+import com.opas.config.AiConsentRequiredException;
 import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Document;
 import com.opas.domain.DraftLetter;
@@ -60,6 +61,10 @@ public class DraftLetterService {
                 .orElseThrow(ResourceNotFoundException::new);
         if (!document.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
+        }
+
+        if (document.getUser().getAiConsentAt() == null) {
+            throw new AiConsentRequiredException();
         }
 
         boolean isPremium = subscriptionRepository.findByUserId(userId)

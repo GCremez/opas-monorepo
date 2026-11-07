@@ -29,6 +29,10 @@ public class User {
     @Column(nullable = false)
     private String language = "en";
 
+    // When the user agreed to letters being sent to the AI provider; null = not yet.
+    @Column(name = "ai_consent_at")
+    private Instant aiConsentAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -85,6 +89,14 @@ public class User {
 
     public void setEmailVerified(boolean emailVerified) {
         this.emailVerified = emailVerified;
+    }
+
+    public Instant getAiConsentAt() {
+        return aiConsentAt;
+    }
+
+    public void setAiConsentAt(Instant aiConsentAt) {
+        this.aiConsentAt = aiConsentAt;
     }
 
     public String getLanguage() {

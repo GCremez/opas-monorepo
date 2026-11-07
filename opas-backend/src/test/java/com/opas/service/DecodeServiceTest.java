@@ -68,6 +68,7 @@ class DecodeServiceTest {
         userId = UUID.randomUUID();
         user = new User();
         user.setId(userId);
+        user.setAiConsentAt(java.time.Instant.now());
         documentId = UUID.randomUUID();
         document = new Document();
         document.setId(documentId);
@@ -106,6 +107,16 @@ class DecodeServiceTest {
 
         assertThrows(ResourceNotFoundException.class,
                 () -> service.validateAndReserve(otherUserId, documentId, false));
+    }
+
+    @Test
+    void validateAndReserveRefusesWithoutAiConsent() {
+        user.setAiConsentAt(null);
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+
+        assertThrows(com.opas.config.AiConsentRequiredException.class,
+                () -> service.validateAndReserve(userId, documentId, false));
+        verifyNoInteractions(usageTracker);
     }
 
     @Test

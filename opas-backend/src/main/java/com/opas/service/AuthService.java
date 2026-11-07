@@ -335,6 +335,16 @@ public class AuthService {
         refreshTokenService.invalidateAll(userId.toString());
     }
 
+    /** Records (or withdraws) the user's agreement to letters being read by the AI provider. */
+    @Transactional
+    public UserResponse setAiConsent(UUID userId, boolean consent) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(ResourceNotFoundException::new);
+        user.setAiConsentAt(consent ? Instant.now() : null);
+        userRepository.save(user);
+        return me(userId);
+    }
+
     public UserResponse me(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(ResourceNotFoundException::new);
