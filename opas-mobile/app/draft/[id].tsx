@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Pressable, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { CAN_PURCHASE } from '../../src/lib/purchases';
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { Button } from '../../src/components/ui/Button';
@@ -71,7 +72,7 @@ export default function DraftLetterScreen() {
         <View className="flex-1 items-center justify-center px-8">
           <Text className="font-display text-title text-fg text-center mb-2">{t('profile.upgrade_title')}</Text>
           <Text className="font-serif text-prose text-fg-soft text-center mb-8">{t('profile.upgrade_desc')}</Text>
-          <Button onPress={() => router.push('/subscription')}>{t('profile.view_plans')}</Button>
+          {CAN_PURCHASE && <Button onPress={() => router.push('/subscription')}>{t('profile.view_plans')}</Button>}
         </View>
       </SafeAreaView>
     );

@@ -2,7 +2,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
+import { CAN_PURCHASE } from '../../src/lib/purchases';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../src/components/ui/Button';
 import { XIcon } from '../../src/components/icons';
@@ -13,7 +14,12 @@ import { getPlans } from '../../src/api/subscription';
 
 type BillingInterval = 'monthly' | 'yearly';
 
-export default function SubscriptionScreen() {
+// Nothing links here when the build can't sell Premium; a deep link lands on Home instead.
+export default function SubscriptionRoute() {
+  return CAN_PURCHASE ? <SubscriptionScreen /> : <Redirect href="/" />;
+}
+
+function SubscriptionScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();

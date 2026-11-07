@@ -17,6 +17,7 @@ import { useThemeColors } from '../../src/store/themeStore';
 import { toDecodeView, type DecodeView } from '../../src/lib/decodeView';
 import { folderName } from '../../src/lib/folders';
 import { track } from '../../src/lib/analytics';
+import { CAN_PURCHASE } from '../../src/lib/purchases';
 
 type ScanState = 'ready' | 'capturing' | 'processing' | 'review' | 'error';
 
@@ -268,7 +269,7 @@ export default function ScanScreen() {
     const limit = error === 'DECODE_LIMIT_REACHED';
     const upload = error === 'UPLOAD_FAILED';
     const title = limit ? t('scan.limit_title') : upload ? t('scan.upload_failed_title') : t('scan.cant_read_title');
-    const body = limit ? t('scan.limit_desc') : upload ? t('scan.upload_failed_desc') : t('scan.cant_read_desc');
+    const body = limit ? t(CAN_PURCHASE ? 'scan.limit_desc' : 'scan.limit_desc_wait') : upload ? t('scan.upload_failed_desc') : t('scan.cant_read_desc');
     const retry = async () => { await discardFailed(); reset(); };
     const gallery = async () => { await discardFailed(); reset(); handlePickFromGallery(); };
     return (
@@ -298,12 +299,14 @@ export default function ScanScreen() {
               </View>
             )}
 
-            {limit ? (
+            {limit && CAN_PURCHASE ? (
               <Button variant="primary" block onPress={() => { reset(); router.push('/subscription'); }}>{t('scan.upgrade')}</Button>
+            ) : limit ? (
+              <Button variant="primary" block onPress={handleClose}>{t('common.close')}</Button>
             ) : (
               <Button variant="primary" block onPress={retry}>{t('common.retry')}</Button>
             )}
-            {limit ? (
+            {limit && !CAN_PURCHASE ? null : limit ? (
               <TouchableOpacity onPress={handleClose} className="items-center py-3.5 mt-2 min-h-touch justify-center">
                 <Text className="font-semibold text-label uppercase text-fg-soft">{t('common.close')}</Text>
               </TouchableOpacity>

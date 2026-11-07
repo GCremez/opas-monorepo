@@ -254,6 +254,7 @@
     "upload_failed_desc": "Check your connection and try again. Nothing was saved.",
     "limit_title": "You've used this month's scans",
     "limit_desc": "Free accounts include 5 scans a month. Upgrade for unlimited scans, or wait until next month.",
+    "limit_desc_wait": "Free accounts include 5 scans a month. Your scans reset at the start of next month.",
     "upgrade": "See Premium",
     "new_scan": "New scan",
     "align_frame": "[ ALIGN LETTER\nWITHIN FRAME ]",

@@ -254,6 +254,7 @@
     "upload_failed_desc": "Kontrollera anslutningen och försök igen. Inget sparades.",
     "limit_title": "Du har använt månadens skanningar",
     "limit_desc": "Gratiskonton har 5 skanningar i månaden. Uppgradera för obegränsat, eller vänta till nästa månad.",
+    "limit_desc_wait": "Gratiskonton har 5 skanningar i månaden. Skanningarna nollställs i början av nästa månad.",
     "upgrade": "Se Premium",
     "new_scan": "Ny skanning",
     "align_frame": "[ PLACERA BREVET\nI RAMEN ]",

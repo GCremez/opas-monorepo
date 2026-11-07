@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Pressable, Modal, KeyboardAvoidingView, Platform, Alert as RNAlert, Linking } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { CAN_PURCHASE } from '../../src/lib/purchases';
 import { useTranslation } from 'react-i18next';
 import { ConfirmSheet } from '../../src/components/ui/ConfirmSheet';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
@@ -233,7 +234,7 @@ export default function ProfileScreen() {
         {/* Account */}
         <View className="px-6 mb-8">
           <SectionHeader title={t('profile.account')} />
-          {ACCOUNT_LINKS.map((item) => {
+          {ACCOUNT_LINKS.filter((item) => CAN_PURCHASE || item.key !== 'subscription').map((item) => {
             const handlePress = () => {
               if (item.route === 'change-password') setShowPasswordSheet(true);
               else if (item.route === 'delete') setShowDeleteConfirm(true);
