@@ -106,7 +106,7 @@
     "signed_in": "Signed in",
     "creating_account": "Creating your account…",
     "account_created": "Account created",
-    "agree_terms": "By creating an account you accept the Terms of Use and the Privacy policy."
+    "agree_terms": "By creating an account, you agree to our Terms of Use and Privacy policy."
   },
   "tabs": {
     "home": "Home",
@@ -255,7 +255,7 @@
     "upload_failed_desc": "Check your connection and try again. Nothing was saved.",
     "limit_title": "You've used this month's scans",
     "limit_desc": "Free accounts include 5 scans a month. Upgrade for unlimited scans, or wait until next month.",
-    "limit_desc_wait": "Free accounts include 5 scans a month. Your scans reset at the start of next month.",
+    "limit_desc_wait": "You can scan 5 letters a month for free. You'll get 5 new scans on the 1st.",
     "upgrade": "See Premium",
     "new_scan": "New scan",
     "align_frame": "[ ALIGN LETTER\nWITHIN FRAME ]",
@@ -419,7 +419,7 @@
     "remaining_short": "{{remaining}} of {{limit}} left",
     "terms": "Terms of Use",
     "ai_reading": "AI reading",
-    "ai_reading_off": "AI reading off. Opas won’t read new letters."
+    "ai_reading_off": "AI reading is off. Opas won't read new letters."
   },
   "document": {
     "title": "Document",
@@ -575,23 +575,23 @@
     "scan_cta": "Tap to scan a new letter →"
   },
   "consent": {
-    "eyebrow": "Before your first letter",
-    "title": "Opas uses AI to read your letters.",
-    "lead": "To explain a letter, Opas sends its text to an AI service. We need your agreement before we do.",
-    "what_label": "What is sent",
-    "what": "The text read from the letter or photo you scan. Nothing else from your phone.",
+    "eyebrow": "Before you scan",
+    "title": "Opas reads your letters with AI. Is that OK?",
+    "lead": "To explain a letter, Opas sends its text to an AI service. We ask you once, before your first scan.",
+    "what_label": "What we send",
+    "what": "Only the text from the letter you scan. Nothing else from your phone.",
     "who_label": "Who reads it",
-    "who": "Anthropic, the company behind the Claude AI model. It processes the text for Opas and does not use it to train its models.",
+    "who": "Anthropic, the company that makes the Claude AI. It reads the text to write your explanation. It does not use your letters to train its AI.",
     "scrub_label": "What we remove first",
-    "scrub": "Names, personal identity codes, addresses and phone numbers, wherever we can detect them.",
-    "withdraw_label": "Your choice",
-    "withdraw": "You can turn this off any time in Profile. Opas then stops reading new letters.",
-    "read_policy": "Read the privacy policy",
-    "save_failed": "Couldn't save your answer. Check your connection and try again.",
-    "agree": "I agree",
+    "scrub": "We remove names, ID numbers, addresses and phone numbers before sending. We may not catch every one.",
+    "withdraw_label": "You can change your mind",
+    "withdraw": "Turn this off any time in Profile. Opas then stops reading new letters.",
+    "read_policy": "Read the full privacy policy",
+    "save_failed": "We couldn't save your answer. Check your internet connection and try again.",
+    "agree": "Agree and start scanning",
     "not_now": "Not now"
   },
   "legal": {
-    "not_affiliated": "Opas is an independent app. It is not affiliated with Kela, Vero, Migri or any Finnish authority. For official information, use their own websites."
+    "not_affiliated": "Opas is an independent app. It is not run by, or connected to, Kela, Vero, Migri or any other Finnish authority. For official information, visit their websites."
   }
 }

@@ -106,7 +106,7 @@
     "signed_in": "Kirjauduttu",
     "creating_account": "Luodaan tiliä…",
     "account_created": "Tili luotu",
-    "agree_terms": "Luomalla tilin hyväksyt käyttöehdot ja tietosuojaselosteen."
+    "agree_terms": "Luomalla tilin hyväksyt käyttöehtomme ja tietosuojaselosteemme."
   },
   "tabs": {
     "home": "Koti",
@@ -255,7 +255,7 @@
     "upload_failed_desc": "Tarkista yhteys ja yritä uudelleen. Mitään ei tallennettu.",
     "limit_title": "Tämän kuun skannaukset on käytetty",
     "limit_desc": "Ilmaistiliin sisältyy 5 skannausta kuukaudessa. Päivitä rajattomiin skannauksiin tai odota ensi kuuhun.",
-    "limit_desc_wait": "Ilmaistiliin sisältyy 5 skannausta kuukaudessa. Skannaukset nollautuvat ensi kuun alussa.",
+    "limit_desc_wait": "Voit skannata 5 kirjettä kuukaudessa ilmaiseksi. Saat 5 uutta skannausta kuun 1. päivänä.",
     "upgrade": "Katso Premium",
     "new_scan": "Uusi skannaus",
     "align_frame": "[ ASETA KIRJE\nKEHYKSEEN ]",
@@ -418,8 +418,8 @@
     "off": "Pois",
     "remaining_short": "{{remaining}}/{{limit}} jäljellä",
     "terms": "Käyttöehdot",
-    "ai_reading": "Tekoälyluku",
-    "ai_reading_off": "Tekoälyluku pois. Opas ei lue uusia kirjeitä."
+    "ai_reading": "Lukeminen tekoälyllä",
+    "ai_reading_off": "Lukeminen tekoälyllä on pois päältä. Opas ei lue uusia kirjeitä."
   },
   "document": {
     "title": "Asiakirja",
@@ -575,23 +575,23 @@
     "scan_cta": "Skannaa uusi kirje →"
   },
   "consent": {
-    "eyebrow": "Ennen ensimmäistä kirjettä",
-    "title": "Opas lukee kirjeesi tekoälyn avulla.",
-    "lead": "Selittääkseen kirjeen Opas lähettää sen tekstin tekoälypalveluun. Tarvitsemme siihen suostumuksesi.",
-    "what_label": "Mitä lähetetään",
-    "what": "Skannaamastasi kirjeestä tai kuvasta luettu teksti. Ei mitään muuta puhelimestasi.",
+    "eyebrow": "Ennen skannausta",
+    "title": "Opas lukee kirjeesi tekoälyllä. Sopiiko se?",
+    "lead": "Selittääkseen kirjeen Opas lähettää sen tekstin tekoälypalveluun. Kysymme tätä kerran, ennen ensimmäistä skannausta.",
+    "what_label": "Mitä lähetämme",
+    "what": "Vain skannaamasi kirjeen tekstin. Ei mitään muuta puhelimestasi.",
     "who_label": "Kuka sen lukee",
-    "who": "Anthropic, Claude-tekoälymallin kehittäjä. Se käsittelee tekstin Oppaan puolesta eikä käytä sitä mallien kouluttamiseen.",
+    "who": "Anthropic, Claude-tekoälyn tekijä. Se lukee tekstin kirjoittaakseen selityksesi. Se ei käytä kirjeitäsi tekoälynsä kouluttamiseen.",
     "scrub_label": "Mitä poistamme ensin",
-    "scrub": "Nimet, henkilötunnukset, osoitteet ja puhelinnumerot, kun tunnistamme ne.",
-    "withdraw_label": "Sinun valintasi",
-    "withdraw": "Voit perua suostumuksen milloin tahansa Profiilissa. Opas ei sen jälkeen lue uusia kirjeitä.",
-    "read_policy": "Lue tietosuojaseloste",
-    "save_failed": "Vastaustasi ei voitu tallentaa. Tarkista yhteys ja yritä uudelleen.",
-    "agree": "Hyväksyn",
+    "scrub": "Poistamme nimet, henkilötunnukset, osoitteet ja puhelinnumerot ennen lähettämistä. Emme välttämättä löydä jokaista.",
+    "withdraw_label": "Voit muuttaa mielesi",
+    "withdraw": "Voit poistaa tämän käytöstä milloin tahansa Profiilissa. Silloin Opas lopettaa uusien kirjeiden lukemisen.",
+    "read_policy": "Lue koko tietosuojaseloste",
+    "save_failed": "Vastaustasi ei voitu tallentaa. Tarkista internetyhteys ja yritä uudelleen.",
+    "agree": "Hyväksy ja aloita skannaus",
     "not_now": "Ei nyt"
   },
   "legal": {
-    "not_affiliated": "Opas on itsenäinen sovellus. Se ei liity Kelaan, Verohallintoon, Migriin tai muuhun suomalaiseen viranomaiseen. Virallisen tiedon löydät niiden omilta sivuilta."
+    "not_affiliated": "Opas on itsenäinen sovellus. Sitä eivät ylläpidä Kela, Verohallinto, Migri tai muut suomalaiset viranomaiset, eikä se liity niihin. Virallista tietoa löydät niiden verkkosivuilta."
   }
 }
