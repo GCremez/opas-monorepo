@@ -48,7 +48,7 @@ Parameters:
 
   MailFromAddress:
     Type: String
-    Default: 'no-reply@opas.fi'
+    Default: 'no-reply@getopas.app'
     Description: Verified SES sender identity (From address) for transactional email
 
 Conditions:

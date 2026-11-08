@@ -12,7 +12,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.opas.app",
+      "bundleIdentifier": "com.getopas.app",
       "buildNumber": "1",
       "infoPlist": {
         "NSCalendarsUsageDescription": "Opas uses your calendar to add deadline reminders for your documents.",
@@ -23,7 +23,7 @@
       },
       "entitlements": {
         "com.apple.security.application-groups": [
-          "group.com.opas.app"
+          "group.com.getopas.app"
         ]
       }
     },
@@ -32,7 +32,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#35503f"
       },
-      "package": "com.opas.app",
+      "package": "com.getopas.app",
       "versionCode": 1,
       "permissions": [
         "CAMERA",

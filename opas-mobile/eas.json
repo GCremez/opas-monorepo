@@ -22,7 +22,7 @@
         "buildConfiguration": "Release"
       },
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.opas.app/api/v1"
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.getopas.app/api/v1"
       }
     },
     "production": {
@@ -31,7 +31,7 @@
         "buildConfiguration": "Release"
       },
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.opas.app/api/v1"
+        "EXPO_PUBLIC_API_BASE_URL": "https://api.getopas.app/api/v1"
       }
     }
   },

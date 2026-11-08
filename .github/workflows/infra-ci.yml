@@ -126,7 +126,7 @@ jobs:
               VpcId=${{ vars.INFRA_VPC_ID }} \
               PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
-              MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@opas.fi' }} \
+              MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@getopas.app' }} \
               StripePremiumPriceIds=${{ vars.STRIPE_PREMIUM_PRICE_IDS }} \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset \
@@ -158,9 +158,9 @@ jobs:
               VpcId=${{ vars.INFRA_VPC_ID }} \
               PublicSubnets=${{ vars.INFRA_PUBLIC_SUBNETS }} \
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
-              MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@opas.fi' }} \
+              MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@getopas.app' }} \
               StripePremiumPriceIds=${{ vars.STRIPE_PREMIUM_PRICE_IDS }} \
-              CorsAllowedOrigins=https://app.opas.fi \
+              CorsAllowedOrigins=https://getopas.app \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset \
             --no-cli-pager

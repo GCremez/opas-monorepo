@@ -1,6 +1,6 @@
 // Public pages the app links to. They live in the repo's docs/ folder, served by GitHub
-// Pages, so they work without the app (Google requires the deletion page to).
-const WEB = 'https://gcremez.github.io/opas-monorepo';
+// Pages at getopas.app, so they work without the app (Google requires the deletion page to).
+const WEB = 'https://getopas.app';
 
 export const LINKS = {
   privacy: `${WEB}/privacy/`,

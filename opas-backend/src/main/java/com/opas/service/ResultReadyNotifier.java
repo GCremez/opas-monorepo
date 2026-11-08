@@ -67,7 +67,7 @@ public class ResultReadyNotifier {
     public ResultReadyNotifier(NotificationService notificationService, EmailService emailService,
             DocumentRepository documentRepository, UserRepository userRepository, TransactionTemplate tx,
             @Value("${opas.notify.ready-email-after:PT10M}") Duration emailAfter,
-            @Value("${opas.links.base-url:https://gcremez.github.io/opas-monorepo}") String linkBaseUrl) {
+            @Value("${opas.links.base-url:https://getopas.app}") String linkBaseUrl) {
         this.notificationService = notificationService;
         this.emailService = emailService;
         this.documentRepository = documentRepository;

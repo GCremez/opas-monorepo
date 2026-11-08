@@ -121,7 +121,7 @@ public class EmailService {
 
     public EmailService(SesV2Client sesClient,
             @Value("${opas.mail.enabled:false}") boolean enabled,
-            @Value("${opas.mail.from:no-reply@opas.fi}") String fromAddress) {
+            @Value("${opas.mail.from:no-reply@getopas.app}") String fromAddress) {
         this.sesClient = sesClient;
         this.enabled = enabled;
         this.fromAddress = fromAddress;
