@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { apiClient, setOnAuthCleared } from '../api/client';
 import { identify, track, reset as resetAnalytics } from '../lib/analytics';
 import type { User } from '../types';
+import { AI_CONSENT_VERSION, hasCurrentConsent } from '../lib/consent';
 
 // Tie PostHog events to a stable, non-PII id (the account UUID) and set person
 // properties. Never pass name/email as the distinct id or as properties.
@@ -20,7 +21,7 @@ interface AuthState {
   isLoading: boolean;
   plan: 'free' | 'premium';
   user: Pick<User, 'name' | 'email'> | null;
-  // Whether the user agreed to letters going to the AI provider. null = not known yet.
+  // Whether the user agreed to the current consent wording. null = not known yet.
   aiConsent: boolean | null;
   setAiConsent: (consent: boolean) => Promise<void>;
   setPlan: (plan: 'free' | 'premium') => void;
@@ -57,7 +58,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   fetchProfile: async () => {
     try {
       const { data } = await apiClient.get('/auth/me');
-      set({ user: { name: data.name, email: data.email }, plan: data.plan ?? 'free', aiConsent: !!data.aiConsentAt });
+      set({ user: { name: data.name, email: data.email }, plan: data.plan ?? 'free', aiConsent: hasCurrentConsent(data.aiConsentAt, data.aiConsentVersion) });
       // Re-identify on every profile load so a session restored at app launch
       // (hydrate -> fetchProfile) is attributed to the right person.
       identifyUser(data.id, data.plan ?? 'free');
@@ -77,7 +78,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setAiConsent: async (consent) => {
-    if (consent) await apiClient.post('/auth/me/ai-consent');
+    if (consent) await apiClient.post('/auth/me/ai-consent', { version: AI_CONSENT_VERSION });
     else await apiClient.delete('/auth/me/ai-consent');
     set({ aiConsent: consent });
     track(consent ? 'ai_consent_given' : 'ai_consent_withdrawn');
@@ -121,7 +122,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: true,
         plan: data.plan ?? 'free',
         user: data.user ?? null,
-        aiConsent: !!data.user?.aiConsentAt,
+        aiConsent: hasCurrentConsent(data.user?.aiConsentAt, data.user?.aiConsentVersion),
       });
       identifyUser(data.user?.id, data.plan ?? 'free');
       track('auth_login_completed', { plan: data.plan ?? 'free', method: 'email' });
@@ -149,7 +150,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isAuthenticated: true,
       plan: data.plan ?? 'free',
       user: data.user ?? null,
-      aiConsent: !!data.user?.aiConsentAt,
+      aiConsent: hasCurrentConsent(data.user?.aiConsentAt, data.user?.aiConsentVersion),
     });
     identifyUser(data.user?.id, data.plan ?? 'free');
     track('auth_verify_completed');

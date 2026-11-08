@@ -4,6 +4,8 @@ export interface User {
   name: string;
   // When the user agreed to letters being read by the AI provider; null = not yet.
   aiConsentAt?: string | null;
+  // Which wording of that consent they agreed to (see lib/consent.ts).
+  aiConsentVersion?: string | null;
 }
 
 export interface AuthResponse {

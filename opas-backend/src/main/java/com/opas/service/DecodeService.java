@@ -118,7 +118,7 @@ public class DecodeService {
         if (!document.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException();
         }
-        if (document.getUser().getAiConsentAt() == null) {
+        if (!document.getUser().hasAiConsent(AiConsentRequiredException.CURRENT_VERSION)) {
             throw new AiConsentRequiredException();
         }
         // Only an uploaded document can start decoding — or a failed one, as a retry (its

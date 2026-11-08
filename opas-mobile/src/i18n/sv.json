@@ -580,6 +580,8 @@
     "lead": "För att förklara ett brev skickar Opas texten till en AI-tjänst. Vi frågar en gång, före din första skanning.",
     "what_label": "Vad vi skickar",
     "what": "Bara texten från brevet du skannar. Inget annat från din telefon.",
+    "sensitive_label": "Hälsa och andra känsliga uppgifter",
+    "sensitive": "Vissa brev innehåller känsliga uppgifter, till exempel om din hälsa eller en funktionsnedsättning i ett beslut från FPA. Opas behöver läsa dem också för att förklara brevet.",
     "who_label": "Vem som läser",
     "who": "Anthropic, företaget bakom AI:n Claude. Det läser texten för att skriva din förklaring. Det använder inte dina brev för att träna sin AI.",
     "scrub_label": "Vad vi tar bort först",
@@ -588,6 +590,7 @@
     "withdraw": "Stäng av det när som helst under Profil. Då slutar Opas läsa nya brev.",
     "read_policy": "Läs hela integritetspolicyn",
     "save_failed": "Vi kunde inte spara ditt svar. Kontrollera internetanslutningen och försök igen.",
+    "explicit": "Genom att trycka på Godkänn samtycker du uttryckligen till att Opas och Anthropic behandlar dina brev, även hälsouppgifter i dem, för att förklara dem för dig.",
     "agree": "Godkänn och börja skanna",
     "not_now": "Inte nu"
   },

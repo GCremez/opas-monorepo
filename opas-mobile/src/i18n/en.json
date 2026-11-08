@@ -580,6 +580,8 @@
     "lead": "To explain a letter, Opas sends its text to an AI service. We ask you once, before your first scan.",
     "what_label": "What we send",
     "what": "Only the text from the letter you scan. Nothing else from your phone.",
+    "sensitive_label": "Health and other sensitive details",
+    "sensitive": "Some letters show sensitive things, such as your health or a disability in a Kela decision. Opas has to read these too, to explain the letter.",
     "who_label": "Who reads it",
     "who": "Anthropic, the company that makes the Claude AI. It reads the text to write your explanation. It does not use your letters to train its AI.",
     "scrub_label": "What we remove first",
@@ -588,6 +590,7 @@
     "withdraw": "Turn this off any time in Profile. Opas then stops reading new letters.",
     "read_policy": "Read the full privacy policy",
     "save_failed": "We couldn't save your answer. Check your internet connection and try again.",
+    "explicit": "By tapping Agree, you explicitly agree that Opas and Anthropic may process your letters, including any health information in them, to explain them to you.",
     "agree": "Agree and start scanning",
     "not_now": "Not now"
   },

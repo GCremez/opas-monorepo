@@ -335,12 +335,17 @@ public class AuthService {
         refreshTokenService.invalidateAll(userId.toString());
     }
 
-    /** Records (or withdraws) the user's agreement to letters being read by the AI provider. */
+    /**
+     * Records the user's explicit agreement to letters, including any health information in
+     * them, being read by the AI provider, with the version of the wording they saw. A null
+     * version withdraws it.
+     */
     @Transactional
-    public UserResponse setAiConsent(UUID userId, boolean consent) {
+    public UserResponse setAiConsent(UUID userId, @Nullable String version) {
         User user = userRepository.findById(userId)
                 .orElseThrow(ResourceNotFoundException::new);
-        user.setAiConsentAt(consent ? Instant.now() : null);
+        user.setAiConsentAt(version != null ? Instant.now() : null);
+        user.setAiConsentVersion(version);
         userRepository.save(user);
         return me(userId);
     }

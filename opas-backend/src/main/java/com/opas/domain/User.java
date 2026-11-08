@@ -33,6 +33,10 @@ public class User {
     @Column(name = "ai_consent_at")
     private Instant aiConsentAt;
 
+    // Which wording of that consent they agreed to (a date); see opas.consent.ai-version.
+    @Column(name = "ai_consent_version")
+    private String aiConsentVersion;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -97,6 +101,19 @@ public class User {
 
     public void setAiConsentAt(Instant aiConsentAt) {
         this.aiConsentAt = aiConsentAt;
+    }
+
+    public String getAiConsentVersion() {
+        return aiConsentVersion;
+    }
+
+    public void setAiConsentVersion(String aiConsentVersion) {
+        this.aiConsentVersion = aiConsentVersion;
+    }
+
+    /** True when the user agreed to the given wording or a later one. */
+    public boolean hasAiConsent(String requiredVersion) {
+        return aiConsentAt != null && aiConsentVersion != null && aiConsentVersion.compareTo(requiredVersion) >= 0;
     }
 
     public String getLanguage() {

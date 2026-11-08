@@ -63,7 +63,7 @@ public class DraftLetterService {
             throw new ResourceNotFoundException();
         }
 
-        if (document.getUser().getAiConsentAt() == null) {
+        if (!document.getUser().hasAiConsent(AiConsentRequiredException.CURRENT_VERSION)) {
             throw new AiConsentRequiredException();
         }
 

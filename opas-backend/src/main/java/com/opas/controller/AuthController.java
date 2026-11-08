@@ -1,6 +1,7 @@
 package com.opas.controller;
 
 import com.opas.config.RateLimit;
+import com.opas.dto.AiConsentRequest;
 import com.opas.dto.AuthResponse;
 import com.opas.dto.ChangePasswordRequest;
 import com.opas.dto.LoginRequest;
@@ -119,11 +120,12 @@ public class AuthController {
     }
 
     @PostMapping("/me/ai-consent")
-    public ResponseEntity<UserResponse> giveAiConsent(Authentication authentication) {
+    public ResponseEntity<UserResponse> giveAiConsent(Authentication authentication,
+            @Valid @RequestBody AiConsentRequest request) {
         String name = authentication.getName();
         if (name == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(authService.setAiConsent(UUID.fromString(name), true));
+        return ResponseEntity.ok(authService.setAiConsent(UUID.fromString(name), request.version()));
     }
 
     @DeleteMapping("/me/ai-consent")
@@ -131,7 +133,7 @@ public class AuthController {
         String name = authentication.getName();
         if (name == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(authService.setAiConsent(UUID.fromString(name), false));
+        return ResponseEntity.ok(authService.setAiConsent(UUID.fromString(name), null));
     }
 
     @GetMapping("/me")

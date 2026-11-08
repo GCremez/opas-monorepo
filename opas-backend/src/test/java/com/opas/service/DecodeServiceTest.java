@@ -69,6 +69,7 @@ class DecodeServiceTest {
         user = new User();
         user.setId(userId);
         user.setAiConsentAt(java.time.Instant.now());
+        user.setAiConsentVersion(com.opas.config.AiConsentRequiredException.CURRENT_VERSION);
         documentId = UUID.randomUUID();
         document = new Document();
         document.setId(documentId);
@@ -117,6 +118,15 @@ class DecodeServiceTest {
         assertThrows(com.opas.config.AiConsentRequiredException.class,
                 () -> service.validateAndReserve(userId, documentId, false));
         verifyNoInteractions(usageTracker);
+    }
+
+    @Test
+    void validateAndReserveAsksAgainAfterTheWordingChanges() {
+        user.setAiConsentVersion("2020-01-01");
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+
+        assertThrows(com.opas.config.AiConsentRequiredException.class,
+                () -> service.validateAndReserve(userId, documentId, false));
     }
 
     @Test

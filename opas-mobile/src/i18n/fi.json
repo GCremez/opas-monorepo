@@ -580,6 +580,8 @@
     "lead": "Selittääkseen kirjeen Opas lähettää sen tekstin tekoälypalveluun. Kysymme tätä kerran, ennen ensimmäistä skannausta.",
     "what_label": "Mitä lähetämme",
     "what": "Vain skannaamasi kirjeen tekstin. Ei mitään muuta puhelimestasi.",
+    "sensitive_label": "Terveys ja muut arkaluonteiset tiedot",
+    "sensitive": "Joissakin kirjeissä on arkaluonteisia tietoja, kuten terveyteesi tai vammaan liittyviä tietoja Kelan päätöksessä. Oppaan täytyy lukea myös ne selittääkseen kirjeen.",
     "who_label": "Kuka sen lukee",
     "who": "Anthropic, Claude-tekoälyn tekijä. Se lukee tekstin kirjoittaakseen selityksesi. Se ei käytä kirjeitäsi tekoälynsä kouluttamiseen.",
     "scrub_label": "Mitä poistamme ensin",
@@ -588,6 +590,7 @@
     "withdraw": "Voit poistaa tämän käytöstä milloin tahansa Profiilissa. Silloin Opas lopettaa uusien kirjeiden lukemisen.",
     "read_policy": "Lue koko tietosuojaseloste",
     "save_failed": "Vastaustasi ei voitu tallentaa. Tarkista internetyhteys ja yritä uudelleen.",
+    "explicit": "Napauttamalla Hyväksy annat nimenomaisen suostumuksesi siihen, että Opas ja Anthropic käsittelevät kirjeitäsi, myös niissä olevia terveystietoja, selittääkseen ne sinulle.",
     "agree": "Hyväksy ja aloita skannaus",
     "not_now": "Ei nyt"
   },

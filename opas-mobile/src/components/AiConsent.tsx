@@ -7,11 +7,13 @@ import { Button } from './ui/Button';
 import { useAuthStore } from '../store/authStore';
 import { LINKS } from '../lib/links';
 
-const POINTS = ['what', 'who', 'scrub', 'withdraw'] as const;
+const POINTS = ['what', 'sensitive', 'who', 'scrub', 'withdraw'] as const;
 
 /**
  * Asked once, before the first letter is read: names the AI provider, says what is sent
- * and why, and records the answer on the account (App Store 5.1.2(i), GDPR consent).
+ * and why, and records the answer on the account (App Store 5.1.2(i)). Letters can hold
+ * health data, so this is explicit consent under GDPR Art. 9(2)(a): it names health
+ * information and the agree button is the explicit act.
  * The backend refuses to decode until it's given, so this isn't only a screen.
  */
 export function AiConsent({ onDecline }: { onDecline: () => void }) {
@@ -57,6 +59,7 @@ export function AiConsent({ onDecline }: { onDecline: () => void }) {
       </ScrollView>
 
       <View className="px-6 pt-2 pb-2">
+        <Text className="font-body text-body-sm text-fg-soft mb-3">{t('consent.explicit')}</Text>
         <Button variant="primary" block size="lg" loading={saving} onPress={agree}>{t('consent.agree')}</Button>
         <Button variant="ghost" block className="mt-1" onPress={onDecline}>{t('consent.not_now')}</Button>
       </View>
