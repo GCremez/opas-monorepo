@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opas</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ece7db" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150e" media="(prefers-color-scheme: dark)">
+<!-- GitHub Pages serves this page for any unknown path, at any depth, so every URL is absolute. -->
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<header class="nav"><div class="nav-in">
+  <a class="brand" href="/"><svg width="30" height="30" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" style="stroke:var(--accent)" stroke-width="3"/><circle cx="70" cy="70" r="43" style="stroke:var(--dot)" stroke-width="3.5" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="9" style="fill:var(--accent)"/><circle cx="108" cy="92" r="9" style="fill:var(--ochre)"/><circle cx="32" cy="92" r="9" style="fill:var(--brick)"/></svg><span>Opas</span></a>
+  <nav class="nav-links" aria-label="Main">
+    <a href="/privacy/">Privacy</a>
+    <a href="/terms/" class="wide">Terms</a>
+    <a href="/support/">Help</a>
+  </nav>
+</div></header>
+<main>
+  <!-- A letter link from the "your letter is ready" email: /d/<document id> -->
+  <div class="wrap head" id="letter" hidden>
+    <div class="eyebrow">Your letter is ready</div>
+    <h1>Open it in Opas.</h1>
+    <p class="lead">Your letter has been read. Open Opas on this phone to see what it means and what to do next.</p>
+    <a class="soon" id="open" href="opas://">Open in Opas</a>
+    <p class="stamp">Opening on a computer? Open the Opas app on your phone instead. The letter is in your Files.</p>
+  </div>
+  <div class="wrap head" id="missing">
+    <div class="eyebrow">Page not found</div>
+    <h1>This page doesn't exist.</h1>
+    <p class="lead">The link may be old or mistyped. <a href="/">Go to the Opas home page</a>.</p>
+  </div>
+</main>
+<footer class="foot"><div class="foot-in">
+  <a class="brand" href="/"><svg width="22" height="22" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" style="stroke:var(--accent)" stroke-width="3"/><circle cx="70" cy="70" r="43" style="stroke:var(--dot)" stroke-width="3.5" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="9" style="fill:var(--accent)"/><circle cx="108" cy="92" r="9" style="fill:var(--ochre)"/><circle cx="32" cy="92" r="9" style="fill:var(--brick)"/></svg><span>Opas</span></a>
+  <span class="tagline">· Your guide to Finnish paperwork</span>
+  <nav aria-label="Footer">
+    <a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/delete-account/">Delete account</a><a href="/support/">Help</a>
+  </nav>
+  <p class="indep">Opas is provided by Salau Distributions, Y-tunnus 3244824-8. It is an independent app, not run by, or connected to, Kela, Vero, Migri or any other Finnish authority.</p>
+</div></footer>
+<script>
+  // Only a document id (a UUID) is accepted, so the page can't be used to open arbitrary app routes.
+  var m = location.pathname.match(/\/d\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i);
+  if (m) {
+    var target = 'opas://d/' + m[1].toLowerCase();
+    document.getElementById('open').href = target;
+    document.getElementById('letter').hidden = false;
+    document.getElementById('missing').hidden = true;
+    document.title = 'Your letter is ready · Opas';
+    // On a phone with Opas installed this opens the letter straight away; otherwise the
+    // button stays as the way in.
+    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) location.href = target;
+  }
+</script>
+</body>
+</html>
