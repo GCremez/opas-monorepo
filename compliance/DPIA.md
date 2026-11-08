@@ -1,6 +1,6 @@
 # Data Protection Impact Assessment: Opas
 
-Draft for legal review · 8 November 2026 · Controller: __CONTROLLER__
+Draft for legal review · 8 November 2026 · Controller: Salau Distributions (Y-tunnus 3244824-8)
 
 This assessment covers reading people's official letters with AI. It is a draft written from the code. A lawyer or data-protection adviser should review it before Opas has real users. The open questions are listed at the end.
 
