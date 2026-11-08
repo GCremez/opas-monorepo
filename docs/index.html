@@ -7,42 +7,106 @@
 <meta name="description" content="Snap a photo of a letter from Kela, Vero or Migri. Opas explains it in plain language and lists every deadline and action.">
 <meta name="theme-color" content="#ece7db" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16150e" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Opas · Every Finnish letter, in a language you actually read">
+<meta property="og:description" content="Scan a letter from Kela, Vero or Migri. Opas tells you what it means, what to do, and by when.">
+<meta property="og:url" content="https://getopas.app/">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 </head>
-<body>
+<body class="home">
 <header class="nav"><div class="nav-in">
   <a class="brand" href="./"><svg width="30" height="30" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" style="stroke:var(--accent)" stroke-width="3"/><circle cx="70" cy="70" r="43" style="stroke:var(--dot)" stroke-width="3.5" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="9" style="fill:var(--accent)"/><circle cx="108" cy="92" r="9" style="fill:var(--ochre)"/><circle cx="32" cy="92" r="9" style="fill:var(--brick)"/></svg><span>Opas</span></a>
   <nav class="nav-links" aria-label="Main">
+    <a href="#how" class="wide">How it works</a>
     <a href="privacy/">Privacy</a>
-    <a href="terms/" class="wide">Terms</a>
     <a href="support/">Help</a>
   </nav>
 </div></header>
 <main>
-<div class="wrap head">
-  <div class="eyebrow">Your guide to Finnish paperwork</div>
-  <h1>Every Finnish letter, in a language you actually read.</h1>
-  <p class="lead">Snap a photo of a letter from Kela, Vero or Migri. Opas removes your personal details, explains the letter in plain language, and lists every deadline and action, so you know what to do and by when.</p>
-  <div class="soon">Coming soon to Google Play</div>
-</div>
-<div class="wrap">
-  <div class="steps points">
-    <div class="point"><div class="tag">SCAN</div><h3>Photograph the letter</h3><p>Point your phone at any official letter. Opas reads every line, including the small print.</p></div>
-    <div class="point"><div class="tag">UNDERSTAND</div><h3>Read what it means</h3><p>Short, plain sentences in English, Finnish or Swedish, with the original always one tap away.</p></div>
-    <div class="point"><div class="tag">ACT</div><h3>Never miss a deadline</h3><p>Every date and task in the letter, with a reminder before each one is due.</p></div>
+
+<div class="wrap hero">
+  <div class="head" style="padding:0">
+    <div class="eyebrow">Your guide to Finnish paperwork</div>
+    <h1>Every Finnish letter, in a language you actually read.</h1>
+    <p class="lead">Snap a photo of a letter from Kela, Vero or Migri. Opas removes your personal details, explains the letter in plain language, and lifts out every deadline and action, so you know exactly what to do, and by when.</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href="mailto:hello@getopas.app?subject=Join%20the%20Opas%20test&body=Hi%2C%20I%27d%20like%20to%20test%20Opas.%0A%0AThe%20email%20I%20use%20on%20Google%20Play%3A%20%0AMy%20phone%20(Android%20model)%3A%20%0A">Join the early test</a>
+      <a class="btn btn-ghost" href="#how">See how it works ↓</a>
+    </div>
+    <div class="fineprint"><b>◆</b> Android first · Free to start · English, Suomi &amp; Svenska</div>
+  </div>
+
+  <!-- The letter that decodes itself -->
+  <div class="stage" aria-hidden="true">
+    <div class="orbit">
+      <svg class="ring" width="150" height="150" viewBox="0 0 150 150" fill="none"><circle cx="75" cy="75" r="60" style="stroke:var(--dot)" stroke-width="2" stroke-dasharray="3 9" stroke-linecap="round"/></svg>
+      <div class="way"><i></i></div><div class="way"><i></i></div><div class="way"><i></i></div>
+    </div>
+    <div class="letter">
+      <div class="top"><div class="label">Verohallinto · reading</div><div class="dots"><i></i><i></i><i></i></div></div>
+      <div class="orig">Original, in Finnish</div>
+      <div class="line">Verovuosi 2025 · jäännösvero</div>
+      <div class="line">Eräpäivä 15.08 · 248,00 €</div>
+      <hr>
+      <div class="label pine">In plain English</div>
+      <div class="plain">You owe <strong>€248</strong> in back tax, due <span class="due">15 August</span>. Pay with the reference number; no form needed.</div>
+      <div class="facts">
+        <div class="fact"><small>AMOUNT</small><span>€248,00</span></div>
+        <div class="fact"><small>DUE</small><span class="due">15 Aug</span></div>
+      </div>
+    </div>
   </div>
 </div>
-<div class="wrap doc">
-  <section>
-    <h2>Your letters stay private.</h2>
-    <p>Before the AI reads a letter, Opas removes names, ID numbers and addresses. We ask before your first scan, and you can delete any letter, or your whole account, at any time.</p>
-    <p><a href="privacy/">How we handle your data</a></p>
-  </section>
-</div>
+
+<div class="strip"><div class="wrap strip-in">
+  <span class="eyebrow">Reads letters from</span>
+  <div class="marquee" aria-label="Kela, Verohallinto, Migri, DVV, TE-palvelut"><div aria-hidden="true">
+    <span>Kela</span><span>Verohallinto</span><span>Migri</span><span>DVV</span><span>TE-palvelut</span>
+    <span>Kela</span><span>Verohallinto</span><span>Migri</span><span>DVV</span><span>TE-palvelut</span>
+    <span>Kela</span><span>Verohallinto</span><span>Migri</span><span>DVV</span><span>TE-palvelut</span>
+    <span>Kela</span><span>Verohallinto</span><span>Migri</span><span>DVV</span><span>TE-palvelut</span>
+  </div></div>
+</div></div>
+
+<section class="problem">
+  <div class="eyebrow">The brown envelope</div>
+  <p>It arrives in Finnish, from an office you've never heard of. Somewhere inside is a deadline you can't find, a sum you're not sure you owe, and an instruction you can't afford to get wrong. <em>Opas reads it for you</em>, and hands back a short, plain list of what to do, and by when.</p>
+</section>
+
+<section class="band" id="how"><div class="wrap">
+  <h2>From envelope to done, in three steps.</h2>
+  <div class="steps points">
+    <div class="point"><div class="tag">01 · SCAN</div><h3>Photograph the letter</h3><p>Point your phone at any official letter, or pick a photo you already took. Finnish or Swedish, Opas reads every line, down to the small print.</p></div>
+    <div class="point"><div class="tag">02 · UNDERSTAND</div><h3>Opas explains it</h3><p>First it removes your name, personal identity code and address. Then it explains the letter in plain language and lifts out the facts that matter.</p></div>
+    <div class="point"><div class="tag">03 · ACT</div><h3>Never miss the deadline</h3><p>Every due date and task gets a reminder: a week before, the day before, and on the morning it's due. The letter is filed, ready when you need it.</p></div>
+  </div>
+</div></section>
+
+<section class="wrap features">
+  <h2>Everything a confusing letter needs, in one calm place.</h2>
+  <div class="feature-grid">
+    <div class="feature"><div class="tag">◆ EXPLAIN</div><h3>Plain-language summaries</h3><p>No jargon used to explain jargon. Short, direct sentences in English, Suomi or Svenska, with the original letter always one tap away, so you can check it yourself.</p></div>
+    <div class="feature"><div class="tag">◆ DEADLINES</div><h3>Reminders that matter</h3><p>Opas finds the real due date buried in the text, counts the days you have left, and reminds you in time. Only the reminders you need, never a wall of notifications.</p></div>
+    <div class="feature"><div class="tag">◆ ORGANISE</div><h3>Your personal record</h3><p>Every letter is filed under the office that sent it and kept searchable, for the day someone asks whether you still have that decision.</p></div>
+    <div class="feature"><div class="tag">◆ PRIVATE</div><h3>Your details out first</h3><p>Names, ID numbers and addresses are removed before the AI reads a letter. We ask before your first scan, and you can delete anything at any time. <a href="privacy/">How we handle your data</a>.</p></div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="closing-card">
+    <svg width="200" height="200" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" stroke="#8fbb9f" stroke-width="3"/><circle cx="70" cy="70" r="43" stroke="#6f6a5c" stroke-width="3.5" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="9" fill="#8fbb9f"/><circle cx="108" cy="92" r="9" fill="#d8a552"/><circle cx="32" cy="92" r="9" fill="#d5745f"/></svg>
+    <h2>Stop dreading the mailbox.</h2>
+    <p>Opas is in early testing on Android. Email us the address you use on Google Play, and we'll add you to the test.</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href="mailto:hello@getopas.app?subject=Join%20the%20Opas%20test&body=Hi%2C%20I%27d%20like%20to%20test%20Opas.%0A%0AThe%20email%20I%20use%20on%20Google%20Play%3A%20%0AMy%20phone%20(Android%20model)%3A%20%0A">Join the early test</a>
+      <a class="btn btn-ghost" href="support/">Questions? Read the help</a>
+    </div>
+  </div>
+</section>
+
 </main>
 <footer class="foot"><div class="foot-in">
   <a class="brand" href="./"><svg width="22" height="22" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" style="stroke:var(--accent)" stroke-width="3"/><circle cx="70" cy="70" r="43" style="stroke:var(--dot)" stroke-width="3.5" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="9" style="fill:var(--accent)"/><circle cx="108" cy="92" r="9" style="fill:var(--ochre)"/><circle cx="32" cy="92" r="9" style="fill:var(--brick)"/></svg><span>Opas</span></a>
