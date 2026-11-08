@@ -35,7 +35,7 @@ public class SubscriptionService {
             UserRepository userRepository,
             @Value("${opas.stripe.enabled}") boolean stripeEnabled,
             @Value("${opas.stripe.secret-key}") String stripeSecretKey,
-            @Value("${opas.stripe.return-base-url:https://opas.app}") String returnBaseUrl,
+            @Value("${opas.stripe.return-base-url:https://gcremez.github.io/opas-monorepo}") String returnBaseUrl,
             @Value("${opas.stripe.premium-price-ids:}") String premiumPriceIds) {
         this.subscriptionRepository = subscriptionRepository;
         this.userRepository = userRepository;
