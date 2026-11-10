@@ -68,7 +68,9 @@ jobs:
         # dates, amounts, reference numbers and authority names kept.
         run: |
           for letters in /test/letters.txt /redaction/sample-letters.txt; do
-            docker run --rm \
+            # The image runs Presidio from its source in /app instead of installing it,
+            # so the test needs /app on the import path.
+            docker run --rm -e PYTHONPATH=/app \
               -v "$PWD/presidio/test:/test:ro" \
               -v "$PWD/../opas-backend/src/main/resources/presidio:/opas:ro" \
               -v "$PWD/../opas-backend/src/test/resources/redaction:/redaction:ro" \

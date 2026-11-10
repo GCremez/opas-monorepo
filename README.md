@@ -604,7 +604,7 @@ For the Presidio image (Finnish, Swedish and English letters, redacted end to en
 
 ```bash
 cd opas-infra && docker compose build presidio-analyzer
-docker run --rm -v "$PWD/presidio/test:/test:ro" \
+docker run --rm -e PYTHONPATH=/app -v "$PWD/presidio/test:/test:ro" \
   -v "$PWD/../opas-backend/src/main/resources/presidio:/opas:ro" \
   opas-presidio-analyzer python /test/check_redaction.py /opas /test/letters.txt
 ```

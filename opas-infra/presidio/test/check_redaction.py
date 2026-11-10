@@ -8,11 +8,12 @@ reference numbers, authority names).
 
 In CI it runs inside the built image (see .github/workflows/infra-ci.yml):
 
-    docker run --rm -v "$PWD/opas-infra/presidio/test:/test:ro" \
+    docker run --rm -e PYTHONPATH=/app -v "$PWD/opas-infra/presidio/test:/test:ro" \
       -v "$PWD/opas-backend/src/main/resources/presidio:/opas:ro" \
       opas-presidio-analyzer python /test/check_redaction.py /opas /test/letters.txt
 
-Exit code 1 if anything fails.
+PYTHONPATH=/app is needed because the image runs Presidio from its source in /app
+rather than installing it. Exit code 1 if anything fails.
 """
 
 import json
