@@ -5,7 +5,7 @@ import WidgetKit
 // shortcut to scanning. The app writes the deadline into the shared App Group whenever its
 // documents change; the widget only reads it and counts the days down itself.
 
-private let appGroup = "group.com.opas.app"
+private let appGroup = "group.app.getopas"
 
 // Paper palette (global.css :root). Widgets can't load the app's fonts, so the serif and
 // mono faces fall back to the system's New York and SF Mono, which keep the same voice.
