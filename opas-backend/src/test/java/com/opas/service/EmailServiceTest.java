@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.sesv2.model.SendEmailRequest;
 class EmailServiceTest {
 
     private final SesV2Client ses = mock(SesV2Client.class);
-    private final EmailService enabled = new EmailService(ses, true, "no-reply@opas.fi");
+    private final EmailService enabled = new EmailService(ses, true, "no-reply@getopas.app");
 
     private SendEmailRequest sent() {
         var captor = ArgumentCaptor.forClass(SendEmailRequest.class);
@@ -54,13 +54,13 @@ class EmailServiceTest {
 
     @Test
     void disabledMailNeverCallsSes() {
-        new EmailService(ses, false, "no-reply@opas.fi").sendVerificationCode("a@b.fi", "123456", "en");
+        new EmailService(ses, false, "no-reply@getopas.app").sendVerificationCode("a@b.fi", "123456", "en");
         verify(ses, never()).sendEmail(any(SendEmailRequest.class));
     }
 
     @Test
     void resultReadyEmailHasAButtonToTheLetterAndNothingFromIt() {
-        String link = "https://opas.app/d/25c4f7a2-71b9-4e81-92af-3a3ae5fd7b3a";
+        String link = "https://getopas.app/d/25c4f7a2-71b9-4e81-92af-3a3ae5fd7b3a";
         enabled.sendResultReady("a@b.fi", link, "fi");
 
         var message = sent().content().simple();

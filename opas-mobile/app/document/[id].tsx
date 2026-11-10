@@ -18,6 +18,7 @@ import { ChevronLeftIcon, DotsIcon } from '../../src/components/icons';
 import { useThemeColors } from '../../src/store/themeStore';
 import type { Document, DecodeResult } from '../../src/types';
 import { usePremium } from '../../src/hooks/usePremium';
+import { CAN_PURCHASE } from '../../src/lib/billing';
 import { addToCalendar } from '../../src/utils/calendar';
 import { daysUntil, formatDate, nextDeadline, parseIsoDate, toDecodeView } from '../../src/lib/decodeView';
 
@@ -34,6 +35,8 @@ export default function DocumentDetailScreen() {
   const { folders, fetchFolders } = useFolderStore();
   const [categorySheet, setCategorySheet] = useState(false);
   const { isPremium } = usePremium();
+  // Premium features stay hidden where they can't be bought (iOS, until In-App Purchase).
+  const showPremium = isPremium || CAN_PURCHASE;
   const [doc, setDoc] = useState<Document | null>(null);
   const [decode, setDecode] = useState<DecodeResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -447,10 +450,16 @@ export default function DocumentDetailScreen() {
               ) : (
                 <Text className="font-body text-body-sm text-muted pt-2">{decode ? t('document.no_actions') : t('document.not_decoded')}</Text>
               )}
-              <Button variant="primary" block size="lg" className="mt-7" onPress={handleDraftLetter}>
-                {t('document.draft_letter')}
-              </Button>
+              {showPremium && (
+                <Button variant="primary" block size="lg" className="mt-7" onPress={handleDraftLetter}>
+                  {t('document.draft_letter')}
+                </Button>
+              )}
             </View>
+          )}
+
+          {!decoding && !!decode && activeTab !== 'original' && (
+            <Text className="font-serif-italic text-[14px] leading-[21px] text-muted mx-6 mt-8">{t('document.ai_disclaimer')}</Text>
           )}
         </ScrollView>
 
@@ -460,12 +469,16 @@ export default function DocumentDetailScreen() {
             <Pressable onPress={handleShare} className={footerAction} accessibilityRole="button">
               <Text className={`${footerLabel} text-fg-soft`}>{t('document.share')}</Text>
             </Pressable>
-            <Pressable onPress={isPremium ? handleExport : () => router.push('/subscription')} className={footerAction} accessibilityRole="button">
-              <Text className={`${footerLabel} text-fg-soft`}>{t('document.export')}</Text>
-            </Pressable>
-            <Pressable onPress={isPremium ? handleArchive : () => router.push('/subscription')} className={footerAction} accessibilityRole="button">
-              <Text className={`${footerLabel} text-fg-soft`}>{t('document.archive')}</Text>
-            </Pressable>
+            {showPremium && (
+              <Pressable onPress={isPremium ? handleExport : () => router.push('/subscription')} className={footerAction} accessibilityRole="button">
+                <Text className={`${footerLabel} text-fg-soft`}>{t('document.export')}</Text>
+              </Pressable>
+            )}
+            {showPremium && (
+              <Pressable onPress={isPremium ? handleArchive : () => router.push('/subscription')} className={footerAction} accessibilityRole="button">
+                <Text className={`${footerLabel} text-fg-soft`}>{t('document.archive')}</Text>
+              </Pressable>
+            )}
             <Pressable onPress={confirmDelete} className={footerAction} accessibilityRole="button">
               <Text className={`${footerLabel} text-danger`}>{t('common.delete')}</Text>
             </Pressable>
@@ -478,7 +491,7 @@ export default function DocumentDetailScreen() {
         title={view?.title ?? doc.filename}
         actions={[
           { label: t('document.share'), onPress: () => { setSheetVisible(false); handleShare(); } },
-          { label: t('document.draft_letter'), onPress: () => { setSheetVisible(false); handleDraftLetter(); } },
+          ...(showPremium ? [{ label: t('document.draft_letter'), onPress: () => { setSheetVisible(false); handleDraftLetter(); } }] : []),
           ...(upcoming ? [{ label: t('document.add_to_calendar'), onPress: handleAddToCalendar }] : []),
           { label: t('document.delete_document'), onPress: confirmDelete, destructive: true },
         ]}

@@ -13,6 +13,7 @@ import { useAuthStore } from '../../src/store/authStore';
 import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { useReminderStore } from '../../src/store/reminderStore';
 import { useThemeStore, useThemeColors, type Appearance_ } from '../../src/store/themeStore';
+import { CAN_PURCHASE } from '../../src/lib/billing';
 
 type Lang = 'en' | 'fi' | 'sv';
 
@@ -233,12 +234,13 @@ export default function ProfileScreen() {
         {/* Account */}
         <View className="px-6 mb-8">
           <SectionHeader title={t('profile.account')} />
-          {ACCOUNT_LINKS.map((item) => {
+          {/* Where Premium can't be bought (iOS), the plan row only shows for people who already have it. */}
+          {ACCOUNT_LINKS.filter((item) => item.key !== 'subscription' || CAN_PURCHASE || tier === 'premium').map((item) => {
             const handlePress = () => {
               if (item.route === 'change-password') setShowPasswordSheet(true);
               else if (item.route === 'delete') setShowDeleteConfirm(true);
-              else if (item.route === 'help') Linking.openURL('https://docs.opas.app');
-              else if (item.route === 'privacy') Linking.openURL('https://opas.app/privacy');
+              else if (item.route === 'help') Linking.openURL('https://getopas.app/help');
+              else if (item.route === 'privacy') Linking.openURL('https://getopas.app/privacy');
               else if (item.route) router.push(item.route as any);
             };
             return (

@@ -244,7 +244,7 @@
     "step_extracting": "Finding dates & actions",
     "reading": "Reading your letter…",
     "please_wait": "Please wait",
-    "privacy_note": "Your document never leaves your control. Personal details are hidden before anything is read.",
+    "privacy_note": "Personal details are removed before the AI reads the text.",
     "grant_permission_desc": "Grant camera access in Settings to scan documents.",
     "flash_on": "Flash · on",
     "flash_off": "Flash · off",
@@ -272,7 +272,24 @@
     "tip_flatten": "Flatten the page",
     "tip_glare": "Avoid shadows & glare",
     "tip_corners": "Fit all four corners",
-    "filing": "Filing your letter…"
+    "filing": "Filing your letter…",
+    "pdf": "Upload a PDF",
+    "pdf_short": "PDF",
+    "file_too_large_title": "This file is too large",
+    "file_too_large_desc": "Opas can read files up to 20 MB. Try a smaller file, or take a photo of the letter.",
+    "limit_desc_no_upgrade": "Free accounts include 5 scans a month. You can scan again from the start of next month.",
+    "check_original": "AI can make mistakes. Check dates against the original letter."
+  },
+  "consent": {
+    "eyebrow": "Before your first letter",
+    "title": "How Opas reads your letters",
+    "point_read": "We read the text from your photo or PDF. Photos are read by Amazon Textract in the EU.",
+    "point_redact": "Names, ID numbers, addresses and similar details are removed wherever we find them.",
+    "point_ai": "The rest of the text is sent to Anthropic's AI (Claude) to explain it. Anthropic may process it in the US. It isn't used to train their AI.",
+    "point_store": "Your letters are stored in your account in the EU (Stockholm) until you delete them.",
+    "privacy_link": "Privacy policy",
+    "allow": "Allow and continue",
+    "decline": "Not now"
   },
   "documents": {
     "title": "Documents",
@@ -465,7 +482,8 @@
     "done_on": "Done · {{date}}",
     "due_in": "Due in {{count}} day",
     "due_in_plural": "Due in {{count}} days",
-    "by_date": "By {{date}}"
+    "by_date": "By {{date}}",
+    "ai_disclaimer": "Opas explains letters with AI and can make mistakes. Check dates and amounts against the original letter. This isn't legal advice."
   },
   "draftLetter": {
     "title": "Draft Letter",
@@ -478,7 +496,8 @@
     "tone": "Tone",
     "tone_formal": "Formal",
     "tone_professional": "Professional",
-    "include_details": "Include document details"
+    "include_details": "Include document details",
+    "check_before_sending": "Read the reply before you send it. AI can make mistakes."
   },
   "calendar": {
     "added": "Added to calendar",
@@ -517,7 +536,9 @@
     "premium_eyebrow": "Opas Premium",
     "save_yearly": "Save 20% yearly",
     "free_trial": "Start 7-day free trial",
-    "trial_note": "Then €4.99/month. Cancel anytime."
+    "trial_note": "Then €4.99/month. Cancel anytime.",
+    "unavailable_title": "Premium isn't available on iPhone yet",
+    "unavailable_desc": "Everything in the free plan works as normal."
   },
   "status": {
     "pending": "Uploading",
