@@ -34,7 +34,7 @@ class ResultReadyNotifierTest {
         PlatformTransactionManager txm = mock(PlatformTransactionManager.class);
         when(txm.getTransaction(any())).thenReturn(new SimpleTransactionStatus());
         notifier = new ResultReadyNotifier(push, email, documents, users, new TransactionTemplate(txm),
-                Duration.ofMinutes(10), "https://opas.app/");
+                Duration.ofMinutes(10), "https://getopas.app/");
         user = new User();
         user.setId(UUID.randomUUID());
         user.setEmail("a@b.fi");
@@ -64,7 +64,7 @@ class ResultReadyNotifierTest {
 
         notifier.emailUnseenResults();
 
-        verify(email).sendResultReady("a@b.fi", "https://opas.app/d/" + documentId, "sv");
+        verify(email).sendResultReady("a@b.fi", "https://getopas.app/d/" + documentId, "sv");
     }
 
     @Test

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version        = '1.0.0'
   s.summary        = 'Hands the next deadline to the Opas home-screen widget.'
   s.author         = ''
-  s.homepage       = 'https://opas.app'
+  s.homepage       = 'https://getopas.app'
   s.platforms      = { :ios => '15.1' }
   s.source         = { git: '' }
   s.static_framework = true

@@ -16,7 +16,7 @@ class SubscriptionServiceTest {
 
     private SubscriptionService service(boolean stripeEnabled) {
         return new SubscriptionService(mock(SubscriptionRepository.class), mock(UserRepository.class), stripeEnabled,
-                "sk_test", "https://opas.app", "price_premium");
+                "sk_test", "https://getopas.app", "price_premium");
     }
 
     private static Subscription withCustomer(String customerId) {

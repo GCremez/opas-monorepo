@@ -624,9 +624,9 @@ All settings come from environment variables (see `opas-backend/.env.example`). 
 | `STRIPE_SECRET_KEY` | empty | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | empty | Stripe webhook signing secret |
 | `STRIPE_PREMIUM_PRICE_IDS` | empty | Comma-separated price IDs allowed at checkout |
-| `STRIPE_RETURN_BASE_URL` | `https://opas.app` | Where Stripe sends people back to |
+| `STRIPE_RETURN_BASE_URL` | `https://getopas.app` | Where Stripe sends people back to |
 | `MAIL_ENABLED` | `false` | Send real emails through SES. Must be `true` in any deployed environment. |
-| `MAIL_FROM` | `no-reply@opas.fi` | Verified SES sender |
+| `MAIL_FROM` | `no-reply@getopas.app` | Verified SES sender |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:3000` | Allowed web origins |
 | `LOGGING_LEVEL_COM_OPAS` | `INFO` | Log level for the app |
 
