@@ -11,6 +11,7 @@ import { ChevronLeftIcon } from '../../src/components/icons';
 import { generateDraftLetter } from '../../src/api/draftLetters';
 import { usePremium } from '../../src/hooks/usePremium';
 import { useThemeColors } from '../../src/store/themeStore';
+import { CAN_PURCHASE } from '../../src/lib/billing';
 
 export default function DraftLetterScreen() {
   const { id } = useLocalSearchParams<{ id: string; filename?: string }>();
@@ -71,7 +72,7 @@ export default function DraftLetterScreen() {
         <View className="flex-1 items-center justify-center px-8">
           <Text className="font-display text-title text-fg text-center mb-2">{t('profile.upgrade_title')}</Text>
           <Text className="font-serif text-prose text-fg-soft text-center mb-8">{t('profile.upgrade_desc')}</Text>
-          <Button onPress={() => router.push('/subscription')}>{t('profile.view_plans')}</Button>
+          {CAN_PURCHASE && <Button onPress={() => router.push('/subscription')}>{t('profile.view_plans')}</Button>}
         </View>
       </SafeAreaView>
     );
@@ -139,6 +140,7 @@ export default function DraftLetterScreen() {
             <View className="bg-surface rounded-md p-4 mb-5">
               <Text className="font-serif text-prose text-fg">{draft}</Text>
             </View>
+            <Text className="font-serif-italic text-[14px] leading-[21px] text-muted mb-5">{t('draftLetter.check_before_sending')}</Text>
             <View className="flex-row gap-3">
               <Button variant="outline" block onPress={handleCopy}>
                 {copied ? t('draftLetter.copied') : t('draftLetter.copy')}

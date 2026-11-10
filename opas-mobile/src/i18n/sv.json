@@ -244,7 +244,7 @@
     "step_extracting": "Hittar datum och åtgärder",
     "reading": "Läser ditt brev…",
     "please_wait": "Vänta",
-    "privacy_note": "Ditt dokument lämnar aldrig din kontroll. Personuppgifter döljs innan något läses.",
+    "privacy_note": "Personuppgifter tas bort innan AI:n läser texten.",
     "grant_permission_desc": "Bevilja kamerans åtkomst i inställningarna för att kunna skanna dokument.",
     "flash_on": "Blixt · på",
     "flash_off": "Blixt · av",
@@ -272,7 +272,24 @@
     "tip_flatten": "Släta ut sidan",
     "tip_glare": "Undvik skuggor och blänk",
     "tip_corners": "Få med alla fyra hörn",
-    "filing": "Arkiverar ditt brev…"
+    "filing": "Arkiverar ditt brev…",
+    "pdf": "Ladda upp en PDF",
+    "pdf_short": "PDF",
+    "file_too_large_title": "Filen är för stor",
+    "file_too_large_desc": "Opas kan läsa filer på högst 20 MB. Prova en mindre fil eller fotografera brevet.",
+    "limit_desc_no_upgrade": "Gratiskonton har 5 skanningar per månad. Du kan skanna igen från början av nästa månad.",
+    "check_original": "AI kan göra fel. Kontrollera datumen mot originalbrevet."
+  },
+  "consent": {
+    "eyebrow": "Innan ditt första brev",
+    "title": "Så läser Opas dina brev",
+    "point_read": "Vi läser texten från ditt foto eller din PDF. Foton läses av Amazon Textract inom EU.",
+    "point_redact": "Namn, personbeteckningar, adresser och liknande uppgifter tas bort där vi hittar dem.",
+    "point_ai": "Resten av texten skickas till Anthropics AI (Claude) som förklarar den. Anthropic kan behandla texten i USA. Den används inte för att träna deras AI.",
+    "point_store": "Dina brev sparas på ditt konto inom EU (Stockholm) tills du raderar dem.",
+    "privacy_link": "Integritetspolicy",
+    "allow": "Tillåt och fortsätt",
+    "decline": "Inte nu"
   },
   "documents": {
     "title": "Dokument",
@@ -465,7 +482,8 @@
     "done_on": "Klart · {{date}}",
     "due_in": "Förfaller om {{count}} dag",
     "due_in_plural": "Förfaller om {{count}} dagar",
-    "by_date": "Senast {{date}}"
+    "by_date": "Senast {{date}}",
+    "ai_disclaimer": "Opas förklarar brev med hjälp av AI och kan göra fel. Kontrollera datum och belopp mot originalbrevet. Det här är inte juridisk rådgivning."
   },
   "draftLetter": {
     "title": "Utkast till brev",
@@ -478,7 +496,8 @@
     "tone": "Ton",
     "tone_formal": "Formell",
     "tone_professional": "Professionell",
-    "include_details": "Inkludera dokumentinformation"
+    "include_details": "Inkludera dokumentinformation",
+    "check_before_sending": "Läs svaret innan du skickar det. AI kan göra fel."
   },
   "calendar": {
     "added": "Tillagd i kalender",
@@ -517,7 +536,9 @@
     "premium_eyebrow": "Opas Premium",
     "save_yearly": "Spara 20% per år",
     "free_trial": "Starta 7 dagars gratis provperiod",
-    "trial_note": "Sedan 4,99 €/månad. Avsluta när som helst."
+    "trial_note": "Sedan 4,99 €/månad. Avsluta när som helst.",
+    "unavailable_title": "Premium finns inte på iPhone än",
+    "unavailable_desc": "Allt i gratisversionen fungerar som vanligt."
   },
   "status": {
     "pending": "Laddas upp",

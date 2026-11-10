@@ -244,7 +244,7 @@
     "step_extracting": "Etsitään päivämääriä ja toimia",
     "reading": "Luetaan kirjettäsi…",
     "please_wait": "Odota hetki",
-    "privacy_note": "Asiakirjasi pysyy hallinnassasi. Henkilötiedot piilotetaan ennen kuin mitään luetaan.",
+    "privacy_note": "Henkilötiedot poistetaan ennen kuin tekoäly lukee tekstin.",
     "grant_permission_desc": "Myöntä kameran käyttöasetuksista, jotta voit skannata asiakirjoja.",
     "flash_on": "Salama · päällä",
     "flash_off": "Salama · pois",
@@ -272,7 +272,24 @@
     "tip_flatten": "Suorista sivu",
     "tip_glare": "Vältä varjoja ja heijastuksia",
     "tip_corners": "Kaikki neljä kulmaa kuvaan",
-    "filing": "Arkistoidaan kirjettäsi…"
+    "filing": "Arkistoidaan kirjettäsi…",
+    "pdf": "Lataa PDF-tiedosto",
+    "pdf_short": "PDF",
+    "file_too_large_title": "Tiedosto on liian suuri",
+    "file_too_large_desc": "Opas voi lukea enintään 20 Mt:n tiedostoja. Kokeile pienempää tiedostoa tai ota kuva kirjeestä.",
+    "limit_desc_no_upgrade": "Ilmaiseen tiliin sisältyy 5 skannausta kuukaudessa. Voit skannata taas ensi kuun alusta.",
+    "check_original": "Tekoäly voi tehdä virheitä. Tarkista päivämäärät alkuperäisestä kirjeestä."
+  },
+  "consent": {
+    "eyebrow": "Ennen ensimmäistä kirjettä",
+    "title": "Näin Opas lukee kirjeesi",
+    "point_read": "Luemme tekstin kuvastasi tai PDF-tiedostostasi. Kuvat lukee Amazon Textract EU:ssa.",
+    "point_redact": "Poistamme nimet, henkilötunnukset, osoitteet ja muut vastaavat tiedot aina, kun löydämme ne.",
+    "point_ai": "Muu teksti lähetetään Anthropicin tekoälylle (Claude), joka selittää sen. Anthropic voi käsitellä tekstiä Yhdysvalloissa. Tekstiä ei käytetä tekoälyn kouluttamiseen.",
+    "point_store": "Kirjeesi tallennetaan tilillesi EU:ssa (Tukholma), kunnes poistat ne.",
+    "privacy_link": "Tietosuojaseloste",
+    "allow": "Salli ja jatka",
+    "decline": "Ei nyt"
   },
   "documents": {
     "title": "Asiakirjat",
@@ -465,7 +482,8 @@
     "done_on": "Tehty · {{date}}",
     "due_in": "Erääntyy {{count}} päivässä",
     "due_in_plural": "Erääntyy {{count}} päivässä",
-    "by_date": "Viimeistään {{date}}"
+    "by_date": "Viimeistään {{date}}",
+    "ai_disclaimer": "Opas selittää kirjeet tekoälyn avulla, ja se voi tehdä virheitä. Tarkista päivämäärät ja summat alkuperäisestä kirjeestä. Tämä ei ole oikeudellista neuvontaa."
   },
   "draftLetter": {
     "title": "Kirjeluonnos",
@@ -478,7 +496,8 @@
     "tone": "Sävy",
     "tone_formal": "Muodollinen",
     "tone_professional": "Ammattimainen",
-    "include_details": "Sisällytä asiakirjan tiedot"
+    "include_details": "Sisällytä asiakirjan tiedot",
+    "check_before_sending": "Lue vastaus ennen kuin lähetät sen. Tekoäly voi tehdä virheitä."
   },
   "calendar": {
     "added": "Lisätty kalenteriin",
@@ -517,7 +536,9 @@
     "premium_eyebrow": "Opas Premium",
     "save_yearly": "Säästä 20% vuodessa",
     "free_trial": "Aloita 7 päivän ilmainen kokeilu",
-    "trial_note": "Sitten 4,99 €/kk. Peru milloin tahansa."
+    "trial_note": "Sitten 4,99 €/kk. Peru milloin tahansa.",
+    "unavailable_title": "Premium ei ole vielä saatavilla iPhonella",
+    "unavailable_desc": "Kaikki ilmaisen version ominaisuudet toimivat normaalisti."
   },
   "status": {
     "pending": "Ladataan",

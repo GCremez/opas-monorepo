@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Animated, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable, Animated, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { XIcon } from '../../src/components/icons';
@@ -17,8 +18,17 @@ import { useThemeColors } from '../../src/store/themeStore';
 import { toDecodeView, type DecodeView } from '../../src/lib/decodeView';
 import { folderName } from '../../src/lib/folders';
 import { track } from '../../src/lib/analytics';
+import { CAN_PURCHASE } from '../../src/lib/billing';
+import { hasAiConsent, grantAiConsent } from '../../src/lib/aiConsent';
+import { AiConsent } from '../../src/components/AiConsent';
+import { useAuthStore } from '../../src/store/authStore';
 
 type ScanState = 'ready' | 'capturing' | 'processing' | 'review' | 'error';
+type ScanSource = 'camera' | 'gallery' | 'file';
+
+// Matches the backend's upload cap (UploadUrlRequest), so a big file is refused here
+// with a clear message instead of failing after the upload starts.
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 
 // The viewfinder is always the ink surface (design 2a), whatever the app theme.
 const INK = {
@@ -144,12 +154,22 @@ export default function ScanScreen() {
   const [phase, setPhase] = useState<'upload' | 'decode'>('upload');
   const [found, setFound] = useState<{ documentId: string; view: DecodeView | null; folderId: string | null } | null>(null);
   const [categorySheet, setCategorySheet] = useState(false);
+  const email = useAuthStore((s) => s.user?.email);
+  // null while it's being read; nothing is uploaded until this is true.
+  const [consented, setConsented] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (permission && !permission.granted && permission.canAskAgain) requestPermission();
-  }, [permission, requestPermission]);
+    let live = true;
+    hasAiConsent(email).then((ok) => { if (live) setConsented(ok); });
+    return () => { live = false; };
+  }, [email]);
 
-  const run = async (name: string, contentType: string, uri: string, source: 'camera' | 'gallery', startedAt: number) => {
+  useEffect(() => {
+    // Ask for the camera only after the consent screen, not on top of it.
+    if (consented && permission && !permission.granted && permission.canAskAgain) requestPermission();
+  }, [consented, permission, requestPermission]);
+
+  const run = async (name: string, contentType: string, uri: string, source: ScanSource, startedAt: number) => {
     const runId = ++runRef.current;
     clearError();
     setFilename(name);
@@ -195,6 +215,20 @@ export default function ScanScreen() {
     track('scan_started', { source: 'gallery' });
     track('scan_gallery_pick');
     await run(asset.fileName ?? `photo_${Date.now()}.jpg`, asset.mimeType ?? 'image/jpeg', asset.uri, 'gallery', Date.now());
+  };
+
+  // Official mail now arrives digitally (OmaKela, Suomi.fi Messages) as PDFs, so a
+  // saved or shared PDF is as common a way in as a photo of a paper letter.
+  const handlePickFile = async () => {
+    const result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf', copyToCacheDirectory: true, multiple: false });
+    if (result.canceled || !result.assets[0]) return;
+    const asset = result.assets[0];
+    if (asset.size && asset.size > MAX_UPLOAD_BYTES) {
+      Alert.alert(t('scan.file_too_large_title'), t('scan.file_too_large_desc'));
+      return;
+    }
+    track('scan_started', { source: 'file' });
+    await run(asset.name || `letter_${Date.now()}.pdf`, 'application/pdf', asset.uri, 'file', Date.now());
   };
 
   const reset = () => {
@@ -268,7 +302,7 @@ export default function ScanScreen() {
     const limit = error === 'DECODE_LIMIT_REACHED';
     const upload = error === 'UPLOAD_FAILED';
     const title = limit ? t('scan.limit_title') : upload ? t('scan.upload_failed_title') : t('scan.cant_read_title');
-    const body = limit ? t('scan.limit_desc') : upload ? t('scan.upload_failed_desc') : t('scan.cant_read_desc');
+    const body = limit ? t(CAN_PURCHASE ? 'scan.limit_desc' : 'scan.limit_desc_no_upgrade') : upload ? t('scan.upload_failed_desc') : t('scan.cant_read_desc');
     const retry = async () => { await discardFailed(); reset(); };
     const gallery = async () => { await discardFailed(); reset(); handlePickFromGallery(); };
     return (
@@ -299,7 +333,7 @@ export default function ScanScreen() {
             )}
 
             {limit ? (
-              <Button variant="primary" block onPress={() => { reset(); router.push('/subscription'); }}>{t('scan.upgrade')}</Button>
+              CAN_PURCHASE && <Button variant="primary" block onPress={() => { reset(); router.push('/subscription'); }}>{t('scan.upgrade')}</Button>
             ) : (
               <Button variant="primary" block onPress={retry}>{t('common.retry')}</Button>
             )}
@@ -364,6 +398,8 @@ export default function ScanScreen() {
             />
           </View>
 
+          <Text className="font-serif-italic text-[14px] leading-[21px] text-muted mx-[26px] mt-4">{t('scan.check_original')}</Text>
+
           <View className="flex-1" />
           <View className="px-[30px] pb-4">
             <Button variant="primary" size="lg" block onPress={() => openDocument(found.documentId)}>{t('scan.save_record')}</Button>
@@ -397,8 +433,24 @@ export default function ScanScreen() {
     );
   }
 
-  if (!permission) {
+  if (consented === null || !permission) {
     return <View style={{ flex: 1, backgroundColor: INK.bg }} />;
+  }
+
+  if (!consented) {
+    return (
+      <AiConsent
+        onAllow={async () => {
+          await grantAiConsent(email);
+          track('ai_consent_granted');
+          setConsented(true);
+        }}
+        onDecline={() => {
+          track('ai_consent_declined');
+          handleClose();
+        }}
+      />
+    );
   }
 
   if (!permission.granted) {
@@ -419,6 +471,7 @@ export default function ScanScreen() {
         <View className="px-[30px] pb-4 gap-3">
           <Button variant="primary" block onPress={requestPermission}>{t('common.grant_permission')}</Button>
           <Button variant="outline" block onPress={handlePickFromGallery}>{t('scan.gallery')}</Button>
+          <Button variant="outline" block onPress={handlePickFile}>{t('scan.pdf')}</Button>
         </View>
       </SafeAreaView>
     );
@@ -499,7 +552,16 @@ export default function ScanScreen() {
           )}
         </Pressable>
 
-        <View className="w-16" />
+        <TouchableOpacity
+          onPress={handlePickFile}
+          disabled={capturing}
+          hitSlop={16}
+          accessibilityRole="button"
+          accessibilityLabel={t('scan.pdf')}
+          className="w-16 items-end"
+        >
+          <Text className="font-semibold text-label uppercase" style={{ color: INK.soft }}>{t('scan.pdf_short')}</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
