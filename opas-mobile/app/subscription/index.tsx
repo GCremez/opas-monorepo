@@ -10,6 +10,7 @@ import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { useAuthStore } from '../../src/store/authStore';
 import { useThemeColors } from '../../src/store/themeStore';
 import { getPlans } from '../../src/api/subscription';
+import { CAN_PURCHASE } from '../../src/lib/billing';
 
 type BillingInterval = 'monthly' | 'yearly';
 
@@ -72,6 +73,19 @@ export default function SubscriptionScreen() {
           <Text className="font-display text-[40px] text-accent mb-4">✓</Text>
           <Text className="font-display text-title text-fg text-center mb-2">{t('subscription.already_premium_title')}</Text>
           <Text className="font-serif text-prose text-fg-soft text-center mb-8">{t('subscription.already_premium_desc')}</Text>
+          <Button variant="outline" onPress={() => router.back()}>{t('common.done')}</Button>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // No prices or checkout where Premium can't be bought in the app (see billing.ts).
+  if (!CAN_PURCHASE) {
+    return (
+      <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="font-display text-title text-fg text-center mb-2">{t('subscription.unavailable_title')}</Text>
+          <Text className="font-serif text-prose text-fg-soft text-center mb-8">{t('subscription.unavailable_desc')}</Text>
           <Button variant="outline" onPress={() => router.back()}>{t('common.done')}</Button>
         </View>
       </SafeAreaView>
