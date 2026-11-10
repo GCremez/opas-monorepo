@@ -285,7 +285,7 @@
     "title": "How Opas reads your letters",
     "point_read": "We read the text from your photo or PDF. Photos are read by Amazon Textract in the EU.",
     "point_redact": "Names, ID numbers, addresses and similar details are removed wherever we find them.",
-    "point_ai": "The rest of the text is sent to Anthropic's AI (Claude) to explain it. Anthropic may process it in the US. It isn't used to train their AI.",
+    "point_ai": "The rest of the text is sent to Claude, an AI made by Anthropic, which runs on Amazon Bedrock in Stockholm, Sweden, so it stays in the EU. Neither Anthropic nor Amazon uses it to train AI.",
     "point_store": "Your letters are stored in your account in the EU (Stockholm) until you delete them.",
     "privacy_link": "Privacy policy",
     "allow": "Allow and continue",
@@ -537,7 +537,7 @@
     "save_yearly": "Save 20% yearly",
     "free_trial": "Start 7-day free trial",
     "trial_note": "Then €4.99/month. Cancel anytime.",
-    "unavailable_title": "Premium isn't available on iPhone yet",
+    "unavailable_title": "Premium isn't available in the app yet",
     "unavailable_desc": "Everything in the free plan works as normal."
   },
   "status": {

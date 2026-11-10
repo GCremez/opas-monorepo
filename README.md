@@ -64,8 +64,8 @@ Missing a Kela deadline or misreading a Migri decision can cost you money or del
 2. **Confirm.** The app tells the backend the upload is done. The backend checks the real file in S3 to make sure the type and size match what the app said.
 3. **Queue.** When you tap Decode, the API checks your monthly limit, puts a job on RabbitMQ and returns right away. You don't sit and wait on a slow request.
 4. **Read the text.** A background worker downloads the file and pulls the text out. PDFs go through PDFBox. Photos go through AWS Textract.
-5. **Remove personal data.** Before anything goes to the AI model, Microsoft Presidio replaces names, ID numbers, addresses and similar details. This is on by default in the app.
-6. **Analyse.** The cleaned text goes to Claude through Spring AI. The prompt asks for JSON back (document type, summary, key fields, language) and tells the model to treat the letter as data only, never as instructions.
+5. **Remove personal data.** Before anything goes to the AI model, Microsoft Presidio replaces names, ID numbers, addresses, phone numbers and bank details, using Finnish, Swedish and English language models and Finnish patterns. Dates, amounts, reference numbers and authority names are kept, because the explanation needs them. This is on by default in the app.
+6. **Analyse.** The cleaned text goes to Claude on Amazon Bedrock in Stockholm, so it stays in the EU. The prompt asks for JSON back (document type, summary, key fields, language) and tells the model to treat the letter as data only, never as instructions.
 7. **Save.** The result is stored in PostgreSQL, and an embedding of the document is saved with pgvector so you can search your documents by meaning later.
 8. **Follow up.** From there you can draft a reply, move the letter into a folder, or search for it later.
 
@@ -73,13 +73,15 @@ Missing a Kela deadline or misreading a Migri decision can cost you money or del
 
 ## Features
 
-- **Scan and decode.** Photo or PDF in. Document type, plain-language summary, key fields and language out.
-- **Privacy first.** Personal data is stripped out before the AI ever sees the text.
-- **Draft replies.** Writes a formal reply or appeal in the same language as the original letter, in the tone you pick.
+- **Scan and decode.** Take a photo, pick one from the gallery, or import a PDF. Official mail has been mostly digital since April 2026 (OmaKela, Suomi.fi Messages), so many letters arrive as PDFs. Document type, plain-language summary, key fields and language out.
+- **Privacy first.** Before the first letter, a consent screen says where letters go and names the AI provider (App Store guideline 5.1.2(i)). Personal data is removed before the AI sees the text: Presidio with Finnish, Swedish and English language models (`opas-infra/presidio`), plus Finnish patterns for the henkilötunnus, street addresses, postcodes, phone numbers and the account holder's own name, including Finnish case endings. Claude runs on Amazon Bedrock in Stockholm, so letter text stays in the EU.
+- **Draft replies.** Writes a formal reply or appeal in the same language as the original letter, in the tone you pick, with placeholders like [your name] where details were removed. Free for everyone during the beta (`DRAFTS_FREE_FOR_EVERYONE`).
+- **Honest about AI.** Every explanation and draft says the AI can make mistakes, to check dates and amounts against the original, and that it isn't legal advice.
 - **Search by meaning.** Searching "tax refund" finds the right letter even if those words aren't in the file name. This uses pgvector with cosine similarity.
 - **Folders and archive** to keep things tidy.
-- **Free and Premium plans.** Free users get 5 decodes a month. Premium runs through Stripe Checkout and the Stripe billing portal.
-- **Push notifications.** A daily reminder if you have letters you haven't decoded yet, and a short weekly summary.
+- **Free and Premium plans.** Free users get 5 decodes a month. Premium runs through Stripe Checkout and the Stripe billing portal. The mobile apps show no prices or checkout for now (`CAN_PURCHASE` in `opas-mobile/src/lib/billing.ts`): the App Store and Google Play both require their own billing for subscriptions.
+- **Deadline reminders.** Scheduled on the phone from the dates in each letter: 7 days before, 1 day before and the morning it's due. Free for everyone. Deadlines can also go into the phone's calendar.
+- **Push notifications.** A push when a letter has been read (with an email if the push doesn't arrive), a daily reminder about letters not yet read, and a weekly summary, in the user's language.
 - **Email verification.** New accounts get a 6-digit code by email (Amazon SES) and can't log in until they confirm it.
 - **Three languages:** English, Finnish and Swedish, in the app and in the verification emails.
 - **Accessible.** WCAG AA contrast, 44px touch targets, reduced motion support, and no status that relies on colour alone.
@@ -114,7 +116,7 @@ flowchart LR
     Worker --> S3
     Worker --> Textract
     Worker --> Presidio[Presidio<br/>PII removal]
-    Worker --> Claude[Claude<br/>via Spring AI]
+    Worker --> Claude[Claude<br/>Amazon Bedrock, Stockholm]
     Worker --> PG
 
     Stripe[Stripe] -->|signed webhooks| API
@@ -162,9 +164,9 @@ sequenceDiagram
 | Layer | Technology | What it does here |
 |---|---|---|
 | Backend | Java 21, Spring Boot 3.5, Spring Security, Spring Data JPA | REST API and background workers |
-| AI | Spring AI with Anthropic Claude | Reads letters and drafts replies |
+| AI | Claude (Sonnet 5.5) on Amazon Bedrock in eu-north-1, through the Anthropic Java SDK | Reads letters and drafts replies |
 | Embeddings | Spring AI Transformers (local model, 384 dimensions) | Vectors for search, no extra API call |
-| Privacy | Microsoft Presidio (analyzer and anonymizer) | Removes personal data before AI calls |
+| Privacy | Microsoft Presidio (analyzer and anonymizer) with Finnish and Swedish spaCy models | Removes personal data before AI calls |
 | Database | PostgreSQL 16, pgvector, Flyway | Storage, vector search, versioned migrations |
 | Cache and state | Redis | Refresh tokens, logout blacklist, quotas, rate limits, webhook idempotency, job locks |
 | Messaging | RabbitMQ with a dead-letter queue | Background decode jobs |
@@ -272,7 +274,7 @@ opas-monorepo/
 - Docker and Docker Compose
 - Node.js 20 and npm
 - Expo Go on your phone, or the iOS Simulator or Android Emulator
-- An Anthropic API key
+- AWS credentials with Bedrock access (`bedrock-mantle:CreateInference` in eu-north-1), or an Anthropic API key with `AI_PROVIDER=anthropic`
 - Optional: Stripe test keys for payments, and an AWS account for Textract and SES. You don't need AWS to test with PDFs and plain text locally.
 
 ### 1. Clone the repo
@@ -326,7 +328,8 @@ At minimum, fill in:
 
 ```dotenv
 DATABASE_PASSWORD=opas
-ANTHROPIC_API_KEY=sk-ant-your-key-here
+# Claude on Bedrock uses your AWS credentials. Without Bedrock access:
+# AI_PROVIDER=anthropic and ANTHROPIC_API_KEY=sk-ant-your-key-here
 
 # Paste each PEM file on one line, with \n for the line breaks
 JWT_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----
@@ -557,21 +560,36 @@ mvn test -Dtest=AuthServiceTest
 
 | Test class | Tests | What it checks |
 |---|---|---|
-| `AuthServiceTest` | 29 | Sign up, verify, login, refresh, logout, password change, deleting an account, language handling |
-| `DocumentServiceTest` | 12 | Upload links, confirming uploads against the real S3 file, ownership, deleting from S3 and the database |
+| `AuthServiceTest` | 38 | Sign up, verify, login, refresh, logout, password change and reset, deleting an account, language handling |
+| `DecodeServiceTest` | 22 | Quota and ownership checks, Premium users skipping the limit, the pipeline, PII removal on and off, skipping duplicates |
+| `DocumentServiceTest` | 18 | Upload links, confirming uploads against the real S3 file, ownership, deleting from S3 and the database |
+| `StripeWebhookServiceTest` | 15 | Signature check, checkout, unpaid sessions, subscription updates and cancellations, invoices |
 | `UsageTrackerTest` | 11 | Monthly quota, atomic reservation, hitting the limit |
-| `StripeWebhookServiceTest` | 9 | Signature check, checkout, unpaid sessions, subscription updates and cancellations, invoices |
+| `PresidioServiceTest` | 13 | Finding and replacing personal data, never asking for dates or organisations, the letter's language, handling failures |
 | `JwtUtilTest` | 9 | Signing, parsing, expiry, broken tokens, tokens signed with the wrong key |
-| `DecodeServiceTest` | 9 | Quota and ownership checks, Premium users skipping the limit, the pipeline, PII removal on and off, skipping duplicates |
+| `JwtAuthenticationFilterTest` | 9 | Reading the header, blacklisted and invalid tokens |
 | `RefreshTokenServiceTest` | 8 | Storing, using a token only once, revoking everything |
 | `AuthControllerTest` | 8 | Request validation and HTTP status codes |
-| `PresidioServiceTest` | 7 | Finding and replacing personal data, handling failures |
-| `JwtAuthenticationFilterTest` | 7 | Reading the header, blacklisted and invalid tokens |
+| `DocumentInsightsTest` | 6 | Title, authority, deadlines and the key figure pulled from decode results, malformed data tolerated |
+| `EmailServiceTest` | 5 | Verification and "letter ready" emails in the user's language, English fallback, mail switched off |
+| `DraftLetterServiceTest` | 5 | Free-for-everyone switch, Premium gating, extracted and redacted text (never raw file bytes), nothing sent if redaction is down |
+| `SubscriptionServiceTest` | 4 | Deleting the Stripe customer when an account is deleted, and Stripe outages |
+| `ResultReadyNotifierTest` | 4 | Push, then email backup when a letter is ready |
 | `GlobalExceptionHandlerTest` | 4 | Error responses for bad input, rate limits, validation and server errors |
+| `ClaudeClientTest` | 8 | Text and token usage, server-side fallback on the Anthropic API, Bedrock model IDs and the client-side retry on refusal |
+| `ClaudeConfigTest` | 3 | Bedrock client starts without credentials; provider settings |
+| `BedrockSigningTest` | 1 | Requests signed (SigV4) for the Stockholm Bedrock endpoint |
+| `PresignedUploadUrlTest` | 1 | Upload URLs sign only what the phone sends (no S3 checksum headers) |
+| `FinnishPiiPatternsTest` | 3 | 20 sample letters (`src/test/resources/redaction/`): every personal detail removed, reference numbers, dates and amounts kept |
+| `DeadlineReminderServiceTest` | 3 | Daily and weekly pushes in the user's language |
+| `WebhookControllerTest` | 3 | Stripe webhook signatures: valid, tampered, missing |
 | `TokenBlacklistServiceTest` | 3 | The logout blacklist |
 | `RateLimitAspectTest` | 3 | Per-endpoint rate limits |
+| `FolderServiceTest` | 3 | Built-in folders created once, kept first, and protected from delete and rename |
+| `DecodeResponseTest` | 2 | Structured data serialized as a JSON object |
 | `OpasApplicationTests` | 1 | The whole app starts against real PostgreSQL and Redis (Testcontainers) |
-| **Total** | **120** | |
+| `DecodeResultPersistenceTest` | 1 | Saving decode results to real PostgreSQL (Testcontainers) |
+| **Total** | **214** | |
 
 For the mobile app:
 
@@ -579,7 +597,16 @@ For the mobile app:
 cd opas-mobile
 npm run typecheck   # TypeScript
 npm run lint        # ESLint
-npm run test:ci     # Jest
+npm run test:ci     # Jest: 28 tests (reminders, deadlines, tasks, search, widget, document store)
+```
+
+For the Presidio image (Finnish, Swedish and English letters, redacted end to end with the real language models; Infra CI runs it too):
+
+```bash
+cd opas-infra && docker compose build presidio-analyzer
+docker run --rm -v "$PWD/presidio/test:/test:ro" \
+  -v "$PWD/../opas-backend/src/main/resources/presidio:/opas:ro" \
+  opas-presidio-analyzer python /test/check_redaction.py /opas /test/letters.txt
 ```
 
 ---
@@ -611,7 +638,11 @@ All settings come from environment variables (see `opas-backend/.env.example`). 
 | `DATABASE_PASSWORD` | required | Database password |
 | `REDIS_URL` | `redis://localhost:6379` | Redis connection |
 | `RABBITMQ_URL` | `amqp://guest:guest@localhost:5672` | RabbitMQ connection |
-| `ANTHROPIC_API_KEY` | required | Claude API key |
+| `AI_PROVIDER` | `bedrock` | Where Claude runs: `bedrock` (Amazon Bedrock, AWS credentials) or `anthropic` (the Anthropic API) |
+| `BEDROCK_REGION` | `eu-north-1` | Bedrock region. Requests are served in this region only |
+| `ANTHROPIC_MODEL` | `claude-sonnet-5-5` | Claude model (the `anthropic.` prefix is added on Bedrock) |
+| `ANTHROPIC_FALLBACK_MODEL` | `claude-sonnet-5` | On Bedrock, a refused request is retried once on this model |
+| `ANTHROPIC_API_KEY` | empty | Only with `AI_PROVIDER=anthropic` |
 | `JWT_PRIVATE_KEY` | required | RS256 private key (PKCS#8 PEM) |
 | `JWT_PUBLIC_KEY` | required | RS256 public key (PEM) |
 | `AWS_REGION` | `eu-north-1` | Region for S3 and Textract |
@@ -619,7 +650,9 @@ All settings come from environment variables (see `opas-backend/.env.example`). 
 | `AWS_ENDPOINT_URL` | empty | Set to `http://localhost:4566` for LocalStack |
 | `S3_BUCKET_NAME` | `opas-app-bucket` | Bucket for uploaded files |
 | `PRESIDIO_SIDECAR_URL` | `http://localhost:5001` | Presidio analyzer |
-| `PRESIDIO_LANGUAGE` | `en` | Language Presidio uses to find personal data |
+| `PRESIDIO_LANGUAGE` | `en` | Language used when a letter's language has no model in the Presidio image |
+| `PRESIDIO_LANGUAGES` | `en` | Languages the Presidio image has models for. Set `en,fi,sv` with the Opas image (`opas-infra/presidio`, used by docker compose) |
+| `DRAFTS_FREE_FOR_EVERYONE` | `true` | Reply drafts for every user (the beta). Set `false` to make them Premium-only |
 | `STRIPE_ENABLED` | `false` | Turns payments on |
 | `STRIPE_SECRET_KEY` | empty | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | empty | Stripe webhook signing secret |
@@ -671,12 +704,12 @@ These are government letters, so they often contain ID numbers, addresses and mo
 
 ## What's missing and what's next
 
-I'd rather be upfront about the gaps:
+The full plan, with priorities, is in [docs/launch-plan.md](docs/launch-plan.md). The main gaps:
 
-- **No mobile unit tests yet.** CI runs the TypeScript check and ESLint on the app, but there are no Jest tests so far.
-- **Finnish personal data.** Presidio runs in English by default. It needs a Finnish model to reliably catch Finnish details like the henkilötunnus (personal identity code).
-- **Real deadline reminders.** Right now the app reminds you about letters you haven't decoded and sends a weekly summary. The next step is using the dates the AI pulls out of each letter to remind you before an actual deadline. The designs already show this.
-- **Faster results.** The app checks back for the decode result. Sending it with a push notification or a WebSocket would feel quicker.
+- **Paying inside the apps.** Both stores require their own billing for subscriptions, so the apps show no checkout yet. Google Play comes first (launch plan P1-6).
+- **The Opas Presidio image in production.** Finnish and Swedish name detection needs the image in `opas-infra/presidio` deployed where production Presidio runs, then `PRESIDIO_LANGUAGES=en,fi,sv`. Finnish stem changes in the account holder's name (Matti → Matin) are left to the language model.
+- **More languages.** Explanations in Ukrainian, Russian, Arabic and Tagalog (P1-2).
+- **Cases, urgency and sources.** Linking related letters into a case, an urgency label on every letter, and links to official sources (P1-3, P1-4, P1-7).
 
 ---
 

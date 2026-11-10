@@ -32,7 +32,7 @@ class PresidioServiceTest {
     void setUp() {
         when(restClientBuilder.baseUrl(anyString())).thenReturn(restClientBuilder);
         when(restClientBuilder.build()).thenReturn(restClient);
-        service = new PresidioService(restClientBuilder, "http://localhost:5001", "http://localhost:5002", "en", false);
+        service = new PresidioService(restClientBuilder, "http://localhost:5001", "http://localhost:5002", "en", "", false);
     }
 
     private void mockPostChain() {
@@ -151,8 +151,8 @@ class PresidioServiceTest {
 
     @Test
     void analyzeRequestCarriesFinnishPersonalIdRecognizer() throws Exception {
-        var request = new PresidioService.AnalyzeRequest("x", "fi",
-                java.util.List.of(PresidioService.finnishPersonalId("fi")));
+        var request = new PresidioService.AnalyzeRequest("x", "fi", PresidioService.ENTITIES,
+                PresidioService.ALLOW_LIST, java.util.List.of(PresidioService.finnishPersonalId("fi")));
 
         var json = new com.fasterxml.jackson.databind.ObjectMapper().readTree(
                 new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(request));
@@ -165,5 +165,55 @@ class PresidioServiceTest {
         assertTrue(hetu.matcher("Henkilötunnus 010190-123A").find());
         assertTrue(hetu.matcher("131052A308T").find()); // 2000s century sign
         assertFalse(hetu.matcher("2026/AT/48213").find());
+    }
+
+    @SuppressWarnings("unchecked")
+    private PresidioService.AnalyzeRequest sentAnalyzeRequest(PresidioService svc, String text) {
+        mockPostChain();
+        when(uriSpec.uri("/analyze")).thenReturn(uriSpec);
+        when(responseSpec.body(any(ParameterizedTypeReference.class))).thenReturn(List.of());
+        svc.analyze(text, List.of("Priya Sharma"));
+        var captor = org.mockito.ArgumentCaptor.forClass(Object.class);
+        org.mockito.Mockito.verify(uriSpec).body(captor.capture());
+        return (PresidioService.AnalyzeRequest) captor.getValue();
+    }
+
+    @Test
+    void neverAsksForDatesOrOrganisations() throws Exception {
+        var request = sentAnalyzeRequest(service, "Toimita selvitys 14.6.2026 mennessä. Kela");
+
+        // Asking for every entity type removed deadlines (DATE_TIME) and tagged "Kela" as NRP.
+        assertFalse(request.entities().contains("DATE_TIME"));
+        assertFalse(request.entities().contains("NRP"));
+        assertFalse(request.entities().contains("ORGANIZATION"));
+        assertTrue(request.entities().containsAll(List.of("PERSON", "FI_PERSONAL_ID", "FI_ADDRESS", "PHONE_NUMBER")));
+        assertTrue(request.allowList().containsAll(List.of("Kela", "Migri", "Verohallinto", "Skatteförvaltningen")));
+
+        String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(request);
+        assertTrue(json.contains("\"allow_list\""), json);
+        assertTrue(json.contains("\"entities\""), json);
+    }
+
+    @Test
+    void usesTheLettersLanguageOnlyWhenTheImageHasIt() {
+        String finnish = "Päätös asumistuesta. Toimita selvitys 14.6.2026 mennessä, tai tuki ei jatku.";
+        // Stock image (English only): stays on the configured default.
+        assertEquals("en", sentAnalyzeRequest(service, finnish).language());
+
+        var multi = new PresidioService(restClientBuilder, "http://localhost:5001", "http://localhost:5002", "en",
+                "en, fi, sv", false);
+        org.mockito.Mockito.clearInvocations(uriSpec);
+        var request = sentAnalyzeRequest(multi, finnish);
+        assertEquals("fi", request.language());
+        // The Finnish patterns and the account holder's name go in the same language.
+        assertTrue(request.adHocRecognizers().stream().allMatch(r -> r.supportedLanguage().equals("fi")));
+    }
+
+    @Test
+    void detectsFinnishSwedishAndEnglishLetters() {
+        assertEquals("fi", PresidioService.detectLanguage("Päätös asumistuesta. Toimita selvitys mennessä, tai tuki ei jatku."));
+        assertEquals("sv", PresidioService.detectLanguage("Beslut om skattekort för 2026. Betala senast 31.8.2026 och kontakta oss om du har frågor."));
+        assertEquals("en", PresidioService.detectLanguage("Your application was received. The decision will be sent to you by post."));
+        assertEquals("fi", PresidioService.detectLanguage("1234/2026"));
     }
 }

@@ -149,7 +149,7 @@ class DecodeServiceTest {
         when(userRepository.getReferenceById(userId)).thenReturn(user);
         when(storageService.getObjectBytes(anyString())).thenReturn("file content".getBytes());
         when(textExtractionService.extract(any(), any())).thenReturn("file content");
-        when(presidioService.scrubPii(anyString())).thenReturn("scrubbed content");
+        when(presidioService.scrubPii(anyString(), anyCollection())).thenReturn("scrubbed content");
 
         mockClaude();
 
@@ -192,7 +192,7 @@ class DecodeServiceTest {
         DecodeMessage decodeMessage = new DecodeMessage(userId, documentId, false);
         service.processDecode(decodeMessage);
 
-        verify(presidioService, never()).scrubPii(anyString());
+        verify(presidioService, never()).scrubPii(anyString(), anyCollection());
     }
 
     @Test

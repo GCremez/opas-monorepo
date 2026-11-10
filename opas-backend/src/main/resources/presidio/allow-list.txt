@@ -1,0 +1,23 @@
+# Words Presidio must never remove: authorities and services named in letters. The
+# backend sends this list with every request (PresidioService); the Presidio image test
+# in opas-infra/presidio/test uses it too.
+Kela
+KELA
+OmaKela
+Migri
+Maahanmuuttovirasto
+Migrationsverket
+Vero
+Verohallinto
+Skatteförvaltningen
+DVV
+Digi- ja väestötietovirasto
+Myndigheten för digitalisering och befolkningsdata
+TE-palvelut
+TE-tjänsterna
+Työmarkkinatori
+Suomi.fi
+Ulosottolaitos
+Utsökningsverket
+Traficom
+YTHS

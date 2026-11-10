@@ -31,7 +31,7 @@ International workers, students and immigrants in Finland receive official lette
 Translation tools give people the words. Translation was never the hard part. Knowing what a letter means for *you* is. ChatGPT can explain a photographed letter for free, so explaining a single letter is not something people will pay for. Opas has to win where general tools fall short:
 
 - **No administrative context.** General models don't reliably know Finnish workflows, appeal periods, or which reference numbers (*diaarinumero*) a reply must quote.
-- **Privacy.** Pasting a whole letter, henkilötunnus included, into a public chatbot exposes sensitive data. Opas removes personal details before the AI sees the text. Finnish names and addresses still need work: see [P0-4](#v1--beta-and-core-single-letter-utility).
+- **Privacy.** Pasting a whole letter, henkilötunnus included, into a public chatbot exposes sensitive data. Opas removes personal details before the AI sees the text, with Finnish and Swedish language models and Finnish patterns, and Claude runs on Amazon Bedrock in Stockholm, so letters stay in the EU.
 - **No workflow.** ChatGPT outputs text. It doesn't track deadlines, link related letters into a case, or keep a structured record.
 
 | What the user needs | ChatGPT today | Where Opas wins |
@@ -81,7 +81,7 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 |---|---|---|---|---|
 | **BriefKlar** | Germany + FR, IT, ES, NL, PL | Freemium + ad-rewarded scans, €4.99–9.90/mo. Research confirmed a free tier of 3 letters/month | Reply drafting, 30+ languages (35+ per its site), audio read-out | Finland-specific knowledge (Kela, Migri, Suomi.fi). **Biggest threat:** already multi-country, and Finland is an obvious next step |
 | **TiG Desk** | Germany | Draft says B2C subscription + B2B HR licences. **Research found the app is free** | On-device OCR (the photo never leaves the phone), deadline calendar | Nordic focus. Note: TiG Desk sets the privacy bar we're behind on until [P2-2](#v3--b2b-distribution-and-platform-infrastructure) |
-| **Foldy** | Germany / EU | B2C subscription, €4–8/mo | Plain-language next steps, 5 languages including Ukrainian, Claude via AWS Bedrock in the EU | Active workflow (replies, case timelines). Foldy's EU hosting is the setup we're evaluating in P0-3 |
+| **Foldy** | Germany / EU | B2C subscription, €4–8/mo | Plain-language next steps, 5 languages including Ukrainian, Claude via AWS Bedrock in the EU | Active workflow (replies, case timelines). Opas now runs Claude the same way: Bedrock, in Stockholm |
 | **Advocat / LetterHelp** | Estonia / Finland | Pay per letter, €5–20 per appeal | Disputes, appeals, immigration letters | Instant and cheaper, without a legal consultation |
 | **Amtli, DocuPilot** | Germany | Not researched | Letter explainers | Show that explaining letters is already a commodity |
 | **FinnPermit** | Finland | Not researched | Immigration Q&A, no letters | Opas works from the user's own letters |
@@ -94,14 +94,14 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 
 | Tier | Price | Includes |
 |---|---|---|
-| **Free** | €0 | **3 scans a month** |
-| **Premium** | **€4.99/month or €39.99/year** | Unlimited scans; case timelines; unlimited reply drafts; calendar and push deadline reminders |
+| **Free** | €0 | **3 scans a month**; deadline reminders (decided: they stay free) |
+| **Premium** | **€4.99/month or €39.99/year** | Unlimited scans; case timelines; unlimited reply drafts |
 | **Credit pack** | **€3.99 for 5 letters** | For occasional users who don't want a subscription |
 | **B2B licences** | Per seat | Employers, relocation agencies, universities (and unions) give Opas to new arrivals |
 
 **This isn't what the app does today.** The code still has 5 free decodes and €4.99 / €47.90. See [P1-9](#v2--case-aware-copilot-and-monetisation).
 
-**Note on deadline reminders:** they already run on the phone for every user, free included (`opas-mobile/src/lib/reminders.ts`). Moving them to Premium means removing a working feature from free users. Decide deliberately; keeping them free may be the better retention bet.
+**Decided: deadline reminders stay free** for every user. They already run on the phone (`opas-mobile/src/lib/reminders.ts`), and they're what brings people back.
 
 ---
 
@@ -116,11 +116,29 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 - "AI can make mistakes / not legal advice" notices.
 - No prices or checkout on iOS (`CAN_PURCHASE` in `src/lib/billing.ts`).
 
+**Also done on the same branch** (V1 code work):
+- Reply drafts were sending the raw file bytes to Claude, unredacted. They now use the extracted text with personal data removed, like decoding.
+- Free reply drafts for everyone during the beta (P0-5).
+- Finnish redaction with a 20-letter test set (P0-4).
+- Redaction no longer removes deadlines, plus Finnish and Swedish language models (P0-4).
+- Claude on Amazon Bedrock in Stockholm (P0-3).
+- Translated server pushes (P0-7).
+- Updated README (P0-8).
+- No checkout on Android either (Google Play first, see below).
+
+**Decisions (10 November 2026):**
+- **Google Play first.** The beta and first release are on Android. Play requires Play Billing for subscriptions (unless enrolled in Google's EEA alternative billing programme), so `CAN_PURCHASE` is now false on every platform: no prices or checkout in the app until store billing is added (P1-6). Nobody needs to pay during the beta: reply drafts are free.
+- **Deadline reminders stay free.**
+
 **Infrastructure and operations:**
 
 - [ ] **DNS and email:** `getopas.app` and `api.getopas.app` live over HTTPS. SES domain verified with SPF, DKIM and DMARC. GitHub variable `MAIL_FROM` not still `opas.fi`.
 - [ ] **Link verification files:** Apple Team ID and Play SHA-256 filled in under `opas-infra/web/.well-known/`, served from getopas.app as `application/json`.
-- [ ] **AI provider and data residency:** Anthropic API directly vs. AWS Bedrock in the EU (e.g. eu-central-1, if it has our Claude model). This is a **GDPR / international data transfer** question, not an EU AI Act one. Article 50 is about telling people they're dealing with AI, which the consent screen and AI notices already cover. See P0-3.
+- [x] **AI provider and data residency (decided: Bedrock).** Claude runs on Amazon Bedrock in eu-north-1 (Stockholm), the same region as the app. Bedrock's Messages endpoint serves only the region it's called in, so letter text stays in Sweden. This was a GDPR / data transfer question, not an EU AI Act one. **Still to do (AWS console):**
+  - enable access to Claude Sonnet 5.5 and Claude Sonnet 5 in Amazon Bedrock in eu-north-1;
+  - check that both models are offered on Bedrock's Messages endpoint (bedrock-mantle) there;
+  - deploy the CloudFormation stack, which gives the task role `bedrock-mantle:CreateInference`.
+- [ ] **Opas Presidio image in production:** deploy `opas-infra/presidio` wherever production Presidio runs, then set the GitHub variable `PRESIDIO_LANGUAGES` to `en,fi,sv` and redeploy the stack. Until then letters are analysed in English (dates are already kept).
 - [ ] **Database hosting documented:** the repo's CloudFormation doesn't create the PostgreSQL database. State the provider, region and backup policy for the privacy policy.
 - [ ] **App store metadata:** create the apps in App Store Connect and Play Console with the ID `app.getopas`. Prepare localised listings and screenshots. The App Privacy / Data Safety answers must match the consent screen.
 - [ ] **EAS credentials** for `app.getopas`, including the iOS push (APNs) key.
@@ -136,16 +154,31 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 
 - [x] **P0-1. Test on physical devices.** Camera and PDF import, consent screen, iOS Premium screens, email links, layouts.
 - [x] **P0-2. Privacy policy.** Data processing, retention periods, and what's sent to the AI. Must name every processor: AWS, Anthropic, Stripe, PostHog, Sentry, Expo push, and the database host.
-- [ ] **P0-3. AI data residency.** Confirm against Anthropic's own documentation where API data is processed and kept. If it isn't the EU, move to Claude on AWS Bedrock in an EU region. If the processing changes, update the consent text (`consent.point_ai`), bump `VERSION` in `src/lib/aiConsent.ts`, and update the privacy policy.
-- [ ] **P0-4. Finnish name, address and ID redaction, on the server for V1.** Photos are read by Textract on the server, so there's no text on the phone to redact yet. On-device redaction (`src/lib/redact.ts`) only becomes possible together with on-device OCR ([P2-2](#v3--b2b-distribution-and-platform-infrastructure)). For V1:
+- [x] **P0-3. AI data residency.** Confirm against Anthropic's own documentation where API data is processed and kept. If it isn't the EU, move to Claude on AWS Bedrock in an EU region. If the processing changes, update the consent text (`consent.point_ai`), bump `VERSION` in `src/lib/aiConsent.ts`, and update the privacy policy.
+  **Done (Bedrock):**
+  - `AI_PROVIDER=bedrock`, `BEDROCK_REGION=eu-north-1`; credentials come from the ECS task role.
+  - Bedrock has no server-side refusal fallback, so a refused request is retried once on Claude Sonnet 5.
+  - The consent text now says Claude runs on Amazon Bedrock in Stockholm, and the consent version is v2, so everyone is asked again.
+  - `AI_PROVIDER=anthropic` switches back.
+  - **The privacy policy needs updating:** Anthropic is no longer a direct processor of letter text; AWS (Bedrock, Stockholm) is.
+- [x] **P0-4. Finnish name, address and ID redaction, on the server for V1.** Photos are read by Textract on the server, so there's no text on the phone to redact yet. On-device redaction (`src/lib/redact.ts`) only becomes possible together with on-device OCR ([P2-2](#v3--b2b-distribution-and-platform-infrastructure)). For V1:
   - run Presidio in `fi`/`sv` with a Finnish model, or add recognisers for Finnish names, street addresses and postcodes;
   - keep the existing henkilötunnus regex (`PresidioService.java`).
 
   **Done when** a test set of 20 sample Kela, Vero and Migri letters (with made-up data) sends no names, ID codes or addresses to the AI.
-- [ ] **P0-5. Free draft replies during the beta.** A backend flag (e.g. `opas.beta.free-drafts`) skips the Premium check in `DraftLetterService.java`, and the app shows the draft button when the flag is on. iOS can't sell Premium yet, so without this iPhone testers never see replies.
+
+  **Done:**
+  - Presidio requests now include patterns for street addresses, postcode + town, Finnish mobile and +358 numbers, and the account holder's own name with Finnish case endings (`PresidioService.java`).
+  - 20 sample letters (`opas-backend/src/test/resources/redaction/sample-letters.txt`) all pass, including that reference numbers, dates and amounts are kept. The same patterns were checked in Python, which Presidio uses.
+  - **Found and fixed:** Presidio was asked for every entity type, which also removed **dates** (deadlines never reached Claude) and tagged "Kela" as a nationality. Opas now asks only for personal data types, and authority names are never removed.
+  - **Finnish and Swedish language models:** `opas-infra/presidio` is Presidio 2.2.362 plus Finnish and Swedish spaCy models. Each letter is analysed in its own language, which catches other people's names (case workers, family members).
+  - **Tested** in the image setup: 7 letters in Finnish, Swedish and English, plus the 20 sample letters, all pass. Infra CI runs the same check.
+  - **To go live:** deploy the image and set `PRESIDIO_LANGUAGES=en,fi,sv` (see §4).
+- [x] **P0-5. Free draft replies during the beta.** A backend flag (e.g. `opas.beta.free-drafts`) skips the Premium check in `DraftLetterService.java`, and the app shows the draft button when the flag is on. iOS can't sell Premium yet, so without this iPhone testers never see replies.
+  **Done:** `DRAFTS_FREE_FOR_EVERYONE` (default `true`). The usage endpoint returns `draftsIncluded`, and the app shows the draft button from it. Fixed on the way: drafts used to send the raw file bytes to Claude, unredacted.
 - [ ] **P0-6. Native-speaker review** of UI text and prompts in **Finnish and Swedish**. The app ships in both, and the consent and disclaimer texts were written without a native speaker. Also check the English for plain-language clarity.
-- [ ] **P0-7. Translated server push notifications.** Local deadline reminders on the phone are already translated. The **server** pushes ("pending documents", weekly summary in `DeadlineReminderService.java`) are hard-coded in English. Use the user's language, as `ResultReadyNotifier` already does.
-- [ ] **P0-8. Update the README.** The app does have unit tests (`src/lib/__tests__`), and deadline reminders already run on the phone. Remove the outdated "What's missing" items and add PDF import, consent and the iOS Premium rule.
+- [x] **P0-7. Translated server push notifications.** Local deadline reminders on the phone are already translated. The **server** pushes ("pending documents", weekly summary in `DeadlineReminderService.java`) are hard-coded in English. Use the user's language, as `ResultReadyNotifier` already does. **Done:** English, Finnish and Swedish, with singular and plural forms.
+- [x] **P0-8. Update the README.** The app does have unit tests (`src/lib/__tests__`), and deadline reminders already run on the phone. Remove the outdated "What's missing" items and add PDF import, consent and the iOS Premium rule.
 
 ### V2 — Case-aware copilot and monetisation
 
@@ -158,7 +191,7 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 - [ ] **P1-5. "Something's wrong" button:** users flag a wrong deadline or summary (document ID, field and comment, no letter text). Review weekly.
 - [ ] **P1-6. In-app purchases on both stores.**
   - **iOS:** StoreKit, e.g. via RevenueCat; then set `CAN_PURCHASE` to true for iOS.
-  - **Android:** **Stripe in the Android app isn't allowed by default either.** Google Play requires Play Billing for digital subscriptions unless we join its EEA alternative billing or external offers programme, which also requires reporting transactions to Google. Choose between Play Billing (via RevenueCat) and enrolling in the programme. Until then, treat Android like iOS: no checkout in the app.
+  - **Android (first, decided 10 Nov 2026):** **Stripe in the Android app isn't allowed by default either.** Google Play requires Play Billing for digital subscriptions unless we join its EEA alternative billing or external offers programme, which also requires reporting transactions to Google. Choose between Play Billing (via RevenueCat) and enrolling in the programme. Until then, Android works like iOS: no checkout in the app (`CAN_PURCHASE` is false everywhere).
   - **Backend:** keep entitlements in sync from store webhooks (RevenueCat) and Stripe webhooks for web purchases.
 - [ ] **P1-7. Case timelines:**
   - group letters into cases by authority and reference number (*diaarinumero*), helped by the existing pgvector embeddings;
@@ -214,8 +247,7 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 |---|---|
 | Anthropic API directly, or AWS Bedrock in the EU? | Check Anthropic's documentation on where data is processed and kept; compare Bedrock EU latency, cost and Claude model availability |
 | How to split revenue between subscriptions and one-off packs? | Beta interviews, then conversion data once in-app purchases launch (P1-6, P1-9) |
-| Should deadline reminders become Premium-only? | Beta retention data, comparing testers who use reminders with those who don't |
-| Play Billing, or Google's EEA alternative billing programme, on Android? | Compare fees and reporting effort (P1-6) |
+| Play Billing, or Google's EEA alternative billing programme, on Android? (Android goes first) | Compare fees and reporting effort (P1-6) |
 | Are there restrictions on automated reply drafting for Finnish administrative appeals? | Confirm with a lawyer. We believe there's no general monopoly on legal advice in Finland (only representing people in court is licensed), but get it confirmed before marketing reply drafting for appeals |
 
 ---

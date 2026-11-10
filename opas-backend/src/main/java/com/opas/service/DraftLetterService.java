@@ -13,6 +13,7 @@ import com.opas.repository.SubscriptionRepository;
 import com.opas.repository.UserRepository;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,18 +25,37 @@ public class DraftLetterService {
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final StorageService storageService;
+    private final TextExtractionService textExtractionService;
+    private final PresidioService presidioService;
     private final ClaudeClient claudeClient;
+    private final boolean freeForEveryone;
 
     public DraftLetterService(DocumentRepository documentRepository,
             DraftLetterRepository draftLetterRepository, UserRepository userRepository,
             SubscriptionRepository subscriptionRepository, StorageService storageService,
-            ClaudeClient claudeClient) {
+            TextExtractionService textExtractionService, PresidioService presidioService,
+            ClaudeClient claudeClient,
+            @Value("${opas.drafts.free-for-everyone:false}") boolean freeForEveryone) {
         this.documentRepository = documentRepository;
         this.draftLetterRepository = draftLetterRepository;
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.storageService = storageService;
+        this.textExtractionService = textExtractionService;
+        this.presidioService = presidioService;
         this.claudeClient = claudeClient;
+        this.freeForEveryone = freeForEveryone;
+    }
+
+    /**
+     * Whether this user may generate reply drafts: Premium users always, everyone while
+     * {@code opas.drafts.free-for-everyone} is on (the beta, so free and iOS testers can
+     * try replies before Premium can be bought in the stores).
+     */
+    @Transactional(readOnly = true)
+    public boolean draftsIncluded(UUID userId) {
+        return freeForEveryone || subscriptionRepository.findByUserId(userId)
+                .map(Subscription::getTier).filter("premium"::equals).isPresent();
     }
 
     @Transactional(readOnly = true)
@@ -57,16 +77,20 @@ public class DraftLetterService {
             throw new ResourceNotFoundException();
         }
 
-        boolean isPremium = subscriptionRepository.findByUserId(userId)
-                .map(Subscription::getTier).filter("premium"::equals).isPresent();
-        if (!isPremium) {
+        if (!draftsIncluded(userId)) {
             throw new IllegalArgumentException("Premium subscription required to generate draft letters");
         }
 
         User user = userRepository.getReferenceById(userId);
 
+        // Same path as decoding: real text out of the photo or PDF (reading the raw bytes
+        // as UTF-8 sent binary noise for anything but plain text), and personal details
+        // always removed before the AI sees it, as the consent screen promises. If
+        // Presidio is down this fails rather than sending the letter unredacted.
         byte[] fileBytes = storageService.getObjectBytes(document.getS3Key());
-        String content = new String(fileBytes, java.nio.charset.StandardCharsets.UTF_8);
+        String content = presidioService.scrubPii(
+                textExtractionService.extract(document.getContentType(), fileBytes),
+                java.util.Collections.singletonList(document.getUser().getName()));
 
         String prompt = buildPrompt(document.getFilename(), content, request.tone(), request.includeOriginal());
         String generatedText = claudeClient.complete(prompt).text();
@@ -100,6 +124,11 @@ public class DraftLetterService {
                 - Present a clear argument for why the decision should be reconsidered
                 - Include a polite closing and space for signature
                 - Use %s language appropriate for formal correspondence
+
+                Personal details in the document were replaced with tags such as <PERSON>, <LOCATION>
+                or <FI_PERSONAL_ID>. Never invent these details: where the letter needs one, write a
+                placeholder in square brackets for the user to fill in, such as [your name],
+                [your address] or [your personal identity code].
 
                 Return only the letter body with salutation, body paragraphs, and closing.
                 """.formatted(filename, content, tone,

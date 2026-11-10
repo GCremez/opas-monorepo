@@ -1,14 +1,15 @@
-import { Platform } from 'react-native';
-
 /**
- * Whether Premium can be bought in this build.
+ * Whether Premium can be bought inside this app. False on every platform for now: the
+ * app shows no prices, upgrade buttons or checkout, and Premium-only actions stay
+ * hidden for people who don't already have Premium.
  *
- * False on iOS: App Store guideline 3.1.1 doesn't allow selling Premium through Stripe
- * Checkout inside an iOS app, so until Premium is offered through In-App Purchase the
- * iOS app shows no prices, upgrade buttons or checkout.
+ * - iOS: App Store guideline 3.1.1 requires In-App Purchase for digital subscriptions,
+ *   so Stripe Checkout isn't allowed in the app.
+ * - Android: Google Play likewise requires Play Billing for digital subscriptions,
+ *   unless the app is enrolled in Google's EEA alternative billing programme.
  *
- * Android still opens Stripe Checkout, but Google Play also requires Play Billing for
- * digital subscriptions unless the app is enrolled in its EEA alternative billing
- * programme. Resolve that before selling on Android (docs/launch-plan.md, P1-6).
+ * The beta doesn't need payments: reply drafts are free for everyone on the server
+ * (opas.drafts.free-for-everyone). Turn this on per platform once store billing is in
+ * place (docs/launch-plan.md, P1-6).
  */
-export const CAN_PURCHASE = Platform.OS !== 'ios';
+export const CAN_PURCHASE = false;

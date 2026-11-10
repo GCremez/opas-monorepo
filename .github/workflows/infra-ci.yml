@@ -4,10 +4,10 @@ name: Infra CI
 on:
   push:
     branches: [main, develop]
-    paths: ['opas-infra/**', '.github/workflows/infra-ci.yml']
+    paths: ['opas-infra/**', 'opas-backend/src/main/resources/presidio/**', 'opas-backend/src/test/resources/redaction/**', '.github/workflows/infra-ci.yml']
   pull_request:
     branches: [main]
-    paths: ['opas-infra/**', '.github/workflows/infra-ci.yml']
+    paths: ['opas-infra/**', 'opas-backend/src/main/resources/presidio/**', 'opas-backend/src/test/resources/redaction/**', '.github/workflows/infra-ci.yml']
   workflow_dispatch:
     inputs:
       deploy:
@@ -63,6 +63,17 @@ jobs:
         run: |
           curl -sf http://localhost:5001/health
           curl -sf http://localhost:5002/health
+      - name: Presidio redaction (Finnish, Swedish and English letters)
+        # Inside the built image, with its own models and config: personal data removed,
+        # dates, amounts, reference numbers and authority names kept.
+        run: |
+          for letters in /test/letters.txt /redaction/sample-letters.txt; do
+            docker run --rm \
+              -v "$PWD/presidio/test:/test:ro" \
+              -v "$PWD/../opas-backend/src/main/resources/presidio:/opas:ro" \
+              -v "$PWD/../opas-backend/src/test/resources/redaction:/redaction:ro" \
+              opas-presidio-analyzer python /test/check_redaction.py /opas "$letters"
+          done
       - name: Tear down
         if: always()
         run: docker compose down -v
@@ -128,6 +139,7 @@ jobs:
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
               MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@getopas.app' }} \
               StripePremiumPriceIds=${{ vars.STRIPE_PREMIUM_PRICE_IDS }} \
+              PresidioLanguages=${{ vars.PRESIDIO_LANGUAGES || 'en' }} \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset \
             --no-cli-pager
@@ -160,6 +172,7 @@ jobs:
               CertificateArn=${{ vars.INFRA_CERT_ARN }} \
               MailFromAddress=${{ vars.MAIL_FROM || 'no-reply@getopas.app' }} \
               StripePremiumPriceIds=${{ vars.STRIPE_PREMIUM_PRICE_IDS }} \
+              PresidioLanguages=${{ vars.PRESIDIO_LANGUAGES || 'en' }} \
               CorsAllowedOrigins=https://getopas.app \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset \

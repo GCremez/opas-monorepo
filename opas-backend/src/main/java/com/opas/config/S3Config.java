@@ -44,7 +44,12 @@ public class S3Config {
 
     @Bean(destroyMethod = "close")
     public S3Client s3Client(AwsCredentialsProvider credentialsProvider) {
-        var builder = S3Client.builder().region(Region.of(region));
+        var builder = S3Client.builder().region(Region.of(region))
+                // AWS SDK 2.30+ adds checksums to every S3 request by default, which
+                // LocalStack and other S3-compatible stores have rejected. Checksums only
+                // where S3 requires them, as before the SDK upgrade.
+                .requestChecksumCalculation(software.amazon.awssdk.core.checksums.RequestChecksumCalculation.WHEN_REQUIRED)
+                .responseChecksumValidation(software.amazon.awssdk.core.checksums.ResponseChecksumValidation.WHEN_REQUIRED);
 
         if (!endpoint.isBlank()) {
             builder.endpointOverride(URI.create(endpoint)).forcePathStyle(true);

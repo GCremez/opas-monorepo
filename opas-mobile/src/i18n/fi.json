@@ -285,7 +285,7 @@
     "title": "Näin Opas lukee kirjeesi",
     "point_read": "Luemme tekstin kuvastasi tai PDF-tiedostostasi. Kuvat lukee Amazon Textract EU:ssa.",
     "point_redact": "Poistamme nimet, henkilötunnukset, osoitteet ja muut vastaavat tiedot aina, kun löydämme ne.",
-    "point_ai": "Muu teksti lähetetään Anthropicin tekoälylle (Claude), joka selittää sen. Anthropic voi käsitellä tekstiä Yhdysvalloissa. Tekstiä ei käytetä tekoälyn kouluttamiseen.",
+    "point_ai": "Muu teksti lähetetään Anthropicin tekemälle tekoälylle Claudelle, jota ajetaan Amazon Bedrockissa Tukholmassa Ruotsissa, joten teksti pysyy EU:ssa. Anthropic ja Amazon eivät käytä sitä tekoälyn kouluttamiseen.",
     "point_store": "Kirjeesi tallennetaan tilillesi EU:ssa (Tukholma), kunnes poistat ne.",
     "privacy_link": "Tietosuojaseloste",
     "allow": "Salli ja jatka",
@@ -537,7 +537,7 @@
     "save_yearly": "Säästä 20% vuodessa",
     "free_trial": "Aloita 7 päivän ilmainen kokeilu",
     "trial_note": "Sitten 4,99 €/kk. Peru milloin tahansa.",
-    "unavailable_title": "Premium ei ole vielä saatavilla iPhonella",
+    "unavailable_title": "Premium ei ole vielä saatavilla sovelluksessa",
     "unavailable_desc": "Kaikki ilmaisen version ominaisuudet toimivat normaalisti."
   },
   "status": {
