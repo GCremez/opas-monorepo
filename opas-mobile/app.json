@@ -12,7 +12,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.opas.app",
+      "bundleIdentifier": "app.getopas",
       "buildNumber": "1",
       "infoPlist": {
         "NSAppTransportSecurity": {
@@ -26,7 +26,7 @@
       },
       "entitlements": {
         "com.apple.security.application-groups": [
-          "group.com.opas.app"
+          "group.app.getopas"
         ]
       },
       "associatedDomains": [
@@ -38,7 +38,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#35503f"
       },
-      "package": "com.opas.app",
+      "package": "app.getopas",
       "versionCode": 1,
       "permissions": [
         "CAMERA",
