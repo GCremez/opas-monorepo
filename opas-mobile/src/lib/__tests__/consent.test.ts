@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { AI_CONSENT_VERSION, hasCurrentConsent } from '../consent';
 
 describe('hasCurrentConsent', () => {
