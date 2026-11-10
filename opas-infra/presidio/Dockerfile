@@ -16,4 +16,11 @@ ENV NLP_CONF_FILE=/app/opas-conf/nlp.yaml \
     ANALYZER_CONF_FILE=/app/opas-conf/analyzer.yaml \
     RECOGNIZER_REGISTRY_CONF_FILE=/app/opas-conf/recognizers.yaml
 
+# Three language models (~1 GB) load when a worker boots. On a cold or busy host that can
+# pass gunicorn's default 30 s worker timeout, and the worker is killed and restarted
+# forever. Give boot room, and give the health check the same.
+ENV GUNICORN_CMD_ARGS="--timeout 180"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
 USER 1001

@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Start services
-        run: docker compose up -d --wait --wait-timeout 180
+        run: docker compose up -d --wait --wait-timeout 300
       - run: docker compose ps
       - name: PostgreSQL
         run: |
@@ -76,6 +76,9 @@ jobs:
               -v "$PWD/../opas-backend/src/test/resources/redaction:/redaction:ro" \
               opas-presidio-analyzer python /test/check_redaction.py /opas "$letters"
           done
+      - name: Presidio logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=200 presidio-analyzer presidio-anonymizer
       - name: Tear down
         if: always()
         run: docker compose down -v
