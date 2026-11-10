@@ -237,8 +237,8 @@ export default function ProfileScreen() {
             const handlePress = () => {
               if (item.route === 'change-password') setShowPasswordSheet(true);
               else if (item.route === 'delete') setShowDeleteConfirm(true);
-              else if (item.route === 'help') Linking.openURL('https://docs.opas.app');
-              else if (item.route === 'privacy') Linking.openURL('https://opas.app/privacy');
+              else if (item.route === 'help') Linking.openURL('https://getopas.app/help');
+              else if (item.route === 'privacy') Linking.openURL('https://getopas.app/privacy');
               else if (item.route) router.push(item.route as any);
             };
             return (

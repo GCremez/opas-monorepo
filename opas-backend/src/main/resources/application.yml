@@ -125,7 +125,7 @@ opas:
     enabled: ${STRIPE_ENABLED:false}
     secret-key: ${STRIPE_SECRET_KEY:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
-    return-base-url: ${STRIPE_RETURN_BASE_URL:https://opas.app}
+    return-base-url: ${STRIPE_RETURN_BASE_URL:https://getopas.app}
     # Comma-separated Stripe price IDs the client is allowed to check out with.
     # Without this allowlist a user could check out with any (e.g. $0) price and
     # still be upgraded to premium by the webhook.
@@ -136,11 +136,11 @@ opas:
     # so local dev works without an SES sender identity — read the code from the app log.
     enabled: ${MAIL_ENABLED:false}
     # A verified SES sender identity (address or domain) in the configured AWS region.
-    from: ${MAIL_FROM:no-reply@opas.fi}
+    from: ${MAIL_FROM:no-reply@getopas.app}
   # Links in email open the app. {base-url}/d/{documentId} must be set up as a universal
   # link (apple-app-site-association on the domain) for the button to open Opas directly.
   links:
-    base-url: ${APP_LINK_BASE_URL:https://opas.app}
+    base-url: ${APP_LINK_BASE_URL:https://getopas.app}
   notify:
     # "Your letter is ready" email, if the result is still unopened this long after it's done.
     ready-email-after: ${READY_EMAIL_AFTER:PT10M}

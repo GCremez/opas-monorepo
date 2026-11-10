@@ -28,7 +28,10 @@
         "com.apple.security.application-groups": [
           "group.com.opas.app"
         ]
-      }
+      },
+      "associatedDomains": [
+        "applinks:getopas.app"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -46,6 +49,23 @@
         "SCHEDULE_EXACT_ALARM",
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "getopas.app",
+              "pathPrefix": "/d/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
       ]
     },
     "scheme": "opas",
