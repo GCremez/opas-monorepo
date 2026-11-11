@@ -48,7 +48,9 @@
     "mini_2_row_3_value": "2 · 1 due",
     "illo_plain": "Your housing allowance was approved.",
     "illo_action": "Report income changes by 30 Nov",
-    "illo_meaning": "What it means"
+    "illo_meaning": "What it means",
+    "continue": "Continue",
+    "create_account": "Create free account"
   },
   "auth": {
     "welcome_back": "Welcome back.",
@@ -589,5 +591,8 @@
     "empty": "Nothing due. You're on top of it.",
     "scan_header": "Opas · Scan",
     "scan_cta": "Tap to scan a new letter →"
+  },
+  "legal": {
+    "not_affiliated": "Opas is an independent app. It is not run by, or connected to, Kela, Vero, Migri or any other Finnish authority. For official information, visit their websites."
   }
 }

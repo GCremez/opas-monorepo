@@ -48,7 +48,9 @@
     "mini_2_row_3_value": "2 · 1 förfaller",
     "illo_plain": "Ditt bostadsbidrag har beviljats.",
     "illo_action": "Anmäl inkomständringar senast 30.11",
-    "illo_meaning": "Vad det betyder"
+    "illo_meaning": "Vad det betyder",
+    "continue": "Fortsätt",
+    "create_account": "Skapa gratiskonto"
   },
   "auth": {
     "welcome_back": "Välkommen tillbaka.",
@@ -589,5 +591,8 @@
     "empty": "Inget förfaller. Du har koll.",
     "scan_header": "Opas · Skanna",
     "scan_cta": "Tryck för att skanna ett brev →"
+  },
+  "legal": {
+    "not_affiliated": "Opas är en fristående app. Den drivs inte av och har ingen koppling till FPA, Skatteförvaltningen, Migri eller någon annan finsk myndighet. Officiell information finns på deras webbplatser."
   }
 }

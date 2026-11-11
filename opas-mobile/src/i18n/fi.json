@@ -48,7 +48,9 @@
     "mini_2_row_3_value": "2 · 1 eräpäivä",
     "illo_plain": "Asumistukesi on myönnetty.",
     "illo_action": "Ilmoita tulomuutoksista 30.11. mennessä",
-    "illo_meaning": "Mitä se tarkoittaa"
+    "illo_meaning": "Mitä se tarkoittaa",
+    "continue": "Jatka",
+    "create_account": "Luo ilmainen tili"
   },
   "auth": {
     "welcome_back": "Tervetuloa takaisin.",
@@ -589,5 +591,8 @@
     "empty": "Ei mitään erääntyvää. Hyvin hoidettu.",
     "scan_header": "Opas · Skannaa",
     "scan_cta": "Skannaa uusi kirje →"
+  },
+  "legal": {
+    "not_affiliated": "Opas on itsenäinen sovellus. Sitä eivät ylläpidä Kela, Verohallinto, Migri tai muut suomalaiset viranomaiset, eikä se liity niihin. Virallista tietoa löydät niiden verkkosivuilta."
   }
 }
