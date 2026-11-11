@@ -48,6 +48,8 @@ public class DecodeService {
     private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher events;
     private final int freeTierLimit;
+    @Value("${opas.explanations.all-languages-for-everyone:false}")
+    private boolean allLanguagesForEveryone;
     private final double inputPricePerMTok;
     private final double outputPricePerMTok;
 
@@ -177,7 +179,8 @@ public class DecodeService {
 
         Instant startedAt = Instant.now();
         ClaudeClient.Reply reply = claudeClient.complete(buildDecodePrompt(document.getFilename(), content,
-                document.getUser().getLanguage()));
+                explanationLanguage(document.getUser().getLanguage(), isPremium(document.getUser().getId()),
+                        allLanguagesForEveryone)));
         Instant completedAt = Instant.now();
 
         String rawText = reply.text();
@@ -323,7 +326,21 @@ public class DecodeService {
                 .map(tier -> Integer.MAX_VALUE).orElse(freeTierLimit);
     }
 
-    /** The language the reader gets their explanation in (the user's app language). */
+    /**
+     * Free explanations are in English; Premium gets them in the app language (launch
+     * plan §3). {@code opas.explanations.all-languages-for-everyone} gives everyone
+     * their app language again, e.g. if the beta needs it.
+     */
+    static String explanationLanguage(String appLanguage, boolean premium, boolean allLanguagesForEveryone) {
+        return premium || allLanguagesForEveryone ? appLanguage : "en";
+    }
+
+    private boolean isPremium(UUID userId) {
+        return subscriptionRepository.findByUserId(userId).map(Subscription::getTier)
+                .filter("premium"::equals).isPresent();
+    }
+
+    /** The language the reader gets their explanation in. */
     private static String readerLanguage(String code) {
         return switch (code == null ? "" : code) {
             case "fi" -> "Finnish";

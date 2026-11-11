@@ -253,7 +253,7 @@ Replaces the earlier €4.99 / €39.99 and "€3.99 for 5 letters" (§8). Store
   - add the €3.99 Single Case Pass (5 letters + one full reply);
   - [x] Premium feature list: smart deadline reminders added;
   - [x] reminders Premium only: `remindersIncluded` on `/subscription/usage`, `REMINDERS_FREE_FOR_EVERYONE` (default true for the beta); set it to false when Premium goes on sale;
-  - [ ] free accounts get explanations in English only, whatever the app language (`readerLanguage` in `DecodeService.java` uses the app language today); other explanation languages are Premium (tell beta testers before it changes);
+  - [x] free accounts get explanations in English only, whatever the app language; Premium gets the app language (`DecodeService.explanationLanguage`). `EXPLANATIONS_ALL_LANGUAGES_FOR_EVERYONE=true` gives everyone their app language again;
   - [ ] add deep explanations, full replies, case timelines and dossier export to the list as each one ships;
   - after the beta: short reply for Free, full reply generator for Premium (replaces `DRAFTS_FREE_FOR_EVERYONE`).
 - [ ] **P1-10. One B2B pilot,** before building a portal: one employer, university or union, free seats for 3 months for feedback, with simple invite codes. It tests whether B2B buyers exist before P2-1.
