@@ -107,7 +107,8 @@
     "signing_in": "Signing in…",
     "signed_in": "Signed in",
     "creating_account": "Creating your account…",
-    "account_created": "Account created"
+    "account_created": "Account created",
+    "agree_terms": "By creating an account, you agree to our Terms of Use and Privacy policy."
   },
   "tabs": {
     "home": "Home",
@@ -435,7 +436,8 @@
     "deadline_reminders": "Deadline reminders",
     "on": "On",
     "off": "Off",
-    "remaining_short": "{{remaining}} of {{limit}} left"
+    "remaining_short": "{{remaining}} of {{limit}} left",
+    "terms": "Terms of Use"
   },
   "document": {
     "title": "Document",

@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Button } from './ui/Button';
+import { LINKS } from '../lib/links';
 
 const POINTS = ['point_read', 'point_sensitive', 'point_redact', 'point_ai', 'point_store'] as const;
 
@@ -28,7 +29,7 @@ export function AiConsent({ onAllow, onDecline }: { onAllow: () => void; onDecli
           </View>
         ))}
         <TouchableOpacity
-          onPress={() => Linking.openURL('https://getopas.app/privacy')}
+          onPress={() => Linking.openURL(LINKS.privacy)}
           accessibilityRole="link"
           className="mt-4 py-2 min-h-touch justify-center self-start"
         >

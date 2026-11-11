@@ -107,7 +107,8 @@
     "signing_in": "Loggar in…",
     "signed_in": "Inloggad",
     "creating_account": "Skapar ditt konto…",
-    "account_created": "Konto skapat"
+    "account_created": "Konto skapat",
+    "agree_terms": "Genom att skapa ett konto godkänner du våra användarvillkor och vår integritetspolicy."
   },
   "tabs": {
     "home": "Hem",
@@ -435,7 +436,8 @@
     "deadline_reminders": "Påminnelser om tidsfrister",
     "on": "På",
     "off": "Av",
-    "remaining_short": "{{remaining}} av {{limit}} kvar"
+    "remaining_short": "{{remaining}} av {{limit}} kvar",
+    "terms": "Användarvillkor"
   },
   "document": {
     "title": "Dokument",

@@ -107,7 +107,8 @@
     "signing_in": "Kirjaudutaan…",
     "signed_in": "Kirjauduttu",
     "creating_account": "Luodaan tiliä…",
-    "account_created": "Tili luotu"
+    "account_created": "Tili luotu",
+    "agree_terms": "Luomalla tilin hyväksyt käyttöehtomme ja tietosuojaselosteemme."
   },
   "tabs": {
     "home": "Koti",
@@ -435,7 +436,8 @@
     "deadline_reminders": "Määräaikamuistutukset",
     "on": "Päällä",
     "off": "Pois",
-    "remaining_short": "{{remaining}}/{{limit}} jäljellä"
+    "remaining_short": "{{remaining}}/{{limit}} jäljellä",
+    "terms": "Käyttöehdot"
   },
   "document": {
     "title": "Asiakirja",

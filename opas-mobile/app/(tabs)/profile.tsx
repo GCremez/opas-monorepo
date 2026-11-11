@@ -14,6 +14,7 @@ import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { useReminderStore } from '../../src/store/reminderStore';
 import { useThemeStore, useThemeColors, type Appearance_ } from '../../src/store/themeStore';
 import { CAN_PURCHASE } from '../../src/lib/billing';
+import { LINKS, OFFICIAL_SITES } from '../../src/lib/links';
 
 type Lang = 'en' | 'fi' | 'sv';
 
@@ -35,6 +36,7 @@ const ACCOUNT_LINKS: AccountLink[] = [
   { key: 'subscription', valueKey: 'subscription_value', accent: true, route: '/subscription' },
   { key: 'help', route: 'help' },
   { key: 'privacy', route: 'privacy' },
+  { key: 'terms', route: 'terms' },
   { key: 'change_password', route: 'change-password' },
   { key: 'delete_account', destructive: true, route: 'delete' },
 ];
@@ -239,8 +241,9 @@ export default function ProfileScreen() {
             const handlePress = () => {
               if (item.route === 'change-password') setShowPasswordSheet(true);
               else if (item.route === 'delete') setShowDeleteConfirm(true);
-              else if (item.route === 'help') Linking.openURL('https://getopas.app/help');
-              else if (item.route === 'privacy') Linking.openURL('https://getopas.app/privacy');
+              else if (item.route === 'help') Linking.openURL(LINKS.support);
+              else if (item.route === 'privacy') Linking.openURL(LINKS.privacy);
+              else if (item.route === 'terms') Linking.openURL(LINKS.terms);
               else if (item.route) router.push(item.route as any);
             };
             return (
@@ -280,6 +283,18 @@ export default function ProfileScreen() {
             <Text className="font-semibold text-label tracking-[0.14em] uppercase text-danger">{t('profile.sign_out')}</Text>
           </TouchableOpacity>
           <Text className="font-mono text-meta text-muted mt-1">{t('profile.version')}</Text>
+        </View>
+
+        {/* Independence statement, with the authorities' own sites (Play government-info policy). */}
+        <View className="px-8 pb-4">
+          <Text className="font-serif-italic text-body-sm text-muted text-center">{t('legal.not_affiliated')}</Text>
+          <View className="flex-row justify-center gap-4 mt-1">
+            {OFFICIAL_SITES.map((site) => (
+              <Pressable key={site.name} onPress={() => Linking.openURL(site.url)} accessibilityRole="link" className="py-2 min-h-touch justify-center">
+                <Text className="font-mono text-meta uppercase text-accent">{site.url.replace(/^https:\/\/(www\.)?/, '')}</Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       </ScrollView>
 
