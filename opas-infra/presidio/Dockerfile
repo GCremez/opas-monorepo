@@ -16,10 +16,12 @@ ENV NLP_CONF_FILE=/app/opas-conf/nlp.yaml \
     ANALYZER_CONF_FILE=/app/opas-conf/analyzer.yaml \
     RECOGNIZER_REGISTRY_CONF_FILE=/app/opas-conf/recognizers.yaml
 
-# Three language models (~1 GB) load when a worker boots. On a cold or busy host that can
-# pass gunicorn's default 30 s worker timeout, and the worker is killed and restarted
-# forever. Give boot room, and give the health check the same.
-ENV GUNICORN_CMD_ARGS="--timeout 180"
+# - --timeout 180: three language models (~1 GB) load when a worker boots, which can pass
+#   gunicorn's default 30 s worker timeout on a cold or busy host.
+# - --no-control-socket: gunicorn 25 runs its control socket in a thread that is still
+#   starting (and logging) while the master forks the worker. In CI the worker then never
+#   reported in. Opas doesn't use the control socket (gunicornc).
+ENV GUNICORN_CMD_ARGS="--timeout 180 --no-control-socket"
 HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
     CMD curl -f http://localhost:${PORT}/health || exit 1
 

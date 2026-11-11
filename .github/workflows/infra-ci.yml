@@ -76,9 +76,19 @@ jobs:
               -v "$PWD/../opas-backend/src/test/resources/redaction:/redaction:ro" \
               opas-presidio-analyzer python /test/check_redaction.py /opas "$letters"
           done
-      - name: Presidio logs on failure
+      - name: Presidio diagnostics on failure
         if: failure()
-        run: docker compose logs --no-color --tail=200 presidio-analyzer presidio-anonymizer
+        run: |
+          for c in opas-presidio-analyzer opas-presidio-anonymizer; do
+            echo "== $c: processes"
+            docker top "$c" || true
+            echo "== $c: health checks"
+            docker inspect --format '{{json .State.Health}}' "$c" | jq . || true
+            # Print where every gunicorn process is stuck (PYTHONFAULTHANDLER=1).
+            docker exec -i "$c" python - < presidio/test/dump_stacks.py || true
+          done
+          sleep 2
+          docker compose logs --no-color --tail=400 presidio-analyzer presidio-anonymizer
       - name: Tear down
         if: always()
         run: docker compose down -v
