@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Email links look like /d/<id> and are personal. They are not indexed.
+Disallow: /d/
+
+Sitemap: https://getopas.app/sitemap.xml

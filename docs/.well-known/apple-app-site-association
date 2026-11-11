@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["APPLE_TEAM_ID.app.getopas"],
+        "components": [{ "/": "/d/*", "comment": "Open a decoded letter from the 'your letter is ready' email" }]
+      }
+    ]
+  }
+}
