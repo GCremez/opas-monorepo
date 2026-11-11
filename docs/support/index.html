@@ -3,51 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Help · Opas</title>
+<title>Support · Opas</title>
 <meta name="description" content="Answers to common questions about Opas, and how to reach us.">
-<meta name="theme-color" content="#ece7db" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#16150e" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#f2ede2">
+<meta property="og:title" content="Support · Opas">
+<meta property="og:description" content="Answers to common questions about Opas, and how to reach us.">
+<meta property="og:url" content="https://getopas.app/support/">
+<meta property="og:type" content="website">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../site.css">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
 </head>
 <body>
-<header class="nav"><div class="nav-in">
-  <a class="brand" href="../"><svg width="30" height="30" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" style="stroke:var(--accent)" stroke-width="3"/><circle cx="70" cy="70" r="43" style="stroke:var(--dot)" stroke-width="3.5" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="9" style="fill:var(--accent)"/><circle cx="108" cy="92" r="9" style="fill:var(--ochre)"/><circle cx="32" cy="92" r="9" style="fill:var(--brick)"/></svg><span>Opas</span></a>
-  <nav class="nav-links" aria-label="Main">
-    <a href="../privacy/">Privacy</a>
-    <a href="../terms/" class="wide">Terms</a>
-    <a href="../support/" aria-current="page">Help</a>
-  </nav>
-</div></header>
-<main>
-<div class="wrap head">
-  <div class="eyebrow">Help</div>
-  <h1>How can we help?</h1>
-  <p class="lead">Something not working, or did Opas get a letter wrong? Email <a href="mailto:privacy@getopas.app">privacy@getopas.app</a>. Tell us what happened and which authority the letter was from. Please don't attach the letter itself.</p>
-</div>
-<div class="wrap doc">
-  <section>
-    <h2>Common questions</h2>
-    <div class="qa"><h3>Is Opas from Kela, Vero or Migri?</h3><p>No. Opas is an independent app and is not connected to any Finnish authority. For official information, visit <a href="https://www.kela.fi">kela.fi</a>, <a href="https://www.vero.fi">vero.fi</a> or <a href="https://migri.fi">migri.fi</a>.</p></div>
-    <div class="qa"><h3>Can I trust the explanation?</h3><p>Use it to understand the letter, then check dates and amounts against the original. The AI can make mistakes. The letter is what counts.</p></div>
-    <div class="qa"><h3>Who sees my letters?</h3><p>The text goes to Anthropic's Claude AI, which writes your explanation. Before that, Opas removes names, ID numbers and addresses. More in the <a href="../privacy/">Privacy policy</a>.</p></div>
-    <div class="qa"><h3>Opas couldn't read my photo.</h3><p>Lay the letter flat, avoid shiny light on the paper, and keep all four corners in the frame.</p></div>
-    <div class="qa"><h3>How many letters can I scan?</h3><p>5 a month on a free account. You get 5 new scans on the 1st of every month.</p></div>
-    <div class="qa"><h3>How do I stop the AI reading my letters?</h3><p>In the app, go to Profile → AI reading and turn it off.</p></div>
-    <div class="qa"><h3>How do I delete my account?</h3><p>Profile → Delete account. No access to the app? <a href="../delete-account/">Delete it by email</a>.</p></div>
-  </section>
-</div>
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+<nav class="wrap nav" aria-label="Main">
+  <a href="/" class="brand" aria-label="Opas home"><svg width="30" height="30" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" stroke="#35503f" stroke-width="5"/><circle cx="70" cy="70" r="43" stroke="#b3a894" stroke-width="4" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="10" fill="#35503f"/><circle cx="108" cy="92" r="10" fill="#916219"/><circle cx="32" cy="92" r="10" fill="#9c3a2c"/></svg><span>Opas</span></a>
+  <div class="spacer"></div>
+  <a href="/#how" class="link navlink hide-xs">How it works</a>
+  <a href="/#pricing" class="link navlink hide-xs">Pricing</a>
+  <a href="mailto:hello@getopas.app?subject=Join%20the%20Opas%20test&body=Hi%2C%20I%27d%20like%20to%20test%20Opas.%0A%0AThe%20email%20I%20use%20on%20Google%20Play%3A%20%0AMy%20phone%20(Android%20model)%3A%20%0A" class="btn btn-pine btn-sm">Join the test</a>
+</nav>
+<main id="main">
+  <header class="wrap doc-head load" style="padding-bottom:64px">
+    <h1>How can we help?</h1>
+    <p class="lead">Answers to the questions people ask most. If yours is not here, write to us.</p>
+  </header>
+  <div class="wrap help">
+    <section aria-label="Questions">
+      <details class="q">
+        <summary>Which letters can Opas read?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>Letters in Finnish or Swedish from Kela, Verohallinto, Migri, DVV, TE-palvelut and most other senders. Paper letters and PDFs both work.</p><p>Opas explains them in English, Suomi or Svenska, whichever you choose.</p></div>
+      </details>
+      <details class="q">
+        <summary>Is Opas from Kela, Vero or Migri?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>No. Opas is an independent app and is not connected to any Finnish authority. For official information, visit <a href="https://www.kela.fi">kela.fi</a>, <a href="https://www.vero.fi">vero.fi</a> or <a href="https://migri.fi">migri.fi</a>.</p></div>
+      </details>
+      <details class="q">
+        <summary>Who sees my letters?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>Opas removes names, ID numbers and addresses first. Then the text goes to Claude, an AI made by Anthropic, running on Amazon Bedrock in Stockholm, so it stays in the EU. More in our <a href="/privacy/">Privacy policy</a>.</p></div>
+      </details>
+      <details class="q">
+        <summary>Can I trust the explanation?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>Use it to understand the letter, then check dates and amounts against the original, which is one tap away. The AI can make mistakes. The letter is what counts.</p><p>If something looks wrong, email us what happened and which authority the letter was from, without attaching the letter.</p></div>
+      </details>
+      <details class="q">
+        <summary>Opas couldn't read my photo.<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>Lay the letter flat, avoid shiny light on the paper, and keep all four corners in the frame. You can also import a PDF.</p></div>
+      </details>
+      <details class="q">
+        <summary>How do reminders work?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>When Opas finds a deadline, it adds it to your Needs you list and reminds you before it's due. Turn on notifications for Opas in your phone settings to get them.</p></div>
+      </details>
+      <details class="q">
+        <summary>How many letters can I scan?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>5 a month on a free account. You get 5 new scans on the 1st of every month.</p></div>
+      </details>
+      <details class="q">
+        <summary>How do I stop the AI reading my letters?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>Email <a href="mailto:privacy@getopas.app">privacy@getopas.app</a> and we'll stop reading new letters for your account. Letters already read stay until you delete them.</p></div>
+      </details>
+      <details class="q">
+        <summary>How do I delete my account?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="a"><p>In the app, tap You, then Delete Account. No access to the app? <a href="/delete-account/">Delete it by email</a>.</p></div>
+      </details>
+    </section>
+    <aside class="card-ink">
+      <h2>Still stuck?</h2>
+      <p>Write to us in English, Suomi or Svenska. Tell us what happened and which authority the letter was from.</p>
+      <a href="mailto:privacy@getopas.app" class="btn">Email us</a>
+      <p class="addr">privacy@getopas.app</p>
+      <div class="warn">Please don't email us your letters. Scan them in the app, where your personal details are removed first.</div>
+    </aside>
+  </div>
 </main>
-<footer class="foot"><div class="foot-in">
-  <a class="brand" href="../"><svg width="22" height="22" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" style="stroke:var(--accent)" stroke-width="3"/><circle cx="70" cy="70" r="43" style="stroke:var(--dot)" stroke-width="3.5" stroke-dasharray="3 9" stroke-linecap="round"/><circle cx="70" cy="26" r="9" style="fill:var(--accent)"/><circle cx="108" cy="92" r="9" style="fill:var(--ochre)"/><circle cx="32" cy="92" r="9" style="fill:var(--brick)"/></svg><span>Opas</span></a>
-  <span class="tagline">· Your guide to Finnish paperwork</span>
-  <nav aria-label="Footer">
-    <a href="../privacy/">Privacy</a><a href="../terms/">Terms</a><a href="../delete-account/">Delete account</a><a href="../support/">Help</a>
-  </nav>
-  <p class="indep">Opas is provided by Salau Distributions, Y-tunnus 3244824-8. It is an independent app, not run by, or connected to, Kela, Vero, Migri or any other Finnish authority.</p>
-</div></footer>
+<footer class="foot">
+  <div class="wrap foot-row">
+    <span class="name">Opas</span>
+    <span>getopas.app</span>
+    <div class="spacer"></div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="/support/" class="link navlink">Support</a>
+      <a href="/privacy/" class="link navlink">Privacy</a>
+      <a href="/terms/" class="link navlink">Terms</a>
+      <a href="/delete-account/" class="link navlink">Delete account</a>
+    </nav>
+  </div>
+  <div class="wrap"><p class="foot-note">Opas is provided by Salau Distributions, Y-tunnus 3244824-8, Finland. It is an independent app, not run by, or connected to, Kela, Vero, Migri or any other Finnish authority.</p></div>
+</footer>
+</div>
 </body>
 </html>
