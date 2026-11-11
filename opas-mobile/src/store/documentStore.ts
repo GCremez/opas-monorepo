@@ -82,7 +82,11 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       await get().fetchDocuments();
       return result;
     } catch (e: unknown) {
-      const status = (e as { response?: { status?: number } })?.response?.status;
+      const response = (e as { response?: { status?: number; data?: { code?: string } } })?.response;
+      const status = response?.status;
+      // 403 ai_consent_required: they withdrew AI consent (maybe on another device), so
+      // the server won't read the letter. The scan screen asks for consent again.
+      const consentRequired = status === 403 && response?.data?.code === 'ai_consent_required';
       // 402 = monthly decode limit reached; distinct message so the UI can route to
       // the upgrade screen instead of showing a generic failure.
       if (status === 402) {
@@ -93,8 +97,10 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       // Error codes, not messages: the scan screen words them per stage, so a letter
       // that uploaded fine but couldn't be read isn't reported as an upload failure.
       set({
-        error: status === 402 ? 'DECODE_LIMIT_REACHED' : stage === 'upload' ? 'UPLOAD_FAILED' : 'DECODE_FAILED',
-        failedDocumentId: stage === 'decode' && status !== 402 ? documentId : null,
+        error: consentRequired
+          ? 'AI_CONSENT_REQUIRED'
+          : status === 402 ? 'DECODE_LIMIT_REACHED' : stage === 'upload' ? 'UPLOAD_FAILED' : 'DECODE_FAILED',
+        failedDocumentId: stage === 'decode' && status !== 402 && !consentRequired ? documentId : null,
       });
       return null;
     }

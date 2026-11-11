@@ -15,6 +15,8 @@ import { useReminderStore } from '../../src/store/reminderStore';
 import { useThemeStore, useThemeColors, type Appearance_ } from '../../src/store/themeStore';
 import { CAN_PURCHASE } from '../../src/lib/billing';
 import { LINKS, OFFICIAL_SITES } from '../../src/lib/links';
+import { hasAiConsent, withdrawAiConsent } from '../../src/lib/aiConsent';
+import { track } from '../../src/lib/analytics';
 
 type Lang = 'en' | 'fi' | 'sv';
 
@@ -110,6 +112,19 @@ export default function ProfileScreen() {
   const remindersAllowed = useReminderStore((s) => s.permission === 'granted');
   const deadlineOn = remindersWanted && remindersAllowed;
   const insets = useSafeAreaInsets();
+  // AI reading: whether letters may go to the AI (the consent screen before the first
+  // scan). Taking it back must be as easy as giving it (GDPR Art. 7(3)). null while read.
+  const serverConsent = user ? user.aiConsent?.version ?? null : undefined;
+  const consentWithdrawn = !!user?.aiConsentWithdrawn;
+  const email = user?.email;
+  const [aiReadingOn, setAiReadingOn] = useState<boolean | null>(null);
+  const [showAiWithdrawConfirm, setShowAiWithdrawConfirm] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    hasAiConsent(email, serverConsent, consentWithdrawn).then((ok) => { if (live) setAiReadingOn(ok); });
+    return () => { live = false; };
+  }, [email, serverConsent, consentWithdrawn]);
 
   useEffect(() => {
     fetchSubscription();
@@ -172,6 +187,18 @@ export default function ProfileScreen() {
     }
   }, [deleteAccountAction, showToast, t, router]);
 
+  const handleWithdrawAiConsent = useCallback(async () => {
+    try {
+      await withdrawAiConsent(email);
+      useAuthStore.getState().setAiConsent(null);
+      setAiReadingOn(false);
+      track('ai_consent_withdrawn');
+      showToast(t('profile.ai_reading_withdrawn'));
+    } catch {
+      RNAlert.alert(t('common.error'), t('profile.ai_reading_withdraw_error'));
+    }
+  }, [email, showToast, t]);
+
   const handleChangePassword = useCallback(async () => {
     if (!pwCurrent || !passwordsMatch || !meetsLength) return;
     setSavingPw(true);
@@ -229,6 +256,18 @@ export default function ProfileScreen() {
               const on = await useReminderStore.getState().setEnabled(!deadlineOn);
               // Asked to turn on but the system said no: point to Settings rather than fail silently.
               showToast(!deadlineOn && !on ? t('reminders.blocked') : `${t('profile.deadline_reminders')} ${on ? t('profile.on') : t('profile.off')}`);
+            }}
+          />
+          <ValueRow
+            c={c}
+            label={t('profile.ai_reading')}
+            value={aiReadingOn === null ? undefined : aiReadingOn ? t('profile.on') : t('profile.off')}
+            valueTone={aiReadingOn ? 'text-accent' : 'text-muted'}
+            hideChevron
+            onPress={() => {
+              if (aiReadingOn) setShowAiWithdrawConfirm(true);
+              // Turning it on happens on the consent screen, which explains what is sent where.
+              else if (aiReadingOn === false) showToast(t('profile.ai_reading_off_hint'));
             }}
           />
         </View>
@@ -443,6 +482,19 @@ export default function ProfileScreen() {
           await handleLogout();
         }}
         onCancel={() => setShowLogoutConfirm(false)}
+      />
+
+      <ConfirmSheet
+        visible={showAiWithdrawConfirm}
+        title={t('profile.ai_reading_withdraw_title')}
+        message={t('profile.ai_reading_withdraw_desc')}
+        confirmLabel={t('profile.ai_reading_withdraw_confirm')}
+        destructive
+        onConfirm={async () => {
+          setShowAiWithdrawConfirm(false);
+          await handleWithdrawAiConsent();
+        }}
+        onCancel={() => setShowAiWithdrawConfirm(false)}
       />
 
       <ConfirmSheet

@@ -19,7 +19,7 @@ import { toDecodeView, type DecodeView } from '../../src/lib/decodeView';
 import { folderName } from '../../src/lib/folders';
 import { track } from '../../src/lib/analytics';
 import { CAN_PURCHASE } from '../../src/lib/billing';
-import { hasAiConsent, grantAiConsent } from '../../src/lib/aiConsent';
+import { AI_CONSENT_VERSION, hasAiConsent, grantAiConsent } from '../../src/lib/aiConsent';
 import { AiConsent } from '../../src/components/AiConsent';
 import { useAuthStore } from '../../src/store/authStore';
 
@@ -157,14 +157,16 @@ export default function ScanScreen() {
   const email = useAuthStore((s) => s.user?.email);
   // Agreed on another device or before a reinstall: /auth/me says so (undefined until loaded).
   const serverConsent = useAuthStore((s) => (s.user ? s.user.aiConsent?.version ?? null : undefined));
+  // Withdrawn (Profile → AI reading, maybe on another device): a yes cached here doesn't count.
+  const consentWithdrawn = useAuthStore((s) => !!s.user?.aiConsentWithdrawn);
   // null while it's being read; nothing is uploaded until this is true.
   const [consented, setConsented] = useState<boolean | null>(null);
 
   useEffect(() => {
     let live = true;
-    hasAiConsent(email, serverConsent).then((ok) => { if (live) setConsented(ok); });
+    hasAiConsent(email, serverConsent, consentWithdrawn).then((ok) => { if (live) setConsented(ok); });
     return () => { live = false; };
-  }, [email, serverConsent]);
+  }, [email, serverConsent, consentWithdrawn]);
 
   useEffect(() => {
     // Ask for the camera only after the consent screen, not on top of it.
@@ -188,6 +190,12 @@ export default function ScanScreen() {
       setFound({ documentId: result.documentId, view: toDecodeView(result), folderId: doc?.folderId ?? null });
       setState('review');
       track('scan_completed', { document_id: result.documentId, duration_ms: Date.now() - startedAt });
+    } else if (useDocumentStore.getState().error === 'AI_CONSENT_REQUIRED') {
+      // Consent was withdrawn elsewhere: refresh what the server says and ask again.
+      clearError();
+      setState('ready');
+      await useAuthStore.getState().fetchProfile();
+      setConsented(false);
     } else {
       setState('error');
       track('scan_failed', { error: useDocumentStore.getState().error ?? 'unknown', stage: source });
@@ -444,6 +452,7 @@ export default function ScanScreen() {
       <AiConsent
         onAllow={async () => {
           await grantAiConsent(email);
+          useAuthStore.getState().setAiConsent(AI_CONSENT_VERSION);
           track('ai_consent_granted');
           setConsented(true);
         }}

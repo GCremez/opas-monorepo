@@ -9,6 +9,8 @@ export interface User {
   name: string;
   /** Null until the person agrees to the AI consent screen. */
   aiConsent?: AiConsent | null;
+  /** True after they withdrew AI consent, until they agree again. */
+  aiConsentWithdrawn?: boolean;
 }
 
 export interface AuthResponse {

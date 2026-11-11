@@ -436,6 +436,13 @@
     "deadline_reminders": "Påminnelser om tidsfrister",
     "on": "På",
     "off": "Av",
+    "ai_reading": "AI-läsning",
+    "ai_reading_withdraw_title": "Stänga av AI-läsning?",
+    "ai_reading_withdraw_desc": "Opas slutar skicka dina brev till AI:n. Brev som redan lästs behåller sina förklaringar. Nästa gång du skannar frågar vi igen, och du kan svara ja eller nej.",
+    "ai_reading_withdraw_confirm": "Stäng av AI-läsning",
+    "ai_reading_withdrawn": "AI-läsning är av",
+    "ai_reading_withdraw_error": "Det gick inte att stänga av AI-läsning. Kontrollera anslutningen och försök igen.",
+    "ai_reading_off_hint": "AI-läsning är av. Vi frågar nästa gång du skannar ett brev.",
     "remaining_short": "{{remaining}} av {{limit}} kvar",
     "terms": "Användarvillkor"
   },

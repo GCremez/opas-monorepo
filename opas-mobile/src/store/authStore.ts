@@ -19,8 +19,10 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   plan: 'free' | 'premium';
-  user: Pick<User, 'name' | 'email' | 'aiConsent'> | null;
+  user: Pick<User, 'name' | 'email' | 'aiConsent' | 'aiConsentWithdrawn'> | null;
   setPlan: (plan: 'free' | 'premium') => void;
+  /** Mirrors an AI consent change made on this device (version given, or null if withdrawn). */
+  setAiConsent: (version: string | null) => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   confirmPasswordReset: (email: string, code: string, newPassword: string) => Promise<void>;
@@ -53,7 +55,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   fetchProfile: async () => {
     try {
       const { data } = await apiClient.get('/auth/me');
-      set({ user: { name: data.name, email: data.email, aiConsent: data.aiConsent ?? null }, plan: data.plan ?? 'free' });
+      set({
+        user: { name: data.name, email: data.email, aiConsent: data.aiConsent ?? null, aiConsentWithdrawn: !!data.aiConsentWithdrawn },
+        plan: data.plan ?? 'free',
+      });
       // Re-identify on every profile load so a session restored at app launch
       // (hydrate -> fetchProfile) is attributed to the right person.
       identifyUser(data.id, data.plan ?? 'free');
@@ -73,6 +78,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setPlan: (plan) => set({ plan }),
+
+  setAiConsent: (version) => set((state) => (state.user
+    ? {
+      user: {
+        ...state.user,
+        aiConsent: version ? { version, grantedAt: new Date().toISOString() } : null,
+        aiConsentWithdrawn: !version,
+      },
+    }
+    : {})),
 
   changePassword: async (currentPassword, newPassword) => {
     await apiClient.post('/auth/change-password', { currentPassword, newPassword });
