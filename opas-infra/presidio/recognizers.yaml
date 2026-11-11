@@ -1,0 +1,25 @@
+# Only the recognisers Opas needs, for all three languages. The Finnish patterns
+# (henkilötunnus, addresses, phone numbers, the account holder's name) are sent by
+# the backend with each request (PresidioService.java).
+supported_languages:
+  - en
+  - fi
+  - sv
+global_regex_flags: 26
+
+recognizers:
+  - name: EmailRecognizer
+    supported_languages: [en, fi, sv]
+    type: predefined
+  - name: IbanRecognizer
+    supported_languages: [en, fi, sv]
+    type: predefined
+  - name: CreditCardRecognizer
+    supported_languages: [en, fi, sv]
+    type: predefined
+  - name: IpRecognizer
+    supported_languages: [en, fi, sv]
+    type: predefined
+  - name: SpacyRecognizer
+    supported_languages: [en, fi, sv]
+    type: predefined

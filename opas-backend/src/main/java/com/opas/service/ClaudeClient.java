@@ -6,6 +6,7 @@ import com.anthropic.models.beta.messages.BetaMessage;
 import com.anthropic.models.beta.messages.BetaStopReason;
 import com.anthropic.models.beta.messages.BetaTextBlock;
 import com.anthropic.models.beta.messages.MessageCreateParams;
+import com.opas.config.ClaudeConfig;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,10 @@ import org.springframework.stereotype.Service;
  * <p>No temperature is sent and thinking is left at the model default: current models
  * reject non-default sampling parameters and return thinking blocks, which are skipped
  * here — only text blocks make up the reply.
+ *
+ * <p>Refusals: on the Anthropic API, Anthropic retries a declined request on another model
+ * (server-side fallback). Bedrock has no server-side fallback, so there a refused request
+ * is retried once on {@code opas.ai.fallback-model}.
  */
 @Service
 public class ClaudeClient {
@@ -27,23 +32,35 @@ public class ClaudeClient {
 
     /** Server-side refusal fallback: Anthropic retries a declined request on another model. */
     private static final String FALLBACK_BETA = "server-side-fallback-2026-07-01";
+    /** Bedrock model IDs carry this provider prefix. */
+    private static final String BEDROCK_PREFIX = "anthropic.";
 
     public record Reply(String text, String model, long inputTokens, long outputTokens) {
     }
 
     private final AnthropicClient client;
+    private final boolean bedrock;
     private final String model;
+    private final String fallbackModel;
     private final long maxTokens;
     private final boolean refusalFallback;
 
     public ClaudeClient(AnthropicClient client,
+            @Value("${opas.ai.provider:bedrock}") String provider,
             @Value("${opas.ai.model}") String model,
+            @Value("${opas.ai.fallback-model:claude-sonnet-5}") String fallbackModel,
             @Value("${opas.ai.max-tokens}") long maxTokens,
             @Value("${opas.ai.refusal-fallback:true}") boolean refusalFallback) {
         this.client = client;
-        this.model = model;
+        this.bedrock = ClaudeConfig.BEDROCK.equals(provider);
+        this.model = modelId(model);
+        this.fallbackModel = fallbackModel == null || fallbackModel.isBlank() ? null : modelId(fallbackModel);
         this.maxTokens = maxTokens;
         this.refusalFallback = refusalFallback;
+    }
+
+    private String modelId(String id) {
+        return bedrock && !id.startsWith(BEDROCK_PREFIX) ? BEDROCK_PREFIX + id : id;
     }
 
     public String model() {
@@ -51,16 +68,11 @@ public class ClaudeClient {
     }
 
     public Reply complete(String prompt) {
-        var params = MessageCreateParams.builder()
-                .model(model)
-                .maxTokens(maxTokens)
-                .addUserMessage(prompt);
-        if (refusalFallback) {
-            // "default" lets the API pick the fallback model by refusal category, so there's
-            // no model list to maintain here.
-            params.addBeta(FALLBACK_BETA).putAdditionalBodyProperty("fallbacks", JsonValue.from("default"));
+        BetaMessage message = send(prompt, model, refusalFallback && !bedrock);
+        if (isRefusal(message) && bedrock && refusalFallback && fallbackModel != null) {
+            log.info("Claude declined on {}; retrying once on {}", model, fallbackModel);
+            message = send(prompt, fallbackModel, false);
         }
-        BetaMessage message = client.beta().messages().create(params.build());
 
         BetaStopReason stop = message.stopReason().orElse(null);
         if (BetaStopReason.REFUSAL.equals(stop)) {
@@ -76,5 +88,22 @@ public class ClaudeClient {
         // With a fallback the answer can come from a different model than requested.
         return new Reply(text, message.model().asString(), message.usage().inputTokens(),
                 message.usage().outputTokens());
+    }
+
+    private BetaMessage send(String prompt, String modelId, boolean serverSideFallback) {
+        var params = MessageCreateParams.builder()
+                .model(modelId)
+                .maxTokens(maxTokens)
+                .addUserMessage(prompt);
+        if (serverSideFallback) {
+            // "default" lets the API pick the fallback model by refusal category, so there's
+            // no model list to maintain here.
+            params.addBeta(FALLBACK_BETA).putAdditionalBodyProperty("fallbacks", JsonValue.from("default"));
+        }
+        return client.beta().messages().create(params.build());
+    }
+
+    private static boolean isRefusal(BetaMessage message) {
+        return BetaStopReason.REFUSAL.equals(message.stopReason().orElse(null));
     }
 }

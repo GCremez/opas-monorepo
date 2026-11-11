@@ -50,18 +50,27 @@ services:
       retries: 5
 
   presidio-analyzer:
-    image: mcr.microsoft.com/presidio-analyzer:latest
+    # Microsoft's image plus Finnish and Swedish language models (presidio/Dockerfile).
+    # The backend uses them when PRESIDIO_LANGUAGES=en,fi,sv.
+    build: ./presidio
+    image: opas-presidio-analyzer
     container_name: opas-presidio-analyzer
     ports:
       - '5001:3000'
     environment:
       GRPC_PORT: '3001'
+      # SIGABRT dumps every thread's stack (presidio/test/dump_stacks.py), for debugging hangs.
+      PYTHONFAULTHANDLER: '1'
 
   presidio-anonymizer:
-    image: mcr.microsoft.com/presidio-anonymizer:latest
+    image: mcr.microsoft.com/presidio-anonymizer:2.2.362
     container_name: opas-presidio-anonymizer
     ports:
       - '5002:3000'
+    environment:
+      # Same as the analyzer image: no gunicorn 25 control-socket thread during worker fork.
+      GUNICORN_CMD_ARGS: '--no-control-socket'
+      PYTHONFAULTHANDLER: '1'
 
   localstack:
     image: localstack/localstack:3

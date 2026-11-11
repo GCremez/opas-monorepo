@@ -60,7 +60,7 @@ class ClaudeClientTest {
     void returnsOnlyTextBlocksAndUsage() {
         reply(BetaStopReason.END_TURN, thinking(), text("{\"title\":"), text(" \"Kela\"}"));
 
-        var result = new ClaudeClient(anthropic, "claude-sonnet-5-5", 16000, true).complete("prompt");
+        var result = new ClaudeClient(anthropic, "anthropic", "claude-sonnet-5-5", "claude-sonnet-5", 16000, true).complete("prompt");
 
         assertEquals("{\"title\": \"Kela\"}", result.text());
         assertEquals("claude-sonnet-5-5", result.model());
@@ -72,7 +72,7 @@ class ClaudeClientTest {
     void sendsNoTemperatureAndEnablesServerSideFallback() {
         reply(BetaStopReason.END_TURN, text("ok"));
 
-        new ClaudeClient(anthropic, "claude-sonnet-5-5", 16000, true).complete("prompt");
+        new ClaudeClient(anthropic, "anthropic", "claude-sonnet-5-5", "claude-sonnet-5", 16000, true).complete("prompt");
 
         MessageCreateParams params = sentParams();
         // Current models reject non-default sampling parameters.
@@ -87,7 +87,7 @@ class ClaudeClientTest {
     void fallbackCanBeTurnedOff() {
         reply(BetaStopReason.END_TURN, text("ok"));
 
-        new ClaudeClient(anthropic, "claude-sonnet-5-5", 16000, false).complete("prompt");
+        new ClaudeClient(anthropic, "anthropic", "claude-sonnet-5-5", "claude-sonnet-5", 16000, false).complete("prompt");
 
         MessageCreateParams params = sentParams();
         assertNull(params._additionalBodyProperties().get("fallbacks"));
@@ -99,6 +99,72 @@ class ClaudeClientTest {
         reply(BetaStopReason.REFUSAL);
 
         assertThrows(ClaudeRefusalException.class,
-                () -> new ClaudeClient(anthropic, "claude-sonnet-5-5", 16000, true).complete("prompt"));
+                () -> new ClaudeClient(anthropic, "anthropic", "claude-sonnet-5-5", "claude-sonnet-5", 16000, true).complete("prompt"));
+    }
+
+    // --- Bedrock -----------------------------------------------------------------------
+
+    private ClaudeClient bedrock() {
+        return new ClaudeClient(anthropic, "bedrock", "claude-sonnet-5-5", "claude-sonnet-5", 16000, true);
+    }
+
+    private BetaMessage message(BetaStopReason stop, String model, BetaContentBlock... blocks) {
+        BetaMessage message = mock(BetaMessage.class);
+        when(message.stopReason()).thenReturn(Optional.of(stop));
+        when(message.content()).thenReturn(List.of(blocks));
+        when(message.model()).thenReturn(Model.of(model));
+        BetaUsage usage = mock(BetaUsage.class);
+        when(message.usage()).thenReturn(usage);
+        return message;
+    }
+
+    @Test
+    void bedrockUsesPrefixedModelIdsAndNoServerSideFallback() {
+        reply(BetaStopReason.END_TURN, text("ok"));
+
+        var client = bedrock();
+        client.complete("prompt");
+
+        MessageCreateParams params = sentParams();
+        assertEquals("anthropic.claude-sonnet-5-5", params.model().asString());
+        assertEquals("anthropic.claude-sonnet-5-5", client.model());
+        // Bedrock doesn't support server-side fallbacks: no beta, no fallbacks field.
+        assertNull(params._additionalBodyProperties().get("fallbacks"));
+        assertTrue(params.betas().map(List::isEmpty).orElse(true));
+    }
+
+    @Test
+    void bedrockRetriesARefusalOnceOnTheFallbackModel() {
+        BetaMessage refused = message(BetaStopReason.REFUSAL, "anthropic.claude-sonnet-5-5");
+        BetaMessage answered = message(BetaStopReason.END_TURN, "anthropic.claude-sonnet-5", text("vastaus"));
+        when(anthropic.beta().messages().create(any(MessageCreateParams.class))).thenReturn(refused, answered);
+
+        var result = bedrock().complete("prompt");
+
+        assertEquals("vastaus", result.text());
+        assertEquals("anthropic.claude-sonnet-5", result.model());
+        var captor = ArgumentCaptor.forClass(MessageCreateParams.class);
+        verify(anthropic.beta().messages(), times(2)).create(captor.capture());
+        assertEquals("anthropic.claude-sonnet-5-5", captor.getAllValues().get(0).model().asString());
+        assertEquals("anthropic.claude-sonnet-5", captor.getAllValues().get(1).model().asString());
+    }
+
+    @Test
+    void bedrockRefusalOnBothModelsIsRaised() {
+        BetaMessage refused = message(BetaStopReason.REFUSAL, "anthropic.claude-sonnet-5-5");
+        when(anthropic.beta().messages().create(any(MessageCreateParams.class))).thenReturn(refused);
+
+        assertThrows(ClaudeRefusalException.class, () -> bedrock().complete("prompt"));
+        verify(anthropic.beta().messages(), times(2)).create(any(MessageCreateParams.class));
+    }
+
+    @Test
+    void bedrockDoesntRetryWhenFallbackIsOff() {
+        BetaMessage refused = message(BetaStopReason.REFUSAL, "anthropic.claude-sonnet-5-5");
+        when(anthropic.beta().messages().create(any(MessageCreateParams.class))).thenReturn(refused);
+
+        var client = new ClaudeClient(anthropic, "bedrock", "claude-sonnet-5-5", "claude-sonnet-5", 16000, false);
+        assertThrows(ClaudeRefusalException.class, () -> client.complete("prompt"));
+        verify(anthropic.beta().messages(), times(1)).create(any(MessageCreateParams.class));
     }
 }

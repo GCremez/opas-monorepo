@@ -18,7 +18,7 @@ export default function DraftLetterScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const c = useThemeColors();
-  const { isPremium } = usePremium();
+  const { canDraft } = usePremium();
 
   const [tone, setTone] = useState<'formal' | 'professional'>('formal');
   const [includeOriginal, setIncludeOriginal] = useState(true);
@@ -65,7 +65,7 @@ export default function DraftLetterScreen() {
     </View>
   );
 
-  if (!isPremium) {
+  if (!canDraft) {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={['top']}>
         <Header title={t('draftLetter.title')} />

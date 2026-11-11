@@ -1,0 +1,44 @@
+# Language models for Opas letters: Finnish and Swedish (the languages authorities
+# write in) and English. Only names and places are used from them: Opas asks Presidio
+# for specific entity types, so dates and organisations (Kela, Migri…) are never removed.
+nlp_engine_name: spacy
+models:
+  - lang_code: en
+    model_name: en_core_web_lg
+  - lang_code: fi
+    model_name: fi_core_news_md
+  - lang_code: sv
+    model_name: sv_core_news_md
+
+ner_model_configuration:
+  model_to_presidio_entity_mapping:
+    PER: PERSON
+    PERSON: PERSON
+    PRS: PERSON          # Swedish model's label for people
+    LOC: LOCATION
+    LOCATION: LOCATION
+    GPE: LOCATION
+    FAC: LOCATION
+  low_confidence_score_multiplier: 0.4
+  low_score_entity_names: []
+  labels_to_ignore:
+    - ORG
+    - ORGANIZATION
+    - NORP
+    - DATE
+    - TIME
+    - TME                # Swedish model's label for dates and times
+    - EVN
+    - MSR
+    - OBJ
+    - WRK
+    - CARDINAL
+    - EVENT
+    - LANGUAGE
+    - LAW
+    - MONEY
+    - ORDINAL
+    - PERCENT
+    - PRODUCT
+    - QUANTITY
+    - WORK_OF_ART

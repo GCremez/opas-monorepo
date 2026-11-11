@@ -1,0 +1,76 @@
+# Sample letters for the Finnish redaction patterns (PresidioService). All personal data
+# is made up. [[...]] must be removed; {{...}} must be kept (needed to explain or reply).
+# Each letter starts with "=== <account holder's name>".
+=== Priya Sharma
+KELA
+[[Priya Sharma]]
+[[Mannerheimintie 12 A 5]]
+[[00100 HELSINKI]]
+Henkilötunnus [[120389-912K]]
+Päätös asumistuesta. Diaarinumero {{1234/2026}}. Tuki {{412,50 euroa}} kuukaudessa {{1.5.2026}} alkaen.
+=== Priya Sharma
+Kela pyytää lisäselvitystä. Lähetämme [[Priyalle]] tämän kirjeen, koska hakemus {{AT-2026-5521}} on kesken.
+Toimita selvitys {{14.6.2026}} mennessä. Kysyttävää? Soita {{020 692 207}}.
+=== Ahmed Al-Rashid
+Maahanmuuttovirasto
+[[Ahmed Al-Rashid]], [[Kotikatu 3 as. 14]], [[33100 TAMPERE]]
+Kuulemiskirje. Asianumero {{Dnro 2026/123456}}. Vastaa {{30 päivän}} kuluessa.
+Puhelin [[040 123 4567]]
+=== Ahmed Al-Rashid
+Migri: [[Al-Rashidin]] oleskelulupahakemus {{OLE-2026-889}} on vastaanotettu {{3.2.2026}}.
+=== Olena Kovalenko
+Verohallinto
+[[Olena Kovalenko]]
+[[Hämeenlinnanväylä 120 B 7]]
+[[00560 Helsinki]]
+Verokortti {{2026}}. Ennakonpidätysprosentti {{18,5 %}}. Tuloraja {{25 000 euroa}}.
+=== Olena Kovalenko
+Vero: [[Olenan]] veronpalautus {{1 234,56 euroa}} maksetaan tilille [[FI21 1234 5600 0007 85]] {{12.8.2026}}.
+=== Juan García
+Skatteförvaltningen
+[[Juan García]], [[Storgatan 7]], [[65100 Vasa]]
+Beslut om skattekort för {{2026}}. Ärendenummer {{2026-SK-4411}}.
+=== Juan García
+Telefon [[+358 40 1234567]]. Ring Skatteförvaltningen på {{029 497 001}} om du har frågor.
+=== Li Wei
+Kela
+[[Li Wei]]
+Päätös opintotuesta {{8.9.2026}}. Liite {{1}}: valitusosoitus. Liitteessä kerrotaan muutoksenhausta.
+=== Li Wei
+Hakemus {{Opintotuki 2026}} on käsitelty. Puhelinnumero [[050-123 456]].
+=== Fatima Hassan
+Digi- ja väestötietovirasto (DVV)
+[[Fatima Hassan]]
+[[Itäväylä 44 C 21]]
+[[00980 Helsinki]]
+Osoitteenmuutos on rekisteröity {{20.3.2026}}.
+=== Fatima Hassan
+Lähetämme [[Fatimalle]] vahvistuksen. Viite {{DVV-2026-77812}}.
+=== Kwame Mensah
+TE-palvelut
+[[Kwame Mensah]], [[Puistokatu 9]], [[40100 JYVÄSKYLÄ]]
+Työnhakusi on voimassa. Asiakasnumero {{TE-552190}}.
+=== Kwame Mensah
+Soita meille numeroon {{0295 025 500}}. [[Mensahin]] seuraava tapaaminen on {{2.10.2026}} klo {{10.00}}.
+=== Maria Silva
+Kela
+[[Maria Silva]]
+[[Rantatie 5]]
+[[90100 OULU]]
+Takaisinperintä: {{356,00 euroa}}. Eräpäivä {{31.7.2026}}. Viitenumero {{1234 5678 9012}}.
+=== Maria Silva
+Hyvä [[Maria Silva]], olemme vastaanottaneet hakemuksesi {{15.4.2026}}.
+=== Nguyen Van An
+Migri
+[[Nguyen Van An]]
+[[Kalevankatu 30 B 12]]
+[[00100 Helsinki]]
+Henkilötunnus [[010190-123A]]. Päätös {{Dnro 2026/998877}}.
+=== Nguyen Van An
+Puhelin [[+358 50 987 6543]]. Asiointi {{maanantaisin}}.
+=== Sofia Rossi
+Kela
+[[Sofia Rossi]], [[Aleksanterinkatu 17]], [[20100 Turku]]
+Lapsilisä {{94,88 euroa}} kuukaudessa. Päätös {{2026-LL-3301}}.
+=== Sofia Rossi
+Kela lähettää [[Sofialle]] päätöksen. Muutoksenhaku {{30 päivän}} kuluessa. Viitenumero {{9876 5432 1098}}.

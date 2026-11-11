@@ -1,0 +1,50 @@
+{
+  "_comment": [
+    "Finnish personal data patterns. The backend sends them to Presidio with every request",
+    "(PresidioService); the Presidio image test (opas-infra/presidio/test) uses them too.",
+    "Presidio runs them with Python re and IGNORECASE. Word edges are spelled out instead of \\b,",
+    "which treats Finnish letters differently in Java and Python. Test: FinnishPiiPatternsTest.",
+    "entities: the only entity types removed. Asking for everything (Presidio's default) also removed dates (DATE_TIME) and tagged \"Kela\" as a nationality (NRP); dates, amounts, organisations and reference numbers must stay."
+  ],
+  "entities": [
+    "PERSON",
+    "LOCATION",
+    "EMAIL_ADDRESS",
+    "PHONE_NUMBER",
+    "IBAN_CODE",
+    "CREDIT_CARD",
+    "IP_ADDRESS",
+    "FI_PERSONAL_ID",
+    "FI_ADDRESS"
+  ],
+  "recognizers": [
+    {
+      "name": "Finnish personal identity code",
+      "entity": "FI_PERSONAL_ID",
+      "pattern": "henkilotunnus",
+      "score": 0.95,
+      "regex": "\\b\\d{6}[-+A-FU-Y]\\d{3}[0-9A-FHJ-NPR-Y]\\b"
+    },
+    {
+      "name": "Finnish street address",
+      "entity": "FI_ADDRESS",
+      "pattern": "street",
+      "score": 0.7,
+      "regex": "(?<![A-Za-zÀ-ÖØ-öø-ÿĀ-ž0-9])[A-ZÅÄÖ][A-Za-zÀ-ÖØ-öø-ÿĀ-ž-]*?(?:tie|katu|kuja|kujanen|polku|tori|väylä|ranta|rinne|kaari|kaarre|raitti|aukio|piha|bulevardi|esplanadi|gatan|vägen|gränd|stigen|torget|backen|allén)\\s+\\d{1,4}(?:\\s?[A-Z](?:\\s?\\d{1,3})?)?(?:\\s+(?:as|bst)\\.?\\s*\\d{1,3})?(?![A-Za-zÀ-ÖØ-öø-ÿĀ-ž0-9])"
+    },
+    {
+      "name": "Finnish postcode and town",
+      "entity": "FI_ADDRESS",
+      "pattern": "postcode_town",
+      "score": 0.6,
+      "regex": "(?<![A-Za-zÀ-ÖØ-öø-ÿĀ-ž0-9])\\d{5}\\s+[A-ZÅÄÖ][A-Za-zÀ-ÖØ-öø-ÿĀ-ž-]{1,30}(?![A-Za-zÀ-ÖØ-öø-ÿĀ-ž0-9])"
+    },
+    {
+      "name": "Finnish phone number",
+      "entity": "PHONE_NUMBER",
+      "pattern": "fi_phone",
+      "score": 0.7,
+      "regex": "(?:\\+358[\\s-]?\\(?0?\\)?\\d{1,3}|(?<![0-9])0(?:4\\d|50))[\\s-]?\\d{3}[\\s-]?\\d{2,4}(?![0-9])"
+    }
+  ]
+}

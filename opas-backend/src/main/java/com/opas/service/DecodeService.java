@@ -171,7 +171,8 @@ public class DecodeService {
         String content = textExtractionService.extract(document.getContentType(), fileBytes);
 
         if (message.scrubPii()) {
-            content = presidioService.scrubPii(content);
+            // The account holder's own name is the one most likely to be on the letter.
+            content = presidioService.scrubPii(content, java.util.Collections.singletonList(document.getUser().getName()));
         }
 
         Instant startedAt = Instant.now();

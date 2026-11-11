@@ -34,9 +34,10 @@ export default function DocumentDetailScreen() {
   const { deleteDocument, archiveDocument, assignFolder, setTaskDone } = useDocumentStore();
   const { folders, fetchFolders } = useFolderStore();
   const [categorySheet, setCategorySheet] = useState(false);
-  const { isPremium } = usePremium();
-  // Premium features stay hidden where they can't be bought (iOS, until In-App Purchase).
+  const { isPremium, canDraft } = usePremium();
+  // Premium features stay hidden where they can't be bought in the app.
   const showPremium = isPremium || CAN_PURCHASE;
+  const showDraft = canDraft || CAN_PURCHASE;
   const [doc, setDoc] = useState<Document | null>(null);
   const [decode, setDecode] = useState<DecodeResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -159,7 +160,7 @@ export default function DocumentDetailScreen() {
   };
 
   const handleDraftLetter = () => {
-    if (!isPremium) {
+    if (!canDraft) {
       router.push('/subscription');
       return;
     }
@@ -450,7 +451,7 @@ export default function DocumentDetailScreen() {
               ) : (
                 <Text className="font-body text-body-sm text-muted pt-2">{decode ? t('document.no_actions') : t('document.not_decoded')}</Text>
               )}
-              {showPremium && (
+              {showDraft && (
                 <Button variant="primary" block size="lg" className="mt-7" onPress={handleDraftLetter}>
                   {t('document.draft_letter')}
                 </Button>
@@ -491,7 +492,7 @@ export default function DocumentDetailScreen() {
         title={view?.title ?? doc.filename}
         actions={[
           { label: t('document.share'), onPress: () => { setSheetVisible(false); handleShare(); } },
-          ...(showPremium ? [{ label: t('document.draft_letter'), onPress: () => { setSheetVisible(false); handleDraftLetter(); } }] : []),
+          ...(showDraft ? [{ label: t('document.draft_letter'), onPress: () => { setSheetVisible(false); handleDraftLetter(); } }] : []),
           ...(upcoming ? [{ label: t('document.add_to_calendar'), onPress: handleAddToCalendar }] : []),
           { label: t('document.delete_document'), onPress: confirmDelete, destructive: true },
         ]}

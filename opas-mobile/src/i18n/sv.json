@@ -285,7 +285,7 @@
     "title": "Så läser Opas dina brev",
     "point_read": "Vi läser texten från ditt foto eller din PDF. Foton läses av Amazon Textract inom EU.",
     "point_redact": "Namn, personbeteckningar, adresser och liknande uppgifter tas bort där vi hittar dem.",
-    "point_ai": "Resten av texten skickas till Anthropics AI (Claude) som förklarar den. Anthropic kan behandla texten i USA. Den används inte för att träna deras AI.",
+    "point_ai": "Resten av texten skickas till Claude, en AI från Anthropic, som körs på Amazon Bedrock i Stockholm, så den stannar inom EU. Varken Anthropic eller Amazon använder den för att träna AI.",
     "point_store": "Dina brev sparas på ditt konto inom EU (Stockholm) tills du raderar dem.",
     "privacy_link": "Integritetspolicy",
     "allow": "Tillåt och fortsätt",
@@ -537,7 +537,7 @@
     "save_yearly": "Spara 20% per år",
     "free_trial": "Starta 7 dagars gratis provperiod",
     "trial_note": "Sedan 4,99 €/månad. Avsluta när som helst.",
-    "unavailable_title": "Premium finns inte på iPhone än",
+    "unavailable_title": "Premium finns inte i appen än",
     "unavailable_desc": "Allt i gratisversionen fungerar som vanligt."
   },
   "status": {

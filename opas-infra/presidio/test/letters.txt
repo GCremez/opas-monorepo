@@ -1,0 +1,40 @@
+# Letters for testing the Presidio image end to end (language models + Opas patterns).
+# All personal data is made up. [[...]] must be removed; {{...}} must be kept.
+# "=== <account holder's name>" starts each letter.
+=== Priya Sharma
+{{KELA}}
+[[Priya Sharma]]
+[[Mannerheimintie 12 A 5]]
+[[00100 HELSINKI]]
+{{Päätös}} asumistuesta. Diaarinumero {{1234/2026}}. Tuki {{412,50 euroa}} kuukaudessa {{1.5.2026}} alkaen.
+Toimita selvitys {{14.6.2026}} mennessä. Käsittelijä [[Anna Virtanen]], {{Kela}}.
+=== Ahmed Al-Rashid
+{{Maahanmuuttovirasto}}
+[[Ahmed Al-Rashid]], [[Kotikatu 3 as. 14]], [[33100 TAMPERE]]
+Kuulemiskirje. Asianumero {{Dnro 2026/123456}}. Vastaa {{30 päivän}} kuluessa, viimeistään {{20.7.2026}}.
+Puolisosi [[Leila Haddad]] on myös hakenut oleskelulupaa. Lisätietoja antaa ylitarkastaja [[Mikko Korhonen]], puhelin [[040 123 4567]].
+=== Olena Kovalenko
+{{Verohallinto}}
+[[Olena Kovalenko]]
+[[Hämeenlinnanväylä 120 B 7]]
+[[00560 Helsinki]]
+Verokortti {{2026}}. Ennakonpidätysprosentti {{18,5 %}}. Veronpalautus {{1 234,56 euroa}} maksetaan tilille [[FI21 1234 5600 0007 85]] {{12.8.2026}}.
+=== Juan García
+{{Skatteförvaltningen}}
+[[Juan García]], [[Storgatan 7]], [[65100 Vasa]]
+Beslut om skattekort för {{2026}}. Ärendenummer {{2026-SK-4411}}. Betala {{350 euro}} senast {{31.8.2026}}.
+Handläggare [[Karin Lindqvist]]. Telefon [[+358 40 1234567]], e-post [[juan.garcia@example.com]].
+=== Fatima Hassan
+{{Digi- ja väestötietovirasto}}
+[[Fatima Hassan]]
+[[Itäväylä 44 C 21]]
+[[00980 Helsinki]]
+Osoitteenmuutos on rekisteröity {{20.3.2026}}. Lähetämme [[Fatimalle]] vahvistuksen. Viite {{DVV-2026-77812}}.
+=== Sofia Rossi
+{{Kela}}
+[[Sofia Rossi]], [[Aleksanterinkatu 17]], [[20100 Turku]]
+Lapsilisä {{94,88 euroa}} kuukaudessa. Lapsesi [[Luca Rossi]] täyttää 17 vuotta {{3.9.2026}}. Muutoksenhaku {{30 päivän}} kuluessa.
+=== Kwame Mensah
+Dear [[Kwame Mensah]],
+Your application {{TE-552190}} to {{TE-palvelut}} was received on {{2 October 2026}}. Your next meeting is on {{15 October 2026}} at 10.00.
+Contact your adviser [[Sarah Johnson]] at [[sarah.johnson@example.fi]].

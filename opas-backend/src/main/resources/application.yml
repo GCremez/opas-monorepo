@@ -86,6 +86,14 @@ opas:
     # this to the document language and load the matching model in the Presidio
     # container; defaulting to English under-detects Finnish PII (e.g. henkilotunnus).
     language: ${PRESIDIO_LANGUAGE:en}
+    # Languages the Presidio image has models for. With the Opas image
+    # (opas-infra/presidio) set en,fi,sv: each letter is then analysed in its own
+    # language, so Finnish and Swedish names are found. The stock image is English-only.
+    languages: ${PRESIDIO_LANGUAGES:en}
+  drafts:
+    # Beta: everyone can generate reply drafts, not only Premium. Set
+    # DRAFTS_FREE_FOR_EVERYONE=false to put drafts back behind Premium.
+    free-for-everyone: ${DRAFTS_FREE_FOR_EVERYONE:true}
   s3:
     bucket: ${S3_BUCKET_NAME:opas-app-bucket}
     region: ${AWS_REGION:eu-north-1}
@@ -94,13 +102,24 @@ opas:
     endpoint: ${AWS_ENDPOINT_URL:}
     upload-ttl-minutes: 15
   ai:
-    # Claude via the official Anthropic SDK (see ClaudeClient). claude-sonnet-4-20250514
-    # was retired; Sonnet 5.5 is its successor.
-    api-key: ${ANTHROPIC_API_KEY}
+    # Where Claude runs (see ClaudeConfig):
+    # - bedrock (default): Claude in Amazon Bedrock, in one EU region, so letter text
+    #   stays in the EU. Credentials come from the AWS default chain (the ECS task role
+    #   in production), which needs bedrock-mantle:CreateInference.
+    # - anthropic: the Anthropic API directly, with ANTHROPIC_API_KEY.
+    provider: ${AI_PROVIDER:bedrock}
+    # Stockholm, where the app runs. Bedrock's Messages endpoint serves only this region.
+    bedrock-region: ${BEDROCK_REGION:eu-north-1}
+    api-key: ${ANTHROPIC_API_KEY:}
+    # Model ID without the Bedrock "anthropic." prefix; it's added for Bedrock.
     model: ${ANTHROPIC_MODEL:claude-sonnet-5-5}
+    # On Bedrock there's no server-side fallback: a refused request is retried once on
+    # this model instead.
+    fallback-model: ${ANTHROPIC_FALLBACK_MODEL:claude-sonnet-5}
     # Room for the model's thinking plus a full JSON decode or letter, without streaming.
     max-tokens: 16000
-    # Anthropic retries a refused request on a fallback model (server-side, "default" mode).
+    # Retry a refused request on a fallback model: server-side ("default" mode) on the
+    # Anthropic API, client-side with fallback-model on Bedrock.
     refusal-fallback: ${ANTHROPIC_REFUSAL_FALLBACK:true}
     # USD per million tokens, for the opas.decode.cost_usd metric. Update with the model.
     input-price-per-mtok: 2.00

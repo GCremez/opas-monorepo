@@ -5,6 +5,7 @@ import com.opas.dto.CheckoutResponse;
 import com.opas.dto.SubscriptionResponse;
 import com.opas.dto.UsageResponse;
 import com.opas.service.DecodeService;
+import com.opas.service.DraftLetterService;
 import com.opas.service.SubscriptionService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -23,10 +24,13 @@ public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
     private final DecodeService decodeService;
+    private final DraftLetterService draftLetterService;
 
-    public SubscriptionController(SubscriptionService subscriptionService, DecodeService decodeService) {
+    public SubscriptionController(SubscriptionService subscriptionService, DecodeService decodeService,
+            DraftLetterService draftLetterService) {
         this.subscriptionService = subscriptionService;
         this.decodeService = decodeService;
+        this.draftLetterService = draftLetterService;
     }
 
     @GetMapping("/plans")
@@ -42,7 +46,8 @@ public class SubscriptionController {
         UUID uid = UUID.fromString(userId);
         long remaining = decodeService.getRemainingDecodes(uid);
         int limit = decodeService.resolveLimit(uid);
-        return ResponseEntity.ok(new UsageResponse(remaining, limit, "monthly"));
+        return ResponseEntity.ok(new UsageResponse(remaining, limit, "monthly",
+                draftLetterService.draftsIncluded(uid)));
     }
 
     @GetMapping

@@ -79,6 +79,12 @@
             <version>2.34.0</version>
         </dependency>
         <dependency>
+            <!-- Claude in Amazon Bedrock (BedrockMantleBackend): letter text stays in the EU region. -->
+            <groupId>com.anthropic</groupId>
+            <artifactId>anthropic-java-bedrock</artifactId>
+            <version>2.34.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
@@ -127,19 +133,16 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.25.0</version>
         </dependency>
         <!-- AWS Textract SDK — OCR for scanned images -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>textract</artifactId>
-            <version>2.25.0</version>
         </dependency>
         <!-- AWS SES v2 SDK — transactional email (verification codes) -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sesv2</artifactId>
-            <version>2.25.0</version>
         </dependency>
         <!-- Apache PDFBox — text layer extraction for digital PDFs -->
         <dependency>
@@ -189,6 +192,16 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <!-- One AWS SDK version for S3, Textract, SES and the Bedrock module
+                     (anthropic-java-bedrock 2.34.0 is built against 2.33.1); mixing
+                     versions fails at runtime. -->
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>2.33.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
