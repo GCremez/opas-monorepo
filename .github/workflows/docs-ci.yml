@@ -1,0 +1,24 @@
+name: Docs CI
+
+# GitHub Pages publishes docs/ straight from main with no build step, so a broken
+# tag, a missing og:image or a dead internal link goes live. This is the build step.
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', 'scripts/check_docs.py', 'scripts/wellknown.py', '.github/workflows/docs-ci.yml']
+  pull_request:
+    branches: [main]
+    paths: ['docs/**', 'scripts/check_docs.py', 'scripts/wellknown.py', '.github/workflows/docs-ci.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate getopas.app pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check HTML, links, sitemap and app-link files
+        run: python3 scripts/check_docs.py

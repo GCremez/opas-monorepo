@@ -101,3 +101,6 @@ desktop.ini
 # Local dev helpers (machine-specific)
 # ============================================================
 opas-mobile/start-expo.sh
+
+# Python bytecode
+__pycache__/
