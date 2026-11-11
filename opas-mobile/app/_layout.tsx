@@ -137,6 +137,7 @@ export default function RootLayout() {
             <Stack.Screen name="subscription/index" />
             <Stack.Screen name="ask" />
             <Stack.Screen name="journey" />
+            <Stack.Screen name="tour" options={{ animation: 'slide_from_bottom' }} />
             <Stack.Screen name="guide/[id]" />
             <Stack.Screen name="application/[id]" />
             <Stack.Screen name="motion-gallery" />

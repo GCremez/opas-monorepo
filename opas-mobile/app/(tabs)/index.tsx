@@ -216,7 +216,7 @@ export default function RecordScreen() {
             <Button variant="primary" size="lg" block onPress={() => { track('empty_state_cta_tap'); router.push('/(tabs)/scan'); }}>
               {t('record.scan_first')}
             </Button>
-            <Pressable onPress={() => router.push({ pathname: '/(onboarding)', params: { replay: '1' } })} className="items-center py-3.5 mt-3 min-h-touch justify-center">
+            <Pressable onPress={() => router.push('/tour')} className="items-center py-3.5 mt-3 min-h-touch justify-center">
               <Text className="font-semibold text-label tracking-[0.06em] uppercase text-muted">{t('record.see_how')}</Text>
             </Pressable>
           </View>
