@@ -702,6 +702,12 @@ These are government letters, so they often contain ID numbers, addresses and mo
 
 ---
 
+## Hosting
+
+For the beta, Opas runs on one free server (Oracle Cloud Always Free, ARM) with docker compose: backend, PostgreSQL, Redis, RabbitMQ, Presidio and Caddy for HTTPS. Step by step: [opas-infra/server/README.md](opas-infra/server/README.md). The ECS setup in `opas-infra/cloudformation` is for later.
+
+---
+
 ## What's missing and what's next
 
 The full plan, with priorities, is in [docs/launch-plan.md](docs/launch-plan.md). The main gaps:

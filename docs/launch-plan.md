@@ -132,6 +132,9 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 
 **Infrastructure and operations:**
 
+- [ ] **Hosting for the beta (decided 11 Nov 2026: free).** One Oracle Cloud Always Free ARM VM (2 OCPU, 12 GB, EU home region) runs the backend, PostgreSQL, Redis, RabbitMQ, Presidio and Caddy with docker compose: `opas-infra/server/README.md`. S3, Textract, SES and Bedrock stay on AWS (pay per use). The ECS stack in `opas-infra/cloudformation` is for later; its first deploy failed because the GitHub deploy role has no CloudFormation permissions, and it needs the database, Redis, RabbitMQ and Presidio to exist.
+- [ ] **Bedrock access:** every Anthropic model returns "not available for this account" (Stockholm and Ireland). Check the account plan (Free plan accounts may not get Marketplace models: upgrade to Paid) and Bedrock service quotas; otherwise an AWS Support case.
+
 - [ ] **DNS and email:** `getopas.app` and `api.getopas.app` live over HTTPS. SES domain verified with SPF, DKIM and DMARC. GitHub variable `MAIL_FROM` not still `opas.fi`.
 - [ ] **Link verification files:** Apple Team ID and Play SHA-256 filled in under `opas-infra/web/.well-known/`, served from getopas.app as `application/json`.
 - [x] **AI provider and data residency (decided: Bedrock).** Claude runs on Amazon Bedrock in eu-north-1 (Stockholm), the same region as the app. Bedrock's Messages endpoint serves only the region it's called in, so letter text stays in Sweden. This was a GDPR / data transfer question, not an EU AI Act one. **Still to do (AWS console):**

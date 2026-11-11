@@ -1,0 +1,11 @@
+# HTTPS for the API, with certificates from Let's Encrypt (automatic). API_DOMAIN is set
+# in .env, e.g. api.getopas.app, and its DNS A record must point at this server.
+{$API_DOMAIN} {
+	encode gzip
+
+	# Metrics stay private: only the health check is public.
+	@private path /actuator/prometheus /actuator/prometheus/* /actuator/info
+	respond @private 404
+
+	reverse_proxy backend:8080
+}
