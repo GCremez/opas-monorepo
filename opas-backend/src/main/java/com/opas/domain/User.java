@@ -36,6 +36,10 @@ public class User {
     @Column(name = "ai_consent_at")
     private Instant aiConsentAt;
 
+    // When they took that consent back (V18); cleared when they agree again.
+    @Column(name = "ai_consent_withdrawn_at")
+    private Instant aiConsentWithdrawnAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -114,12 +118,23 @@ public class User {
     public void recordAiConsent(String version, Instant at) {
         this.aiConsentVersion = version;
         this.aiConsentAt = at;
+        this.aiConsentWithdrawnAt = null;
     }
 
     /** The person took back their AI consent (GDPR Art. 7(3)): forget version and time. */
-    public void withdrawAiConsent() {
+    public void withdrawAiConsent(Instant at) {
         this.aiConsentVersion = null;
         this.aiConsentAt = null;
+        this.aiConsentWithdrawnAt = at;
+    }
+
+    public Instant getAiConsentWithdrawnAt() {
+        return aiConsentWithdrawnAt;
+    }
+
+    /** True after withdrawal until they agree again: letters must not go to the AI. */
+    public boolean hasWithdrawnAiConsent() {
+        return aiConsentWithdrawnAt != null;
     }
 
     public Instant getCreatedAt() {

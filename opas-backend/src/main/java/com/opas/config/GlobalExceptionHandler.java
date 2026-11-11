@@ -49,6 +49,16 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    @ExceptionHandler(AiConsentRequiredException.class)
+    public ProblemDetail handleAiConsentRequired(AiConsentRequiredException e) {
+        // 403 with a distinct code so the app shows the consent screen again.
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+        detail.setType(URI.create("about:blank"));
+        detail.setTitle("AI Consent Required");
+        detail.setProperty("code", "ai_consent_required");
+        return detail;
+    }
+
     @ExceptionHandler(DecodeFailedException.class)
     public ProblemDetail handleDecodeFailed(DecodeFailedException e) {
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());

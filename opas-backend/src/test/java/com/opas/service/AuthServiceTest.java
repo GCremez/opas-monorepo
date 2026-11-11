@@ -587,7 +587,14 @@ class AuthServiceTest {
 
         assertNull(user.getAiConsentVersion());
         assertNull(user.getAiConsentAt());
+        assertTrue(user.hasWithdrawnAiConsent());
         verify(userRepository).save(user);
+
+        when(subscriptionRepository.findByUserId(userId)).thenReturn(java.util.Optional.of(subscription));
+        assertTrue(service.me(userId).isAiConsentWithdrawn());
+
+        service.recordAiConsent(userId, "v3");
+        assertFalse(user.hasWithdrawnAiConsent());
     }
 
     @Test
@@ -596,6 +603,7 @@ class AuthServiceTest {
         when(subscriptionRepository.findByUserId(userId)).thenReturn(java.util.Optional.of(subscription));
 
         assertNull(service.me(userId).getAiConsent());
+        assertFalse(service.me(userId).isAiConsentWithdrawn());
 
         user.recordAiConsent("v2", java.time.Instant.parse("2026-11-11T12:00:00Z"));
         var consent = service.me(userId).getAiConsent();

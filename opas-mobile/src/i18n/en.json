@@ -436,6 +436,13 @@
     "deadline_reminders": "Deadline reminders",
     "on": "On",
     "off": "Off",
+    "ai_reading": "AI reading",
+    "ai_reading_withdraw_title": "Stop AI reading?",
+    "ai_reading_withdraw_desc": "Opas will stop sending your letters to the AI. Letters already read keep their explanations. Next time you scan, we'll ask again, and you can say yes or no.",
+    "ai_reading_withdraw_confirm": "Stop AI reading",
+    "ai_reading_withdrawn": "AI reading is off",
+    "ai_reading_withdraw_error": "Could not turn off AI reading. Check your connection and try again.",
+    "ai_reading_off_hint": "AI reading is off. We'll ask next time you scan a letter.",
     "remaining_short": "{{remaining}} of {{limit}} left",
     "terms": "Terms of Use"
   },

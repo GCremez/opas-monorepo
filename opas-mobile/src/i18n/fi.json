@@ -436,6 +436,13 @@
     "deadline_reminders": "Määräaikamuistutukset",
     "on": "Päällä",
     "off": "Pois",
+    "ai_reading": "Tekoälyluku",
+    "ai_reading_withdraw_title": "Lopetetaanko tekoälyluku?",
+    "ai_reading_withdraw_desc": "Opas lakkaa lähettämästä kirjeitäsi tekoälylle. Jo luettujen kirjeiden selitykset säilyvät. Kun seuraavan kerran skannaat, kysymme uudelleen, ja voit vastata kyllä tai ei.",
+    "ai_reading_withdraw_confirm": "Lopeta tekoälyluku",
+    "ai_reading_withdrawn": "Tekoälyluku on pois päältä",
+    "ai_reading_withdraw_error": "Tekoälylukua ei voitu lopettaa. Tarkista yhteys ja yritä uudelleen.",
+    "ai_reading_off_hint": "Tekoälyluku on pois päältä. Kysymme, kun skannaat seuraavan kirjeen.",
     "remaining_short": "{{remaining}}/{{limit}} jäljellä",
     "terms": "Käyttöehdot"
   },

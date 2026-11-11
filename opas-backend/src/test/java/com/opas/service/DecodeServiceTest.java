@@ -109,6 +109,27 @@ class DecodeServiceTest {
     }
 
     @Test
+    void validateAndReserveRefusesAfterConsentWasWithdrawn() {
+        user.withdrawAiConsent(java.time.Instant.now());
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+
+        assertThrows(com.opas.config.AiConsentRequiredException.class,
+                () -> service.validateAndReserve(userId, documentId, true));
+        assertEquals("uploaded", document.getStatus());
+    }
+
+    @Test
+    void validateAndReserveWorksAgainOnceConsentIsGivenAgain() {
+        user.withdrawAiConsent(java.time.Instant.now());
+        user.recordAiConsent("v3", java.time.Instant.now());
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        when(usageTracker.tryReserve(anyString(), anyString(), anyInt())).thenReturn(1L);
+
+        service.validateAndReserve(userId, documentId, true);
+        assertEquals("processing", document.getStatus());
+    }
+
+    @Test
     void validateAndReserveThrowsWhenNotUploaded() {
         document.setStatus("pending");
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
