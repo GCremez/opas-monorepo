@@ -98,6 +98,10 @@ opas:
     # Free explanations are in English; Premium gets the app language (launch plan §3).
     # EXPLANATIONS_ALL_LANGUAGES_FOR_EVERYONE=true gives everyone their app language.
     all-languages-for-everyone: ${EXPLANATIONS_ALL_LANGUAGES_FOR_EVERYONE:false}
+  cases:
+    # Case timelines (letters grouped by sender and case number) are Premium (launch plan
+    # §3). Beta: on for everyone. Set CASES_FREE_FOR_EVERYONE=false to put them behind Premium.
+    free-for-everyone: ${CASES_FREE_FOR_EVERYONE:true}
   reminders:
     # Deadline reminders are Premium (launch plan §3). Beta: on for everyone, because
     # nobody can buy Premium in the stores yet. Set REMINDERS_FREE_FOR_EVERYONE=false
