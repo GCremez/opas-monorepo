@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import type { TextInputInstance } from 'react-native';
 import { GatherScrollView } from '../../src/components/motion';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -43,7 +44,7 @@ export default function FilesScreen() {
   const c = useThemeColors();
   const { documents, loading, error, fetchDocuments, clearError } = useDocumentStore();
   const { folders, fetchFolders, createFolder: apiCreateFolder, deleteFolder: apiDeleteFolder } = useFolderStore();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [folderToDelete, setFolderToDelete] = useState<string | null>(null);

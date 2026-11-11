@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, TouchableOpacity, ScrollView } from 'react-native';
+import type { TextInputInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +30,7 @@ export default function SearchScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   const { documents, fetchDocuments } = useDocumentStore();
   const { folders, fetchFolders } = useFolderStore();
   const [query, setQuery] = useState('');

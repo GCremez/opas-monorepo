@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 import { View, Text, ScrollView, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeftIcon } from '../src/components/icons';
@@ -22,7 +23,7 @@ const SUGGESTIONS = ['How do I renew it?', 'What will it cost?', 'Can my spouse 
 export default function AskOpasScreen() {
   const router = useRouter();
   const c = useThemeColors();
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Msg[]>([]);
 
