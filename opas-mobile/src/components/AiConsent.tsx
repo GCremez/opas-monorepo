@@ -4,11 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Button } from './ui/Button';
 
-const POINTS = ['point_read', 'point_redact', 'point_ai', 'point_store'] as const;
+const POINTS = ['point_read', 'point_sensitive', 'point_redact', 'point_ai', 'point_store'] as const;
 
 /**
  * Shown before the first letter is uploaded: says plainly where the letter goes,
  * names the AI provider, and asks for an explicit yes (App Store guideline 5.1.2(i)).
+ * Letters can hold health data, so this is also explicit consent under GDPR
+ * Art. 9(2)(a): it names health information, and tapping Allow is the explicit act.
  */
 export function AiConsent({ onAllow, onDecline }: { onAllow: () => void; onDecline: () => void }) {
   const { t } = useTranslation();
@@ -34,6 +36,7 @@ export function AiConsent({ onAllow, onDecline }: { onAllow: () => void; onDecli
         </TouchableOpacity>
       </ScrollView>
       <View className="px-[30px] pt-2 pb-2 gap-3">
+        <Text className="font-body text-body-sm text-fg-soft">{t('consent.explicit')}</Text>
         <Button variant="primary" size="lg" block onPress={onAllow}>{t('consent.allow')}</Button>
         <Button variant="ghost" block onPress={onDecline}>{t('consent.decline')}</Button>
       </View>
