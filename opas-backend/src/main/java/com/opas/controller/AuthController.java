@@ -1,6 +1,8 @@
 package com.opas.controller;
 
 import com.opas.config.RateLimit;
+import com.opas.dto.AiConsentRequest;
+import com.opas.dto.AiConsentResponse;
 import com.opas.dto.AuthResponse;
 import com.opas.dto.ChangePasswordRequest;
 import com.opas.dto.LoginRequest;
@@ -116,6 +118,16 @@ public class AuthController {
         UUID userId = UUID.fromString(name);
         authService.deleteAccount(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    /** The person agreed to the AI consent screen {@code version} (shown before the first upload). */
+    @PostMapping("/me/ai-consent")
+    public ResponseEntity<AiConsentResponse> aiConsent(Authentication authentication,
+            @Valid @RequestBody AiConsentRequest request) {
+        String name = authentication.getName();
+        if (name == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(authService.recordAiConsent(UUID.fromString(name), request.version()));
     }
 
     @GetMapping("/me")

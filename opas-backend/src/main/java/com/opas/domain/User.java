@@ -29,6 +29,13 @@ public class User {
     @Column(nullable = false)
     private String language = "en";
 
+    // Which version of the AI consent screen this person agreed to, and when (V16).
+    @Column(name = "ai_consent_version")
+    private String aiConsentVersion;
+
+    @Column(name = "ai_consent_at")
+    private Instant aiConsentAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -93,6 +100,20 @@ public class User {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getAiConsentVersion() {
+        return aiConsentVersion;
+    }
+
+    public Instant getAiConsentAt() {
+        return aiConsentAt;
+    }
+
+    /** Records that this person agreed to the AI consent screen {@code version}, now. */
+    public void recordAiConsent(String version, Instant at) {
+        this.aiConsentVersion = version;
+        this.aiConsentAt = at;
     }
 
     public Instant getCreatedAt() {

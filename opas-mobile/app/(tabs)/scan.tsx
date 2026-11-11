@@ -155,14 +155,16 @@ export default function ScanScreen() {
   const [found, setFound] = useState<{ documentId: string; view: DecodeView | null; folderId: string | null } | null>(null);
   const [categorySheet, setCategorySheet] = useState(false);
   const email = useAuthStore((s) => s.user?.email);
+  // Agreed on another device or before a reinstall: /auth/me says so (undefined until loaded).
+  const serverConsent = useAuthStore((s) => (s.user ? s.user.aiConsent?.version ?? null : undefined));
   // null while it's being read; nothing is uploaded until this is true.
   const [consented, setConsented] = useState<boolean | null>(null);
 
   useEffect(() => {
     let live = true;
-    hasAiConsent(email).then((ok) => { if (live) setConsented(ok); });
+    hasAiConsent(email, serverConsent).then((ok) => { if (live) setConsented(ok); });
     return () => { live = false; };
-  }, [email]);
+  }, [email, serverConsent]);
 
   useEffect(() => {
     // Ask for the camera only after the consent screen, not on top of it.

@@ -6,6 +6,7 @@ import com.opas.config.ResourceNotFoundException;
 import com.opas.domain.Document;
 import com.opas.domain.Subscription;
 import com.opas.domain.User;
+import com.opas.dto.AiConsentResponse;
 import com.opas.dto.AuthResponse;
 import com.opas.dto.LoginRequest;
 import com.opas.dto.RefreshRequest;
@@ -339,6 +340,15 @@ public class AuthService {
                 .orElseThrow(ResourceNotFoundException::new);
         String plan = subscriptionRepository.findByUserId(user.getId()).map(Subscription::getTier).orElse("free");
         return UserResponse.from(user, plan);
+    }
+
+    /** Records that this person agreed to the AI consent screen {@code version}. */
+    @Transactional
+    public AiConsentResponse recordAiConsent(UUID userId, String version) {
+        User user = userRepository.findById(userId).orElseThrow(ResourceNotFoundException::new);
+        user.recordAiConsent(version, Instant.now());
+        userRepository.save(user);
+        return AiConsentResponse.of(user);
     }
 
     private AuthResponse generateAuthResponse(User user) {

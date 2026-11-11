@@ -87,6 +87,15 @@ public class GlobalExceptionHandler {
         return detail;
     }
 
+    /** An address with no endpoint is 404, not a 500 with a stack trace in the log. */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ProblemDetail handleNotFound(org.springframework.web.servlet.resource.NoResourceFoundException e) {
+        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        detail.setType(URI.create("about:blank"));
+        detail.setTitle("Not Found");
+        return detail;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleInternal(Exception e) {
         log.error("Unhandled exception", e);
