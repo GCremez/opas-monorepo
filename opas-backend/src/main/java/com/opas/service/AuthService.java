@@ -356,7 +356,7 @@ public class AuthService {
     @Transactional
     public void withdrawAiConsent(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(ResourceNotFoundException::new);
-        user.withdrawAiConsent();
+        user.withdrawAiConsent(Instant.now());
         userRepository.save(user);
     }
 

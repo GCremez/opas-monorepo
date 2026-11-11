@@ -10,6 +10,11 @@ public class UserResponse {
     private String plan;
     /** Null until the person agrees to the AI consent screen. */
     private AiConsentResponse aiConsent;
+    /**
+     * True after the person withdrew AI consent, until they agree again. Tells the app to
+     * forget a yes it cached on this device rather than send it to the server again.
+     */
+    private boolean aiConsentWithdrawn;
 
     public UserResponse() {
     }
@@ -27,7 +32,10 @@ public class UserResponse {
     }
 
     public static UserResponse from(User user, String plan) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail(), plan, AiConsentResponse.of(user));
+        UserResponse response = new UserResponse(user.getId(), user.getName(), user.getEmail(), plan,
+                AiConsentResponse.of(user));
+        response.aiConsentWithdrawn = user.hasWithdrawnAiConsent();
+        return response;
     }
 
     public UUID getId() {
@@ -48,5 +56,9 @@ public class UserResponse {
 
     public AiConsentResponse getAiConsent() {
         return aiConsent;
+    }
+
+    public boolean isAiConsentWithdrawn() {
+        return aiConsentWithdrawn;
     }
 }

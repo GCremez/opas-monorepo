@@ -97,6 +97,15 @@ class DraftLetterServiceTest {
     }
 
     @Test
+    void refusedAfterConsentWasWithdrawn() {
+        user.withdrawAiConsent(java.time.Instant.now());
+        when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
+        assertThrows(com.opas.config.AiConsentRequiredException.class,
+                () -> service(true).generateDraft(userId, documentId, new DraftLetterRequest("formal", true)));
+        verifyNoInteractions(claudeClient);
+    }
+
+    @Test
     void sendsExtractedRedactedTextNotRawFileBytes() {
         byte[] pdfBytes = "%PDF-1.7 binary".getBytes();
         when(documentRepository.findById(documentId)).thenReturn(Optional.of(document));
