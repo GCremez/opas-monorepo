@@ -140,6 +140,19 @@ Point the app at it: `EXPO_PUBLIC_API_BASE_URL=https://api.getopas.app/api/v1`
 
 ## Updating
 
+**Automatically (recommended):** the server checks `main` every 5 minutes and deploys new
+commits itself, so merging a PR is the deploy. One-time setup on the server:
+
+```bash
+cd ~/opas-monorepo && git pull
+sudo bash opas-infra/server/install-auto-update.sh
+```
+
+- What it did: `journalctl -u opas-auto-update --no-pager | tail -20`
+- Turn it off: `sudo systemctl disable --now opas-auto-update.timer`
+
+**By hand:**
+
 ```bash
 cd ~/opas-monorepo && git pull
 cd opas-infra/server && docker compose up -d --build
