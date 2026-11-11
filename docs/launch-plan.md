@@ -31,7 +31,7 @@ International workers, students and immigrants in Finland receive official lette
 Translation tools give people the words. Translation was never the hard part. Knowing what a letter means for *you* is. ChatGPT can explain a photographed letter for free, so explaining a single letter is not something people will pay for. Opas has to win where general tools fall short:
 
 - **No administrative context.** General models don't reliably know Finnish workflows, appeal periods, or which reference numbers (*diaarinumero*) a reply must quote.
-- **Privacy.** Pasting a whole letter, henkilötunnus included, into a public chatbot exposes sensitive data. Opas removes personal details before the AI sees the text, with Finnish and Swedish language models and Finnish patterns, and Claude runs on Amazon Bedrock in Stockholm, so letters stay in the EU.
+- **Privacy.** Pasting a whole letter, henkilötunnus included, into a public chatbot exposes sensitive data. Opas removes personal details before the AI sees the text, with Finnish and Swedish language models and Finnish patterns, and Claude reads only that redacted text. (Claude runs through the Anthropic API for the beta, so letters may be processed outside the EU: decided 11 Nov 2026, see §4.)
 - **No workflow.** ChatGPT outputs text. It doesn't track deadlines, link related letters into a case, or keep a structured record.
 
 | What the user needs | ChatGPT today | Where Opas wins |
@@ -167,6 +167,7 @@ Replaces the earlier €4.99 / €39.99 and "€3.99 for 5 letters" (§8). Store
 - No checkout on Android either (Google Play first, see below).
 
 **Decisions (11 November 2026):**
+- **Claude through the Anthropic API, not Bedrock,** for the beta: no budget for Bedrock and the AWS account has no access, while the existing Anthropic key works today. Letter text may be processed outside the EU (Anthropic's `inference_geo` offers `global` or `us`, no EU option). Consent screen v4, privacy policy, home and support pages say so. Set a monthly spend limit on the Anthropic account. `AI_PROVIDER=bedrock` switches back (with a new consent version) once there's budget.
 - **Free tier is 3 letters a month**, during the beta too.
 - **Deadline reminders are Premium only, and smart** (7, 3 and 1 day before, morning of, merged when they coincide). Reverses the 10 Nov decision below. On for everyone during the beta.
 - **Free explanations are in English only.** Explanations in any other language are Premium.
@@ -178,11 +179,12 @@ Replaces the earlier €4.99 / €39.99 and "€3.99 for 5 letters" (§8). Store
 **Infrastructure and operations:**
 
 - [ ] **Hosting for the beta (decided 11 Nov 2026: free).** One Oracle Cloud Always Free ARM VM (2 OCPU, 12 GB, EU home region) runs the backend, PostgreSQL, Redis, RabbitMQ, Presidio and Caddy with docker compose: `opas-infra/server/README.md`. S3, Textract, SES and Bedrock stay on AWS (pay per use). The ECS stack in `opas-infra/cloudformation` is for later; its first deploy failed because the GitHub deploy role has no CloudFormation permissions, and it needs the database, Redis, RabbitMQ and Presidio to exist.
-- [ ] **Bedrock access:** every Anthropic model returns "not available for this account" (Stockholm and Ireland). Check the account plan (Free plan accounts may not get Marketplace models: upgrade to Paid) and Bedrock service quotas; otherwise an AWS Support case.
+- [ ] ~~**Bedrock access**~~ **Deferred (11 Nov 2026):** the beta uses the Anthropic API instead (§4 decisions). Every Anthropic model on Bedrock still returns "not available for this account"; revisit when there's budget.
+- [ ] **Anthropic account:** billing set up and a monthly spend limit; `ANTHROPIC_API_KEY` set on the server; sign Anthropic's DPA (data processing addendum) and note its transfer mechanism and retention period in the privacy policy (`compliance/DPIA.md`).
 
 - [ ] **DNS and email:** `getopas.app` and `api.getopas.app` live over HTTPS. SES domain verified with SPF, DKIM and DMARC. GitHub variable `MAIL_FROM` not still `opas.fi`.
 - [ ] **Link verification files:** Apple Team ID and Play SHA-256 filled in under `opas-infra/web/.well-known/`, served from getopas.app as `application/json`. Both files are now published from `docs/.well-known/` with placeholders; fill them in with `python3 scripts/wellknown.py --apple-team-id … --android-sha256 …` and run `--check` before a release. **Needs a paid Apple Developer account and a Play Console account.** Until then a tapped email link lands on `/d/<id>`, which offers an "Open in Opas" button plus the early-test link.
-- [x] **AI provider and data residency (decided: Bedrock).** Claude runs on Amazon Bedrock in eu-north-1 (Stockholm), the same region as the app. Bedrock's Messages endpoint serves only the region it's called in, so letter text stays in Sweden. This was a GDPR / data transfer question, not an EU AI Act one. **Still to do (AWS console):**
+- [x] **AI provider and data residency (decided: Bedrock; superseded 11 Nov 2026 by the Anthropic API for the beta, see §4).** Claude runs on Amazon Bedrock in eu-north-1 (Stockholm), the same region as the app. Bedrock's Messages endpoint serves only the region it's called in, so letter text stays in Sweden. This was a GDPR / data transfer question, not an EU AI Act one. **Still to do (AWS console):**
   - enable access to Claude Sonnet 5.5 and Claude Sonnet 5 in Amazon Bedrock in eu-north-1;
   - check that both models are offered on Bedrock's Messages endpoint (bedrock-mantle) there;
   - deploy the CloudFormation stack, which gives the task role `bedrock-mantle:CreateInference`.

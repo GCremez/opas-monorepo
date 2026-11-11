@@ -7,8 +7,9 @@ import { apiClient } from '../api/client';
 // account. Bump the version if what happens to a letter changes, so everyone is asked
 // again (v2: Claude moved from Anthropic's API, possibly in the US, to Amazon Bedrock
 // in Stockholm; v3: names health information and asks for explicit consent to it,
-// GDPR Art. 9(2)(a)).
-export const AI_CONSENT_VERSION = 'v3';
+// GDPR Art. 9(2)(a); v4: back to Anthropic's API, which may process letters outside
+// the EU, e.g. in the US).
+export const AI_CONSENT_VERSION = 'v4';
 
 const keyFor = (email: string | undefined) =>
   `ai_consent_${AI_CONSENT_VERSION}_${(email ?? 'anon').replace(/[^A-Za-z0-9._-]/g, '_')}`;

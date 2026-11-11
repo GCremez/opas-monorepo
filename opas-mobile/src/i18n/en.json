@@ -289,7 +289,7 @@
     "point_read": "We read the text from your photo or PDF. Photos are read by Amazon Textract in the EU.",
     "point_sensitive": "Some letters show sensitive things, such as your health or a disability in a Kela decision. Opas has to read these too, to explain the letter.",
     "point_redact": "Names, ID numbers, addresses and similar details are removed wherever we find them.",
-    "point_ai": "The rest of the text is sent to Claude, an AI made by Anthropic, which runs on Amazon Bedrock in Stockholm, Sweden, so it stays in the EU. Neither Anthropic nor Amazon uses it to train AI.",
+    "point_ai": "The rest of the text is sent to Claude, an AI made by Anthropic, through Anthropic's own service. Anthropic may process it outside the EU, for example in the United States. Anthropic doesn't use it to train AI.",
     "point_store": "Your letters are stored in your account in the EU (Stockholm) until you delete them.",
     "explicit": "By tapping Allow and continue, you explicitly agree that Opas may process your letters, including any health information in them, as described above.",
     "privacy_link": "Privacy policy",

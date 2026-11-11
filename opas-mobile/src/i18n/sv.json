@@ -289,7 +289,7 @@
     "point_read": "Vi läser texten från ditt foto eller din PDF. Foton läses av Amazon Textract inom EU.",
     "point_sensitive": "Vissa brev innehåller känsliga uppgifter, till exempel om din hälsa eller en funktionsnedsättning i ett beslut från FPA. Opas behöver läsa dem också för att förklara brevet.",
     "point_redact": "Namn, personbeteckningar, adresser och liknande uppgifter tas bort där vi hittar dem.",
-    "point_ai": "Resten av texten skickas till Claude, en AI från Anthropic, som körs på Amazon Bedrock i Stockholm, så den stannar inom EU. Varken Anthropic eller Amazon använder den för att träna AI.",
+    "point_ai": "Resten av texten skickas till Claude, en AI från Anthropic, via Anthropics egen tjänst. Anthropic kan behandla den utanför EU, till exempel i USA. Anthropic använder den inte för att träna AI.",
     "point_store": "Dina brev sparas på ditt konto inom EU (Stockholm) tills du raderar dem.",
     "explicit": "Genom att trycka på Tillåt och fortsätt samtycker du uttryckligen till att Opas behandlar dina brev, även hälsouppgifter i dem, på det sätt som beskrivs ovan.",
     "privacy_link": "Integritetspolicy",
