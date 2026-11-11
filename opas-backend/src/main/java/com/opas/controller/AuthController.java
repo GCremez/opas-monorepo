@@ -130,6 +130,16 @@ public class AuthController {
         return ResponseEntity.ok(authService.recordAiConsent(UUID.fromString(name), request.version()));
     }
 
+    /** The person took back their AI consent (Profile → AI reading). */
+    @DeleteMapping("/me/ai-consent")
+    public ResponseEntity<Void> withdrawAiConsent(Authentication authentication) {
+        String name = authentication.getName();
+        if (name == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        authService.withdrawAiConsent(UUID.fromString(name));
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(Authentication authentication) {
         String name = authentication.getName();

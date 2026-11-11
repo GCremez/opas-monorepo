@@ -579,6 +579,18 @@ class AuthServiceTest {
     }
 
     @Test
+    void withdrawAiConsentClearsVersionAndTime() {
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+        user.recordAiConsent("v3", java.time.Instant.parse("2026-11-11T12:00:00Z"));
+
+        service.withdrawAiConsent(userId);
+
+        assertNull(user.getAiConsentVersion());
+        assertNull(user.getAiConsentAt());
+        verify(userRepository).save(user);
+    }
+
+    @Test
     void meReportsAiConsentOnlyOnceGiven() {
         when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
         when(subscriptionRepository.findByUserId(userId)).thenReturn(java.util.Optional.of(subscription));

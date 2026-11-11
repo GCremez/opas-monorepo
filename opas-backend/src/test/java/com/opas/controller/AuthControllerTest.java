@@ -139,6 +139,17 @@ class AuthControllerTest {
     }
 
     @Test
+    void withdrawAiConsentClearsItForTheSignedInUser() {
+        UUID id = UUID.randomUUID();
+        when(authentication.getName()).thenReturn(id.toString());
+
+        var response = controller.withdrawAiConsent(authentication);
+
+        assertEquals(204, response.getStatusCode().value());
+        org.mockito.Mockito.verify(authService).withdrawAiConsent(id);
+    }
+
+    @Test
     void aiConsentVersionIsValidated() {
         try (var factory = jakarta.validation.Validation.buildDefaultValidatorFactory()) {
             var validator = factory.getValidator();
