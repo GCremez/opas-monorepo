@@ -27,9 +27,19 @@ public class DocumentInsights {
      */
     public record Insights(@Nullable String title, @Nullable String authority, List<DocumentDeadline> deadlines,
             @Nullable String documentType, @Nullable String summary, List<String> actions,
-            @Nullable String keyFigure) {
-        static final Insights EMPTY = new Insights(null, null, List.of(), null, null, List.of(), null);
+            @Nullable String keyFigure, @Nullable String caseReference, @Nullable String issuedDate) {
+        static final Insights EMPTY = new Insights(null, null, List.of(), null, null, List.of(), null, null, null);
     }
+
+    /**
+     * Key-field labels that name the sender's case or file number, for letters explained
+     * before the prompt asked for caseReference. Payment references (viitenumero), invoice
+     * and decision numbers change from letter to letter, so they never make a case.
+     */
+    private static final Pattern CASE_LABEL = Pattern.compile(
+            "diaari|\\bdnro\\b|\\bdnr\\b|asianumero|asiatunnus|ärende|diarienummer|hakemusnumero"
+                    + "|case (number|reference|no)|file (number|reference)|application (number|no)",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     private static final Pattern MONEY_OR_PERCENT =
             Pattern.compile("[€$£%]|\\b(EUR|euroa?)\\b", Pattern.CASE_INSENSITIVE);
@@ -90,8 +100,20 @@ public class DocumentInsights {
             keyFigure = values.stream().filter(v -> MONEY_OR_PERCENT.matcher(v).find()).findFirst()
                     .orElse(null);
         }
+        String caseReference = text(root.path("caseReference"));
+        if (caseReference == null && keyFields.isObject()) {
+            var fields = keyFields.fields();
+            while (caseReference == null && fields.hasNext()) {
+                var field = fields.next();
+                if (CASE_LABEL.matcher(field.getKey()).find()) {
+                    caseReference = field.getValue().isNumber() ? field.getValue().asText() : text(field.getValue());
+                }
+            }
+        }
+        String issued = text(root.path("issuedDate"));
         return new Insights(text(root.path("title")), text(root.path("authority")), List.copyOf(deadlines),
-                text(root.path("documentType")), text(root.path("summary")), List.copyOf(actions), keyFigure);
+                text(root.path("documentType")), text(root.path("summary")), List.copyOf(actions), keyFigure,
+                caseReference, issued != null && isIsoDate(issued) ? issued : null);
     }
 
     @Nullable

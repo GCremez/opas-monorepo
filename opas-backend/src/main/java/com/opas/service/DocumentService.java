@@ -243,6 +243,7 @@ public class DocumentService {
         return new DocumentResponse(doc.getId(), doc.getFilename(), doc.getContentType(), doc.getFileSize(),
                 doc.getStatus(), doc.getFolderId(), doc.getCreatedAt(), doc.getUpdatedAt(), uploadUrl, downloadUrl,
                 insights.title(), insights.authority(), insights.deadlines(), insights.documentType(),
-                insights.summary(), insights.actions(), insights.keyFigure(), completedTasks);
+                insights.summary(), insights.actions(), insights.keyFigure(), completedTasks,
+                insights.caseReference(), insights.issuedDate());
     }
 }

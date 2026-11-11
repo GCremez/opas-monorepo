@@ -27,14 +27,17 @@ public class SubscriptionController {
     private final DecodeService decodeService;
     private final DraftLetterService draftLetterService;
     private final boolean remindersFreeForEveryone;
+    private final boolean casesFreeForEveryone;
 
     public SubscriptionController(SubscriptionService subscriptionService, DecodeService decodeService,
             DraftLetterService draftLetterService,
-            @Value("${opas.reminders.free-for-everyone:false}") boolean remindersFreeForEveryone) {
+            @Value("${opas.reminders.free-for-everyone:false}") boolean remindersFreeForEveryone,
+            @Value("${opas.cases.free-for-everyone:false}") boolean casesFreeForEveryone) {
         this.subscriptionService = subscriptionService;
         this.decodeService = decodeService;
         this.draftLetterService = draftLetterService;
         this.remindersFreeForEveryone = remindersFreeForEveryone;
+        this.casesFreeForEveryone = casesFreeForEveryone;
     }
 
     @GetMapping("/plans")
@@ -52,9 +55,10 @@ public class SubscriptionController {
         int limit = decodeService.resolveLimit(uid);
         // Deadline reminders are Premium; during the beta they're on for everyone. The
         // reminders themselves are scheduled on the phone, which reads this flag.
-        boolean remindersIncluded = remindersFreeForEveryone || subscriptionService.isPremium(uid);
+        boolean premium = subscriptionService.isPremium(uid);
         return ResponseEntity.ok(new UsageResponse(remaining, limit, "monthly",
-                draftLetterService.draftsIncluded(uid), remindersIncluded));
+                draftLetterService.draftsIncluded(uid), remindersFreeForEveryone || premium,
+                casesFreeForEveryone || premium));
     }
 
     @GetMapping

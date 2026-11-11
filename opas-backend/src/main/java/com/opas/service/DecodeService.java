@@ -382,6 +382,11 @@ public class DecodeService {
                   "deadlines": [{"date": "YYYY-MM-DD", "description": "what is due by then"}],
                   "actions": ["a concrete step the reader has to take"],
                   "keyFields": {"label": "value"},
+                  "caseReference": the sender's own case or file number for this matter, exactly as
+                                   written (e.g. a diaarinumero, Dnro, asianumero, ärendenummer or
+                                   application number), which later letters about the same matter
+                                   repeat; not a payment reference (viitenumero), invoice or decision
+                                   number; or null,
                   "category": the best fit of "tax", "residence", "kela", "healthcare", "employment",
                               "education", "housing", "finance", or null if none fits
                 }

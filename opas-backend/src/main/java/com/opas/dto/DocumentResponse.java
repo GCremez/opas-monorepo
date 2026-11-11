@@ -16,5 +16,8 @@ public record DocumentResponse(UUID id, String filename, String contentType, Lon
         // The headline figure for lists, e.g. "€387.20/mo".
         @Nullable String keyFigure,
         // Deadlines and actions the user has marked done.
-        List<CompletedTaskResponse> completedTasks) {
+        List<CompletedTaskResponse> completedTasks,
+        // The sender's case or file number (diaarinumero etc.) and the letter's own date:
+        // letters from the same sender with the same reference form one case (the app groups them).
+        @Nullable String caseReference, @Nullable String issuedDate) {
 }
