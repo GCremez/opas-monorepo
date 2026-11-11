@@ -136,14 +136,14 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 - [ ] **Bedrock access:** every Anthropic model returns "not available for this account" (Stockholm and Ireland). Check the account plan (Free plan accounts may not get Marketplace models: upgrade to Paid) and Bedrock service quotas; otherwise an AWS Support case.
 
 - [ ] **DNS and email:** `getopas.app` and `api.getopas.app` live over HTTPS. SES domain verified with SPF, DKIM and DMARC. GitHub variable `MAIL_FROM` not still `opas.fi`.
-- [ ] **Link verification files:** Apple Team ID and Play SHA-256 filled in under `opas-infra/web/.well-known/`, served from getopas.app as `application/json`.
+- [ ] **Link verification files:** Apple Team ID and Play SHA-256 filled in under `opas-infra/web/.well-known/`, served from getopas.app as `application/json`. Both files are now published from `docs/.well-known/` with placeholders; fill them in with `python3 scripts/wellknown.py --apple-team-id … --android-sha256 …` and run `--check` before a release. **Needs a paid Apple Developer account and a Play Console account.** Until then a tapped email link lands on `/d/<id>`, which offers an "Open in Opas" button plus the early-test link.
 - [x] **AI provider and data residency (decided: Bedrock).** Claude runs on Amazon Bedrock in eu-north-1 (Stockholm), the same region as the app. Bedrock's Messages endpoint serves only the region it's called in, so letter text stays in Sweden. This was a GDPR / data transfer question, not an EU AI Act one. **Still to do (AWS console):**
   - enable access to Claude Sonnet 5.5 and Claude Sonnet 5 in Amazon Bedrock in eu-north-1;
   - check that both models are offered on Bedrock's Messages endpoint (bedrock-mantle) there;
   - deploy the CloudFormation stack, which gives the task role `bedrock-mantle:CreateInference`.
 - [ ] **Opas Presidio image in production:** deploy `opas-infra/presidio` wherever production Presidio runs, then set the GitHub variable `PRESIDIO_LANGUAGES` to `en,fi,sv` and redeploy the stack. Until then letters are analysed in English (dates are already kept).
 - [ ] **Database hosting documented:** the repo's CloudFormation doesn't create the PostgreSQL database. State the provider, region and backup policy for the privacy policy.
-- [ ] **App store metadata:** create the apps in App Store Connect and Play Console with the ID `app.getopas`. Prepare localised listings and screenshots. The App Privacy / Data Safety answers must match the consent screen.
+- [ ] **App store metadata:** create the apps in App Store Connect and Play Console with the ID `app.getopas`. **Blocked: neither developer account is paid for yet, and both link-verification files depend on them.** Prepare localised listings and screenshots. The App Privacy / Data Safety answers must match the consent screen.
 - [ ] **EAS credentials** for `app.getopas`, including the iOS push (APNs) key.
 - [ ] **Merge PR #11, deploy, and make a new build.** Production deploys only from `main`.
 
