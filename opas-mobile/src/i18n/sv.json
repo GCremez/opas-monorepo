@@ -256,7 +256,7 @@
     "upload_failed_title": "Kunde inte ladda upp dokumentet",
     "upload_failed_desc": "Kontrollera anslutningen och försök igen. Inget sparades.",
     "limit_title": "Du har använt månadens skanningar",
-    "limit_desc": "Gratiskonton har 5 skanningar i månaden. Uppgradera för obegränsat, eller vänta till nästa månad.",
+    "limit_desc": "Gratiskonton har 3 skanningar i månaden. Uppgradera för obegränsat, eller vänta till nästa månad.",
     "upgrade": "Se Premium",
     "new_scan": "Ny skanning",
     "align_frame": "[ PLACERA BREVET\nI RAMEN ]",
@@ -280,7 +280,7 @@
     "pdf_short": "PDF",
     "file_too_large_title": "Filen är för stor",
     "file_too_large_desc": "Opas kan läsa filer på högst 20 MB. Prova en mindre fil eller fotografera brevet.",
-    "limit_desc_no_upgrade": "Gratiskonton har 5 skanningar per månad. Du kan skanna igen från början av nästa månad.",
+    "limit_desc_no_upgrade": "Gratiskonton har 3 skanningar per månad. Du kan skanna igen från början av nästa månad.",
     "check_original": "AI kan göra fel. Kontrollera datumen mot originalbrevet."
   },
   "consent": {
@@ -434,8 +434,16 @@
     "lang_sv": "Svenska",
     "lang_sv_native": "Svenska",
     "deadline_reminders": "Påminnelser om tidsfrister",
+    "reminders_premium": "Premium",
     "on": "På",
     "off": "Av",
+    "ai_reading": "AI-läsning",
+    "ai_reading_hint": "Nästa brev du skannar frågar om lov igen.",
+    "ai_reading_withdraw_title": "Stäng av AI-läsning?",
+    "ai_reading_withdraw_desc": "Opas slutar skicka brevtext till Claude. Brev som redan förklarats finns kvar i ditt arkiv. Nästa brev du skannar frågar om lov igen.",
+    "ai_reading_withdraw": "Stäng av",
+    "ai_reading_withdrawn": "AI-läsning avstängd",
+    "ai_reading_error": "Det gick inte att stänga av. Kontrollera anslutningen och försök igen.",
     "remaining_short": "{{remaining}} av {{limit}} kvar",
     "terms": "Användarvillkor"
   },
@@ -536,13 +544,14 @@
       "f1": "Obegränsade dokumentskanningar",
       "f2": "Skriv svarsbrev på finska",
       "f3": "Exportera & arkivera vad som helst",
-      "f4": "Påminnelser som aldrig missar"
+      "f4": "Smarta påminnelser en vecka, 3 dagar och 1 dag före tidsfristen"
     },
     "checkout_error": "Något gick fel. Försök igen.",
     "premium_eyebrow": "Opas Premium",
-    "save_yearly": "Spara 20% per år",
+    "save_yearly": "Spara 30 % per år",
     "free_trial": "Starta 7 dagars gratis provperiod",
-    "trial_note": "Sedan 4,99 €/månad. Avsluta när som helst.",
+    "trial_note_monthly": "Sedan 5,99 €/månad. Avsluta när som helst.",
+    "trial_note_yearly": "Sedan 49,99 €/år. Avsluta när som helst.",
     "unavailable_title": "Premium finns inte i appen än",
     "unavailable_desc": "Allt i gratisversionen fungerar som vanligt."
   },
@@ -577,6 +586,9 @@
   },
   "reminders": {
     "due_today": "förfaller i dag",
+    "several_title": "{{count}} tidsfrister närmar sig",
+    "several_item": "{{what}}: {{left}}",
+    "premium_only": "Påminnelser om tidsfrister ingår i Premium.",
     "days_left": "{{count}} dag kvar",
     "days_left_plural": "{{count}} dagar kvar",
     "body": "{{what}} senast {{date}}. Tryck för att öppna.",

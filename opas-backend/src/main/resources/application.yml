@@ -94,6 +94,11 @@ opas:
     # Beta: everyone can generate reply drafts, not only Premium. Set
     # DRAFTS_FREE_FOR_EVERYONE=false to put drafts back behind Premium.
     free-for-everyone: ${DRAFTS_FREE_FOR_EVERYONE:true}
+  reminders:
+    # Deadline reminders are Premium (launch plan §3). Beta: on for everyone, because
+    # nobody can buy Premium in the stores yet. Set REMINDERS_FREE_FOR_EVERYONE=false
+    # to put them behind Premium.
+    free-for-everyone: ${REMINDERS_FREE_FOR_EVERYONE:true}
   s3:
     bucket: ${S3_BUCKET_NAME:opas-app-bucket}
     region: ${AWS_REGION:eu-north-1}
@@ -164,7 +169,9 @@ opas:
     # "Your letter is ready" email, if the result is still unopened this long after it's done.
     ready-email-after: ${READY_EMAIL_AFTER:PT10M}
   free-tier:
-    monthly-decode-limit: 5
+    # Three, not five: the beta keeps the ceiling low enough that Premium has a reason
+    # to exist, and the app, the website and the terms all say three (P1-9).
+    monthly-decode-limit: 3
 
 logging:
   pattern:

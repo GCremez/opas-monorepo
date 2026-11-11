@@ -9,6 +9,7 @@ import com.opas.service.DraftLetterService;
 import com.opas.service.SubscriptionService;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,12 +26,15 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final DecodeService decodeService;
     private final DraftLetterService draftLetterService;
+    private final boolean remindersFreeForEveryone;
 
     public SubscriptionController(SubscriptionService subscriptionService, DecodeService decodeService,
-            DraftLetterService draftLetterService) {
+            DraftLetterService draftLetterService,
+            @Value("${opas.reminders.free-for-everyone:false}") boolean remindersFreeForEveryone) {
         this.subscriptionService = subscriptionService;
         this.decodeService = decodeService;
         this.draftLetterService = draftLetterService;
+        this.remindersFreeForEveryone = remindersFreeForEveryone;
     }
 
     @GetMapping("/plans")
@@ -46,8 +50,11 @@ public class SubscriptionController {
         UUID uid = UUID.fromString(userId);
         long remaining = decodeService.getRemainingDecodes(uid);
         int limit = decodeService.resolveLimit(uid);
+        // Deadline reminders are Premium; during the beta they're on for everyone. The
+        // reminders themselves are scheduled on the phone, which reads this flag.
+        boolean remindersIncluded = remindersFreeForEveryone || subscriptionService.isPremium(uid);
         return ResponseEntity.ok(new UsageResponse(remaining, limit, "monthly",
-                draftLetterService.draftsIncluded(uid)));
+                draftLetterService.draftsIncluded(uid), remindersIncluded));
     }
 
     @GetMapping

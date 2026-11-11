@@ -256,7 +256,7 @@
     "upload_failed_title": "Couldn't upload this document",
     "upload_failed_desc": "Check your connection and try again. Nothing was saved.",
     "limit_title": "You've used this month's scans",
-    "limit_desc": "Free accounts include 5 scans a month. Upgrade for unlimited scans, or wait until next month.",
+    "limit_desc": "Free accounts include 3 scans a month. Upgrade for unlimited scans, or wait until next month.",
     "upgrade": "See Premium",
     "new_scan": "New scan",
     "align_frame": "[ ALIGN LETTER\nWITHIN FRAME ]",
@@ -280,7 +280,7 @@
     "pdf_short": "PDF",
     "file_too_large_title": "This file is too large",
     "file_too_large_desc": "Opas can read files up to 20 MB. Try a smaller file, or take a photo of the letter.",
-    "limit_desc_no_upgrade": "Free accounts include 5 scans a month. You can scan again from the start of next month.",
+    "limit_desc_no_upgrade": "Free accounts include 3 scans a month. You can scan again from the start of next month.",
     "check_original": "AI can make mistakes. Check dates against the original letter."
   },
   "consent": {
@@ -434,8 +434,16 @@
     "lang_sv": "Svenska",
     "lang_sv_native": "Swedish",
     "deadline_reminders": "Deadline reminders",
+    "reminders_premium": "Premium",
     "on": "On",
     "off": "Off",
+    "ai_reading": "AI reading",
+    "ai_reading_hint": "The next letter you scan will ask for your permission again.",
+    "ai_reading_withdraw_title": "Turn off AI reading?",
+    "ai_reading_withdraw_desc": "Opas will stop sending letter text to Claude. Letters already explained stay in your archive. The next letter you scan will ask for your permission again.",
+    "ai_reading_withdraw": "Turn off",
+    "ai_reading_withdrawn": "AI reading turned off",
+    "ai_reading_error": "Could not turn it off. Check your connection and try again.",
     "remaining_short": "{{remaining}} of {{limit}} left",
     "terms": "Terms of Use"
   },
@@ -536,13 +544,14 @@
       "f1": "Unlimited document scans",
       "f2": "Draft reply letters in Finnish",
       "f3": "Export & archive anything",
-      "f4": "Deadline reminders that never miss"
+      "f4": "Smart deadline reminders: a week, 3 days and 1 day before"
     },
     "checkout_error": "Something went wrong. Please try again.",
     "premium_eyebrow": "Opas Premium",
-    "save_yearly": "Save 20% yearly",
+    "save_yearly": "Save 30% yearly",
     "free_trial": "Start 7-day free trial",
-    "trial_note": "Then €4.99/month. Cancel anytime.",
+    "trial_note_monthly": "Then €5.99/month. Cancel anytime.",
+    "trial_note_yearly": "Then €49.99/year. Cancel anytime.",
     "unavailable_title": "Premium isn't available in the app yet",
     "unavailable_desc": "Everything in the free plan works as normal."
   },
@@ -577,6 +586,9 @@
   },
   "reminders": {
     "due_today": "due today",
+    "several_title": "{{count}} deadlines need you",
+    "several_item": "{{what}}: {{left}}",
+    "premium_only": "Deadline reminders are part of Premium.",
     "days_left": "{{count}} day left",
     "days_left_plural": "{{count}} days left",
     "body": "{{what}} by {{date}}. Tap to open it.",

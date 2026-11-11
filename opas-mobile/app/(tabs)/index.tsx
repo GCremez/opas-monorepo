@@ -134,8 +134,10 @@ export default function RecordScreen() {
   const docCount = documents.length;
   const reminders = useReminderStore();
   const upcomingDeadline = collectDeadlines(documents).some((i) => i.days >= 0);
+  // Reminders are Premium (or on for everyone in the beta), so only ask those who get them.
+  const { canRemind: remindersIncluded } = usePremium();
   const askForReminders =
-    reminders.hydrated && reminders.permission === 'undetermined' && !reminders.promptDismissed && upcomingDeadline;
+    remindersIncluded && reminders.hydrated && reminders.permission === 'undetermined' && !reminders.promptDismissed && upcomingDeadline;
 
   const open = collectDeadlines(documents).filter((item) => !completedAt(item.document, deadlineKey(item.deadline)));
   const overdue = open

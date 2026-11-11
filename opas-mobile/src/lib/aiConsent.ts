@@ -56,3 +56,19 @@ export async function grantAiConsent(email: string | undefined): Promise<void> {
   // Not blocking: if the server can't be reached, the next hasAiConsent call retries.
   await recordOnServer();
 }
+
+/**
+ * Takes the yes back (GDPR Art. 7(3): as easy to withdraw as to give). The server is
+ * cleared first and an error propagates, so the device copy stays "granted" when the
+ * request fails — otherwise this device would look withdrawn while the server still
+ * holds consent, and the next hasAiConsent call would quietly re-grant it.
+ */
+export async function withdrawAiConsent(email: string | undefined): Promise<void> {
+  await apiClient.delete('/auth/me/ai-consent');
+  try {
+    // Not 'granted', so hasAiConsent says no even if the server check is skipped.
+    await SecureStore.setItemAsync(keyFor(email), 'withdrawn');
+  } catch {
+    // The server record is authoritative and has already been cleared.
+  }
+}
