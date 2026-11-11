@@ -50,6 +50,10 @@ export interface Document {
   keyFigure?: string | null;
   /** Deadlines and actions the user has marked done (see lib/tasks). */
   completedTasks?: { key: string; completedAt: string }[];
+  /** The sender's case or file number (diaarinumero etc.), as the letter writes it (see lib/cases). */
+  caseReference?: string | null;
+  /** The letter's own date, YYYY-MM-DD. */
+  issuedDate?: string | null;
 }
 
 export interface DecodeResult {

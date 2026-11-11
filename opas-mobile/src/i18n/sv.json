@@ -584,6 +584,22 @@
     "documents_heading": "Dokument",
     "options": "Mappalternativ"
   },
+  "case": {
+    "eyebrow": "Ärende",
+    "cases": "Ärenden",
+    "part_of": "Del av ett ärende · {{count}} brev",
+    "part_of_plural": "Del av ett ärende · {{count}} brev",
+    "meta": "{{reference}} · {{count}} brev · sedan {{date}}",
+    "meta_plural": "{{reference}} · {{count}} brev · sedan {{date}}",
+    "next": "Nästa tidsfrist",
+    "letter": "Brev",
+    "deadline": "Tidsfrist",
+    "done": "Klart",
+    "missed": "Missad",
+    "how": "Brev hör till samma ärende när samma myndighet använder samma diarienummer på dem.",
+    "premium_only": "Tidslinjer för ärenden ingår i Premium.",
+    "not_found": "Det här ärendet har inga brev längre."
+  },
   "reminders": {
     "due_today": "förfaller i dag",
     "several_title": "{{count}} tidsfrister närmar sig",

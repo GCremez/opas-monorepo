@@ -584,6 +584,22 @@
     "documents_heading": "Asiakirjat",
     "options": "Kansion asetukset"
   },
+  "case": {
+    "eyebrow": "Asia",
+    "cases": "Asiat",
+    "part_of": "Osa asiaa · {{count}} kirje",
+    "part_of_plural": "Osa asiaa · {{count}} kirjettä",
+    "meta": "{{reference}} · {{count}} kirje · alkaen {{date}}",
+    "meta_plural": "{{reference}} · {{count}} kirjettä · alkaen {{date}}",
+    "next": "Seuraava määräaika",
+    "letter": "Kirje",
+    "deadline": "Määräaika",
+    "done": "Tehty",
+    "missed": "Myöhässä",
+    "how": "Kirjeet kuuluvat samaan asiaan, kun sama virasto käyttää niissä samaa diaarinumeroa.",
+    "premium_only": "Asioiden aikajanat kuuluvat Premiumiin.",
+    "not_found": "Tässä asiassa ei ole enää kirjeitä."
+  },
   "reminders": {
     "due_today": "erääntyy tänään",
     "several_title": "{{count}} määräaikaa lähestyy",

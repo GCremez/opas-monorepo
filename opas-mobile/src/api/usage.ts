@@ -8,6 +8,8 @@ export interface UsageResponse {
   draftsIncluded?: boolean;
   /** Premium, or deadline reminders are on for everyone during the beta. */
   remindersIncluded?: boolean;
+  /** Premium, or case timelines are on for everyone during the beta. */
+  casesIncluded?: boolean;
 }
 
 export async function getUsage(): Promise<UsageResponse> {

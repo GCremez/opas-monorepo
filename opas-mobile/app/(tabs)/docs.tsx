@@ -13,6 +13,8 @@ import { useFolderStore } from '../../src/store/folderStore';
 import { useThemeColors } from '../../src/store/themeStore';
 import { collectDeadlines } from '../../src/lib/decodeView';
 import { authorityOf, groupByAuthority, UNREAD } from '../../src/lib/authorities';
+import { groupCases, nextCaseDeadline } from '../../src/lib/cases';
+import { usePremium } from '../../src/hooks/usePremium';
 
 /** "2H" / "3D" since the most recent change. */
 function shortAgo(iso: string): string {
@@ -80,6 +82,9 @@ export default function FilesScreen() {
   // Design 2c: grouped by the sender. The user's own folders sit in the same list;
   // the built-in topics are browsed from Search instead.
   const authorities = useMemo(() => groupByAuthority(documents), [documents]);
+  // Case timelines (P1-7): Premium, on for everyone during the beta.
+  const { canSeeCases } = usePremium();
+  const cases = useMemo(() => (canSeeCases ? groupCases(documents) : []), [canSeeCases, documents]);
   const ownFolders = folders.filter((f) => !f.categoryKey);
   const unread = documents.filter((d) => !authorityOf(d.authority));
   const groupCount = authorities.length + ownFolders.length;
@@ -114,6 +119,26 @@ export default function FilesScreen() {
           <ErrorState
             onRetry={() => { clearError(); fetchDocuments(); }}
           />
+        )}
+
+        {cases.length > 0 && (
+          <View className="px-6 mb-[18px]">
+            <Text className="font-semibold text-label uppercase text-fg pb-2.5 border-b border-rule">{t('case.cases')}</Text>
+            {cases.map((k) => {
+              const next = nextCaseDeadline(k);
+              const meta = [`${k.authority} · ${k.reference}`, t('documents.docs_count', { count: k.documents.length })];
+              if (next) meta.push(next.days === 0 ? t('reminders.due_today') : t('reminders.days_left', { count: next.days }));
+              return (
+                <GroupRow
+                  key={k.key}
+                  name={k.documents[k.documents.length - 1].title?.trim() || k.authority}
+                  meta={meta.join(' · ')}
+                  tone={next && next.days <= 7 ? 'text-danger' : 'text-muted'}
+                  onPress={() => router.push(`/case/${encodeURIComponent(k.key)}`)}
+                />
+              );
+            })}
+          </View>
         )}
 
         <View className="px-6">
