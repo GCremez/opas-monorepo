@@ -1,5 +1,5 @@
 # Opas on a single server: the backend and everything it needs, behind Caddy (HTTPS).
-# S3, Textract, SES and Claude (Amazon Bedrock) stay on AWS. Works on ARM64 and x86-64;
+# S3, Textract and SES stay on AWS; Claude is the Anthropic API. Works on ARM64 and x86-64;
 # images are built on the server from this repository. Memory limits add up to ~4 GB, so
 # a 4 GB server (EC2 t4g.medium) fits with the swap file from README.md.
 #
@@ -43,7 +43,8 @@ services:
       PRESIDIO_ANONYMIZER_URL: http://presidio-anonymizer:3000
       # The Opas Presidio image has Finnish and Swedish models.
       PRESIDIO_LANGUAGES: en,fi,sv
-      AI_PROVIDER: ${AI_PROVIDER:-bedrock}
+      AI_PROVIDER: ${AI_PROVIDER:-anthropic}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       SPRING_PROFILES_ACTIVE: production
     depends_on:
       postgres:

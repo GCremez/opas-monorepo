@@ -18,7 +18,7 @@ public class ClaudeConfig {
     public static final String ANTHROPIC = "anthropic";
 
     @Bean
-    public AnthropicClient anthropicClient(@Value("${opas.ai.provider:bedrock}") String provider,
+    public AnthropicClient anthropicClient(@Value("${opas.ai.provider:anthropic}") String provider,
             @Value("${opas.ai.bedrock-region:eu-north-1}") String bedrockRegion,
             @Value("${opas.ai.api-key:}") String apiKey) {
         var builder = AnthropicOkHttpClient.builder()

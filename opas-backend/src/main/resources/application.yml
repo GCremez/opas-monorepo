@@ -108,11 +108,13 @@ opas:
     upload-ttl-minutes: 15
   ai:
     # Where Claude runs (see ClaudeConfig):
-    # - bedrock (default): Claude in Amazon Bedrock, in one EU region, so letter text
-    #   stays in the EU. Credentials come from the AWS default chain (the ECS task role
-    #   in production), which needs bedrock-mantle:CreateInference.
-    # - anthropic: the Anthropic API directly, with ANTHROPIC_API_KEY.
-    provider: ${AI_PROVIDER:bedrock}
+    # - anthropic (default, decided 11 Nov 2026): the Anthropic API, with ANTHROPIC_API_KEY.
+    #   Letter text may be processed outside the EU; the consent screen (v4) and the
+    #   privacy policy say so.
+    # - bedrock: Claude in Amazon Bedrock, in one EU region, so letter text stays in the
+    #   EU. Credentials come from the AWS default chain, which needs
+    #   bedrock-mantle:CreateInference. Switching back means a new consent version.
+    provider: ${AI_PROVIDER:anthropic}
     # Stockholm, where the app runs. Bedrock's Messages endpoint serves only this region.
     bedrock-region: ${BEDROCK_REGION:eu-north-1}
     api-key: ${ANTHROPIC_API_KEY:}

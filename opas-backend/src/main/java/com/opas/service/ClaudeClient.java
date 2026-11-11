@@ -46,7 +46,7 @@ public class ClaudeClient {
     private final boolean refusalFallback;
 
     public ClaudeClient(AnthropicClient client,
-            @Value("${opas.ai.provider:bedrock}") String provider,
+            @Value("${opas.ai.provider:anthropic}") String provider,
             @Value("${opas.ai.model}") String model,
             @Value("${opas.ai.fallback-model:claude-sonnet-5}") String fallbackModel,
             @Value("${opas.ai.max-tokens}") long maxTokens,

@@ -65,7 +65,7 @@ Missing a Kela deadline or misreading a Migri decision can cost you money or del
 3. **Queue.** When you tap Decode, the API checks your monthly limit, puts a job on RabbitMQ and returns right away. You don't sit and wait on a slow request.
 4. **Read the text.** A background worker downloads the file and pulls the text out. PDFs go through PDFBox. Photos go through AWS Textract.
 5. **Remove personal data.** Before anything goes to the AI model, Microsoft Presidio replaces names, ID numbers, addresses, phone numbers and bank details, using Finnish, Swedish and English language models and Finnish patterns. Dates, amounts, reference numbers and authority names are kept, because the explanation needs them. This is on by default in the app.
-6. **Analyse.** The cleaned text goes to Claude on Amazon Bedrock in Stockholm, so it stays in the EU. The prompt asks for JSON back (document type, summary, key fields, language) and tells the model to treat the letter as data only, never as instructions.
+6. **Analyse.** The cleaned text goes to Claude through the Anthropic API (it may be processed outside the EU; the consent screen says so). `AI_PROVIDER=bedrock` runs Claude on Amazon Bedrock in Stockholm instead. The prompt asks for JSON back (document type, summary, key fields, language) and tells the model to treat the letter as data only, never as instructions.
 7. **Save.** The result is stored in PostgreSQL, and an embedding of the document is saved with pgvector so you can search your documents by meaning later.
 8. **Follow up.** From there you can draft a reply, move the letter into a folder, or search for it later.
 
@@ -116,7 +116,7 @@ flowchart LR
     Worker --> S3
     Worker --> Textract
     Worker --> Presidio[Presidio<br/>PII removal]
-    Worker --> Claude[Claude<br/>Amazon Bedrock, Stockholm]
+    Worker --> Claude[Claude<br/>Anthropic API]
     Worker --> PG
 
     Stripe[Stripe] -->|signed webhooks| API
@@ -164,7 +164,7 @@ sequenceDiagram
 | Layer | Technology | What it does here |
 |---|---|---|
 | Backend | Java 21, Spring Boot 3.5, Spring Security, Spring Data JPA | REST API and background workers |
-| AI | Claude (Sonnet 5.5) on Amazon Bedrock in eu-north-1, through the Anthropic Java SDK | Reads letters and drafts replies |
+| AI | Claude (Sonnet 5.5) through the Anthropic API and Java SDK (Amazon Bedrock in eu-north-1 as an option) | Reads letters and drafts replies |
 | Embeddings | Spring AI Transformers (local model, 384 dimensions) | Vectors for search, no extra API call |
 | Privacy | Microsoft Presidio (analyzer and anonymizer) with Finnish and Swedish spaCy models | Removes personal data before AI calls |
 | Database | PostgreSQL 16, pgvector, Flyway | Storage, vector search, versioned migrations |
@@ -274,7 +274,7 @@ opas-monorepo/
 - Docker and Docker Compose
 - Node.js 20 and npm
 - Expo Go on your phone, or the iOS Simulator or Android Emulator
-- AWS credentials with Bedrock access (`bedrock-mantle:CreateInference` in eu-north-1), or an Anthropic API key with `AI_PROVIDER=anthropic`
+- An Anthropic API key (`ANTHROPIC_API_KEY`), or AWS credentials with Bedrock access and `AI_PROVIDER=bedrock`
 - Optional: Stripe test keys for payments, and an AWS account for Textract and SES. You don't need AWS to test with PDFs and plain text locally.
 
 ### 1. Clone the repo
@@ -328,8 +328,9 @@ At minimum, fill in:
 
 ```dotenv
 DATABASE_PASSWORD=opas
-# Claude on Bedrock uses your AWS credentials. Without Bedrock access:
-# AI_PROVIDER=anthropic and ANTHROPIC_API_KEY=sk-ant-your-key-here
+# Claude through the Anthropic API (the default). For Amazon Bedrock instead:
+# AI_PROVIDER=bedrock, with AWS credentials that have Bedrock access
+ANTHROPIC_API_KEY=sk-ant-your-key-here
 
 # Paste each PEM file on one line, with \n for the line breaks
 JWT_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----
@@ -638,7 +639,7 @@ All settings come from environment variables (see `opas-backend/.env.example`). 
 | `DATABASE_PASSWORD` | required | Database password |
 | `REDIS_URL` | `redis://localhost:6379` | Redis connection |
 | `RABBITMQ_URL` | `amqp://guest:guest@localhost:5672` | RabbitMQ connection |
-| `AI_PROVIDER` | `bedrock` | Where Claude runs: `bedrock` (Amazon Bedrock, AWS credentials) or `anthropic` (the Anthropic API) |
+| `AI_PROVIDER` | `anthropic` | Where Claude runs: `anthropic` (the Anthropic API) or `bedrock` (Amazon Bedrock, AWS credentials). Changing it changes where letters go: update the consent text and its version |
 | `BEDROCK_REGION` | `eu-north-1` | Bedrock region. Requests are served in this region only |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5-5` | Claude model (the `anthropic.` prefix is added on Bedrock) |
 | `ANTHROPIC_FALLBACK_MODEL` | `claude-sonnet-5` | On Bedrock, a refused request is retried once on this model |
