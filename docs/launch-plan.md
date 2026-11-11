@@ -2,7 +2,7 @@
 
 Product positioning, competitors, pricing, setup requirements and the phased roadmap for Opas, the AI assistant that helps international residents understand and act on official Finnish mail.
 
-Last updated: 10 November 2026. [§8](#8-changes-from-the-previous-versions) lists what changed from the earlier versions and why.
+Last updated: 11 November 2026. [§8](#8-changes-from-the-previous-versions) lists what changed from the earlier versions and why.
 
 ---
 
@@ -38,7 +38,7 @@ Translation tools give people the words. Translation was never the hard part. Kn
 |---|---|---|
 | Understand this one letter | Good enough | Not a reason to pay |
 | Remember my case (the 3rd Migri letter refers to the 1st) | Forgets | Case timeline |
-| Don't miss the deadline | Doesn't know when it is | Reminders 7 days, 1 day and the morning of; calendar export |
+| Don't miss the deadline | Doesn't know when it is | Smart reminders 7, 3 and 1 day before and the morning of (Premium); calendar export |
 | Scary or routine? | Hedges | Urgency label |
 | Reply in proper Finnish | Can, but the user can't check it | Drafts that quote the right references and attachments |
 | Accuracy | Sometimes makes up rules | Answers with official sources |
@@ -92,18 +92,58 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 
 ## 3. Revenue and pricing
 
-| Tier | Price | Includes |
+### The principle
+
+Free answers **"What does this letter say?"** Premium answers **"How do I get through this whole situation without a mistake?"**
+
+Premium can't feel like the free tier with the limits removed. People pay for a safety net: saved time, avoided penalties, and a whole process handled, not single letters.
+
+- **Free: hook and build trust.** Read the letter, see the deadline, add it to the calendar, and (during the beta) draft a first reply.
+- **Premium: peace of mind for the whole case.** Deep explanations, a case that remembers its history, complete replies, your own language, and a record you can hand to an advisor.
+
+### Free vs. Premium
+
+| Feature / capability | Free tier | Premium tier | Conversion hook / value proposition |
+|---|---|---|---|
+| **Document scans & analysis** | 3 letters / month | Unlimited scans & uploads | Heavy mail periods (moving, tax season, visa renewal) exceed free limits fast. |
+| **Translation & analysis** | Key bullet points + action items | Key bullet points + deep explanations | Explains why decisions were made (e.g. Kela housing benefit income thresholds). |
+| **Deadline tracking** | Basic local phone calendar export | Smart reminders + timeline countdown | Push alerts 7, 3, and 1 day before deadlines to prevent costly missed appeal windows. |
+| **Reply drafting** | Short, standard reply template (1 paragraph) | Full custom AI reply generator | Tailored counter-arguments, custom tone, and document attachment guidance. |
+| **Case threading** (V2) | Single-letter view only | Multi-letter case timelines | Connects multi-month administrative chains into one active timeline. |
+| **Multi-language support** | English summary only | Native explanations in 10+ languages | Native clarity for Ukrainian, Russian, Arabic, Tagalog, Spanish, etc. |
+| **Form assistant** (V3) | Not included | Interactive form helper | Step-by-step guidance for filling online OmaKela / Suomi.fi portal forms. |
+| **Export & records** | Standard text copy | One-click case dossier PDF export | Clean PDF bundle for lawyers, union advisors (TEK), or formal appeals. |
+
+Decided 11 November 2026: the free tier is **3 letters a month, beta included**, and **deadline reminders are Premium only** (reversing the 10 November decision). Free users still see every deadline in the Needs you list and can add one to their calendar. During the beta everyone gets reminders (`REMINDERS_FREE_FOR_EVERYONE`), because nobody can buy Premium yet.
+
+**What "smart" means (built 11 Nov 2026, `src/lib/reminders.ts`):** reminders a week, 3 days and 1 day before and on the morning it's due; none for a deadline already ticked off; deadlines that would remind at the same moment arrive as one notification, nearest first. Next: the case-wide countdown (P1-7).
+
+**Decided (11 Nov 2026): free explanations are in English only.** Today the app explains a letter in the app language (English, Finnish or Swedish) for everyone; Finnish, Swedish and the 10+ new languages become Premium (P1-9). The app itself stays in all three languages.
+
+**What to lead with in marketing and the paywall:**
+
+1. **Risk shield.** A letter says "pay back €450 by 30 November". Premium shows what happens if you ignore it, what your options are, and drafts the appeal.
+2. **Case memory.** Letter 2 is a follow-up to letter 1 from three months ago. Premium knows, and the reply quotes the earlier dates and *diaarinumero* automatically.
+3. **Household sharing.** One person manages everyone's Kela and Vero mail.
+
+**Guardrails for Premium features**
+- **Not legal advice.** "Appeal strategy" and "counter-arguments" must stay explanations of the user's options with the official source, plus a draft the user checks. Confirm with a lawyer before marketing appeals (§7).
+- **Only claim what we can cite.** Deep explanations depend on official sources (P1-4); without them, Premium would be confident guessing.
+- **Free users still see their deadlines.** Reminders are Premium, but the deadline itself is always on the letter, in the Needs you list and exportable to the calendar. Never hide a deadline behind the paywall.
+
+### Prices
+
+| Plan | Price | For whom |
 |---|---|---|
-| **Free** | €0 | **3 scans a month**; deadline reminders (decided: they stay free) |
-| **Premium** | **€4.99/month or €39.99/year** | Unlimited scans; case timelines; unlimited reply drafts |
-| **Credit pack** | **€3.99 for 5 letters** | For occasional users who don't want a subscription |
-| **B2B licences** | Per seat | Employers, relocation agencies, universities (and unions) give Opas to new arrivals |
+| **Free** | €0 | Everyone: 3 letters a month, deadlines list and calendar export, short replies |
+| **Premium monthly** | **€5.99 / month**, cancel anytime | Busy periods: moving, permits, tax season |
+| **Premium yearly** | **€49.99 / year** (€4.17/month, 30% off monthly) | Long-term workers and students |
+| **Single Case Pass** | **€3.99 one-off**: 5 more letters + one full reply | People with one or two urgent letters a year who don't want a subscription |
+| **B2B licences** | Per seat | Employers, relocation agencies, universities and unions give Opas to new arrivals |
 
-**This isn't what the app does today.** The code still has 5 free decodes and €4.99 / €47.90. See [P1-9](#v2--case-aware-copilot-and-monetisation).
+Replaces the earlier €4.99 / €39.99 and "€3.99 for 5 letters" (§8). Store fees come off these prices (15% for small developers on both stores).
 
-**Decided: deadline reminders stay free** for every user. They already run on the phone (`opas-mobile/src/lib/reminders.ts`), and they're what brings people back.
-
----
+**Where the app is (11 Nov 2026):** free limit 3, Premium screen and website at €5.99 / €49.99 with "Save 30% yearly", and smart reminders listed as Premium (on for everyone during the beta). Still to do: the Stripe prices themselves, the Single Case Pass, and the new Premium features. See [P1-9](#v2--case-aware-copilot-and-monetisation).
 
 ## 4. Launch setup checklist
 
@@ -126,9 +166,14 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 - Updated README (P0-8).
 - No checkout on Android either (Google Play first, see below).
 
+**Decisions (11 November 2026):**
+- **Free tier is 3 letters a month**, during the beta too.
+- **Deadline reminders are Premium only, and smart** (7, 3 and 1 day before, morning of, merged when they coincide). Reverses the 10 Nov decision below. On for everyone during the beta.
+- **Free explanations are in English only.** Explanations in any other language are Premium.
+
 **Decisions (10 November 2026):**
 - **Google Play first.** The beta and first release are on Android. Play requires Play Billing for subscriptions (unless enrolled in Google's EEA alternative billing programme), so `CAN_PURCHASE` is now false on every platform: no prices or checkout in the app until store billing is added (P1-6). Nobody needs to pay during the beta: reply drafts are free.
-- **Deadline reminders stay free.**
+- ~~Deadline reminders stay free.~~ Reversed on 11 Nov: Premium only.
 
 **Infrastructure and operations:**
 
@@ -201,12 +246,21 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
   - track the lifecycle: request → clarification → decision → appeal window;
   - feed the case history into reply drafts, so they refer to earlier submissions.
 - [ ] **P1-8. Record consent on the server:** `POST /me/consents` stores the user, consent type, version and time, so we can show GDPR consent.
-- [ ] **P1-9. Pricing in the code:**
-  - free quota 5 → 3;
-  - yearly price €47.90 → €39.99 (prices are hard-coded in `app/subscription/index.tsx`; move them to the backend);
-  - add the €3.99 five-letter credit pack;
-  - decide whether deadline reminders stay free (§3).
+- [ ] **P1-9. Pricing and tiers in the code (§3):**
+  - [x] free quota 5 → 3 (`application.yml`);
+  - [x] prices €5.99 / month and €49.99 / year on the Premium screen and website, "Save 30% yearly";
+  - [ ] new Stripe prices for €5.99 / €49.99 (the price IDs come from the backend), and move the displayed prices from `app/subscription/index.tsx` to the backend;
+  - add the €3.99 Single Case Pass (5 letters + one full reply);
+  - [x] Premium feature list: smart deadline reminders added;
+  - [x] reminders Premium only: `remindersIncluded` on `/subscription/usage`, `REMINDERS_FREE_FOR_EVERYONE` (default true for the beta); set it to false when Premium goes on sale;
+  - [ ] free accounts get explanations in English only, whatever the app language (`readerLanguage` in `DecodeService.java` uses the app language today); other explanation languages are Premium (tell beta testers before it changes);
+  - [ ] add deep explanations, full replies, case timelines and dossier export to the list as each one ships;
+  - after the beta: short reply for Free, full reply generator for Premium (replaces `DRAFTS_FREE_FOR_EVERYONE`).
 - [ ] **P1-10. One B2B pilot,** before building a portal: one employer, university or union, free seats for 3 months for feedback, with simple invite codes. It tests whether B2B buyers exist before P2-1.
+- [ ] **P1-11. Deep explanations (Premium):** why the authority decided this, built on the P1-4 sources.
+- [ ] **P1-12. Full reply generator (Premium):** tone, counter-arguments, attachment list, references from the case (P1-7).
+- [ ] **P1-13. Risk shield (Premium):** for letters with a payment or appeal deadline, what happens if you don't respond and what your options are. Wait for the legal check (§7).
+- [ ] **P1-14. Case dossier PDF export (Premium):** one file with a case's letters, explanations, replies and dates.
 
 ### V3 — B2B distribution and platform infrastructure
 
@@ -216,6 +270,8 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 - [ ] **P2-2. On-device OCR** (Apple Vision / ML Kit): photos are read on the phone and never uploaded. Together with this, move redaction onto the device (`src/lib/redact.ts`), so only redacted text leaves the phone. Matches TiG Desk's privacy model.
 - [ ] **P2-3. Official digital mailbox.** There's no public API that lets a third-party app pull someone's Suomi.fi mail. The realistic route is DVV's planned option to choose an approved alternative mail service, which means security certification, an agreement with DVV, and competing with OmaPosti (Posti + Kivra). Start with DVV's requirements once they're published.
 - [ ] **P2-4. Nordic expansion:** Sweden (Skatteverket, Försäkringskassan, Migrationsverket) and Norway (NAV, Skatteetaten, UDI). Mostly new content and prompts, not new architecture.
+- [ ] **P2-5. Form helper (Premium):** step-by-step guidance for OmaKela and Suomi.fi forms. Guidance next to the form only; Opas never logs in for the user.
+- [ ] **P2-6. Household sharing (Premium):** one subscription for a spouse and dependants, each with their own letters and consent.
 
 ---
 
@@ -250,6 +306,8 @@ Official mail in Finland has been **primarily digital since 14 April 2026**, thr
 |---|---|
 | Anthropic API directly, or AWS Bedrock in the EU? | Check Anthropic's documentation on where data is processed and kept; compare Bedrock EU latency, cost and Claude model availability |
 | How to split revenue between subscriptions and one-off packs? | Beta interviews, then conversion data once in-app purchases launch (P1-6, P1-9) |
+| €5.99 / €49.99, or the cheaper €4.99 / €39.99? | Beta interviews: ask what they'd pay after their last letter; then test once purchases launch |
+| Does the short free reply convert, or just frustrate? | Compare draft use and upgrades after the beta ends free drafts |
 | Play Billing, or Google's EEA alternative billing programme, on Android? (Android goes first) | Compare fees and reporting effort (P1-6) |
 | Are there restrictions on automated reply drafting for Finnish administrative appeals? | Confirm with a lawyer. We believe there's no general monopoly on legal advice in Finland (only representing people in court is licensed), but get it confirmed before marketing reply drafting for appeals |
 
@@ -270,6 +328,8 @@ This version uses the team's draft as the base. These changes were made while me
 | P2-3: connect to government digital mail APIs | Become an approved alternative mail service under DVV's plan | There's no public API for third parties to pull citizens' Suomi.fi mail |
 | April 2026 switch "creates an immediate spike" | Already happened; demand is a hypothesis to test | The switch was on 14 April 2026, and we have no adoption data yet |
 | Competitor pricing and features | Kept, marked unverified, with research findings where they differ (e.g. TiG Desk is free) | Couldn't verify from competitors' sites |
+| Premium €4.99 / €39.99; credit pack €3.99 for 5 letters (§3) | €5.99 / €49.99; Single Case Pass €3.99 for 5 letters + one full reply; full Free vs. Premium matrix (11 Nov 2026) | Premium has to be a safety net for the whole case, not the free tier without limits |
+| Deadline reminders free (10 Nov) | Smart reminders Premium only; deadlines stay visible to everyone (11 Nov) | Reminders are a clear reason to pay; free users keep the deadline list and calendar export |
 | — | **Kept from the earlier plan:** personas, market size, PR #11 status, detailed setup steps, beta setup, P1-9 pricing changes in code, P1-10 B2B pilot before the portal, sources | The draft dropped these, and they're still needed to implement or check the plan |
 
 ---
