@@ -14,6 +14,7 @@ import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { useReminderStore } from '../../src/store/reminderStore';
 import { useThemeStore, useThemeColors, type Appearance_ } from '../../src/store/themeStore';
 import { CAN_PURCHASE } from '../../src/lib/billing';
+import { withdrawAiConsent } from '../../src/lib/aiConsent';
 import { LINKS, OFFICIAL_SITES } from '../../src/lib/links';
 
 type Lang = 'en' | 'fi' | 'sv';
@@ -87,7 +88,7 @@ export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { logout, deleteAccount: deleteAccountAction, changePassword, user, plan } = useAuthStore();
+  const { logout, deleteAccount: deleteAccountAction, changePassword, user, plan, fetchProfile } = useAuthStore();
   const { subscription, fetchSubscription, usage, fetchUsage } = useSubscriptionStore();
   const appearance = useThemeStore((s) => s.preference);
   const setAppearance = useThemeStore((s) => s.setPreference);
@@ -102,6 +103,7 @@ export default function ProfileScreen() {
   );
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showConsentConfirm, setShowConsentConfirm] = useState(false);
   const [showPasswordSheet, setShowPasswordSheet] = useState(false);
   const [langSheetOpen, setLangSheetOpen] = useState(false);
   const [appearanceSheetOpen, setAppearanceSheetOpen] = useState(false);
@@ -114,6 +116,9 @@ export default function ProfileScreen() {
   useEffect(() => {
     fetchSubscription();
     fetchUsage();
+    // Login only returns id/name/email, so the AI consent shown below is unknown until
+    // /auth/me has been read.
+    fetchProfile();
   }, []);
 
   const { meetsLength, strengthScore, strengthColor, passwordsMatch, pwRules } = useMemo(() => {
@@ -172,6 +177,17 @@ export default function ProfileScreen() {
     }
   }, [deleteAccountAction, showToast, t, router]);
 
+  const email = user?.email;
+  const handleWithdrawConsent = useCallback(async () => {
+    try {
+      await withdrawAiConsent(email);
+      await fetchProfile();
+      showToast(t('profile.ai_reading_withdrawn'));
+    } catch {
+      RNAlert.alert(t('common.error'), t('profile.ai_reading_error'));
+    }
+  }, [email, fetchProfile, showToast, t]);
+
   const handleChangePassword = useCallback(async () => {
     if (!pwCurrent || !passwordsMatch || !meetsLength) return;
     setSavingPw(true);
@@ -192,6 +208,7 @@ export default function ProfileScreen() {
   }, [pwCurrent, pwNew, passwordsMatch, meetsLength, changePassword, showToast, t, resetPasswordForm]);
 
   const tier = subscription?.tier ?? plan;
+  const aiConsentOn = !!user?.aiConsent;
   const langLabel = LANGUAGES.find((l) => l.key === selectedLang);
   const initial = user?.name?.trim()?.[0]?.toUpperCase() ?? '·';
 
@@ -230,6 +247,17 @@ export default function ProfileScreen() {
               // Asked to turn on but the system said no: point to Settings rather than fail silently.
               showToast(!deadlineOn && !on ? t('reminders.blocked') : `${t('profile.deadline_reminders')} ${on ? t('profile.on') : t('profile.off')}`);
             }}
+          />
+          {/* Withdrawal must be as easy as giving consent (GDPR Art. 7(3)); the row only
+              opens the confirm sheet while consent is on. When it is off, tapping says
+              that the next letter will ask again. */}
+          <ValueRow
+            c={c}
+            label={t('profile.ai_reading')}
+            value={aiConsentOn ? t('profile.on') : t('profile.off')}
+            valueTone={aiConsentOn ? 'text-accent' : 'text-muted'}
+            hideChevron={!aiConsentOn}
+            onPress={() => (aiConsentOn ? setShowConsentConfirm(true) : showToast(t('profile.ai_reading_hint')))}
           />
         </View>
 
@@ -456,6 +484,19 @@ export default function ProfileScreen() {
           await handleDeleteAccount();
         }}
         onCancel={() => setShowDeleteConfirm(false)}
+      />
+
+      <ConfirmSheet
+        visible={showConsentConfirm}
+        title={t('profile.ai_reading_withdraw_title')}
+        message={t('profile.ai_reading_withdraw_desc')}
+        confirmLabel={t('profile.ai_reading_withdraw')}
+        destructive
+        onConfirm={async () => {
+          setShowConsentConfirm(false);
+          await handleWithdrawConsent();
+        }}
+        onCancel={() => setShowConsentConfirm(false)}
       />
     </SafeAreaView>
   );

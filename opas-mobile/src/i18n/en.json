@@ -436,6 +436,13 @@
     "deadline_reminders": "Deadline reminders",
     "on": "On",
     "off": "Off",
+    "ai_reading": "AI reading",
+    "ai_reading_hint": "The next letter you scan will ask for your permission again.",
+    "ai_reading_withdraw_title": "Turn off AI reading?",
+    "ai_reading_withdraw_desc": "Opas will stop sending letter text to Claude. Letters already explained stay in your archive. The next letter you scan will ask for your permission again.",
+    "ai_reading_withdraw": "Turn off",
+    "ai_reading_withdrawn": "AI reading turned off",
+    "ai_reading_error": "Could not turn it off. Check your connection and try again.",
     "remaining_short": "{{remaining}} of {{limit}} left",
     "terms": "Terms of Use"
   },

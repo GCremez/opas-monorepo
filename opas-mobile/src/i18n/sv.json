@@ -436,6 +436,13 @@
     "deadline_reminders": "Påminnelser om tidsfrister",
     "on": "På",
     "off": "Av",
+    "ai_reading": "AI-läsning",
+    "ai_reading_hint": "Nästa brev du skannar frågar om lov igen.",
+    "ai_reading_withdraw_title": "Stäng av AI-läsning?",
+    "ai_reading_withdraw_desc": "Opas slutar skicka brevtext till Claude. Brev som redan förklarats finns kvar i ditt arkiv. Nästa brev du skannar frågar om lov igen.",
+    "ai_reading_withdraw": "Stäng av",
+    "ai_reading_withdrawn": "AI-läsning avstängd",
+    "ai_reading_error": "Det gick inte att stänga av. Kontrollera anslutningen och försök igen.",
     "remaining_short": "{{remaining}} av {{limit}} kvar",
     "terms": "Användarvillkor"
   },

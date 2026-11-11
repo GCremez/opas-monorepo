@@ -436,6 +436,13 @@
     "deadline_reminders": "Määräaikamuistutukset",
     "on": "Päällä",
     "off": "Pois",
+    "ai_reading": "Tekoälyluku",
+    "ai_reading_hint": "Seuraava skannaamasi kirje kysyy lupaa uudestaan.",
+    "ai_reading_withdraw_title": "Poistetaanko tekoälyluku käytöstä?",
+    "ai_reading_withdraw_desc": "Opas ei enää lähetä kirjeiden tekstiä Claudelle. Jo selitetyt kirjeet säilyvät arkistossasi. Seuraava skannaamasi kirje kysyy lupaa uudestaan.",
+    "ai_reading_withdraw": "Poista käytöstä",
+    "ai_reading_withdrawn": "Tekoälyluku poistettu käytöstä",
+    "ai_reading_error": "Poistaminen ei onnistunut. Tarkista yhteys ja yritä uudelleen.",
     "remaining_short": "{{remaining}}/{{limit}} jäljellä",
     "terms": "Käyttöehdot"
   },
