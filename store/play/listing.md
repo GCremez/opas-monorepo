@@ -39,20 +39,20 @@ Fota ett finskt brev och läs vad det säger, vad du ska göra och när.
 ```
 Opas reads Finnish official letters for you.
 
-Take a photo of a letter, or import a PDF. Opas explains it in plain English, Finnish or Swedish: what the letter says, what you need to do, and by when. Dates and amounts are pulled out so you can see them at a glance. Everything stays in one place, searchable and filed by sender.
+Take a photo of a letter, or import a PDF. Opas explains it in plain English: what the letter says, what you need to do, and by when. Dates and amounts are pulled out so you can see them at a glance. Everything stays in one place, searchable and filed by sender.
 
 WHICH LETTERS
 Opas reads letters from Kela, Verohallinto (Vero), Migri, DVV, TE-palvelut and most other Finnish senders. Paper letters, photos and PDFs all work.
 
 WHAT YOU GET
-• A short explanation of what the letter means, in your language
+• A short explanation of what the letter means, in plain English
 • The deadlines it contains, with reminders before they pass
 • Amounts, reference numbers and what to pay, if anything
 • Folders and search, so a letter from last spring is easy to find
 • Reply drafts in Finnish, for letters that need an answer
 
 PRIVACY
-Your letters contain personal data, so Opas takes it seriously. Names, identity numbers and addresses are removed on our own server before any AI sees the text. The rest is sent to Claude, an AI made by Anthropic, running on Amazon Bedrock in Stockholm, Sweden, so it stays in the EU. Neither Anthropic nor Amazon uses your letters to train AI. You agree before the first scan, and you can take permission back at any time under Profile → AI reading.
+Your letters contain personal data, so Opas takes it seriously. Names, identity numbers and addresses are removed on our own server before any AI sees the text. The rest is sent to Claude, an AI made by Anthropic, which may process it outside the EU, for example in the United States. Anthropic doesn't use your letters to train AI. You agree before the first scan, and you can take permission back at any time under Profile → AI reading.
 
 Opas is an independent app. It is not made by, approved by, or connected to Kela, Vero, Migri, DVV, TE-palvelut or any other Finnish authority.
 
@@ -74,14 +74,14 @@ MITKÄ KIRJEET
 Opas lukee Kelan, Verohallinnon, Migrin, DVV:n, TE-palvelujen ja useimpien muiden suomalaisten lähettäjien kirjeitä. Paperikirjeet, kuvat ja PDF:t käyvät kaikki.
 
 MITÄ SAAT
-• Lyhyen selityksen siitä, mitä kirje tarkoittaa, omalla kielelläsi
+• Lyhyen selityksen siitä, mitä kirje tarkoittaa, selkeällä englannilla
 • Kirjeen määräajat ja muistutukset ennen niiden umpeutumista
 • Summat, viitenumerot ja sen, mitä pitää maksaa
 • Kansiot ja haun, jotta viime kevään kirje löytyy helposti
 • Vastausluonnokset suomeksi kirjeisiin, joihin pitää vastata
 
 TIETOSUOJA
-Kirjeissäsi on henkilötietoja, joten Opas suhtautuu niihin vakavasti. Nimet, henkilötunnukset ja osoitteet poistetaan omalla palvelimellamme ennen kuin tekoäly näkee tekstin. Loppu tekstistä lähetetään Claudelle, Anthropicin tekoälylle, joka pyörii Amazon Bedrockissa Tukholmassa, Ruotsissa, eli pysyy EU:ssa. Anthropic tai Amazon ei käytä kirjeitäsi tekoälyn kouluttamiseen. Annat luvan ennen ensimmäistä skannausta ja voit perua sen milloin tahansa kohdassa Profiili → Tekoälyluku.
+Kirjeissäsi on henkilötietoja, joten Opas suhtautuu niihin vakavasti. Nimet, henkilötunnukset ja osoitteet poistetaan omalla palvelimellamme ennen kuin tekoäly näkee tekstin. Loppu tekstistä lähetetään Claudelle, Anthropicin tekoälylle, joka voi käsitellä sitä EU:n ulkopuolella, esimerkiksi Yhdysvalloissa. Anthropic ei käytä kirjeitäsi tekoälyn kouluttamiseen. Annat luvan ennen ensimmäistä skannausta ja voit perua sen milloin tahansa kohdassa Profiili → Tekoälyluku.
 
 Opas on itsenäinen sovellus. Sitä ei ole tehnyt, hyväksynyt tai siihen ole yhteydessä Kela, Vero, Migri, DVV, TE-palvelut tai mikään muu suomalainen viranomainen.
 
@@ -103,14 +103,14 @@ VILKA BREV
 Opas läser brev från Kela, Skatteförvaltningen (Vero), Migri, DVV, TE-tjänster och de flesta andra finska avsändare. Pappersbrev, foton och PDF:er fungerar alla.
 
 DET HÄR FÅR DU
-• En kort förklaring av vad brevet betyder, på ditt språk
+• En kort förklaring av vad brevet betyder, på enkel engelska
 • Tidsfristerna i brevet, med påminnelser innan de passerar
 • Belopp, referensnummer och vad som ska betalas
 • Mappar och sökning, så att ett brev från i våras är lätt att hitta
 • Svarsutkast på finska till brev som behöver ett svar
 
 INTEGRITET
-Dina brev innehåller personuppgifter, och Opas tar det på allvar. Namn, personbeteckningar och adresser tas bort på vår egen server innan någon AI ser texten. Resten skickas till Claude, en AI från Anthropic, som körs på Amazon Bedrock i Stockholm, Sverige, så att den stannar i EU. Varken Anthropic eller Amazon använder dina brev för att träna AI. Du samtycker före den första skanningen och kan ta tillbaka samtycket när som helst under Profil → AI-läsning.
+Dina brev innehåller personuppgifter, och Opas tar det på allvar. Namn, personbeteckningar och adresser tas bort på vår egen server innan någon AI ser texten. Resten skickas till Claude, en AI från Anthropic, som kan behandla den utanför EU, till exempel i USA. Anthropic använder inte dina brev för att träna AI. Du samtycker före den första skanningen och kan ta tillbaka samtycket när som helst under Profil → AI-läsning.
 
 Opas är en oberoende app. Den är inte gjord av, godkänd av eller kopplad till Kela, Vero, Migri, DVV, TE-tjänster eller någon annan finsk myndighet.
 

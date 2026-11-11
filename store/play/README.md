@@ -34,8 +34,8 @@ Console purchase is the urgent one, not Apple.
 
 ## Order of operations
 
-1. **Bedrock model access.** Nothing in the app works until Claude answers; see
-   `docs/launch-plan.md` P0-3. This is an AWS console action, not a Play one.
+1. **Anthropic API key and spend limit.** Nothing in the app works until Claude
+   answers; see `docs/launch-plan.md` §4. Bedrock is deferred.
 2. **Play Console account.** Decide the account type above, pay the $25, finish
    identity verification.
 3. **Build the first AAB** with EAS and upload it to a closed test. Do not wait

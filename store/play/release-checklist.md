@@ -1,7 +1,7 @@
 # Release checklist
 
-The order matters: the Play Console account starts the clock, and Bedrock is the
-only thing that makes the app useful. Nothing here can be done until the $25 Play
+The order matters: the Play Console account starts the clock, and Claude (through
+the Anthropic API) is the only thing that makes the app useful. Nothing here can be done until the $25 Play
 Console account exists.
 
 ## 0. Before paying: decide the account type
@@ -22,12 +22,11 @@ started this week beats waiting a month.
 **This is the urgent purchase.** Apple's $99/year can wait: the Android-first
 plan does not need it, and TestFlight only matters once an iPhone build exists.
 
-## 1. Unblock the product (AWS, not Play)
+## 1. Unblock the product (Anthropic and the server, not Play)
 
-- [ ] Bedrock model access in `eu-north-1` for the models in
-  `docs/launch-plan.md` P0-3. Today every Anthropic model returns "not available
-  for this account". If the AWS account is on the Free plan, upgrade it to Paid
-  and request model access again.
+- [ ] Anthropic API key on the server (`AI_PROVIDER=anthropic`, the default), with
+  billing and a monthly spend limit on the Anthropic account. Bedrock is deferred
+  (`docs/launch-plan.md` §4, 11 Nov 2026).
 - [ ] `POST /decode` returns a real explanation on a test letter. Do not spend
   the 14-day test clock on a build whose core action fails.
 - [ ] `https://api.getopas.app/actuator/health` → `UP`.

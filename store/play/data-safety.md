@@ -26,7 +26,7 @@ so the answer is **not shared**.
 | **Personal info → Name** | Yes | No | Required | App functionality, Account management | `User.name`; registration form; shown under Profile |
 | **Personal info → Email address** | Yes | No | Required | App functionality, Account management, Developer communications | `User.email`; login, verification, result-ready email, replies |
 | **Personal info → User IDs** | Yes | No | Required | App functionality, Analytics | Account UUID (`User.id`) is the PostHog distinct ID and the document owner key |
-| **Health info** (inside a letter) | Yes | No | Optional | App functionality | A Kela or hospital letter can contain diagnoses or treatment. Sent only after the explicit Art. 9(2)(a) consent screen, redacted first, then to Claude on Bedrock in Stockholm. Stored as part of the document until deleted |
+| **Health info** (inside a letter) | Yes | No | Optional | App functionality | A Kela or hospital letter can contain diagnoses or treatment. Sent only after the explicit Art. 9(2)(a) consent screen, redacted first, then to Claude through the Anthropic API (may be processed in the US). Stored as part of the document until deleted |
 | **Photos** | Yes | No | Optional | App functionality | `expo-image-picker` / `expo-camera`; the photo is uploaded for Textract and stored as the original letter |
 | **Files and docs** | Yes | No | Optional | App functionality | PDF import via `expo-document-picker`; the PDF is uploaded and stored |
 | **App activity → App interactions** | Yes | No | Required | Analytics | PostHog events in `src/lib/analytics.ts` and call sites: scans, logins, tab taps, document actions. No letter text, names or emails are attached |
