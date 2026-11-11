@@ -38,7 +38,7 @@ public class DocumentInsights {
      */
     private static final Pattern CASE_LABEL = Pattern.compile(
             "diaari|\\bdnro\\b|\\bdnr\\b|asianumero|asiatunnus|ärende|diarienummer|hakemusnumero"
-                    + "|case (number|reference|no)|file (number|reference)|application (number|no)",
+                    + "|case (number|reference|no)|file (number|reference)|\\bapplication\\b",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     private static final Pattern MONEY_OR_PERCENT =

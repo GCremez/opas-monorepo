@@ -8,6 +8,11 @@ export function canRemind(plan: string, usage: UsageResponse | null): boolean {
   return plan === 'premium' || usage?.remindersIncluded === true;
 }
 
+/** Case timelines are Premium; the server can turn them on for everyone (beta). */
+export function canSeeCases(plan: string, usage: UsageResponse | null): boolean {
+  return plan === 'premium' || usage?.casesIncluded === true;
+}
+
 export function usePremium() {
   const plan = useAuthStore((s) => s.plan);
   const usage = useSubscriptionStore((s) => s.usage);
@@ -28,5 +33,7 @@ export function usePremium() {
     canDraft: premiumByPlan || usage?.draftsIncluded === true,
     /** Gets deadline reminders: Premium, or reminders are on for everyone (beta). */
     canRemind: canRemind(plan, usage),
+    /** Sees case timelines: Premium, or cases are on for everyone (beta). */
+    canSeeCases: canSeeCases(plan, usage),
   };
 }

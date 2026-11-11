@@ -584,6 +584,22 @@
     "documents_heading": "Documents",
     "options": "Folder options"
   },
+  "case": {
+    "eyebrow": "Case",
+    "cases": "Cases",
+    "part_of": "Part of a case · {{count}} letter",
+    "part_of_plural": "Part of a case · {{count}} letters",
+    "meta": "{{reference}} · {{count}} letter · since {{date}}",
+    "meta_plural": "{{reference}} · {{count}} letters · since {{date}}",
+    "next": "Next deadline",
+    "letter": "Letter",
+    "deadline": "Deadline",
+    "done": "Done",
+    "missed": "Missed",
+    "how": "Letters join a case when the same office uses the same case number (diaarinumero) on them.",
+    "premium_only": "Case timelines are part of Premium.",
+    "not_found": "This case has no letters any more."
+  },
   "reminders": {
     "due_today": "due today",
     "several_title": "{{count}} deadlines need you",

@@ -21,6 +21,7 @@ import { usePremium } from '../../src/hooks/usePremium';
 import { CAN_PURCHASE } from '../../src/lib/billing';
 import { addToCalendar } from '../../src/utils/calendar';
 import { daysUntil, formatDate, nextDeadline, parseIsoDate, toDecodeView } from '../../src/lib/decodeView';
+import { caseOf } from '../../src/lib/cases';
 
 type TabView = 'summary' | 'original' | 'dates' | 'actions';
 type DecodeState = 'idle' | 'running' | 'failed';
@@ -34,7 +35,8 @@ export default function DocumentDetailScreen() {
   const { deleteDocument, archiveDocument, assignFolder, setTaskDone } = useDocumentStore();
   const { folders, fetchFolders } = useFolderStore();
   const [categorySheet, setCategorySheet] = useState(false);
-  const { isPremium, canDraft } = usePremium();
+  const { isPremium, canDraft, canSeeCases } = usePremium();
+  const allDocuments = useDocumentStore((s) => s.documents);
   // Premium features stay hidden where they can't be bought in the app.
   const showPremium = isPremium || CAN_PURCHASE;
   const showDraft = canDraft || CAN_PURCHASE;
@@ -276,6 +278,22 @@ export default function DocumentDetailScreen() {
               {currentFolder ? folderName(currentFolder, t) : t('document.choose_category')} ›
             </Text>
           </Pressable>
+          {/* Case timeline (P1-7): other letters from this sender about the same matter. */}
+          {(() => {
+            const kase = canSeeCases ? caseOf(allDocuments, allDocuments.find((d) => d.id === doc.id) ?? doc) : null;
+            if (!kase) return null;
+            return (
+              <Pressable
+                onPress={() => router.push(`/case/${encodeURIComponent(kase.key)}`)}
+                className="flex-row items-center gap-2 self-start min-h-touch"
+                accessibilityRole="button"
+                accessibilityLabel={t('case.part_of', { count: kase.documents.length })}
+              >
+                <Text className="font-semibold text-label uppercase text-muted">{t('case.eyebrow')}</Text>
+                <Text className="font-body text-body-sm text-accent">{t('case.part_of', { count: kase.documents.length })} ›</Text>
+              </Pressable>
+            );
+          })()}
         </View>
 
         {/* Tab underline row — scrolls sideways when translated labels don't fit. */}

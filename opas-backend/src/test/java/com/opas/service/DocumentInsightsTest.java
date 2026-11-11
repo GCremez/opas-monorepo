@@ -77,6 +77,8 @@ class DocumentInsightsTest {
         // Letters explained before the prompt asked for it: a case-like key field.
         assertEquals("MIG-2026-55", insights.from("""
                 {"keyFields": {"Amount": "€10", "Hakemusnumero": "MIG-2026-55"}}""").caseReference());
+        assertEquals("OL1234567", insights.from("""
+                {"keyFields": {"Permit type": "Work", "Application": "OL1234567"}}""").caseReference());
         assertEquals("4711/2026", insights.from("""
                 {"keyFields": {"Ärendenummer": "4711/2026"}}""").caseReference());
         // Payment references and decision numbers change per letter: never a case.
