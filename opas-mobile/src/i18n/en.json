@@ -256,7 +256,7 @@
     "upload_failed_title": "Couldn't upload this document",
     "upload_failed_desc": "Check your connection and try again. Nothing was saved.",
     "limit_title": "You've used this month's scans",
-    "limit_desc": "Free accounts include 5 scans a month. Upgrade for unlimited scans, or wait until next month.",
+    "limit_desc": "Free accounts include 3 scans a month. Upgrade for unlimited scans, or wait until next month.",
     "upgrade": "See Premium",
     "new_scan": "New scan",
     "align_frame": "[ ALIGN LETTER\nWITHIN FRAME ]",
@@ -280,7 +280,7 @@
     "pdf_short": "PDF",
     "file_too_large_title": "This file is too large",
     "file_too_large_desc": "Opas can read files up to 20 MB. Try a smaller file, or take a photo of the letter.",
-    "limit_desc_no_upgrade": "Free accounts include 5 scans a month. You can scan again from the start of next month.",
+    "limit_desc_no_upgrade": "Free accounts include 3 scans a month. You can scan again from the start of next month.",
     "check_original": "AI can make mistakes. Check dates against the original letter."
   },
   "consent": {

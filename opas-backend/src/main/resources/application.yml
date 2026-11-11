@@ -164,7 +164,9 @@ opas:
     # "Your letter is ready" email, if the result is still unopened this long after it's done.
     ready-email-after: ${READY_EMAIL_AFTER:PT10M}
   free-tier:
-    monthly-decode-limit: 5
+    # Three, not five: the beta keeps the ceiling low enough that Premium has a reason
+    # to exist, and the app, the website and the terms all say three (P1-9).
+    monthly-decode-limit: 3
 
 logging:
   pattern:
