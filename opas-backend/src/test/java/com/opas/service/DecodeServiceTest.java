@@ -363,4 +363,13 @@ class DecodeServiceTest {
     void promptAsksForACategory() {
         assertTrue(DecodeService.buildDecodePrompt("a.jpg", "x", "en").contains("\"category\""));
     }
+
+    @Test
+    void freeExplanationsAreInEnglishPremiumGetsTheAppLanguage() {
+        assertEquals("en", DecodeService.explanationLanguage("fi", false, false));
+        assertEquals("fi", DecodeService.explanationLanguage("fi", true, false));
+        assertEquals("sv", DecodeService.explanationLanguage("sv", false, true));
+        assertTrue(DecodeService.buildDecodePrompt("a.pdf", "x",
+                DecodeService.explanationLanguage("fi", false, false)).contains("in English"));
+    }
 }
