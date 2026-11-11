@@ -352,6 +352,14 @@ public class AuthService {
         return AiConsentResponse.of(user);
     }
 
+    /** Withdraws this person's AI consent; the app asks again before the next scan. */
+    @Transactional
+    public void withdrawAiConsent(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(ResourceNotFoundException::new);
+        user.withdrawAiConsent();
+        userRepository.save(user);
+    }
+
     private AuthResponse generateAuthResponse(User user) {
         String plan = subscriptionRepository.findByUserId(user.getId()).map(Subscription::getTier).orElse("free");
         String userId = user.getId().toString();

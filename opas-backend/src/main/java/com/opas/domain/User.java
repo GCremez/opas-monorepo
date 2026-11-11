@@ -116,6 +116,12 @@ public class User {
         this.aiConsentAt = at;
     }
 
+    /** The person took back their AI consent (GDPR Art. 7(3)): forget version and time. */
+    public void withdrawAiConsent() {
+        this.aiConsentVersion = null;
+        this.aiConsentAt = null;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
