@@ -1,0 +1,127 @@
+# Opas on a single server: the backend and everything it needs, behind Caddy (HTTPS).
+# S3, Textract, SES and Claude (Amazon Bedrock) stay on AWS. Works on ARM64 and x86-64;
+# images are built on the server from this repository. Memory limits add up to ~4 GB, so
+# a 4 GB server (EC2 t4g.medium) fits with the swap file from README.md.
+#
+#   cp .env.example .env   # fill it in
+#   docker compose up -d --build
+#
+# See README.md in this folder. Nothing but Caddy (80/443) is reachable from outside.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    mem_limit: 128m
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      API_DOMAIN: ${API_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  backend:
+    build: ../../opas-backend
+    image: opas-backend
+    restart: unless-stopped
+    # Java takes 75% of this as heap (MaxRAMPercentage in the Dockerfile).
+    mem_limit: 1200m
+    env_file: .env
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/opas
+      DATABASE_USER: opas
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      RABBITMQ_URL: amqp://opas:${RABBITMQ_PASSWORD}@rabbitmq:5672
+      PRESIDIO_SIDECAR_URL: http://presidio-analyzer:3000
+      PRESIDIO_ANONYMIZER_URL: http://presidio-anonymizer:3000
+      # The Opas Presidio image has Finnish and Swedish models.
+      PRESIDIO_LANGUAGES: en,fi,sv
+      AI_PROVIDER: ${AI_PROVIDER:-bedrock}
+      SPRING_PROFILES_ACTIVE: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      presidio-analyzer:
+        condition: service_healthy
+      presidio-anonymizer:
+        condition: service_started
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    mem_limit: 384m
+    environment:
+      POSTGRES_DB: opas
+      POSTGRES_USER: opas
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U opas']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    mem_limit: 96m
+    command: ['redis-server', '--requirepass', '${REDIS_PASSWORD}', '--appendonly', 'yes']
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASSWORD" ping | grep PONG']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    restart: unless-stopped
+    mem_limit: 320m
+    environment:
+      RABBITMQ_DEFAULT_USER: opas
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  presidio-analyzer:
+    build: ../presidio
+    image: opas-presidio-analyzer
+    restart: unless-stopped
+    # Three spaCy models: ~950 MB measured.
+    mem_limit: 1600m
+
+  presidio-anonymizer:
+    image: mcr.microsoft.com/presidio-anonymizer:2.2.362
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      # No gunicorn 25 control-socket thread during worker fork (see ../presidio/Dockerfile).
+      GUNICORN_CMD_ARGS: '--no-control-socket'
+
+volumes:
+  caddy-data:
+  caddy-config:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
