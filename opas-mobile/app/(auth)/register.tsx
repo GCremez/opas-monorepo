@@ -77,7 +77,7 @@ export default function RegisterScreen() {
     <SafeAreaView className="flex-1 bg-bg" edges={['top', 'bottom']}>
       <KeyboardAvoidingView className="flex-1 bg-bg" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View className="flex-row items-center gap-2 px-6 pt-2">
-          <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/welcome'))} hitSlop={8} accessibilityLabel={t('common.back')}>
+          <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/(onboarding)'))} hitSlop={8} accessibilityLabel={t('common.back')}>
             <ChevronLeftIcon size={22} color={c['fg-soft']} />
           </Pressable>
           <Text className="font-semibold text-label tracking-[0.20em] uppercase text-muted">{t('auth.create_account')}</Text>
