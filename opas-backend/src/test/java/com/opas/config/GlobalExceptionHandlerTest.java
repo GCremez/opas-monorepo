@@ -83,4 +83,15 @@ class GlobalExceptionHandlerTest {
             this.email = email;
         }
     }
+
+    @Test
+    void unknownAddressIs404NotServerError() {
+        var ex = new org.springframework.web.servlet.resource.NoResourceFoundException(
+                org.springframework.http.HttpMethod.POST, "api/v1/nope");
+
+        ProblemDetail detail = handler.handleNotFound(ex);
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), detail.getStatus());
+        assertEquals("Not Found", detail.getTitle());
+    }
 }

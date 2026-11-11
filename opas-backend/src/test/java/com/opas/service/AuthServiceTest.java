@@ -565,4 +565,29 @@ class AuthServiceTest {
         assertEquals("en", AuthService.normalizeLanguage(" "));
         assertEquals("en", AuthService.normalizeLanguage(null));
     }
+
+    @Test
+    void recordAiConsentStoresVersionAndTime() {
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+
+        var consent = service.recordAiConsent(userId, "v2");
+
+        assertEquals("v2", consent.version());
+        assertNotNull(consent.grantedAt());
+        assertEquals("v2", user.getAiConsentVersion());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void meReportsAiConsentOnlyOnceGiven() {
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+        when(subscriptionRepository.findByUserId(userId)).thenReturn(java.util.Optional.of(subscription));
+
+        assertNull(service.me(userId).getAiConsent());
+
+        user.recordAiConsent("v2", java.time.Instant.parse("2026-11-11T12:00:00Z"));
+        var consent = service.me(userId).getAiConsent();
+        assertEquals("v2", consent.version());
+        assertEquals(java.time.Instant.parse("2026-11-11T12:00:00Z"), consent.grantedAt());
+    }
 }

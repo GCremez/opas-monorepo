@@ -19,7 +19,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   plan: 'free' | 'premium';
-  user: Pick<User, 'name' | 'email'> | null;
+  user: Pick<User, 'name' | 'email' | 'aiConsent'> | null;
   setPlan: (plan: 'free' | 'premium') => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   fetchProfile: async () => {
     try {
       const { data } = await apiClient.get('/auth/me');
-      set({ user: { name: data.name, email: data.email }, plan: data.plan ?? 'free' });
+      set({ user: { name: data.name, email: data.email, aiConsent: data.aiConsent ?? null }, plan: data.plan ?? 'free' });
       // Re-identify on every profile load so a session restored at app launch
       // (hydrate -> fetchProfile) is attributed to the right person.
       identifyUser(data.id, data.plan ?? 'free');

@@ -1,7 +1,14 @@
+export interface AiConsent {
+  version: string;
+  grantedAt: string;
+}
+
 export interface User {
   id: string;
   email: string;
   name: string;
+  /** Null until the person agrees to the AI consent screen. */
+  aiConsent?: AiConsent | null;
 }
 
 export interface AuthResponse {

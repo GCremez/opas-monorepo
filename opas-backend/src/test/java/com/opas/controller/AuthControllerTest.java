@@ -124,4 +124,28 @@ class AuthControllerTest {
 
         assertEquals(401, response.getStatusCode().value());
     }
+
+    @Test
+    void aiConsentRecordsTheVersionForTheSignedInUser() {
+        UUID id = UUID.randomUUID();
+        when(authentication.getName()).thenReturn(id.toString());
+        var recorded = new com.opas.dto.AiConsentResponse("v2", java.time.Instant.now());
+        when(authService.recordAiConsent(id, "v2")).thenReturn(recorded);
+
+        var response = controller.aiConsent(authentication, new com.opas.dto.AiConsentRequest("v2"));
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(recorded, response.getBody());
+    }
+
+    @Test
+    void aiConsentVersionIsValidated() {
+        try (var factory = jakarta.validation.Validation.buildDefaultValidatorFactory()) {
+            var validator = factory.getValidator();
+            assertTrue(validator.validate(new com.opas.dto.AiConsentRequest("v2")).isEmpty());
+            assertFalse(validator.validate(new com.opas.dto.AiConsentRequest("")).isEmpty());
+            assertFalse(validator.validate(new com.opas.dto.AiConsentRequest("v2; drop table")).isEmpty());
+            assertFalse(validator.validate(new com.opas.dto.AiConsentRequest("x".repeat(33))).isEmpty());
+        }
+    }
 }
