@@ -12,7 +12,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -62,6 +64,10 @@ public class SecurityConfig {
                                 "/api/v1/auth/logout")
                         .permitAll().requestMatchers(HttpMethod.POST, "/api/v1/webhooks/stripe").permitAll()
                         .anyRequest().authenticated())
+                // A missing, expired or invalid access token is 401, not Spring's default 403:
+                // the app refreshes the token (15-minute lifetime) only on 401, so with 403
+                // every session broke after 15 minutes instead of refreshing.
+                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
                         .frameOptions(fo -> fo.deny())
