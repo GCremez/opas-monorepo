@@ -6,6 +6,8 @@ export interface UsageResponse {
   period: string;
   /** Premium, or drafts are free for everyone during the beta. */
   draftsIncluded?: boolean;
+  /** Premium, or deadline reminders are on for everyone during the beta. */
+  remindersIncluded?: boolean;
 }
 
 export async function getUsage(): Promise<UsageResponse> {

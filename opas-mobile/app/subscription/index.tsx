@@ -36,9 +36,10 @@ export default function SubscriptionScreen() {
     t('subscription.features.f4'),
   ];
 
+  // Prices match docs/launch-plan.md §3 and the Stripe prices; move them to the backend (P1-9).
   const price = interval === 'monthly'
-    ? { amount: '€4.99', period: `/ ${t('subscription.monthly')}` }
-    : { amount: '€47.90', period: `/ ${t('subscription.yearly')}` };
+    ? { amount: '€5.99', period: `/ ${t('subscription.monthly')}` }
+    : { amount: '€49.99', period: `/ ${t('subscription.yearly')}` };
 
   const handleSubscribe = async () => {
     const priceId = interval === 'monthly' ? plans[0] : plans[1];
@@ -142,7 +143,7 @@ export default function SubscriptionScreen() {
         <Button variant="primary" size="lg" block loading={loading} onPress={handleSubscribe}>
           {t('subscription.free_trial')}
         </Button>
-        <Text className="font-serif-italic text-[14px] text-muted text-center mt-3">{t('subscription.trial_note')}</Text>
+        <Text className="font-serif-italic text-[14px] text-muted text-center mt-3">{t(interval === 'monthly' ? 'subscription.trial_note_monthly' : 'subscription.trial_note_yearly')}</Text>
       </View>
     </SafeAreaView>
   );

@@ -14,6 +14,7 @@ import { useSubscriptionStore } from '../../src/store/subscriptionStore';
 import { useReminderStore } from '../../src/store/reminderStore';
 import { useThemeStore, useThemeColors, type Appearance_ } from '../../src/store/themeStore';
 import { CAN_PURCHASE } from '../../src/lib/billing';
+import { canRemind } from '../../src/hooks/usePremium';
 import { withdrawAiConsent } from '../../src/lib/aiConsent';
 import { LINKS, OFFICIAL_SITES } from '../../src/lib/links';
 
@@ -110,7 +111,9 @@ export default function ProfileScreen() {
   // Deadline reminders: on only when the user wants them and the system allows them.
   const remindersWanted = useReminderStore((s) => s.enabled);
   const remindersAllowed = useReminderStore((s) => s.permission === 'granted');
-  const deadlineOn = remindersWanted && remindersAllowed;
+  // Reminders are Premium (or on for everyone in the beta).
+  const remindersIncluded = canRemind(subscription?.tier ?? plan, usage);
+  const deadlineOn = remindersIncluded && remindersWanted && remindersAllowed;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -239,10 +242,15 @@ export default function ProfileScreen() {
           <ValueRow
             c={c}
             label={t('profile.deadline_reminders')}
-            value={deadlineOn ? t('profile.on') : t('profile.off')}
+            value={!remindersIncluded ? t('profile.reminders_premium') : deadlineOn ? t('profile.on') : t('profile.off')}
             valueTone={deadlineOn ? 'text-accent' : 'text-muted'}
-            hideChevron
+            hideChevron={remindersIncluded || !CAN_PURCHASE}
             onPress={async () => {
+              if (!remindersIncluded) {
+                if (CAN_PURCHASE) router.push('/subscription');
+                else showToast(t('reminders.premium_only'));
+                return;
+              }
               const on = await useReminderStore.getState().setEnabled(!deadlineOn);
               // Asked to turn on but the system said no: point to Settings rather than fail silently.
               showToast(!deadlineOn && !on ? t('reminders.blocked') : `${t('profile.deadline_reminders')} ${on ? t('profile.on') : t('profile.off')}`);

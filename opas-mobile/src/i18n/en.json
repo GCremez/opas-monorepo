@@ -434,6 +434,7 @@
     "lang_sv": "Svenska",
     "lang_sv_native": "Swedish",
     "deadline_reminders": "Deadline reminders",
+    "reminders_premium": "Premium",
     "on": "On",
     "off": "Off",
     "ai_reading": "AI reading",
@@ -543,13 +544,14 @@
       "f1": "Unlimited document scans",
       "f2": "Draft reply letters in Finnish",
       "f3": "Export & archive anything",
-      "f4": "Deadline reminders that never miss"
+      "f4": "Smart deadline reminders: a week, 3 days and 1 day before"
     },
     "checkout_error": "Something went wrong. Please try again.",
     "premium_eyebrow": "Opas Premium",
-    "save_yearly": "Save 20% yearly",
+    "save_yearly": "Save 30% yearly",
     "free_trial": "Start 7-day free trial",
-    "trial_note": "Then €4.99/month. Cancel anytime.",
+    "trial_note_monthly": "Then €5.99/month. Cancel anytime.",
+    "trial_note_yearly": "Then €49.99/year. Cancel anytime.",
     "unavailable_title": "Premium isn't available in the app yet",
     "unavailable_desc": "Everything in the free plan works as normal."
   },
@@ -584,6 +586,9 @@
   },
   "reminders": {
     "due_today": "due today",
+    "several_title": "{{count}} deadlines need you",
+    "several_item": "{{what}}: {{left}}",
+    "premium_only": "Deadline reminders are part of Premium.",
     "days_left": "{{count}} day left",
     "days_left_plural": "{{count}} days left",
     "body": "{{what}} by {{date}}. Tap to open it.",

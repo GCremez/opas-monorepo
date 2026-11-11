@@ -434,6 +434,7 @@
     "lang_sv": "Svenska",
     "lang_sv_native": "Svenska",
     "deadline_reminders": "Påminnelser om tidsfrister",
+    "reminders_premium": "Premium",
     "on": "På",
     "off": "Av",
     "ai_reading": "AI-läsning",
@@ -543,13 +544,14 @@
       "f1": "Obegränsade dokumentskanningar",
       "f2": "Skriv svarsbrev på finska",
       "f3": "Exportera & arkivera vad som helst",
-      "f4": "Påminnelser som aldrig missar"
+      "f4": "Smarta påminnelser en vecka, 3 dagar och 1 dag före tidsfristen"
     },
     "checkout_error": "Något gick fel. Försök igen.",
     "premium_eyebrow": "Opas Premium",
-    "save_yearly": "Spara 20% per år",
+    "save_yearly": "Spara 30 % per år",
     "free_trial": "Starta 7 dagars gratis provperiod",
-    "trial_note": "Sedan 4,99 €/månad. Avsluta när som helst.",
+    "trial_note_monthly": "Sedan 5,99 €/månad. Avsluta när som helst.",
+    "trial_note_yearly": "Sedan 49,99 €/år. Avsluta när som helst.",
     "unavailable_title": "Premium finns inte i appen än",
     "unavailable_desc": "Allt i gratisversionen fungerar som vanligt."
   },
@@ -584,6 +586,9 @@
   },
   "reminders": {
     "due_today": "förfaller i dag",
+    "several_title": "{{count}} tidsfrister närmar sig",
+    "several_item": "{{what}}: {{left}}",
+    "premium_only": "Påminnelser om tidsfrister ingår i Premium.",
     "days_left": "{{count}} dag kvar",
     "days_left_plural": "{{count}} dagar kvar",
     "body": "{{what}} senast {{date}}. Tryck för att öppna.",

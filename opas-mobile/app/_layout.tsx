@@ -32,7 +32,9 @@ import { registerForPushNotifications } from '../src/utils/notifications';
 import * as Notifications from 'expo-notifications';
 import { useDocumentStore } from '../src/store/documentStore';
 import { useReminderStore } from '../src/store/reminderStore';
+import { useSubscriptionStore } from '../src/store/subscriptionStore';
 import { syncReminders } from '../src/lib/reminders';
+import { canRemind } from '../src/hooks/usePremium';
 import { updateWidget } from '../src/lib/widget';
 import { initAnalytics } from '../src/lib/analytics';
 import { initSentry } from '../src/lib/sentry';
@@ -86,14 +88,23 @@ export default function RootLayout() {
   const documents = useDocumentStore((s) => s.documents);
   const remindersOn = useReminderStore((s) => s.enabled);
   const permission = useReminderStore((s) => s.permission);
+  // Reminders are Premium (or on for everyone in the beta): the server says which.
+  const plan = useAuthStore((s) => s.plan);
+  const usage = useSubscriptionStore((s) => s.usage);
   useEffect(() => {
     useReminderStore.getState().hydrate();
   }, []);
   useEffect(() => {
+    if (isAuthenticated) useSubscriptionStore.getState().fetchUsage();
+  }, [isAuthenticated]);
+  useEffect(() => {
     if (!isAuthenticated) return;
-    syncReminders(documents, remindersOn, i18n.t, i18n.language).catch(() => {});
     updateWidget(documents, i18n.t, i18n.language);
-  }, [isAuthenticated, documents, remindersOn, permission, i18n.t, i18n.language]);
+    // Until the server has answered (e.g. offline), leave what's scheduled alone rather
+    // than cancel a Premium user's reminders.
+    if (!usage && plan !== 'premium') return;
+    syncReminders(documents, remindersOn && canRemind(plan, usage), i18n.t, i18n.language).catch(() => {});
+  }, [isAuthenticated, documents, remindersOn, permission, plan, usage, i18n.t, i18n.language]);
 
   // Tapping a reminder opens its document, whether the app was running or not.
   useEffect(() => {

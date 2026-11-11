@@ -94,6 +94,11 @@ opas:
     # Beta: everyone can generate reply drafts, not only Premium. Set
     # DRAFTS_FREE_FOR_EVERYONE=false to put drafts back behind Premium.
     free-for-everyone: ${DRAFTS_FREE_FOR_EVERYONE:true}
+  reminders:
+    # Deadline reminders are Premium (launch plan §3). Beta: on for everyone, because
+    # nobody can buy Premium in the stores yet. Set REMINDERS_FREE_FOR_EVERYONE=false
+    # to put them behind Premium.
+    free-for-everyone: ${REMINDERS_FREE_FOR_EVERYONE:true}
   s3:
     bucket: ${S3_BUCKET_NAME:opas-app-bucket}
     region: ${AWS_REGION:eu-north-1}

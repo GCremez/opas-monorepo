@@ -434,6 +434,7 @@
     "lang_sv": "Svenska",
     "lang_sv_native": "Ruotsi",
     "deadline_reminders": "Määräaikamuistutukset",
+    "reminders_premium": "Premium",
     "on": "Päällä",
     "off": "Pois",
     "ai_reading": "Tekoälyluku",
@@ -543,13 +544,14 @@
       "f1": "Rajattomasti asiakirjaskannauksia",
       "f2": "Vastauskirjeet suomeksi",
       "f3": "Vie ja arkistoi mitä tahansa",
-      "f4": "Muistutukset, jotka eivät petä"
+      "f4": "Älykkäät muistutukset viikkoa, 3 päivää ja päivää ennen määräaikaa"
     },
     "checkout_error": "Jotain meni pieleen. Yritä uudelleen.",
     "premium_eyebrow": "Opas Premium",
-    "save_yearly": "Säästä 20% vuodessa",
+    "save_yearly": "Säästä 30 % vuodessa",
     "free_trial": "Aloita 7 päivän ilmainen kokeilu",
-    "trial_note": "Sitten 4,99 €/kk. Peru milloin tahansa.",
+    "trial_note_monthly": "Sitten 5,99 €/kk. Peru milloin tahansa.",
+    "trial_note_yearly": "Sitten 49,99 €/v. Peru milloin tahansa.",
     "unavailable_title": "Premium ei ole vielä saatavilla sovelluksessa",
     "unavailable_desc": "Kaikki ilmaisen version ominaisuudet toimivat normaalisti."
   },
@@ -584,6 +586,9 @@
   },
   "reminders": {
     "due_today": "erääntyy tänään",
+    "several_title": "{{count}} määräaikaa lähestyy",
+    "several_item": "{{what}}: {{left}}",
+    "premium_only": "Määräaikamuistutukset kuuluvat Premiumiin.",
     "days_left": "{{count}} päivä jäljellä",
     "days_left_plural": "{{count}} päivää jäljellä",
     "body": "{{what}} viimeistään {{date}}. Avaa napauttamalla.",

@@ -69,6 +69,13 @@ public class SubscriptionService {
         }
     }
 
+    /** Whether this user has Premium right now. No subscription row means free. */
+    @Transactional(readOnly = true)
+    public boolean isPremium(UUID userId) {
+        return subscriptionRepository.findByUserId(userId)
+                .map(Subscription::getTier).filter("premium"::equals).isPresent();
+    }
+
     @Transactional(readOnly = true)
     public Subscription getSubscription(UUID userId) {
         return subscriptionRepository.findByUserId(userId)

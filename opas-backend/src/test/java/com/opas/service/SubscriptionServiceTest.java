@@ -65,4 +65,25 @@ class SubscriptionServiceTest {
             stripe.verifyNoInteractions();
         }
     }
+
+    @Test
+    void premiumOnlyWithAPremiumSubscription() {
+        SubscriptionRepository repo = mock(SubscriptionRepository.class);
+        SubscriptionService service = new SubscriptionService(repo, mock(UserRepository.class), false,
+                "sk_test", "https://getopas.app", "price_premium");
+        java.util.UUID premium = java.util.UUID.randomUUID();
+        java.util.UUID free = java.util.UUID.randomUUID();
+        java.util.UUID none = java.util.UUID.randomUUID();
+        Subscription paid = new Subscription();
+        paid.setTier("premium");
+        Subscription basic = new Subscription();
+        basic.setTier("free");
+        when(repo.findByUserId(premium)).thenReturn(java.util.Optional.of(paid));
+        when(repo.findByUserId(free)).thenReturn(java.util.Optional.of(basic));
+        when(repo.findByUserId(none)).thenReturn(java.util.Optional.empty());
+
+        assertTrue(service.isPremium(premium));
+        assertFalse(service.isPremium(free));
+        assertFalse(service.isPremium(none));
+    }
 }
