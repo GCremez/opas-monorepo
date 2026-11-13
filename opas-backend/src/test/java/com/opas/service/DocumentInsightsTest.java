@@ -69,4 +69,26 @@ class DocumentInsightsTest {
         // No amount or percentage: no headline, rather than whatever value comes first.
         assertNull(insights.from("{\"keyFields\": {\"Year\": \"2025\", \"Permit type\": \"Permanent (P)\"}}").keyFigure());
     }
+
+    @Test
+    void caseReferenceComesFromTheFieldThenFromCaseLikeKeyFields() {
+        assertEquals("KELA/1234/2026", insights.from("""
+                {"caseReference": " KELA/1234/2026 ", "keyFields": {"Dnro": "999"}}""").caseReference());
+        // Letters explained before the prompt asked for it: a case-like key field.
+        assertEquals("MIG-2026-55", insights.from("""
+                {"keyFields": {"Amount": "€10", "Hakemusnumero": "MIG-2026-55"}}""").caseReference());
+        assertEquals("OL1234567", insights.from("""
+                {"keyFields": {"Permit type": "Work", "Application": "OL1234567"}}""").caseReference());
+        assertEquals("4711/2026", insights.from("""
+                {"keyFields": {"Ärendenummer": "4711/2026"}}""").caseReference());
+        // Payment references and decision numbers change per letter: never a case.
+        assertNull(insights.from("""
+                {"keyFields": {"Viitenumero": "1234 5678", "Päätösnumero": "77"}}""").caseReference());
+    }
+
+    @Test
+    void issuedDateOnlyWhenItIsARealDate() {
+        assertEquals("2026-10-02", insights.from("{\"issuedDate\": \"2026-10-02\"}").issuedDate());
+        assertNull(insights.from("{\"issuedDate\": \"2.10.2026\"}").issuedDate());
+    }
 }

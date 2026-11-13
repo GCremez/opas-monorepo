@@ -243,8 +243,9 @@ Replaces the earlier €4.99 / €39.99 and "€3.99 for 5 letters" (§8). Store
   - **iOS:** StoreKit, e.g. via RevenueCat; then set `CAN_PURCHASE` to true for iOS.
   - **Android (first, decided 10 Nov 2026):** **Stripe in the Android app isn't allowed by default either.** Google Play requires Play Billing for digital subscriptions unless we join its EEA alternative billing or external offers programme, which also requires reporting transactions to Google. Choose between Play Billing (via RevenueCat) and enrolling in the programme. Until then, Android works like iOS: no checkout in the app (`CAN_PURCHASE` is false everywhere).
   - **Backend:** keep entitlements in sync from store webhooks (RevenueCat) and Stripe webhooks for web purchases.
-- [ ] **P1-7. Case timelines:**
-  - group letters into cases by authority and reference number (*diaarinumero*), helped by the existing pgvector embeddings;
+- [ ] **P1-7. Case timelines:** (first part built 11 Nov 2026)
+  - [x] group letters into cases by authority and reference number (*diaarinumero*, Dnro, ärendenummer, Migri application number): the decode returns `caseReference`, older letters fall back to case-like key fields, and the app groups them (`src/lib/cases.ts`). A case screen shows letters and deadlines on one timeline with a countdown to the next deadline; the Files tab lists cases; a letter links to its case. Premium, on for everyone in the beta (`CASES_FREE_FOR_EVERYONE`);
+  - [ ] let people link or unlink a letter by hand, and try the pgvector embeddings for letters without a reference number;
   - track the lifecycle: request → clarification → decision → appeal window;
   - feed the case history into reply drafts, so they refer to earlier submissions.
 - [ ] **P1-8. Record consent on the server:** `POST /me/consents` stores the user, consent type, version and time, so we can show GDPR consent.
