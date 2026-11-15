@@ -56,6 +56,12 @@ public class StripeWebhookService {
     }
 
     public Event verifySignature(String payload, String sigHeader) {
+        // No secret configured (payments are off): nothing can be verified, so nothing is
+        // accepted. Never let an empty secret reach the HMAC check, where the "signature"
+        // would be something anyone can compute.
+        if (webhookSecret == null || webhookSecret.isBlank()) {
+            throw new IllegalArgumentException("Invalid webhook signature");
+        }
         try {
             return Webhook.constructEvent(payload, sigHeader, webhookSecret);
         } catch (SignatureVerificationException e) {

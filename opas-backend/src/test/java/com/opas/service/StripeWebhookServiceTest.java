@@ -287,4 +287,20 @@ class StripeWebhookServiceTest {
 
         assertEquals("premium", sub.getTier());
     }
+
+    /**
+     * Attack: payments are off, so there is no webhook secret. The webhook URL is public,
+     * and a forged "checkout completed" event would make the sender Premium for free.
+     */
+    @Test
+    void forgedEventIsRefusedWhenNoWebhookSecretIsConfigured() throws Exception {
+        var noSecret = new StripeWebhookService(subscriptionRepository,
+                new io.micrometer.core.instrument.simple.SimpleMeterRegistry(), "", "price_premium_monthly");
+        String payload = "{\"id\":\"evt_forged\",\"object\":\"event\",\"type\":\"checkout.session.completed\"}";
+        long now = System.currentTimeMillis() / 1000;
+        String sig = "0".repeat(64);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> noSecret.verifySignature(payload, "t=" + now + ",v1=" + sig));
+    }
 }

@@ -1,5 +1,6 @@
 package com.opas.controller;
 
+import com.opas.config.RateLimit;
 import com.opas.dto.DraftLetterRequest;
 import com.opas.dto.DraftLetterResponse;
 import com.opas.service.DraftLetterService;
@@ -34,6 +35,7 @@ public class DraftLetterController {
         return ResponseEntity.ok(draftLetterService.listDraftLetters(UUID.fromString(name), documentId));
     }
 
+    @RateLimit(key = "draft-letter", limit = 10, windowSeconds = 3600)
     @PostMapping
     public ResponseEntity<DraftLetterResponse> generate(Authentication authentication,
             @PathVariable UUID documentId, @Valid @RequestBody DraftLetterRequest request) {

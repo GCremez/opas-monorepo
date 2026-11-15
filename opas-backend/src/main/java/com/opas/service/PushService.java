@@ -22,7 +22,12 @@ public class PushService {
 
     @Transactional
     public void register(UUID userId, PushTokenRequest request) {
-        pushTokenRepository.deleteByUserIdAndToken(userId, request.token());
+        // A device token belongs to whoever signed in on that device last. Removing it only
+        // for this user left the previous account's row in place: the insert then hit the
+        // unique index (500), and that account's "letter is ready" pushes kept going to a
+        // phone someone else now uses.
+        pushTokenRepository.deleteByToken(request.token());
+        pushTokenRepository.flush();
 
         User user = userRepository.getReferenceById(userId);
         PushToken token = new PushToken();

@@ -3,6 +3,11 @@
 {$API_DOMAIN} {
 	encode gzip
 
+	# Browsers and apps must never fall back to plain HTTP for this host. The backend sets
+	# this header only on requests it sees as HTTPS, and behind Caddy it sees HTTP.
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	header -Via
+
 	# Metrics stay private: only the health check is public.
 	@private path /actuator/prometheus /actuator/prometheus/* /actuator/info
 	respond @private 404

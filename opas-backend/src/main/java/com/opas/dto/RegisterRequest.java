@@ -9,5 +9,5 @@ import jakarta.validation.constraints.Size;
  * verification email arrives in the user's language. Defaults to English.
  */
 public record RegisterRequest(@NotBlank @Email String email, @NotBlank @Size(min = 8, max = 128) String password,
-        @NotBlank String name, String language) {
+        @NotBlank @Size(max = 100) String name, @Size(max = 16) String language) {
 }

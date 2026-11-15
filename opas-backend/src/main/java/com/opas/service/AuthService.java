@@ -138,7 +138,10 @@ public class AuthService {
      * and tokens are issued (the user is logged straight in). Uses a generic error on
      * every failure path so it can't be used to probe which emails are registered.
      */
-    @Transactional
+    // noRollbackFor: a wrong code throws IllegalArgumentException, and a rollback would also
+    // undo the guess that was just counted — every code then allowed unlimited guesses
+    // (OneTimeCodeAttemptsTest). Nothing else is written before that exception.
+    @Transactional(noRollbackFor = IllegalArgumentException.class)
     public AuthResponse verifyEmail(String email, String code) {
         User user = userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid or expired verification code"));
@@ -305,7 +308,10 @@ public class AuthService {
      * error on every failure path so it can't be used to probe which emails are
      * registered or which codes are close.
      */
-    @Transactional
+    // noRollbackFor: a wrong code throws IllegalArgumentException, and a rollback would also
+    // undo the guess that was just counted — every code then allowed unlimited guesses
+    // (OneTimeCodeAttemptsTest). Nothing else is written before that exception.
+    @Transactional(noRollbackFor = IllegalArgumentException.class)
     public void resetPassword(String email, String code, String newPassword) {
         User user = userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid or expired reset code"));
