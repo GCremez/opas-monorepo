@@ -354,7 +354,9 @@ public class DecodeService {
         // like instructions ("ignore previous instructions…"). Fence it and tell the
         // model to treat everything inside the fence as data, never as commands. A
         // document can't close the fence early by containing the end marker itself.
-        String fenced = content.replace("END_DOCUMENT", "END_DOCUMENT_");
+        // The filename is user-chosen too and sits outside the fence, so it's reduced to plain
+        // filename characters. The text is cut to a bounded length (see PromptSafety).
+        String fenced = PromptSafety.fence(content);
         // The mobile app renders these exact fields (masthead, summary, dates, actions),
         // and only dates stated in the letter: a guessed deadline is worse than none.
         return """
@@ -367,9 +369,7 @@ public class DecodeService {
 
                 Filename: %s
 
-                BEGIN_DOCUMENT
                 %s
-                END_DOCUMENT
 
                 Reply with only a JSON object (no prose, no code fence) with exactly these fields:
                 {
@@ -400,7 +400,7 @@ public class DecodeService {
                 Migri, DVV and immigration, "tax" covers Vero, "employment" covers TE services
                 and employers.
                 """
-                .formatted(filename, fenced, readerLanguage(userLanguage));
+                .formatted(PromptSafety.filename(filename), fenced, readerLanguage(userLanguage));
     }
 
     public static DecodeResponse toResponse(DecodeResult result) {

@@ -75,23 +75,20 @@ public class PasswordResetService {
         PasswordResetCode entity = maybe.get();
 
         if (Instant.now().isAfter(entity.getExpiresAt())) {
-            codeRepository.delete(entity);
+            codeRepository.removeCode(user.getId());
             return false;
         }
-        if (entity.getAttempts() >= MAX_ATTEMPTS) {
-            codeRepository.delete(entity);
-            return false;
-        }
-
-        boolean matches = constantTimeEquals(entity.getCodeHash(), sha256Hex(submittedCode));
-        if (!matches) {
-            entity.setAttempts(entity.getAttempts() + 1);
-            codeRepository.save(entity);
+        // Count this guess before looking at it, atomically (see claimAttempt).
+        if (codeRepository.claimAttempt(user.getId(), MAX_ATTEMPTS) == 0) {
+            codeRepository.removeCode(user.getId());
             return false;
         }
 
-        codeRepository.delete(entity);
-        return true;
+        if (!constantTimeEquals(entity.getCodeHash(), sha256Hex(submittedCode))) {
+            return false;
+        }
+        // Single use: of two requests with the right code, only the one that removes it wins.
+        return codeRepository.removeCode(user.getId()) == 1;
     }
 
     private static boolean constantTimeEquals(String a, String b) {

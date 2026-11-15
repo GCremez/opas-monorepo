@@ -1,5 +1,6 @@
 package com.opas.controller;
 
+import com.opas.config.RateLimit;
 import com.opas.dto.AssignFolderRequest;
 import com.opas.dto.ConfirmUploadRequest;
 import com.opas.dto.DocumentResponse;
@@ -44,6 +45,8 @@ public class DocumentController {
         return UUID.fromString(name);
     }
 
+    // Each call creates a document row and a signed 20 MB upload slot.
+    @RateLimit(key = "upload-url", limit = 60, windowSeconds = 3600)
     @PostMapping("/upload-url")
     public ResponseEntity<DocumentResponse> requestUploadUrl(Authentication authentication,
             @Valid @RequestBody UploadUrlRequest request) {
@@ -65,6 +68,8 @@ public class DocumentController {
         return ResponseEntity.ok(documentService.listDocuments(userId));
     }
 
+    // Each search runs the embedding model on the server.
+    @RateLimit(key = "search", limit = 60, windowSeconds = 60)
     @GetMapping("/search")
     public ResponseEntity<List<com.opas.dto.DocumentSearchResult>> search(Authentication authentication,
             @RequestParam("q") String query,
@@ -74,7 +79,9 @@ public class DocumentController {
             return ResponseEntity.ok(List.of());
         }
         int bounded = Math.max(1, Math.min(limit, 50));
-        return ResponseEntity.ok(embeddingService.searchSimilarWithScore(userId, query, bounded));
+        // A search is a few words; don't run the embedding model over an arbitrarily long string.
+        String boundedQuery = query.length() > 500 ? query.substring(0, 500) : query;
+        return ResponseEntity.ok(embeddingService.searchSimilarWithScore(userId, boundedQuery, bounded));
     }
 
     @GetMapping("/{id}")

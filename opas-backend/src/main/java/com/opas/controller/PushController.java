@@ -1,5 +1,6 @@
 package com.opas.controller;
 
+import com.opas.config.RateLimit;
 import com.opas.dto.PushTokenRequest;
 import com.opas.service.PushService;
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ public class PushController {
         this.pushService = pushService;
     }
 
+    @RateLimit(key = "push-register", limit = 20, windowSeconds = 3600)
     @PostMapping("/register")
     public ResponseEntity<Void> register(Authentication authentication,
             @Valid @RequestBody PushTokenRequest request) {
