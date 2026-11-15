@@ -148,8 +148,18 @@ cd ~/opas-monorepo && git pull
 sudo bash opas-infra/server/install-auto-update.sh
 ```
 
+A commit is deployed only when its GitHub checks have all finished and none failed, its
+images build, and the new containers come up healthy. Otherwise the server stays on (or
+goes back to) the version it was running and skips that commit; the next commit on `main`
+is tried as usual. A commit that touches nothing CI covers has no checks and is deployed
+after 10 minutes. A changed `Caddyfile` restarts Caddy (a second or two of downtime).
+
 - What it did: `journalctl -u opas-auto-update --no-pager | tail -20`
 - Turn it off: `sudo systemctl disable --now opas-auto-update.timer`
+- Deploy without waiting for checks: `OPAS_DEPLOY_SKIP_CI=1 opas-infra/server/auto-update.sh`
+- Going back can't undo a database migration the new backend already ran. Keep migrations
+  compatible with the previous backend (add first, remove in a later release).
+- Needs Docker Compose 2.17 or newer (`docker compose version`), for `up --wait-timeout`.
 
 **By hand:**
 
