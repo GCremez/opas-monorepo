@@ -653,7 +653,7 @@ footer .it{flex-basis:100%;font:italic 400 15px var(--display);max-width:70ch}
     <a class="nl" href="#year">Your year</a>
     <a class="nl" href="#chatgpt">Why not ChatGPT</a>
     <a class="nl" href="#faq">Questions</a>
-    <a class="pill pill-accent" href="#beta">Join the beta</a>
+    <a class="pill pill-accent" href="#beta">Join the waitlist</a>
   </div>
 </nav>
 <main id="top">
@@ -678,7 +678,7 @@ footer .it{flex-basis:100%;font:italic 400 15px var(--display);max-width:70ch}
         <span class="side">Free beta · Android and iPhone</span>
         <div class="mid">
           <a class="brand" href="#opening" aria-label="Opas home"><svg width="22" height="22" viewBox="0 0 140 140" fill="none" aria-hidden="true"><circle cx="70" cy="70" r="56" stroke="var(--accent)" stroke-width="7"/><circle cx="70" cy="26" r="12" fill="var(--accent)"/><circle cx="108" cy="92" r="12" fill="var(--warning)"/><circle cx="32" cy="92" r="12" fill="var(--danger)"/></svg>Opas</a>
-          <a class="pill pill-accent" href="#beta">Join the beta</a>
+          <a class="pill pill-accent" href="#beta">Join the waitlist</a>
         </div>
         <span class="side">Scroll <span class="scrl" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></span></span>
       </div>
@@ -1035,22 +1035,12 @@ footer .it{flex-basis:100%;font:italic 400 15px var(--display);max-width:70ch}
         <ul><li>Unlimited letters</li><li>Explanations in Suomi and Svenska too</li><li>Reminders a week, 3 days and 1 day before</li><li>Reply drafts in Finnish</li><li>Export, archive and case timelines</li></ul></div>
     </div>
     <div class="join rv" id="joinCard">
-      <form id="signup" novalidate>
-        <h3>Join the beta</h3>
-        <p class="sub">Two steps. We'll send the invite to the account on your phone.</p>
-        <div class="stepl"><span>Your phone</span></div>
-        <fieldset class="os"><legend>Your phone</legend>
-          <label><input type="radio" name="os" value="Android" checked><b>Android</b><span>Invite through Google Play</span></label>
-          <label><input type="radio" name="os" value="iPhone"><b>iPhone</b><span>Invite to your Apple ID</span></label>
-        </fieldset>
-        <div class="stepl"><span id="step2">Your Google Play email</span></div>
-        <div class="field">
-          <input id="email" type="email" autocomplete="email" placeholder=" " required aria-describedby="email-help">
-          <label for="email" id="email-label">Google Play email</label>
-          <button class="pill pill-accent" type="submit">Get my invite</button>
-        </div>
-        <p class="help" id="email-help"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="flex:none;margin-top:2px"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span id="helpText">Used only to send your invite. No newsletter.</span></p>
-      </form>
+      <div id="signup">
+        <h3>Get your invite</h3>
+        <p class="sub">Leave your email and phone type. We'll send your invite when a spot opens.</p>
+        <a class="pill pill-accent" id="joinBtn" href="https://tally.so/r/J1zDDR" target="_blank" rel="noopener">Join the waitlist</a>
+        <p class="help"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="flex:none;margin-top:2px"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Used only for your invite and launch news. Unsubscribe any time.</span></p>
+      </div>
       <div class="thanks" id="thanks" hidden tabindex="-1"></div>
     </div>
   </section>
@@ -1218,19 +1208,15 @@ footer .it{flex-basis:100%;font:italic 400 15px var(--display);max-width:70ch}
   var words2=[['English.','en'],['suomeksi.','fi'],['på svenska.','sv']],wi=0,wd=document.getElementById('word');
   if(!reduce)setInterval(function(){wd.classList.add('out');setTimeout(function(){wi=(wi+1)%words2.length;wd.textContent=words2[wi][0];wd.setAttribute('lang',words2[wi][1]);wd.classList.remove('out')},450)},2600);
   
-  var f=document.getElementById('signup'),e=document.getElementById('email'),lbl=document.getElementById('email-label'),s2=document.getElementById('step2'),hp=document.getElementById('email-help'),ht=document.getElementById('helpText'),th=document.getElementById('thanks');
-  document.querySelectorAll('input[name="os"]').forEach(function(r){r.addEventListener('change',function(){var x=r.value==='iPhone'?'Apple ID email':'Google Play email';lbl.textContent=x;s2.textContent='Your '+x})});
-  e.addEventListener('input',function(){if(e.getAttribute('aria-invalid')){e.removeAttribute('aria-invalid');hp.classList.remove('err');ht.textContent='Used only to send your invite. No newsletter.'}});
-  f.addEventListener('submit',function(ev){ev.preventDefault();
-    if(!e.value||!e.checkValidity()){e.setAttribute('aria-invalid','true');hp.classList.add('err');ht.textContent='That doesn’t look like an email address. Try name@example.com.';e.focus();return}
-    var os=f.querySelector('input[name="os"]:checked').value;
-    f.hidden=true;th.hidden=false;
-    var body='Hi,\n\nI would like to join the Opas beta.\n\nPhone: '+os+'\n'+(os==='iPhone'?'Apple ID email: ':'Google Play email: ')+e.value+'\n';
-    location.href='mailto:hello@getopas.app?subject='+encodeURIComponent('Join the Opas beta')+'&body='+encodeURIComponent(body);
-    th.innerHTML='<svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle class="c" cx="32" cy="32" r="28" stroke-width="2.5"/><path class="t" d="M20 33l8 8 16-17" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Almost there.</h3><p>Your email app should open with the request. Send it, and we\u2019ll invite <b>'+esc(e.value)+'</b> to the '+os+' beta.</p><p style="font-size:13.5px;color:var(--muted)">Nothing opened? Email <a href="mailto:hello@getopas.app">hello@getopas.app</a>.</p>';
-    th.focus();
-  });
+  var jb=document.getElementById('joinBtn');
+  if(jb){jb.addEventListener('click',function(ev){
+    if(!window.Tally||!window.Tally.openPopup)return; /* falls back to opening the form page */
+    ev.preventDefault();
+    var q=new URLSearchParams(location.search);
+    window.Tally.openPopup('J1zDDR',{layout:'modal',width:480,overlay:true,hiddenFields:{utm_source:q.get('utm_source')||'website',utm_campaign:q.get('utm_campaign')||''}});
+  });}
 })();
 </script>
+<script async src="https://tally.so/widgets/embed.js"></script>
 </body>
 </html>
