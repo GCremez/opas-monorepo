@@ -68,7 +68,7 @@ opas-infra/      — Docker Compose infrastructure
 - **Styling**: NativeWind v4 (Tailwind CSS for React Native)
 - **State**: Zustand stores (authStore, documentStore, folderStore, subscriptionStore)
 - **i18n**: react-i18next with en/fi/sv JSON files
-- **Fonts**: Lufga (display/headings), system-ui (body), JetBrains Mono (mono)
+- **Fonts**: Newsreader (display + prose), Instrument Sans (UI/body), JetBrains Mono (data/metadata), loaded via @expo-google-fonts in `app/_layout.tsx`
 - **HTTP**: axios with interceptors for JWT auth
 - **Camera**: expo-camera CameraView for real capture + expo-image-picker for gallery
 - **Navigation**: expo-router with Stack + Tab navigator, custom floating-pill BottomTabBar
@@ -88,22 +88,29 @@ opas-infra/      — Docker Compose infrastructure
 - 8 containers: PostgreSQL, Redis, RabbitMQ, LocalStack (S3), Presidio analyzer, Presidio anonymizer, Prometheus, Grafana
 - All run via `docker compose up -d`
 
-## Design System
+## Design System — v2 "Personal Record"
 
-### Colors (dark theme only)
+The single source of truth is `opas-mobile/src/lib/tokens.ts` (+ `tailwind.config.js` and `global.css`). The look is a well-kept paper file: warm paper, ink text, a pine accent, ochre for deadlines. Borders, not shadows. The old dark-only mint (#92d9bb) / Lufga system is retired — do not use it. The brand kit (logo, marketing and store rules) lives in the Opas Brand Kit design system.
+
+### Themes
+Two themes: **Paper** (light, default, `:root`) and **Ink** (dark, `.dark`). Use the token classes (`bg-bg`, `text-fg`, `border-line`, `bg-accent`, `text-warning`…) — they resolve to the active theme. For SVG icons and native props (e.g. `tintColor`) use `useThemeColors()` hex values, never hardcoded hex.
+
 ```
-bg:        #000000
-surface:   #1c1c1e
-surface-2: #2c2c2e
-surface-3: #3a3a3c
-fg:        #f5f5f7 (body text)
-muted:     #86868b (secondary text)
-border:    #38383a
-accent:    #92d9bb (mint green, primary interactive color)
-danger:    #ff453a
-warning:   #ff9f0a
-success:   #30d158
-info:      #5e5ce6
+token       paper      ink        use
+bg          #f2ede2    #16150e    page background
+surface     #eae3d3    #201e16    raised panel / card
+surface-2   #e3dbc8    #2a2820    inset, inputs
+fg          #211e16    #ece6d8    primary text
+fg-soft     #4c473c    #b6ae9e    body / secondary text
+muted       #666054    #948e81    metadata, labels (AA on all surfaces)
+hairline    rgba(33,30,22,.12) / rgba(236,230,216,.13)  row dividers (class: border-line)
+rule        rgba(33,30,22,.22) / rgba(236,230,216,.24)  section underlines
+accent      #35503f    #8fbb9f    pine/sage — primary action, positive values
+on-accent   #f2ede2    #16150e    text on accent
+warning     #835817    #d8a552    ochre — deadlines, "action needed"
+danger      #9c3a2c    #d5745f    brick — urgent, destructive
+info        #42606f    #7fa0b3    slate — neutral emphasis
+node        #cdbfa6    #6f6a5c    logo start-waypoint, disabled dots
 ```
 
 ### Spacing Scale (in px)
@@ -111,15 +118,30 @@ info:      #5e5ce6
 
 Use Tailwind utility classes throughout. No inline `StyleSheet.create()`. Avoid random hardcoded gap/margin/padding values.
 
-### Font Sizes
+### Radius
+sm 8 · md 12 · lg 18 (cards) · xl 24 · pill 999 (primary button, tab bar)
+
+### Type
+Three families, each with one job: **Newsreader** = the human voice (titles, explanations), **Instrument Sans** = the interface, **JetBrains Mono** = facts (amounts, dates, references).
+
 ```
-display:   32px/700  (headings only)
-heading-l: 20px/600
-heading-m: 17px/600
-body:      15px      (primary content)
-body-sm:   13px      (secondary/metadata)
-caption:   12px/500  (labels, badges)
+display   32/34  Newsreader 500, -0.01em   greetings, screen titles
+title     24/27  Newsreader 500, -0.01em   document titles
+prose     16/26  Newsreader 400            plain-language summaries
+heading   17/22  Instrument Sans 600       row titles
+body      15/22  Instrument Sans 400       UI / body
+body-sm   13/19  Instrument Sans 400       secondary lines
+label     11.5/15 Instrument Sans 600, uppercase, 0.14em   tracked-caps eyebrows
+data      13/18  JetBrains Mono 500        amounts, dates
+meta      12/16  JetBrains Mono 400, 0.04em  metadata
 ```
+Floor: UI text never under 12px (tracked caps 11.5px). Respect the device text-size setting.
+
+### Logo
+`LogoMark` in `src/components/icons/index.tsx` — the waypoint compass. Colours follow the active theme (accent ring and waypoint, node start point, warning destination pin).
+
+### Motion
+150 / 250 / 400 ms (`duration` in tokens.ts). Quiet and purposeful; every animation respects reduced motion.
 
 ### Key Components
 - `Button` — variants: primary (accent bg), ghost (no bg), danger (red bg)
@@ -198,4 +220,4 @@ caption:   12px/500  (labels, badges)
 7. **SafeAreaView for top edge** — `edges={['top']}` for tab screens, `edges={['top', 'bottom']}` for scan/overlay
 8. **Colors pass as string props to icons** — use hex values matching token definitions (not class names for SVG colors)
 9. **Alert.alert uses `t()` for all strings** — never hardcoded dialog text
-10. **RefreshControl tintColor** uses `#92d9bb` hex (native prop, not a CSS class)
+10. **RefreshControl tintColor** uses `useThemeColors().accent` (native prop, not a CSS class; never a hardcoded hex)
